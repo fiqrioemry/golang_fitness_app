@@ -1,44 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <title>Dashboard Final Project Team 2</title>
-</head>
-<body>
-  <!-- dashboard final project team 2 starting point ... -->
-  <!-- Navbar -->
-  <header class="flex items-center justify-between bg-[#F5EFE3] py-5 px-10">
-    <div class="flex items-center justify-between border-[1px] border-solid border-[#F2BD57] rounded-3xl ml-[10px] w-[15rem] h-[2.5rem]">
-        <img class="w-5 ml-3" src="/image-source/Icon and Logo/ICON/search2.png" alt="cari">
-        <div class="bg-[#F2BD57] rounded-3xl w-[5rem] h-[2.5rem] border-[1px] border-solid border-[#F2BD57] ">
-            <div class="flex justify-center items-center text-xl p-1 font-semibold  ">Search</div>
-        </div>
-    </div>
-    <div class="flex flex-row items-center justify-center gap-5">
-        <div class="text-2xl font-bold text-[#553629]">Bang Ucok</div>
-        <img class="w-[50px]" src="/final-project-team-2/image-source/Icon and Logo/avatar.png" alt="avatar">
-        <div class="flex flex-row items-center justify-center gap-4">
-            <div class="relative flex items-center justify-center">
-                <div class="flex items-center justify-center bg-[#F2BD57] p-2 rounded-md">
-                    <img class="w-[20px]" src="/final-project-team-2/image-source/Icon and Logo/ICON/shopping-chart.png" alt="keranjang">
-                   
-                </div>
-                <div class="absolute -top-3 -right-2 w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
-                    <p class="text-sm text-white font-semibold">5</p>
-                </div>
-            </div>
-            <div class="flex items-center justify-center bg-[#F2BD57] p-2 rounded-md">
-                <img class="w-[20px]" src="/final-project-team-2/image-source/Icon and Logo/ICON/setting-logo.png" alt="pengaturan">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-            </div>
-            <div class="flex items-center justify-center bg-[#F2BD57] p-2 rounded-md">
-                <img class="w-[20px]" src="/final-project-team-2/image-source/Icon and Logo/pngegg (8).png" alt="keluar">
-            </div>
+    <title>Dashboard Final Project Team 2</title>
+    <!-- Tailwind CDN instalation link -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <!-- external icon instalation link -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  </head>
+  <body>
+    <!-- dashboard final project team 2 starting point ... -->
+    <!-- Navbar start point -->
+    <header class="flex items-center justify-between bg-[#F5EFE3] py-5 px-10">
+      <div class="flex items-center justify-between border-[1px] border-solid border-[#F2BD57] rounded-3xl ml-[10px] w-[15rem] h-[2.5rem]">
+        <img class="w-5 ml-3" src="/image-source/Icon and Logo/ICON/search2.png" alt="cari" />
+        <div class="bg-[#F2BD57] rounded-3xl w-[5rem] h-[2.5rem] border-[1px] border-solid border-[#F2BD57]">
+          <div class="flex justify-center items-center text-xl p-1 font-semibold">Search</div>
         </div>
-    </div>
-</header>
-</body>
+      </div>
+      <div class="flex flex-row items-center justify-center gap-5">
+        <div class="text-2xl font-bold text-[#553629]">Bang Ucok</div>
+        <img class="w-[50px]" src="/final-project-team-2/image-source/Icon and Logo/avatar.png" alt="avatar" />
+        <div class="flex flex-row items-center justify-center gap-4">
+          <div class="relative flex items-center justify-center">
+            <div class="flex items-center justify-center bg-[#F2BD57] p-2 rounded-md">
+              <img class="w-[20px]" src="/final-project-team-2/image-source/Icon and Logo/ICON/shopping-chart.png" alt="keranjang" />
+            </div>
+            <div class="absolute -top-3 -right-2 w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
+              <p class="text-sm text-white font-semibold">5</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-center bg-[#F2BD57] p-2 rounded-md">
+            <img class="w-[20px]" src="/final-project-team-2/image-source/Icon and Logo/ICON/setting-logo.png" alt="pengaturan" />
+          </div>
+          <div class="flex items-center justify-center bg-[#F2BD57] p-2 rounded-md">
+            <img class="w-[20px]" src="/final-project-team-2/image-source/Icon and Logo/pngegg (8).png" alt="keluar" />
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- Navbar End -->
+    <!-- Food Category start point -->
+    <section class="food-category font-['Poppins'] relative mx-auto py-3 px-[2.5rem] w-full bg-[#f5efe3]">
+      <div class="top-ctn-food flex mb-[20px] justify-between items-center px-6">
+        <div class="title-ctn-food bg-[#f2bd57] py-[5px] px-[10px] rounded-2xl">food cateogry</div>
+        <div class="option-field flex justify-between w-full uppercase max-w-[600px]">
+          <div class="option py-[5px] px-[10px] rounded-2xl border-2 border-[#f2bd57]">all</div>
+          <div class="option py-[5px] px-[10px] rounded-2xl border-2 border-[#f2bd57]">pizza</div>
+          <div class="option py-[5px] px-[10px] rounded-2xl border-2 border-[#f2bd57]">Rice</div>
+          <div class="option py-[5px] px-[10px] rounded-2xl border-2 border-[#f2bd57]">Burger</div>
+          <div class="option py-[5px] px-[10px] rounded-2xl border-2 border-[#f2bd57]">Noodle</div>
+          <div class="option py-[5px] px-[10px] rounded-2xl border-2 border-[#f2bd57]">Dessert</div>
+          <div class="option py-[5px] px-[10px] rounded-2xl border-2 border-[#f2bd57]">Healty</div>
+        </div>
+      </div>
+      <div class="bot-ctn-food mt-10 mb-10 px-[20px]">
+        <div class="pad-ctn-food relative flex justify-around items-center px-5">
+          <div class="menubox relative max-w-[320px] h-full max-h-[420px] bg-white p-4 rounded-xl">
+            <div class="pricing flex items-center justify-between text-[#f2bd57] text-xl">
+              <h3>Rp. 35.000</h3>
+              <div class="likes flex gap-1 w-14">
+                <button><img src="image-source/Icon and Logo/question" alt="" /></button>
+                <button><img src="images/like.png" alt="likes" /></button>
+              </div>
+            </div>
+            <div class="menu-img flex justify-center max-h-[200px] p-[10px]">
+              <img class="" src="images/nasi briyani.png" alt="" />
+            </div>
+            <div class="menu-title font-bold text-xl mb-2">
+              <h3>Nasi Briyani</h3>
+            </div>
+            <div class="menu-desc h-[100px] text-sm mb-3">A Delicious indian rice with lots of spices combined make it tasty and delightful with variant of taste</div>
+            <div class="order-menu flex justify-between align-middle">
+              <div class="qty flex max-w-[50px] gap-2">
+                <div class="increase">
+                  <button type="submit">-</button>
+                </div>
+                <div class="display-num">0</div>
+                <div class="increase">
+                  <button type="submit">+</button>
+                </div>
+              </div>
+              <div class="flex align-middle gap-1">
+                <button class="bg-[#f2bd57] grid place-content-center py-1 px-2"><ion-icon name="cart-outline"></ion-icon></button>
+                <button class="bg-[#f2bd57] py-1 px-2">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="menubox relative max-w-[320px] h-full max-h-[420px] bg-white p-4 rounded-xl">
+            <div class="pricing flex items-center justify-between text-[#f2bd57] text-xl">
+              <h3>Rp. 35.000</h3>
+              <div class="likes flex gap-1 w-14">
+                <button><img src="images/question.png" alt="" /></button>
+                <button><img src="images/like.png" alt="likes" /></button>
+              </div>
+            </div>
+            <div class="menu-img flex justify-center max-h-[200px] p-[10px]">
+              <img class="" src="images/nasi briyani.png" alt="" />
+            </div>
+            <div class="menu-title font-bold text-xl mb-2">
+              <h3>Nasi Briyani</h3>
+            </div>
+            <div class="menu-desc h-[100px] text-sm mb-3">A Delicious indian rice with lots of spices combined make it tasty and delightful with variant of taste</div>
+            <div class="order-menu flex justify-between align-middle">
+              <div class="qty flex max-w-[50px] gap-2">
+                <div class="increase">
+                  <button type="submit">-</button>
+                </div>
+                <div class="display-num">0</div>
+                <div class="increase">
+                  <button type="submit">+</button>
+                </div>
+              </div>
+              <div class="flex align-middle gap-1">
+                <button class="bg-[#f2bd57] grid place-content-center py-1 px-2"><ion-icon name="cart-outline"></ion-icon></button>
+                <button class="bg-[#f2bd57] py-1 px-2">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="menubox relative max-w-[320px] h-full max-h-[420px] bg-white p-4 rounded-xl">
+            <div class="pricing flex items-center justify-between text-[#f2bd57] text-xl">
+              <h3>Rp. 35.000</h3>
+              <div class="likes flex gap-1 w-14">
+                <button><img src="images/question.png" alt="" /></button>
+                <button><img src="images/like.png" alt="likes" /></button>
+              </div>
+            </div>
+            <div class="menu-img flex justify-center max-h-[200px] p-[10px]">
+              <img class="" src="images/nasi briyani.png" alt="" />
+            </div>
+            <div class="menu-title font-bold text-xl mb-2">
+              <h3>Nasi Briyani</h3>
+            </div>
+            <div class="menu-desc h-[100px] text-sm mb-3">A Delicious indian rice with lots of spices combined make it tasty and delightful with variant of taste</div>
+            <div class="order-menu flex justify-between align-middle">
+              <div class="qty flex max-w-[50px] gap-2">
+                <div class="increase">
+                  <button type="submit">-</button>
+                </div>
+                <div class="display-num">0</div>
+                <div class="increase">
+                  <button type="submit">+</button>
+                </div>
+              </div>
+              <div class="flex align-middle gap-1">
+                <button class="bg-[#f2bd57] grid place-content-center py-1 px-2"><ion-icon name="cart-outline"></ion-icon></button>
+                <button class="bg-[#f2bd57] py-1 px-2">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="menubox relative max-w-[320px] h-full max-h-[420px] bg-white p-4 rounded-xl">
+            <div class="pricing flex items-center justify-between text-[#f2bd57] text-xl">
+              <h3>Rp. 35.000</h3>
+              <div class="likes flex gap-1 w-14">
+                <button><img src="images/question.png" alt="" /></button>
+                <button><img src="images/like.png" alt="likes" /></button>
+              </div>
+            </div>
+            <div class="menu-img flex justify-center max-h-[200px] p-[10px]">
+              <img class="" src="images/nasi briyani.png" alt="" />
+            </div>
+            <div class="menu-title font-bold text-xl mb-2">
+              <h3>Nasi Briyani</h3>
+            </div>
+            <div class="menu-desc h-[100px] text-sm mb-3">A Delicious indian rice with lots of spices combined make it tasty and delightful with variant of taste</div>
+            <div class="order-menu flex justify-between align-middle">
+              <div class="qty flex max-w-[50px] gap-2">
+                <div class="increase">
+                  <button type="submit">-</button>
+                </div>
+                <div class="display-num">0</div>
+                <div class="increase">
+                  <button type="submit">+</button>
+                </div>
+              </div>
+              <div class="flex align-middle gap-1">
+                <button class="bg-[#f2bd57] grid place-content-center py-1 px-2"><ion-icon name="cart-outline"></ion-icon></button>
+                <button class="bg-[#f2bd57] py-1 px-2">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="slide-left absolute left-0"><button class="w-10 h-10 text-[25px] z-50 rounded-full bg-[#f2bd57]"><</button></div>
+          <div class="slide-left absolute right-0"><button class="w-10 h-10 text-[25px] z-50 rounded-full bg-[#f2bd57]">></button></div>
+        </div>
+      </div>
+    </section>
+    <!-- food category end point -->
+  </body>
 </html>
