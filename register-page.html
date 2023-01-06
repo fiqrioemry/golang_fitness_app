@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration Page</title>
+    <!-- tailwindcss CDN intalation -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <!-- external icon instalation link -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  </head>
+  <body>
+    <!-- registration page start here ...  -->
+    <div class="container flex p-[40px] min-h-screen bg-[#f5efe3] font-['Poppins']">
+      <div class="grid grid-cols-2 shadow-xl w-full bg-white">
+        <div class="flex w-full max-w-3xl bg-no-repeat justify-center items-center bg-emerald-400" style="background-image: url('image-source/background/pizza\ background.png')">
+          <div class="absolute p-10 z-50 top-5 left-5">
+            <div class="text-3xl font-bold text-white tracking-widest">FOODHOLIC</div>
+          </div>
+          <div class="relative flex justify-center items-center">
+            <div class="bg-images translate-x-24 -translate-y-10"><img class="w-4/5" src="image-source/background/bgc-image.png" alt="register-bg-image" /></div>
+            <div class="absolute text-6xl text-white">Healty and Tasty</div>
+          </div>
+        </div>
+        <div class="right-side flex flex-col p-3 w-full bg-white">
+          <div class="rs top-ctn: flex items-center justify-between mb-5">
+            <div class="return">
+              <a href=""><ion-icon name="arrow-back-outline"></ion-icon>Kembali ke home page</a>
+            </div>
+            <div class="lang-setting">
+              <button class="rounded-full bg-yellow-500 w-8">EN</button>
+              <button class="rounded-full bg-white w-8">IN</button>
+            </div>
+          </div>
+          <div class="rs middle-ctn flex flex-col items-center px-24">
+            <div class="rs title mb-6">
+              <div class="font-bold text-2xl">Bergabung Segera</div>
+            </div>
+            <form action="" method="post" class="mb-5 w-full">
+              <div class="form-fill flex flex-col mb-4 w-full">
+                <label for="namalengkap">Nama Lengkap</label>
+                <input class="py-2 px-4 text- rounded-md" type="text" name="namalengkap" id="namalengkap" placeholder="Masukkan nama kamu..." required />
+              </div>
+              <div class="form-fill flex flex-col mb-4 w-full">
+                <label for="email">Email</label>
+                <input class="py-2 px-4 rounded-md" type="text" name="email" id="email" placeholder="Masukkan email kamu..." required />
+              </div>
+              <div class="form-fill flex flex-col mb-4 w-full">
+                <label for="password">Password</label>
+                <input class="py-2 px-4 rounded-md" type="text" name="password" id="password" placeholder="Masukkan password kamu ..." required />
+              </div>
+              <div class="form-fill flex flex-col mb-4 w-full">
+                <label for="password2">Konfirmasi Password</label>
+                <input class="py-2 px-4 rounded-md mb-3" type="text" name="password2" id="password2" placeholder="Konfirmasi password kamu..." required />
+              </div>
+              <div class="form-submit">
+                <button class="text-2xl w-full py-3 px-7 bg-emerald-400 rounded-md active:scale-95" type="submit" name="submit">Daftar Sekarang</button>
+              </div>
+            </form>
+          </div>
+          <div class="bottom-ctn">
+            <div class="flex gap-2 justify-center">
+              <p>sudah punya akun?</p>
+              <a class="font-semibold" href="">masuk </a>
+            </div>
+            <div class="flex gap-2 justify-center">
+              <p>Lupa Password?</p>
+              <a class="font-semibold" href="#">Ganti Password </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- registration page ends here ...  -->
+  </body>
+</html>
