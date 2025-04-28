@@ -57,17 +57,32 @@ func main() {
 	typeService := services.NewTypeService(typeRepo)
 	typeHandler := handlers.NewTypeHandler(typeService)
 
+	// level class
+	levelRepo := repositories.NewLevelRepository(db)
+	levelService := services.NewLevelService(levelRepo)
+	levelHandler := handlers.NewLevelHandler(levelService)
+
+	// location class
+	locationRepo := repositories.NewLocationRepository(db)
+	locationService := services.NewLocationService(locationRepo)
+	locationHandler := handlers.NewLocationHandler(locationService)
+
 	routes.AuthRoutes(r, authHandler)
 	routes.TypeRoutes(r, typeHandler)
 	routes.ClassRoutes(r, classHandler)
+	routes.LevelRoutes(r, levelHandler)
 	routes.ProfileRoutes(r, profileHandler)
 	routes.CategoryRoutes(r, categoryHandler)
 	routes.SubcategoryRoutes(r, subcategoryHandler)
+	routes.LocationRoutes(r, locationHandler)
 
-	seeders.SeedTypes(db)
 	seeders.SeedUsers(db)
 	seeders.SeedCategories(db)
 	seeders.SeedSubcategories(db)
+	seeders.SeedTypes(db)
+	seeders.SeedLevels(db)
+	seeders.SeedLocations(db)
+	seeders.SeedClasses(db)
 
 	port := os.Getenv("PORT")
 	log.Println("server running on port:", port)

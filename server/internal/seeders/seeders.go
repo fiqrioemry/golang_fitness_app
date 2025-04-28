@@ -159,3 +159,170 @@ func SeedTypes(db *gorm.DB) {
 		log.Println("✅ Successfully seeded types!")
 	}
 }
+
+func SeedLevels(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Level{}).Count(&count)
+
+	if count > 0 {
+		log.Println("Levels already seeded, skipping...")
+		return
+	}
+
+	levels := []models.Level{
+		{ID: uuid.New(), Name: "Beginner"},
+		{ID: uuid.New(), Name: "Intermediate"},
+		{ID: uuid.New(), Name: "Advanced"},
+		{ID: uuid.New(), Name: "All Levels"},
+	}
+
+	if err := db.Create(&levels).Error; err != nil {
+		log.Printf("failed seeding levels: %v", err)
+	} else {
+		log.Println("✅ Successfully seeded levels!")
+	}
+}
+
+func SeedLocations(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Location{}).Count(&count)
+
+	if count > 0 {
+		log.Println("Locations already seeded, skipping...")
+		return
+	}
+
+	locations := []models.Location{
+		{
+			ID:          uuid.New(),
+			Name:        "Fitness Studio A",
+			Address:     "123 Fitness St, New York, NY",
+			GeoLocation: "40.712776,-74.005974", // Contoh lat, long
+		},
+		{
+			ID:          uuid.New(),
+			Name:        "Gym B",
+			Address:     "456 Gym Ave, Los Angeles, CA",
+			GeoLocation: "34.052235,-118.243683", // Contoh lat, long
+		},
+		{
+			ID:          uuid.New(),
+			Name:        "Yoga Center C",
+			Address:     "789 Yoga Rd, San Francisco, CA",
+			GeoLocation: "37.774929,-122.419418", // Contoh lat, long
+		},
+	}
+
+	if err := db.Create(&locations).Error; err != nil {
+		log.Printf("failed seeding locations: %v", err)
+	} else {
+		log.Println("✅ Successfully seeded locations!")
+	}
+}
+
+func SeedClasses(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Class{}).Count(&count)
+
+	if count > 0 {
+		log.Println("Classes already seeded, skipping...")
+		return
+	}
+
+	// Fetch necessary related data
+	var categories []models.Category
+	if err := db.Find(&categories).Error; err != nil {
+		log.Printf("failed to fetch categories: %v", err)
+		return
+	}
+
+	var subcategories []models.Subcategory
+	if err := db.Find(&subcategories).Error; err != nil {
+		log.Printf("failed to fetch subcategories: %v", err)
+		return
+	}
+
+	var types []models.Type
+	if err := db.Find(&types).Error; err != nil {
+		log.Printf("failed to fetch types: %v", err)
+		return
+	}
+
+	var levels []models.Level
+	if err := db.Find(&levels).Error; err != nil {
+		log.Printf("failed to fetch levels: %v", err)
+		return
+	}
+
+	var locations []models.Location
+	if err := db.Find(&locations).Error; err != nil {
+		log.Printf("failed to fetch locations: %v", err)
+		return
+	}
+
+	// Create sample class data
+	classes := []models.Class{
+		{
+			ID:             uuid.New(),
+			Title:          "Yoga Beginners",
+			Image:          "https://example.com/yoga-beginner.jpg",
+			Duration:       60,
+			Description:    "A gentle introduction to yoga.",
+			AdditionalList: []string{"Beginner", "Stretching", "Breathing"},
+			TypeID:         types[0].ID,  // Group Class
+			LevelID:        levels[0].ID, // Beginner
+			LocationID:     locations[0].ID,
+			CategoryID:     categories[0].ID,    // Yoga
+			SubcategoryID:  subcategories[0].ID, // Hatha Yoga
+			IsActive:       true,
+		},
+		{
+			ID:             uuid.New(),
+			Title:          "Strength Training - Intermediate",
+			Image:          "https://example.com/strength-training.jpg",
+			Duration:       90,
+			Description:    "A strength-building session for intermediate athletes.",
+			AdditionalList: []string{"Intermediate", "Strength", "Weightlifting"},
+			TypeID:         types[0].ID,  // Group Class
+			LevelID:        levels[1].ID, // Intermediate
+			LocationID:     locations[1].ID,
+			CategoryID:     categories[1].ID,    // Strength Training
+			SubcategoryID:  subcategories[1].ID, // Bodyweight Training
+			IsActive:       true,
+		},
+		{
+			ID:             uuid.New(),
+			Title:          "Zumba Dance Party",
+			Image:          "https://example.com/zumba-dance.jpg",
+			Duration:       60,
+			Description:    "A high-energy, fun dance workout.",
+			AdditionalList: []string{"Dance", "Cardio", "Party"},
+			TypeID:         types[0].ID,  // Group Class
+			LevelID:        levels[2].ID, // Advanced
+			LocationID:     locations[2].ID,
+			CategoryID:     categories[2].ID,    // Cardio
+			SubcategoryID:  subcategories[2].ID, // Zumba
+			IsActive:       true,
+		},
+		{
+			ID:             uuid.New(),
+			Title:          "Private Yoga Session",
+			Image:          "https://example.com/private-yoga.jpg",
+			Duration:       45,
+			Description:    "A one-on-one session with a yoga instructor.",
+			AdditionalList: []string{"Private", "Yoga", "Therapy"},
+			TypeID:         types[1].ID,  // Personal Training
+			LevelID:        levels[0].ID, // Beginner
+			LocationID:     locations[0].ID,
+			CategoryID:     categories[0].ID,    // Yoga
+			SubcategoryID:  subcategories[0].ID, // Vinyasa Yoga
+			IsActive:       true,
+		},
+	}
+
+	if err := db.Create(&classes).Error; err != nil {
+		log.Printf("failed seeding classes: %v", err)
+	} else {
+		log.Println("✅ Successfully seeded classes!")
+	}
+}

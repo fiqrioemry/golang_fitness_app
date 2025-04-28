@@ -172,3 +172,23 @@ type LevelResponse struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
+
+// location
+type CreateLocationRequest struct {
+	Name        string `json:"name" binding:"required,min=2"`
+	Address     string `json:"address" binding:"required"`
+	GeoLocation string `json:"geoLocation" binding:"required"`
+}
+
+type UpdateLocationRequest struct {
+	Name        string `json:"name" binding:"required,min=2"`
+	Address     string `json:"address" binding:"required"`
+	GeoLocation string `json:"geoLocation" binding:"required"`
+}
+
+type LocationResponse struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Address     string `json:"address"`
+	GeoLocation string `json:"geoLocation"`
+}
