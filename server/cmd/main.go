@@ -31,7 +31,7 @@ func main() {
 	authHandler := handlers.NewAuthHandler(authService)
 
 	profileRepo := repositories.NewProfileRepository(db)
-	profileService := services.NewProfileService(profileRepo, authService)
+	profileService := services.NewProfileService(profileRepo)
 	profileHandler := handlers.NewProfileHandler(profileService)
 
 	routes.AuthRoutes(r, authHandler)

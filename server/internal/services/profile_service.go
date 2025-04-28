@@ -1,29 +1,85 @@
 package services
 
 import (
+	"mime/multipart"
+	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
+	"server/internal/utils"
+	"time"
 )
 
 type ProfileService interface {
-	GetUserProfile(userID string) (*models.User, error)
-}
-type profileService struct {
-	profileRepo repositories.ProfileRepository
-	authService *authService
+	GetUserByID(userID string) (*models.User, error)
+	UpdateProfile(userID string, req dto.UpdateProfileRequest) error
+	UpdateAvatar(userID string, file *multipart.FileHeader) (string, error)
 }
 
-func NewProfileService(profileRepo repositories.ProfileRepository, authService *AuthService) *ProfileService {
-	return &profileService{
-		profileRepo: profileRepo,
-		authService: authService,
-	}
+type profileService struct {
+	repo repositories.ProfileRepository
 }
-func (s *authService) GetUserProfile(userID string) (*models.User, error) {
+
+func NewProfileService(repo repositories.ProfileRepository) ProfileService {
+	return &profileService{repo}
+}
+
+func (s *profileService) GetUserByID(userID string) (*models.User, error) {
+	return s.repo.GetUserByID(userID)
+}
+func (s *profileService) UpdateProfile(userID string, req dto.UpdateProfileRequest) error {
 	user, err := s.repo.GetUserByID(userID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return user, nil
+	user.Profile.Fullname = req.Fullname
+	user.Profile.Gender = req.Gender
+	user.Profile.Phone = req.Phone
+	user.Profile.Bio = req.Bio
+	if req.Birthday != "" {
+		birthday, err := time.Parse("2006-01-02", req.Birthday)
+		if err == nil {
+			user.Profile.Birthday = &birthday
+		}
+	}
+
+	return s.repo.UpdateUser(user)
+}
+
+func (s *profileService) UpdateAvatar(userID string, file *multipart.FileHeader) (string, error) {
+	user, err := s.repo.GetUserByID(userID)
+	if err != nil {
+		return "", err
+	}
+
+	if file == nil {
+		return "", nil
+	}
+
+	if err := utils.ValidateImageFile(file); err != nil {
+		return "", err
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+	defer src.Close()
+
+	newAvatarURL, err := utils.UploadToCloudinary(src)
+	if err != nil {
+		return "", err
+	}
+
+	if user.Profile.Avatar != "" && user.Profile.Avatar != newAvatarURL && !isDiceBear(user.Profile.Avatar) {
+		_ = utils.DeleteFromCloudinary(user.Profile.Avatar)
+	}
+
+	user.Profile.Avatar = newAvatarURL
+	err = s.repo.UpdateUser(user)
+	return newAvatarURL, err
+}
+
+func isDiceBear(url string) bool {
+	return url != "" && (len(url) > 0 && (url[:30] == "https://api.dicebear.com" || url[:31] == "https://avatars.dicebear.com"))
 }

@@ -5,7 +5,7 @@ import "time"
 type RegisterRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
-	Fullname string `json:"fullname" binding:"required,min=3"`
+	Fullname string `json:"fullname" binding:"required,min=5"`
 }
 
 type LoginRequest struct {
@@ -44,4 +44,12 @@ type ProfileResponse struct {
 	Bio       string    `json:"bio"`
 	Phone     string    `json:"phone"`
 	UpdatedAt time.Time `json:"joinedAt"`
+}
+
+type UpdateProfileRequest struct {
+	Fullname string `form:"fullname" binding:"required,min=5"`
+	Birthday string `form:"birthday"`
+	Gender   string `form:"gender"`
+	Phone    string `form:"phone"`
+	Bio      string `form:"bio"`
 }
