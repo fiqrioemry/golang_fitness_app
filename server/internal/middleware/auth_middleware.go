@@ -3,22 +3,15 @@ package middleware
 import (
 	"net/http"
 	"server/internal/utils"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Authorization header missing"})
-			return
-		}
-
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if tokenString == authHeader {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Invalid authorization header format"})
+		tokenString, err := c.Cookie("accessToken")
+		if err != nil || tokenString == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized!! Token missing"})
 			return
 		}
 
@@ -28,9 +21,8 @@ func AuthRequired() gin.HandlerFunc {
 			return
 		}
 
-		// inject userID dan role ke context
-		c.Set("userID", claims.UserID)
 		c.Set("role", claims.Role)
+		c.Set("userID", claims.UserID)
 
 		c.Next()
 	}

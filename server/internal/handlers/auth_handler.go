@@ -43,9 +43,10 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	utils.SetAccessTokenCookie(c, tokens.AccessToken)
 	utils.SetRefreshTokenCookie(c, tokens.RefreshToken)
 
-	c.JSON(http.StatusCreated, gin.H{"accessToken": tokens.AccessToken})
+	c.JSON(http.StatusOK, gin.H{"message": "Register Successfully"})
 }
 
 func (h *AuthHandler) VerifyOTP(c *gin.Context) {
@@ -74,9 +75,10 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	utils.SetAccessTokenCookie(c, tokens.AccessToken)
 	utils.SetRefreshTokenCookie(c, tokens.RefreshToken)
 
-	c.JSON(http.StatusOK, gin.H{"accessToken": tokens.AccessToken})
+	c.JSON(http.StatusOK, gin.H{"message": "Login Successfully"})
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
@@ -91,6 +93,7 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 		return
 	}
 
+	utils.ClearAccessTokenCookie(c)
 	utils.ClearRefreshTokenCookie(c)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Logout success"})
@@ -109,9 +112,11 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
+	utils.SetAccessTokenCookie(c, tokens.AccessToken)
+
 	utils.SetRefreshTokenCookie(c, tokens.RefreshToken)
 
-	c.JSON(http.StatusOK, gin.H{"accessToken": tokens.AccessToken})
+	c.JSON(http.StatusOK, gin.H{"message": "refresh successful"})
 }
 
 func (h *AuthHandler) AuthMe(c *gin.Context) {

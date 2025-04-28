@@ -171,13 +171,15 @@ func (s *authService) RefreshToken(refreshToken string) (*dto.AuthResponse, erro
 		return nil, errors.New("refresh token not found")
 	}
 
-	// Ambil user dari database
+	if tokenModel.ExpiredAt.Before(time.Now()) {
+		return nil, errors.New("refresh token expired")
+	}
+
 	user, err := s.repo.GetUserByID(tokenModel.UserID.String())
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
 
-	// generate new tokens pakai role dari DB
 	accessToken, err := utils.GenerateAccessToken(user.ID.String(), user.Role)
 	if err != nil {
 		return nil, err
@@ -188,7 +190,6 @@ func (s *authService) RefreshToken(refreshToken string) (*dto.AuthResponse, erro
 		return nil, err
 	}
 
-	// store new refresh token and delete old
 	if err := s.repo.DeleteRefreshToken(refreshToken); err != nil {
 		return nil, err
 	}

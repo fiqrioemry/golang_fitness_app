@@ -23,7 +23,7 @@ func GenerateAccessToken(userID, role string) (string, error) {
 		UserID: userID,
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(60 * time.Minute)),
 		},
 	}
 
@@ -86,6 +86,30 @@ func ClearRefreshTokenCookie(c *gin.Context) {
 		"refreshToken",
 		"",
 		-1, // expire segera
+		"/",
+		"",
+		true,
+		true,
+	)
+}
+
+func SetAccessTokenCookie(c *gin.Context, accessToken string) {
+	c.SetCookie(
+		"accessToken",
+		accessToken,
+		1*3600, // 1 jam
+		"/",
+		"",
+		true,
+		true,
+	)
+}
+
+func ClearAccessTokenCookie(c *gin.Context) {
+	c.SetCookie(
+		"accessToken",
+		"",
+		-1,
 		"/",
 		"",
 		true,
