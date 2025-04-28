@@ -56,6 +56,7 @@ func InitDatabase() {
 		&models.Token{},
 		&models.Location{},
 		&models.Category{},
+		&models.Subcategory{},
 		&models.Type{},
 		&models.Level{},
 		&models.Class{},

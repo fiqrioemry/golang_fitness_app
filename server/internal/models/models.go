@@ -239,6 +239,22 @@ func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+type Subcategory struct {
+	ID         uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	Name       string    `gorm:"type:varchar(255);not null" json:"name"`
+	CategoryID uuid.UUID `gorm:"type:char(36);not null" json:"categoryId"`
+
+	// Relationship
+	Category Category `gorm:"foreignKey:CategoryID"`
+}
+
+func (s *Subcategory) BeforeCreate(tx *gorm.DB) (err error) {
+	if s.ID == uuid.Nil {
+		s.ID = uuid.New()
+	}
+	return
+}
+
 type Type struct {
 	ID   uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	Name string    `gorm:"type:varchar(255);not null" json:"name"`

@@ -107,3 +107,34 @@ type ClassResponse struct {
 	CategoryID  string    `json:"categoryId"`
 	CreatedAt   time.Time `json:"createdAt"`
 }
+
+type CreateCategoryRequest struct {
+	Name string `json:"name" binding:"required,min=2"`
+}
+
+type UpdateCategoryRequest struct {
+	Name string `json:"name" binding:"required,min=2"`
+}
+
+type CategoryResponse struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// subcategory
+
+type CreateSubcategoryRequest struct {
+	Name       string `json:"name" binding:"required,min=2"`
+	CategoryID string `json:"categoryId" binding:"required"`
+}
+
+type UpdateSubcategoryRequest struct {
+	Name       string `json:"name" binding:"required,min=2"`
+	CategoryID string `json:"categoryId" binding:"required"`
+}
+
+type SubcategoryResponse struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	CategoryID string `json:"categoryId"`
+}
