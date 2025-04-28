@@ -57,30 +57,34 @@ type UpdateProfileRequest struct {
 	Bio      string `form:"bio"`
 }
 
+// class request
 type CreateClassRequest struct {
-	Title       string                `form:"title" binding:"required"`
-	Duration    int                   `form:"duration" binding:"required,min=15"`
-	Description string                `form:"description" binding:"required"`
-	Additional  []string              `form:"additional[]"`
-	TypeID      string                `form:"typeId" binding:"required"`
-	LevelID     string                `form:"levelId" binding:"required"`
-	LocationID  string                `form:"locationId" binding:"required"`
-	CategoryID  string                `form:"categoryId" binding:"required"`
-	Image       *multipart.FileHeader `form:"image" binding:"required"`
+	Title         string                `form:"title" binding:"required"`
+	Duration      int                   `form:"duration" binding:"required,min=15"`
+	Description   string                `form:"description" binding:"required"`
+	Additional    []string              `form:"additional[]"`
+	TypeID        string                `form:"typeId" binding:"required"`
+	LevelID       string                `form:"levelId" binding:"required"`
+	LocationID    string                `form:"locationId" binding:"required"`
+	CategoryID    string                `form:"categoryId" binding:"required"`
+	SubcategoryID string                `form:"subcategoryId" binding:"required"`
+	Image         *multipart.FileHeader `form:"image" binding:"required"`
 }
 
 type UpdateClassRequest struct {
-	Title       string                `form:"title"`
-	Duration    int                   `form:"duration"`
-	Description string                `form:"description"`
-	Additional  []string              `form:"additional[]"`
-	TypeID      string                `form:"typeId"`
-	LevelID     string                `form:"levelId"`
-	LocationID  string                `form:"locationId"`
-	CategoryID  string                `form:"categoryId"`
-	Image       *multipart.FileHeader `form:"image"`
+	Title         string                `form:"title"`
+	Duration      int                   `form:"duration"`
+	Description   string                `form:"description"`
+	Additional    []string              `form:"additional[]"`
+	TypeID        string                `form:"typeId"`
+	LevelID       string                `form:"levelId"`
+	LocationID    string                `form:"locationId"`
+	CategoryID    string                `form:"categoryId"`
+	SubcategoryID string                `form:"subcategoryId"`
+	Image         *multipart.FileHeader `form:"image"`
 }
 
+// class response
 type ClassQueryParam struct {
 	Q          string `form:"q"`
 	TypeID     string `form:"typeId"`
@@ -94,20 +98,22 @@ type ClassQueryParam struct {
 }
 
 type ClassResponse struct {
-	ID          string    `json:"id"`
-	Title       string    `json:"title"`
-	Image       string    `json:"image"`
-	IsActive    bool      `json:"isActive"`
-	Duration    int       `json:"duration"`
-	Description string    `json:"description"`
-	Additional  []string  `json:"additional"`
-	TypeID      string    `json:"typeId"`
-	LevelID     string    `json:"levelId"`
-	LocationID  string    `json:"locationId"`
-	CategoryID  string    `json:"categoryId"`
-	CreatedAt   time.Time `json:"createdAt"`
+	ID            string    `json:"id"`
+	Title         string    `json:"title"`
+	Image         string    `json:"image"`
+	IsActive      bool      `json:"isActive"`
+	Duration      int       `json:"duration"`
+	Description   string    `json:"description"`
+	Additional    []string  `json:"additional"`
+	TypeID        string    `json:"typeId"`
+	LevelID       string    `json:"levelId"`
+	LocationID    string    `json:"locationId"`
+	CategoryID    string    `json:"categoryId"`
+	SubcategoryID string    `json:"subcategoryId"`
+	CreatedAt     time.Time `json:"createdAt"`
 }
 
+// Category
 type CreateCategoryRequest struct {
 	Name string `json:"name" binding:"required,min=2"`
 }
@@ -121,7 +127,7 @@ type CategoryResponse struct {
 	Name string `json:"name"`
 }
 
-// subcategory
+// Subcategory
 
 type CreateSubcategoryRequest struct {
 	Name       string `json:"name" binding:"required,min=2"`
@@ -137,4 +143,13 @@ type SubcategoryResponse struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
 	CategoryID string `json:"categoryId"`
+}
+
+// Type
+type CreateTypeRequest struct {
+	Name string `json:"name" binding:"required,min=2"`
+}
+
+type UpdateTypeRequest struct {
+	Name string `json:"name" binding:"required,min=2"`
 }

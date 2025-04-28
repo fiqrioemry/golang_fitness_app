@@ -43,6 +43,7 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 	levelID, _ := uuid.Parse(req.LevelID)
 	locationID, _ := uuid.Parse(req.LocationID)
 	categoryID, _ := uuid.Parse(req.CategoryID)
+	subcategoryID, _ := uuid.Parse(req.SubcategoryID)
 
 	class := models.Class{
 		Title:          req.Title,
@@ -54,6 +55,7 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 		LevelID:        levelID,
 		LocationID:     locationID,
 		CategoryID:     categoryID,
+		SubcategoryID:  subcategoryID, // <-- Tambahan baru
 		IsActive:       true,
 		CreatedAt:      time.Now(),
 	}
@@ -94,6 +96,11 @@ func (s *classService) UpdateClass(id string, req dto.UpdateClassRequest) error 
 	if req.CategoryID != "" {
 		categoryID, _ := uuid.Parse(req.CategoryID)
 		class.CategoryID = categoryID
+	}
+
+	if req.SubcategoryID != "" {
+		subcategoryID, _ := uuid.Parse(req.SubcategoryID)
+		class.SubcategoryID = subcategoryID
 	}
 
 	if req.Image != nil {
@@ -137,19 +144,21 @@ func (s *classService) GetClassByID(id string) (*dto.ClassResponse, error) {
 	}
 
 	return &dto.ClassResponse{
-		ID:          class.ID.String(),
-		Title:       class.Title,
-		Image:       class.Image,
-		IsActive:    class.IsActive,
-		Duration:    class.Duration,
-		Description: class.Description,
-		Additional:  class.AdditionalList,
-		TypeID:      class.TypeID.String(),
-		LevelID:     class.LevelID.String(),
-		LocationID:  class.LocationID.String(),
-		CategoryID:  class.CategoryID.String(),
-		CreatedAt:   class.CreatedAt,
+		ID:            class.ID.String(),
+		Title:         class.Title,
+		Image:         class.Image,
+		IsActive:      class.IsActive,
+		Duration:      class.Duration,
+		Description:   class.Description,
+		Additional:    class.AdditionalList,
+		TypeID:        class.TypeID.String(),
+		LevelID:       class.LevelID.String(),
+		LocationID:    class.LocationID.String(),
+		CategoryID:    class.CategoryID.String(),
+		SubcategoryID: class.SubcategoryID.String(),
+		CreatedAt:     class.CreatedAt,
 	}, nil
+
 }
 
 func (s *classService) GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassResponse, int64, error) {
@@ -184,19 +193,21 @@ func (s *classService) GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassRes
 	var result []dto.ClassResponse
 	for _, c := range classes {
 		result = append(result, dto.ClassResponse{
-			ID:          c.ID.String(),
-			Title:       c.Title,
-			Image:       c.Image,
-			IsActive:    c.IsActive,
-			Duration:    c.Duration,
-			Description: c.Description,
-			Additional:  c.AdditionalList,
-			TypeID:      c.TypeID.String(),
-			LevelID:     c.LevelID.String(),
-			LocationID:  c.LocationID.String(),
-			CategoryID:  c.CategoryID.String(),
-			CreatedAt:   c.CreatedAt,
+			ID:            c.ID.String(),
+			Title:         c.Title,
+			Image:         c.Image,
+			IsActive:      c.IsActive,
+			Duration:      c.Duration,
+			Description:   c.Description,
+			Additional:    c.AdditionalList,
+			TypeID:        c.TypeID.String(),
+			LevelID:       c.LevelID.String(),
+			LocationID:    c.LocationID.String(),
+			CategoryID:    c.CategoryID.String(),
+			SubcategoryID: c.SubcategoryID.String(),
+			CreatedAt:     c.CreatedAt,
 		})
+
 	}
 
 	return result, total, nil
@@ -211,18 +222,19 @@ func (s *classService) GetActiveClasses() ([]dto.ClassResponse, error) {
 	var result []dto.ClassResponse
 	for _, c := range classes {
 		result = append(result, dto.ClassResponse{
-			ID:          c.ID.String(),
-			Title:       c.Title,
-			Image:       c.Image,
-			IsActive:    c.IsActive,
-			Duration:    c.Duration,
-			Description: c.Description,
-			Additional:  c.AdditionalList,
-			TypeID:      c.TypeID.String(),
-			LevelID:     c.LevelID.String(),
-			LocationID:  c.LocationID.String(),
-			CategoryID:  c.CategoryID.String(),
-			CreatedAt:   c.CreatedAt,
+			ID:            c.ID.String(),
+			Title:         c.Title,
+			Image:         c.Image,
+			IsActive:      c.IsActive,
+			Duration:      c.Duration,
+			Description:   c.Description,
+			Additional:    c.AdditionalList,
+			TypeID:        c.TypeID.String(),
+			LevelID:       c.LevelID.String(),
+			LocationID:    c.LocationID.String(),
+			CategoryID:    c.CategoryID.String(),
+			SubcategoryID: c.SubcategoryID.String(),
+			CreatedAt:     c.CreatedAt,
 		})
 	}
 

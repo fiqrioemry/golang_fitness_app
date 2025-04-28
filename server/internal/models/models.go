@@ -79,13 +79,15 @@ type Class struct {
 	LevelID        uuid.UUID `json:"levelId"`
 	LocationID     uuid.UUID `json:"locationId"`
 	CategoryID     uuid.UUID `json:"categoryId"`
+	SubcategoryID  uuid.UUID `json:"subcategoryId"`
 	CreatedAt      time.Time `gorm:"autoCreateTime" json:"createdAt"`
 
 	// relationship
-	Type     Type     `gorm:"foreignKey:TypeID"`
-	Level    Level    `gorm:"foreignKey:LevelID"`
-	Category Category `gorm:"foreignKey:CategoryID"`
-	Location Location `gorm:"foreignKey:LocationID"`
+	Type        Type        `gorm:"foreignKey:TypeID"`
+	Level       Level       `gorm:"foreignKey:LevelID"`
+	Category    Category    `gorm:"foreignKey:CategoryID"`
+	Subcategory Subcategory `gorm:"foreignKey:SubcategoryID"`
+	Location    Location    `gorm:"foreignKey:LocationID"`
 }
 
 func (c *Class) BeforeSave(tx *gorm.DB) (err error) {
@@ -217,6 +219,7 @@ func (p *Payment) BeforeCreate(tx *gorm.DB) (err error) {
 type Location struct {
 	ID          uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	Name        string    `gorm:"type:varchar(255);not null" json:"name"`
+	Address     string    `gorm:"type:varchar(255);not null" json:"address"`
 	GeoLocation string    `gorm:"type:varchar(255);not null" json:"geoLocation"`
 }
 
