@@ -69,6 +69,7 @@ type CreateClassRequest struct {
 	CategoryID    string                `form:"categoryId" binding:"required"`
 	SubcategoryID string                `form:"subcategoryId" binding:"required"`
 	Image         *multipart.FileHeader `form:"image" binding:"required"`
+	ImageURL      string                `form:"-"`
 }
 
 type UpdateClassRequest struct {
@@ -82,6 +83,7 @@ type UpdateClassRequest struct {
 	CategoryID    string                `form:"categoryId"`
 	SubcategoryID string                `form:"subcategoryId"`
 	Image         *multipart.FileHeader `form:"image"`
+	ImageURL      string                `form:"-"`
 }
 
 // class response
@@ -97,20 +99,36 @@ type ClassQueryParam struct {
 	Sort       string `form:"sort,default=latest"`
 }
 
+type ClassDetailResponse struct {
+	ID             string   `json:"id"`
+	Title          string   `json:"title"`
+	Image          string   `json:"image"`
+	IsActive       bool     `json:"isActive"`
+	Duration       int      `json:"duration"`
+	Description    string   `json:"description"`
+	AdditionalList []string `json:"additional"`
+	Type           string   `json:"type"`
+	Level          string   `json:"level"`
+	Location       string   `json:"location"`
+	Category       string   `json:"category"`
+	Subcategory    string   `json:"subcategory"`
+	CreatedAt      string   `json:"createdAt"`
+}
+
 type ClassResponse struct {
-	ID            string    `json:"id"`
-	Title         string    `json:"title"`
-	Image         string    `json:"image"`
-	IsActive      bool      `json:"isActive"`
-	Duration      int       `json:"duration"`
-	Description   string    `json:"description"`
-	Additional    []string  `json:"additional"`
-	TypeID        string    `json:"typeId"`
-	LevelID       string    `json:"levelId"`
-	LocationID    string    `json:"locationId"`
-	CategoryID    string    `json:"categoryId"`
-	SubcategoryID string    `json:"subcategoryId"`
-	CreatedAt     time.Time `json:"createdAt"`
+	ID             string   `json:"id"`
+	Title          string   `json:"title"`
+	Image          string   `json:"image"`
+	IsActive       bool     `json:"isActive"`
+	Duration       int      `json:"duration"`
+	Description    string   `json:"description"`
+	AdditionalList []string `json:"additional"`
+	TypeID         string   `json:"typeId"`
+	LevelID        string   `json:"levelId"`
+	LocationID     string   `json:"locationId"`
+	CategoryID     string   `json:"categoryId"`
+	SubcategoryID  string   `json:"subcategoryId"`
+	CreatedAt      string   `json:"createdAt"`
 }
 
 // Category

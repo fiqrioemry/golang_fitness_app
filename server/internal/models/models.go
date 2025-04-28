@@ -83,11 +83,21 @@ type Class struct {
 	CreatedAt      time.Time `gorm:"autoCreateTime" json:"createdAt"`
 
 	// relationship
-	Type        Type        `gorm:"foreignKey:TypeID"`
-	Level       Level       `gorm:"foreignKey:LevelID"`
-	Category    Category    `gorm:"foreignKey:CategoryID"`
-	Subcategory Subcategory `gorm:"foreignKey:SubcategoryID"`
-	Location    Location    `gorm:"foreignKey:LocationID"`
+	Gallery     ClassGallery `gorm:"foreignKey:classID"`
+	Type        Type         `gorm:"foreignKey:TypeID"`
+	Level       Level        `gorm:"foreignKey:LevelID"`
+	Category    Category     `gorm:"foreignKey:CategoryID"`
+	Subcategory Subcategory  `gorm:"foreignKey:SubcategoryID"`
+	Location    Location     `gorm:"foreignKey:LocationID"`
+
+	Galleries []*ClassGallery `gorm:"foreignKey:ClassID" json:"galleries,omitempty"`
+}
+
+type ClassGallery struct {
+	ID        uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	ClassID   uuid.UUID `gorm:"type:char(36);not null;index" json:"classId"`
+	URL       string    `gorm:"type:varchar(255);not null" json:"imageUrl"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
 }
 
 func (c *Class) BeforeSave(tx *gorm.DB) (err error) {

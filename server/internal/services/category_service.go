@@ -43,6 +43,11 @@ func (s *categoryService) UpdateCategory(id string, req dto.UpdateCategoryReques
 }
 
 func (s *categoryService) DeleteCategory(id string) error {
+	_, err := s.repo.GetCategoryByID(id)
+	if err != nil {
+		return err
+	}
+
 	return s.repo.DeleteCategory(id)
 }
 

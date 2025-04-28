@@ -43,6 +43,11 @@ func (s *levelService) UpdateLevel(id string, req dto.UpdateLevelRequest) error 
 }
 
 func (s *levelService) DeleteLevel(id string) error {
+	_, err := s.repo.GetLevelByID(id)
+	if err != nil {
+		return err
+	}
+
 	return s.repo.DeleteLevel(id)
 }
 

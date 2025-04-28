@@ -43,6 +43,11 @@ func (s *typeService) UpdateType(id string, req dto.UpdateTypeRequest) error {
 }
 
 func (s *typeService) DeleteType(id string) error {
+	_, err := s.repo.GetTypeByID(id)
+	if err != nil {
+		return err
+	}
+
 	return s.repo.DeleteType(id)
 }
 

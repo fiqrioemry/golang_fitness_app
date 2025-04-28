@@ -52,6 +52,10 @@ func (s *subcategoryService) UpdateSubcategory(id string, req dto.UpdateSubcateg
 }
 
 func (s *subcategoryService) DeleteSubcategory(id string) error {
+	_, err := s.repo.GetSubcategoryByID(id)
+	if err != nil {
+		return err
+	}
 	return s.repo.DeleteSubcategory(id)
 }
 

@@ -17,7 +17,7 @@ import (
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 )
 
-const MaxFileSize = 1 * 1024 * 1024
+const MaxFileSize = 1 * 1024 * 1024 // sesuaikan mau berapa MB (jangan lupa limiter juga di set dari 5MB)
 
 var AllowedImageTypes = []string{"image/jpeg", "image/png", "image/gif", "image/webp"}
 
@@ -98,6 +98,39 @@ func isAllowedImageType(fileType string) bool {
 		}
 	}
 	return false
+}
+
+func UploadImageWithValidation(fileHeader *multipart.FileHeader) (string, error) {
+	if fileHeader == nil {
+		return "", errors.New("no image file provided")
+	}
+
+	// Validate size and type
+	if err := ValidateImageFile(fileHeader); err != nil {
+		return "", err
+	}
+
+	// Open file
+	file, err := fileHeader.Open()
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	// Upload to Cloudinary
+	imageURL, err := UploadToCloudinary(file)
+	if err != nil {
+		return "", err
+	}
+
+	return imageURL, nil
+}
+
+// CleanupImageOnError menghapus gambar dari Cloudinary jika terjadi error
+func CleanupImageOnError(imageURL string) {
+	if imageURL != "" {
+		_ = DeleteFromCloudinary(imageURL)
+	}
 }
 
 func UploadToLocal(file multipart.File, fileHeader *multipart.FileHeader) (string, error) {

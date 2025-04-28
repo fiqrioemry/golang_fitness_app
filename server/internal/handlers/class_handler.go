@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"server/internal/dto"
 	"server/internal/services"
+	"server/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,7 +24,15 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 		return
 	}
 
+	imageURL, err := utils.UploadImageWithValidation(req.Image)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Image upload failed", "error": err.Error()})
+		return
+	}
+	req.ImageURL = imageURL
+
 	if err := h.classService.CreateClass(req); err != nil {
+		utils.CleanupImageOnError(imageURL)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create class", "error": err.Error()})
 		return
 	}
@@ -39,7 +48,17 @@ func (h *ClassHandler) UpdateClass(c *gin.Context) {
 		return
 	}
 
+	if req.Image != nil {
+		imageURL, err := utils.UploadImageWithValidation(req.Image)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Image upload failed", "error": err.Error()})
+			return
+		}
+		req.ImageURL = imageURL
+	}
+
 	if err := h.classService.UpdateClass(id, req); err != nil {
+		utils.CleanupImageOnError(req.ImageURL)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update class", "error": err.Error()})
 		return
 	}
@@ -67,7 +86,23 @@ func (h *ClassHandler) GetClassByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, class)
+	classResponse := dto.ClassDetailResponse{
+		ID:             class.ID,
+		Title:          class.Title,
+		Image:          class.Image,
+		IsActive:       class.IsActive,
+		Duration:       class.Duration,
+		Description:    class.Description,
+		AdditionalList: class.AdditionalList,
+		Type:           class.Type,
+		Level:          class.Level,
+		Location:       class.Location,
+		Category:       class.Category,
+		Subcategory:    class.Subcategory,
+		CreatedAt:      class.CreatedAt,
+	}
+
+	c.JSON(http.StatusOK, classResponse)
 }
 
 func (h *ClassHandler) GetAllClasses(c *gin.Context) {

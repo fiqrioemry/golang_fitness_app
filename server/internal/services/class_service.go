@@ -14,7 +14,7 @@ type ClassService interface {
 	CreateClass(req dto.CreateClassRequest) error
 	UpdateClass(id string, req dto.UpdateClassRequest) error
 	DeleteClass(id string) error
-	GetClassByID(id string) (*dto.ClassResponse, error)
+	GetClassByID(id string) (*dto.ClassDetailResponse, error)
 	GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassResponse, int64, error)
 	GetActiveClasses() ([]dto.ClassResponse, error)
 }
@@ -28,26 +28,30 @@ func NewClassService(repo repositories.ClassRepository) ClassService {
 }
 
 func (s *classService) CreateClass(req dto.CreateClassRequest) error {
-	file, err := req.Image.Open()
+	typeID, err := uuid.Parse(req.TypeID)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
-
-	imageUrl, err := utils.UploadToCloudinary(file)
+	levelID, err := uuid.Parse(req.LevelID)
 	if err != nil {
 		return err
 	}
-
-	typeID, _ := uuid.Parse(req.TypeID)
-	levelID, _ := uuid.Parse(req.LevelID)
-	locationID, _ := uuid.Parse(req.LocationID)
-	categoryID, _ := uuid.Parse(req.CategoryID)
-	subcategoryID, _ := uuid.Parse(req.SubcategoryID)
+	locationID, err := uuid.Parse(req.LocationID)
+	if err != nil {
+		return err
+	}
+	categoryID, err := uuid.Parse(req.CategoryID)
+	if err != nil {
+		return err
+	}
+	subcategoryID, err := uuid.Parse(req.SubcategoryID)
+	if err != nil {
+		return err
+	}
 
 	class := models.Class{
 		Title:          req.Title,
-		Image:          imageUrl,
+		Image:          req.ImageURL,
 		Duration:       req.Duration,
 		Description:    req.Description,
 		AdditionalList: req.Additional,
@@ -55,7 +59,7 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 		LevelID:        levelID,
 		LocationID:     locationID,
 		CategoryID:     categoryID,
-		SubcategoryID:  subcategoryID, // <-- Tambahan baru
+		SubcategoryID:  subcategoryID,
 		IsActive:       true,
 		CreatedAt:      time.Now(),
 	}
@@ -115,9 +119,13 @@ func (s *classService) UpdateClass(id string, req dto.UpdateClassRequest) error 
 			return err
 		}
 
-		if class.Image != "" {
-			_ = utils.DeleteFromCloudinary(class.Image)
+		if req.ImageURL != "" {
+			if class.Image != "" {
+				_ = utils.DeleteFromCloudinary(class.Image)
+			}
+			class.Image = req.ImageURL
 		}
+
 		class.Image = newImageUrl
 	}
 
@@ -137,26 +145,26 @@ func (s *classService) DeleteClass(id string) error {
 	return s.repo.DeleteClass(id)
 }
 
-func (s *classService) GetClassByID(id string) (*dto.ClassResponse, error) {
+func (s *classService) GetClassByID(id string) (*dto.ClassDetailResponse, error) {
 	class, err := s.repo.GetClassByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.ClassResponse{
-		ID:            class.ID.String(),
-		Title:         class.Title,
-		Image:         class.Image,
-		IsActive:      class.IsActive,
-		Duration:      class.Duration,
-		Description:   class.Description,
-		Additional:    class.AdditionalList,
-		TypeID:        class.TypeID.String(),
-		LevelID:       class.LevelID.String(),
-		LocationID:    class.LocationID.String(),
-		CategoryID:    class.CategoryID.String(),
-		SubcategoryID: class.SubcategoryID.String(),
-		CreatedAt:     class.CreatedAt,
+	return &dto.ClassDetailResponse{
+		ID:             class.ID.String(),
+		Title:          class.Title,
+		Image:          class.Image,
+		IsActive:       class.IsActive,
+		Duration:       class.Duration,
+		Description:    class.Description,
+		AdditionalList: class.AdditionalList,
+		Type:           class.Type.Name,
+		Level:          class.Level.Name,
+		Location:       class.Location.Name,
+		Category:       class.Category.Name,
+		Subcategory:    class.Subcategory.Name,
+		CreatedAt:      class.CreatedAt.String(),
 	}, nil
 
 }
@@ -193,19 +201,19 @@ func (s *classService) GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassRes
 	var result []dto.ClassResponse
 	for _, c := range classes {
 		result = append(result, dto.ClassResponse{
-			ID:            c.ID.String(),
-			Title:         c.Title,
-			Image:         c.Image,
-			IsActive:      c.IsActive,
-			Duration:      c.Duration,
-			Description:   c.Description,
-			Additional:    c.AdditionalList,
-			TypeID:        c.TypeID.String(),
-			LevelID:       c.LevelID.String(),
-			LocationID:    c.LocationID.String(),
-			CategoryID:    c.CategoryID.String(),
-			SubcategoryID: c.SubcategoryID.String(),
-			CreatedAt:     c.CreatedAt,
+			ID:             c.ID.String(),
+			Title:          c.Title,
+			Image:          c.Image,
+			IsActive:       c.IsActive,
+			Duration:       c.Duration,
+			Description:    c.Description,
+			AdditionalList: c.AdditionalList,
+			TypeID:         c.TypeID.String(),
+			LevelID:        c.LevelID.String(),
+			LocationID:     c.LocationID.String(),
+			CategoryID:     c.CategoryID.String(),
+			SubcategoryID:  c.SubcategoryID.String(),
+			CreatedAt:      c.CreatedAt.String(),
 		})
 
 	}
@@ -222,19 +230,19 @@ func (s *classService) GetActiveClasses() ([]dto.ClassResponse, error) {
 	var result []dto.ClassResponse
 	for _, c := range classes {
 		result = append(result, dto.ClassResponse{
-			ID:            c.ID.String(),
-			Title:         c.Title,
-			Image:         c.Image,
-			IsActive:      c.IsActive,
-			Duration:      c.Duration,
-			Description:   c.Description,
-			Additional:    c.AdditionalList,
-			TypeID:        c.TypeID.String(),
-			LevelID:       c.LevelID.String(),
-			LocationID:    c.LocationID.String(),
-			CategoryID:    c.CategoryID.String(),
-			SubcategoryID: c.SubcategoryID.String(),
-			CreatedAt:     c.CreatedAt,
+			ID:             c.ID.String(),
+			Title:          c.Title,
+			Image:          c.Image,
+			IsActive:       c.IsActive,
+			Duration:       c.Duration,
+			Description:    c.Description,
+			AdditionalList: c.AdditionalList,
+			TypeID:         c.TypeID.String(),
+			LevelID:        c.LevelID.String(),
+			LocationID:     c.LocationID.String(),
+			CategoryID:     c.CategoryID.String(),
+			SubcategoryID:  c.SubcategoryID.String(),
+			CreatedAt:      c.CreatedAt.String(),
 		})
 	}
 
