@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -66,23 +67,47 @@ func (p *Profile) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Class struct {
-	ID          uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	Title       string    `gorm:"type:varchar(255);not null" json:"title"`
-	Image       string    `gorm:"type:varchar(255);not null" json:"image"`
-	IsActive    bool      `gorm:"default:true" json:"isActive"`
-	Duration    int       `gorm:"not null" json:"duration"`
-	Description string    `gorm:"type:text" json:"description"`
-	Additional  string    `gorm:"type:text" json:"additional"` // <- Fix: sebelumnya datatypes.JSON
-	TypeID      uuid.UUID `json:"typeId"`
-	LevelID     uuid.UUID `json:"levelId"`
-	LocationID  uuid.UUID `json:"locationId"`
-	CategoryID  uuid.UUID `json:"categoryId"`
-	CreatedAt   time.Time `gorm:"autoCreateTime" json:"createdAt"`
+	ID             uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	Title          string    `gorm:"type:varchar(255);not null" json:"title"`
+	Image          string    `gorm:"type:varchar(255);not null" json:"image"`
+	IsActive       bool      `gorm:"default:true" json:"isActive"`
+	Duration       int       `gorm:"not null" json:"duration"`
+	Description    string    `gorm:"type:text" json:"description"`
+	Additional     string    `gorm:"type:longtext" json:"-"`
+	AdditionalList []string  `gorm:"-" json:"additional"`
+	TypeID         uuid.UUID `json:"typeId"`
+	LevelID        uuid.UUID `json:"levelId"`
+	LocationID     uuid.UUID `json:"locationId"`
+	CategoryID     uuid.UUID `json:"categoryId"`
+	CreatedAt      time.Time `gorm:"autoCreateTime" json:"createdAt"`
 
+	// relationship
 	Type     Type     `gorm:"foreignKey:TypeID"`
 	Level    Level    `gorm:"foreignKey:LevelID"`
 	Category Category `gorm:"foreignKey:CategoryID"`
 	Location Location `gorm:"foreignKey:LocationID"`
+}
+
+func (c *Class) BeforeSave(tx *gorm.DB) (err error) {
+	if c.AdditionalList != nil {
+		jsonBytes, err := json.Marshal(c.AdditionalList)
+		if err != nil {
+			return err
+		}
+		c.Additional = string(jsonBytes)
+	}
+	return nil
+}
+
+func (c *Class) AfterFind(tx *gorm.DB) (err error) {
+	if c.Additional != "" {
+		var tags []string
+		if err := json.Unmarshal([]byte(c.Additional), &tags); err != nil {
+			return err
+		}
+		c.AdditionalList = tags
+	}
+	return nil
 }
 
 func (c *Class) BeforeCreate(tx *gorm.DB) (err error) {

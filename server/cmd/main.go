@@ -34,7 +34,12 @@ func main() {
 	profileService := services.NewProfileService(profileRepo)
 	profileHandler := handlers.NewProfileHandler(profileService)
 
+	classRepo := repositories.NewClassRepository(db)
+	classService := services.NewClassService(classRepo)
+	classHandler := handlers.NewClassHandler(classService)
+
 	routes.AuthRoutes(r, authHandler)
+	routes.ClassRoutes(r, classHandler)
 	routes.ProfileRoutes(r, profileHandler)
 
 	port := os.Getenv("PORT")
