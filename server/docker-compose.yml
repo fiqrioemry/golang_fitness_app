@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mysql:8
+    container_name: mysql-user
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Oemry241995@
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  server:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: fitness-app
+    env_file:
+      - ./.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+      - db
+    volumes:
+      - .:/app
+
+volumes:
+  mysql-data:

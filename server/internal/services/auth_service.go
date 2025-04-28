@@ -1,0 +1,209 @@
+package services
+
+import (
+	"errors"
+	"fmt"
+	"server/internal/config"
+	"server/internal/dto"
+	"server/internal/models"
+	"server/internal/repositories"
+	"server/internal/utils"
+	"time"
+)
+
+type AuthService interface {
+	GetUserProfile(userID string) (*models.User, error)
+	Register(req *dto.RegisterRequest) (*dto.AuthResponse, error)
+	Login(req *dto.LoginRequest) (*dto.AuthResponse, error)
+	Logout(refreshToken string) error
+	RefreshToken(refreshToken string) (*dto.AuthResponse, error)
+	SendOTP(email string) error
+	VerifyOTP(email, otp string) error
+}
+
+type authService struct {
+	repo repositories.AuthRepository
+}
+
+func NewAuthService(repo repositories.AuthRepository) AuthService {
+	return &authService{repo}
+}
+
+func (s *authService) SendOTP(email string) error {
+	_, err := s.repo.GetUserByEmail(email)
+	if err == nil {
+		return errors.New("email already registered")
+	}
+
+	otp := utils.GenerateOTP(6)
+	body := fmt.Sprintf("Your OTP code is %s", otp)
+
+	err = utils.SendEmail(email, otp, body)
+	if err != nil {
+		return errors.New("failed to send email")
+	}
+
+	err = config.RedisClient.Set(config.Ctx, "otp:"+email, otp, 5*time.Minute).Err()
+	return err
+}
+
+func (s *authService) GetUserProfile(userID string) (*models.User, error) {
+	user, err := s.repo.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (s *authService) VerifyOTP(email, otp string) error {
+	savedOtp, err := config.RedisClient.Get(config.Ctx, "otp:"+email).Result()
+	if err != nil {
+		return errors.New("otp expired or invalid")
+	}
+
+	if savedOtp != otp {
+		return errors.New("invalid OTP code")
+	}
+
+	config.RedisClient.Del(config.Ctx, "otp:"+email)
+	return nil
+}
+
+func (s *authService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, error) {
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	profile := models.Profile{
+		Fullname: req.Fullname,
+		Avatar:   utils.RandomUserAvatar(),
+	}
+
+	user := models.User{
+		Email:    req.Email,
+		Password: hashedPassword,
+		Role:     "customer",
+		Profile:  profile,
+	}
+
+	if err := s.repo.CreateUser(&user); err != nil {
+		return nil, err
+	}
+
+	userID := user.ID.String()
+
+	accessToken, err := utils.GenerateAccessToken(userID, user.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := utils.GenerateRefreshToken(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	tokenModel := &models.Token{
+		UserID:    user.ID,
+		Token:     refreshToken,
+		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
+	}
+	if err := s.repo.StoreRefreshToken(tokenModel); err != nil {
+		return nil, err
+	}
+
+	return &dto.AuthResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
+}
+
+func (s *authService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
+	user, err := s.repo.GetUserByEmail(req.Email)
+	if err != nil {
+		return nil, errors.New("invalid credentials")
+	}
+
+	if !utils.CheckPasswordHash(req.Password, user.Password) {
+		return nil, errors.New("invalid credentials")
+	}
+
+	// generate tokens
+	accessToken, err := utils.GenerateAccessToken(user.ID.String(), user.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := utils.GenerateRefreshToken(user.ID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	tokenModel := &models.Token{
+		UserID:    user.ID,
+		Token:     refreshToken,
+		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
+	}
+	if err := s.repo.StoreRefreshToken(tokenModel); err != nil {
+		return nil, err
+	}
+
+	return &dto.AuthResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
+}
+
+func (s *authService) Logout(refreshToken string) error {
+	return s.repo.DeleteRefreshToken(refreshToken)
+}
+
+func (s *authService) RefreshToken(refreshToken string) (*dto.AuthResponse, error) {
+
+	_, err := utils.DecodeRefreshToken(refreshToken)
+	if err != nil {
+		return nil, errors.New("invalid refresh token")
+	}
+
+	tokenModel, err := s.repo.FindRefreshToken(refreshToken)
+	if err != nil {
+		return nil, errors.New("refresh token not found")
+	}
+
+	// Ambil user dari database
+	user, err := s.repo.GetUserByID(tokenModel.UserID.String())
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	// generate new tokens pakai role dari DB
+	accessToken, err := utils.GenerateAccessToken(user.ID.String(), user.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	newRefreshToken, err := utils.GenerateRefreshToken(user.ID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	// store new refresh token and delete old
+	if err := s.repo.DeleteRefreshToken(refreshToken); err != nil {
+		return nil, err
+	}
+
+	newToken := &models.Token{
+		UserID:    user.ID,
+		Token:     newRefreshToken,
+		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
+	}
+	if err := s.repo.StoreRefreshToken(newToken); err != nil {
+		return nil, err
+	}
+
+	return &dto.AuthResponse{
+		AccessToken:  accessToken,
+		RefreshToken: newRefreshToken,
+	}, nil
+}
