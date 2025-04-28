@@ -7,6 +7,7 @@ import (
 	"server/internal/handlers"
 	"server/internal/repositories"
 	"server/internal/routes"
+	"server/internal/seeders"
 	"server/internal/services"
 	"server/internal/utils"
 
@@ -41,6 +42,8 @@ func main() {
 	routes.AuthRoutes(r, authHandler)
 	routes.ClassRoutes(r, classHandler)
 	routes.ProfileRoutes(r, profileHandler)
+
+	seeders.SeedUsers(db)
 
 	port := os.Getenv("PORT")
 	log.Println("server running on port:", port)

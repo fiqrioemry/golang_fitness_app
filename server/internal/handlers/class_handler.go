@@ -83,6 +83,10 @@ func (h *ClassHandler) GetAllClasses(c *gin.Context) {
 		return
 	}
 
+	if classes == nil {
+		classes = []dto.ClassResponse{}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"classes": classes,
 		"total":   total,
