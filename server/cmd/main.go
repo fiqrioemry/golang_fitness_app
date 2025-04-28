@@ -30,7 +30,12 @@ func main() {
 	authService := services.NewAuthService(authRepo)
 	authHandler := handlers.NewAuthHandler(authService)
 
+	profileRepo := repositories.NewProfileRepository(db)
+	profileService := services.NewProfileService(profileRepo, authService)
+	profileHandler := handlers.NewProfileHandler(profileService)
+
 	routes.AuthRoutes(r, authHandler)
+	routes.ProfileRoutes(r, profileHandler)
 
 	port := os.Getenv("PORT")
 	log.Println("server running on port:", port)
