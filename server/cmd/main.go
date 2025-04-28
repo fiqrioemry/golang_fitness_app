@@ -52,14 +52,22 @@ func main() {
 	subcategoryService := services.NewSubcategoryService(subcategoryRepo)
 	subcategoryHandler := handlers.NewSubcategoryHandler(subcategoryService)
 
+	// type class
+	typeRepo := repositories.NewTypeRepository(db)
+	typeService := services.NewTypeService(typeRepo)
+	typeHandler := handlers.NewTypeHandler(typeService)
+
 	routes.AuthRoutes(r, authHandler)
+	routes.TypeRoutes(r, typeHandler)
 	routes.ClassRoutes(r, classHandler)
 	routes.ProfileRoutes(r, profileHandler)
 	routes.CategoryRoutes(r, categoryHandler)
 	routes.SubcategoryRoutes(r, subcategoryHandler)
 
+	seeders.SeedTypes(db)
 	seeders.SeedUsers(db)
 	seeders.SeedCategories(db)
+	seeders.SeedSubcategories(db)
 
 	port := os.Getenv("PORT")
 	log.Println("server running on port:", port)

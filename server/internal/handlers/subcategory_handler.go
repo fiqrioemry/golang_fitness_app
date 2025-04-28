@@ -70,7 +70,7 @@ func (h *SubcategoryHandler) GetAllSubcategories(c *gin.Context) {
 		subcategories = []dto.SubcategoryResponse{}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"subcategories": subcategories})
+	c.JSON(http.StatusOK, subcategories)
 }
 
 func (h *SubcategoryHandler) GetSubcategoryByID(c *gin.Context) {
@@ -98,5 +98,5 @@ func (h *SubcategoryHandler) GetSubcategoriesByCategoryID(c *gin.Context) {
 		subcategories = []dto.SubcategoryResponse{}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"subcategories": subcategories})
+	c.JSON(http.StatusOK, subcategories)
 }

@@ -247,7 +247,6 @@ type Subcategory struct {
 	Name       string    `gorm:"type:varchar(255);not null" json:"name"`
 	CategoryID uuid.UUID `gorm:"type:char(36);not null" json:"categoryId"`
 
-	// Relationship
 	Category Category `gorm:"foreignKey:CategoryID"`
 }
 

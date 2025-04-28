@@ -42,7 +42,7 @@ func SeedUsers(db *gorm.DB) {
 		log.Println("Failed to seed customer:", err)
 	}
 
-	log.Println("✅ User seeding completed")
+	log.Println("✅ User seeding completed!")
 }
 
 func SeedCategories(db *gorm.DB) {
@@ -70,7 +70,7 @@ func SeedCategories(db *gorm.DB) {
 	if err := db.Create(&categories).Error; err != nil {
 		log.Printf("failed seeding categories: %v", err)
 	} else {
-		log.Println("successfully seeded categories!")
+		log.Println("✅ Categories seeding completed!")
 	}
 }
 
@@ -83,7 +83,6 @@ func SeedSubcategories(db *gorm.DB) {
 		return
 	}
 
-	// Map: categoryName -> list of subcategories
 	subcategoryData := map[string][]string{
 		"Pilates": {
 			"Mat Pilates",
@@ -103,7 +102,6 @@ func SeedSubcategories(db *gorm.DB) {
 		},
 	}
 
-	// Fetch all categories
 	var categories []models.Category
 	if err := db.Find(&categories).Error; err != nil {
 		log.Printf("failed to fetch categories: %v", err)
@@ -134,6 +132,30 @@ func SeedSubcategories(db *gorm.DB) {
 	if err := db.Create(&subcategories).Error; err != nil {
 		log.Printf("failed seeding subcategories: %v", err)
 	} else {
-		log.Println("successfully seeded subcategories!")
+		log.Println("✅ subcategories seeding completed!")
+	}
+}
+
+func SeedTypes(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Type{}).Count(&count)
+
+	if count > 0 {
+		log.Println("Types already seeded, skipping...")
+		return
+	}
+
+	types := []models.Type{
+		{ID: uuid.New(), Name: "Group Class"},
+		{ID: uuid.New(), Name: "Personal Training"},
+		{ID: uuid.New(), Name: "Virtual Class"},
+		{ID: uuid.New(), Name: "Outdoor Training"},
+		{ID: uuid.New(), Name: "Workshop"},
+	}
+
+	if err := db.Create(&types).Error; err != nil {
+		log.Printf("failed seeding types: %v", err)
+	} else {
+		log.Println("✅ Successfully seeded types!")
 	}
 }

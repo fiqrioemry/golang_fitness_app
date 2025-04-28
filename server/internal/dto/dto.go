@@ -145,11 +145,30 @@ type SubcategoryResponse struct {
 	CategoryID string `json:"categoryId"`
 }
 
-// Type
+// Type class
 type CreateTypeRequest struct {
 	Name string `json:"name" binding:"required,min=2"`
 }
 
 type UpdateTypeRequest struct {
 	Name string `json:"name" binding:"required,min=2"`
+}
+
+type TypeResponse struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// Level class
+type CreateLevelRequest struct {
+	Name string `json:"name" binding:"required,min=2"`
+}
+
+type UpdateLevelRequest struct {
+	Name string `json:"name" binding:"required,min=2"`
+}
+
+type LevelResponse struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
