@@ -677,3 +677,140 @@ func SeedScheduleTemplates(db *gorm.DB) {
 		log.Println("✅ ScheduleTemplates seeding completed!")
 	}
 }
+
+func SeedBookings(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Booking{}).Count(&count)
+
+	if count > 0 {
+		log.Println("Bookings already seeded, skipping...")
+		return
+	}
+
+	// Fetch customer user
+	var user models.User
+	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
+		log.Println("Failed to find customer user:", err)
+		return
+	}
+
+	// Fetch class schedules
+	var schedules []models.ClassSchedule
+	if err := db.Limit(3).Find(&schedules).Error; err != nil {
+		log.Println("Failed to fetch class schedules:", err)
+		return
+	}
+
+	if len(schedules) == 0 {
+		log.Println("No class schedules available for booking seeding.")
+		return
+	}
+
+	// Create dummy bookings
+	var bookings []models.Booking
+	for _, schedule := range schedules {
+		booking := models.Booking{
+			ID:              uuid.New(),
+			UserID:          user.ID,
+			ClassScheduleID: schedule.ID,
+			Status:          "booked",
+		}
+		bookings = append(bookings, booking)
+	}
+
+	if err := db.Create(&bookings).Error; err != nil {
+		log.Printf("failed seeding bookings: %v", err)
+	} else {
+		log.Println("✅ Bookings seeding completed!")
+	}
+}
+
+func SeedAttendances(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Attendance{}).Count(&count)
+
+	if count > 0 {
+		log.Println("Attendances already seeded, skipping...")
+		return
+	}
+
+	// Fetch bookings
+	var bookings []models.Booking
+	if err := db.Limit(3).Find(&bookings).Error; err != nil {
+		log.Println("Failed to fetch bookings:", err)
+		return
+	}
+
+	if len(bookings) == 0 {
+		log.Println("No bookings available for attendance seeding.")
+		return
+	}
+
+	var attendances []models.Attendance
+	now := time.Now()
+
+	for _, booking := range bookings {
+		attendance := models.Attendance{
+			ID:              uuid.New(),
+			UserID:          booking.UserID,
+			ClassScheduleID: booking.ClassScheduleID,
+			Status:          "attended",
+			CheckedAt:       &now,
+		}
+		attendances = append(attendances, attendance)
+	}
+
+	if err := db.Create(&attendances).Error; err != nil {
+		log.Printf("failed seeding attendances: %v", err)
+	} else {
+		log.Println("✅ Attendances seeding completed!")
+	}
+}
+
+func SeedReviews(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Review{}).Count(&count)
+
+	if count > 0 {
+		log.Println("Reviews already seeded, skipping...")
+		return
+	}
+
+	// Fetch user (customer)
+	var user models.User
+	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
+		log.Println("Failed to find customer user:", err)
+		return
+	}
+
+	// Fetch classes
+	var classes []models.Class
+	if err := db.Limit(3).Find(&classes).Error; err != nil {
+		log.Println("Failed to fetch classes:", err)
+		return
+	}
+
+	if len(classes) == 0 {
+		log.Println("No classes found for review seeding.")
+		return
+	}
+
+	// Create dummy reviews
+	var reviews []models.Review
+	for i, class := range classes {
+		review := models.Review{
+			ID:      uuid.New(),
+			UserID:  user.ID,
+			ClassID: class.ID,
+			Rating:  4 + (i % 2), // 4 atau 5 bervariasi
+			Comment: "Great class experience!",
+		}
+		reviews = append(reviews, review)
+	}
+
+	if err := db.Create(&reviews).Error; err != nil {
+		log.Printf("failed seeding reviews: %v", err)
+	} else {
+		log.Println("✅ Reviews seeding completed!")
+	}
+}

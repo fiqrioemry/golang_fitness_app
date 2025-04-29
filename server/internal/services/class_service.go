@@ -150,6 +150,26 @@ func (s *classService) GetClassByID(id string) (*dto.ClassDetailResponse, error)
 	if err != nil {
 		return nil, err
 	}
+	galleries := make([]dto.GalleryResponse, len(class.Galleries))
+	for i, g := range class.Galleries {
+		galleries[i] = dto.GalleryResponse{
+			ID:        g.ID.String(),
+			ImageURL:  g.URL,
+			CreatedAt: g.CreatedAt.Format(time.RFC3339),
+		}
+	}
+
+	reviews := make([]dto.ReviewResponse, len(class.Reviews))
+	for i, r := range class.Reviews {
+		reviews[i] = dto.ReviewResponse{
+			ID:         r.ID.String(),
+			UserName:   r.User.Profile.Fullname,
+			ClassTitle: class.Title,
+			Rating:     r.Rating,
+			Comment:    r.Comment,
+			CreatedAt:  r.CreatedAt.Format(time.RFC3339),
+		}
+	}
 
 	return &dto.ClassDetailResponse{
 		ID:             class.ID.String(),
@@ -164,7 +184,9 @@ func (s *classService) GetClassByID(id string) (*dto.ClassDetailResponse, error)
 		Location:       class.Location.Name,
 		Category:       class.Category.Name,
 		Subcategory:    class.Subcategory.Name,
-		CreatedAt:      class.CreatedAt.String(),
+		Galleries:      galleries,
+		Reviews:        reviews,
+		CreatedAt:      class.CreatedAt.Format(time.RFC3339),
 	}, nil
 
 }

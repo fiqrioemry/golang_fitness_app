@@ -37,9 +37,18 @@ func (r *classRepository) DeleteClass(id string) error {
 
 func (r *classRepository) GetClassByID(id string) (*models.Class, error) {
 	var class models.Class
-	if err := r.db.Preload("Type").Preload("Level").Preload("Category").Preload("Subcategory").Preload("Location").First(&class, "id = ?", id).Error; err != nil {
+	if err := r.db.
+		Preload("Type").
+		Preload("Level").
+		Preload("Category").
+		Preload("Subcategory").
+		Preload("Location").
+		Preload("Galleries").
+		Preload("Reviews.User.Profile").
+		First(&class, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
+
 	return &class, nil
 }
 

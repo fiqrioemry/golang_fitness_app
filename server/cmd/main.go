@@ -85,7 +85,7 @@ func main() {
 	userPackageService := services.NewUserPackageService(userPackageRepo)
 	userPackageHandler := handlers.NewUserPackageHandler(userPackageService)
 
-	// payment
+	// Payment
 	paymentRepo := repositories.NewPaymentRepository(db)
 	paymentService := services.NewPaymentService(paymentRepo, packageRepo, userPackageRepo)
 	paymentHandler := handlers.NewPaymentHandler(paymentService)
@@ -100,6 +100,23 @@ func main() {
 	scheduleTemplateService := services.NewScheduleTemplateService(scheduleTemplateRepo, classRepo, classScheduleRepo)
 	scheduleTemplateHandler := handlers.NewScheduleTemplateHandler(scheduleTemplateService)
 
+	// Booking
+	bookingRepo := repositories.NewBookingRepository(db)
+	bookingService := services.NewBookingService(bookingRepo, classScheduleRepo, userPackageRepo)
+	bookingHandler := handlers.NewBookingHandler(bookingService)
+
+	// Attendance
+	attendanceRepo := repositories.NewAttendanceRepository(db)
+	attendanceService := services.NewAttendanceService(attendanceRepo, bookingRepo)
+	attendanceHandler := handlers.NewAttendanceHandler(attendanceService)
+
+	// Review
+	reviewRepo := repositories.NewReviewRepository(db)
+	reviewService := services.NewReviewService(reviewRepo)
+	reviewHandler := handlers.NewReviewHandler(reviewService)
+
+	routes.ReviewRoutes(r, reviewHandler)
+
 	routes.AuthRoutes(r, authHandler)
 	routes.TypeRoutes(r, typeHandler)
 	routes.ClassRoutes(r, classHandler)
@@ -107,9 +124,11 @@ func main() {
 	routes.PackageRoutes(r, packageHandler)
 	routes.ProfileRoutes(r, profileHandler)
 	routes.PaymentRoutes(r, paymentHandler)
+	routes.BookingRoutes(r, bookingHandler)
 	routes.CategoryRoutes(r, categoryHandler)
 	routes.LocationRoutes(r, locationHandler)
 	routes.InstructorRoutes(r, instructorHandler)
+	routes.AttendanceRoutes(r, attendanceHandler)
 	routes.SubcategoryRoutes(r, subcategoryHandler)
 	routes.UserPackageRoutes(r, userPackageHandler)
 	routes.ClassScheduleRoutes(r, classScheduleHandler)

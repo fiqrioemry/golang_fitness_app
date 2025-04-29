@@ -91,6 +91,7 @@ type Class struct {
 
 	// optional
 	Galleries []*ClassGallery `gorm:"foreignKey:ClassID" json:"galleries,omitempty"`
+	Reviews   []Review        `gorm:"foreignKey:ClassID" json:"reviews,omitempty"`
 }
 
 type ClassGallery struct {
@@ -218,12 +219,14 @@ func (cs *ClassSchedule) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Booking struct {
-	ID         uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID     uuid.UUID `gorm:"type:char(36);not null" json:"userId"`
-	ScheduleID uuid.UUID `gorm:"type:char(36);not null" json:"scheduleId"`
-	UsedCredit int       `gorm:"not null;default:1" json:"usedCredit"`
-	Status     string    `gorm:"type:varchar(20);default:'booked';check:status IN ('booked', 'cancelled', 'attended')" json:"status"`
-	BookedAt   time.Time `gorm:"autoCreateTime" json:"bookedAt"`
+	ID              uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID          uuid.UUID      `gorm:"type:char(36);not null" json:"userId"`
+	ClassScheduleID uuid.UUID      `gorm:"type:char(36);not null" json:"classScheduleId"`
+	Status          string         `gorm:"type:varchar(50);not null;default:'booked'" json:"status"`
+	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
+
+	ClassSchedule ClassSchedule `gorm:"foreignKey:ClassScheduleID" json:"classSchedule"`
 }
 
 func (b *Booking) BeforeCreate(tx *gorm.DB) (err error) {
@@ -319,23 +322,25 @@ type Voucher struct {
 	ID           uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	Code         string         `gorm:"type:varchar(100);uniqueIndex;not null" json:"code"`
 	Description  string         `gorm:"type:text" json:"description"`
-	DiscountType string         `gorm:"type:varchar(20);not null" json:"discountType"` // "percentage" atau "fixed"
-	Discount     float64        `gorm:"not null" json:"discount"`                      // misal 10% atau 10000
-	MaxDiscount  *float64       `json:"maxDiscount,omitempty"`                         // untuk discount percentage
-	Quota        int            `gorm:"not null" json:"quota"`                         // berapa kali bisa digunakan
+	DiscountType string         `gorm:"type:varchar(20);not null" json:"discountType"`
+	Discount     float64        `gorm:"not null" json:"discount"`
+	MaxDiscount  *float64       `json:"maxDiscount,omitempty"`
+	Quota        int            `gorm:"not null" json:"quota"`
 	ExpiredAt    time.Time      `gorm:"not null" json:"expiredAt"`
 	CreatedAt    time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 type Review struct {
-	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID    uuid.UUID      `gorm:"type:char(36);not null;index" json:"userId"`
-	ClassID   uuid.UUID      `gorm:"type:char(36);not null;index" json:"classId"`
-	Rating    int            `gorm:"not null;check:rating >= 1 AND rating <= 5" json:"rating"` // rating 1-5
-	Comment   string         `gorm:"type:text" json:"comment"`
-	CreatedAt time.Time      `gorm:"autoCreateTime" json:"createdAt"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	ID        uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID    uuid.UUID `gorm:"type:char(36);not null" json:"userId"`
+	ClassID   uuid.UUID `gorm:"type:char(36);not null" json:"classId"`
+	Rating    int       `gorm:"not null" json:"rating"`
+	Comment   string    `gorm:"type:text" json:"comment"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
+
+	User  User  `gorm:"foreignKey:UserID" json:"user"`
+	Class Class `gorm:"foreignKey:ClassID" json:"class"`
 }
 
 func (r *Review) BeforeCreate(tx *gorm.DB) (err error) {
@@ -346,13 +351,16 @@ func (r *Review) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Attendance struct {
-	ID         uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID     uuid.UUID      `gorm:"type:char(36);not null;index" json:"userId"`
-	ScheduleID uuid.UUID      `gorm:"type:char(36);not null;index" json:"scheduleId"`
-	Status     string         `gorm:"type:varchar(20);not null;check:status IN ('attended', 'absent', 'cancelled')" json:"status"`
-	CheckedAt  *time.Time     `json:"checkedAt,omitempty"`
-	CreatedAt  time.Time      `gorm:"autoCreateTime" json:"createdAt"`
-	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
+	ID              uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID          uuid.UUID      `gorm:"type:char(36);not null;index" json:"userId"`
+	ClassScheduleID uuid.UUID      `gorm:"type:char(36);not null;index" json:"classScheduleId"`
+	Status          string         `gorm:"type:varchar(20);not null;check:status IN ('attended', 'absent', 'cancelled')" json:"status"`
+	CheckedAt       *time.Time     `json:"checkedAt,omitempty"`
+	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
+
+	ClassSchedule ClassSchedule `gorm:"foreignKey:ClassScheduleID" json:"classSchedule"`
+	User          User          `gorm:"foreignKey:UserID"`
 }
 
 type Instructor struct {

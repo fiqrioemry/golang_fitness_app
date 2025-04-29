@@ -100,19 +100,27 @@ type ClassQueryParam struct {
 }
 
 type ClassDetailResponse struct {
-	ID             string   `json:"id"`
-	Title          string   `json:"title"`
-	Image          string   `json:"image"`
-	IsActive       bool     `json:"isActive"`
-	Duration       int      `json:"duration"`
-	Description    string   `json:"description"`
-	AdditionalList []string `json:"additional"`
-	Type           string   `json:"type"`
-	Level          string   `json:"level"`
-	Location       string   `json:"location"`
-	Category       string   `json:"category"`
-	Subcategory    string   `json:"subcategory"`
-	CreatedAt      string   `json:"createdAt"`
+	ID             string            `json:"id"`
+	Title          string            `json:"title"`
+	Image          string            `json:"image"`
+	IsActive       bool              `json:"isActive"`
+	Duration       int               `json:"duration"`
+	Description    string            `json:"description"`
+	AdditionalList []string          `json:"additional"`
+	Type           string            `json:"type"`
+	Level          string            `json:"level"`
+	Location       string            `json:"location"`
+	Category       string            `json:"category"`
+	Subcategory    string            `json:"subcategory"`
+	Galleries      []GalleryResponse `json:"galleries"`
+	Reviews        []ReviewResponse  `json:"reviews"`
+	CreatedAt      string            `json:"createdAt"`
+}
+
+type GalleryResponse struct {
+	ID        string `json:"id"`
+	ImageURL  string `json:"imageUrl"`
+	CreatedAt string `json:"createdAt"`
 }
 
 type ClassResponse struct {
@@ -357,4 +365,51 @@ type CreateScheduleTemplateRequest struct {
 	StartHour    int    `json:"startHour" binding:"required,min=0,max=23"`
 	StartMinute  int    `json:"startMinute" binding:"required,min=0,max=59"`
 	Capacity     int    `json:"capacity" binding:"required,gt=0"`
+}
+
+// booking
+
+type CreateBookingRequest struct {
+	ClassScheduleID string `json:"classScheduleId" binding:"required"`
+}
+
+type BookingResponse struct {
+	ID         string `json:"id"`
+	ClassTitle string `json:"classTitle"`
+	StartTime  string `json:"startTime"`
+	EndTime    string `json:"endTime"`
+	Status     string `json:"status"`
+}
+
+// Attendance
+
+type MarkAttendanceRequest struct {
+	BookingID string `json:"bookingId" binding:"required"`
+	Status    string `json:"status" binding:"required,oneof=attended absent cancelled"`
+}
+
+type AttendanceResponse struct {
+	ID           string `json:"id"`
+	ClassTitle   string `json:"classTitle"`
+	UserFullname string `json:"userFullname"`
+	StartTime    string `json:"startTime"`
+	EndTime      string `json:"endTime"`
+	Status       string `json:"status"`
+	CheckedAt    string `json:"checkedAt"`
+}
+
+// Review
+type CreateReviewRequest struct {
+	ClassID string `json:"classId" binding:"required"`
+	Rating  int    `json:"rating" binding:"required,min=1,max=5"`
+	Comment string `json:"comment" binding:"omitempty"`
+}
+
+type ReviewResponse struct {
+	ID         string `json:"id"`
+	UserName   string `json:"userName"`
+	ClassTitle string `json:"classTitle"`
+	Rating     int    `json:"rating"`
+	Comment    string `json:"comment"`
+	CreatedAt  string `json:"createdAt"`
 }
