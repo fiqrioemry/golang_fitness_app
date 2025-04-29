@@ -40,7 +40,7 @@ func (h *AttendanceHandler) GetAllAttendances(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"attendances": attendances})
+	c.JSON(http.StatusOK, attendances)
 }
 
 func (h *AttendanceHandler) ExportAttendances(c *gin.Context) {

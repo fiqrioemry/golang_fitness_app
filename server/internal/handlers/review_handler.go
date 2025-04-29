@@ -42,5 +42,5 @@ func (h *ReviewHandler) GetReviewsByClass(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"reviews": reviews})
+	c.JSON(http.StatusOK, reviews)
 }

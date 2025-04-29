@@ -19,11 +19,11 @@ func NewUserPackageHandler(userPackageService services.UserPackageService) *User
 func (h *UserPackageHandler) GetUserPackages(c *gin.Context) {
 	userID := utils.MustGetUserID(c)
 
-	packages, err := h.userPackageService.GetUserPackages(userID)
+	userPackages, err := h.userPackageService.GetUserPackages(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch user packages", "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"userPackages": packages})
+	c.JSON(http.StatusOK, userPackages)
 }

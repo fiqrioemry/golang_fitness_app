@@ -71,7 +71,7 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 		return err
 	}
 
-	if req.ImageURLs != nil && len(req.ImageURLs) > 0 {
+	if len(req.ImageURLs) > 0 {
 		var galleries []models.ClassGallery
 		for _, url := range req.ImageURLs {
 			galleries = append(galleries, models.ClassGallery{
@@ -81,7 +81,10 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 				CreatedAt: time.Now(),
 			})
 		}
-		_ = s.repo.SaveClassGalleries(galleries)
+		if err := s.repo.SaveClassGalleries(galleries); err != nil {
+			return err
+		}
+
 	}
 
 	return nil

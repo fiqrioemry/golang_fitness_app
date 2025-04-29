@@ -8,6 +8,7 @@ import (
 
 type AuthRepository interface {
 	CreateUser(user *models.User) error
+	UpdateUser(user *models.User) error
 	DeleteRefreshToken(token string) error
 	StoreRefreshToken(token *models.Token) error
 	GetUserByID(userID string) (*models.User, error)
@@ -28,6 +29,9 @@ func (r *authRepository) GetUserByEmail(email string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+func (r *authRepository) UpdateUser(user *models.User) error {
+	return r.db.Save(user).Error
 }
 
 func (r *authRepository) GetUserByID(userID string) (*models.User, error) {

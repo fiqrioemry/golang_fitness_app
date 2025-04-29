@@ -270,19 +270,19 @@ type PackageDetailResponse struct {
 }
 
 // instructor
-
 type CreateInstructorRequest struct {
+	UserID         string `json:"userId" binding:"required,uuid"`
 	Experience     int    `json:"experience" binding:"required,min=0"`
 	Specialties    string `json:"specialties" binding:"required"`
 	Certifications string `json:"certifications"`
 }
 
 type UpdateInstructorRequest struct {
+	UserID         string `json:"userId" binding:"required,uuid"`
 	Experience     int    `json:"experience"`
 	Specialties    string `json:"specialties"`
 	Certifications string `json:"certifications"`
 }
-
 type InstructorResponse struct {
 	ID             string  `json:"id"`
 	UserID         string  `json:"userId"`

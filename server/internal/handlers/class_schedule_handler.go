@@ -64,5 +64,5 @@ func (h *ClassScheduleHandler) GetAllClassSchedules(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"schedules": schedules})
+	c.JSON(http.StatusOK, schedules)
 }

@@ -94,11 +94,11 @@ func (h *PackageHandler) GetAllPackages(c *gin.Context) {
 func (h *PackageHandler) GetPackageByID(c *gin.Context) {
 	id := c.Param("id")
 
-	pkg, err := h.packageService.GetPackageByID(id)
+	classPackage, err := h.packageService.GetPackageByID(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Package not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, pkg)
+	c.JSON(http.StatusOK, classPackage)
 }

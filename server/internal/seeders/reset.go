@@ -79,6 +79,7 @@ func ResetDatabase(db *gorm.DB) {
 	SeedLevels(db)
 	SeedLocations(db)
 	SeedClasses(db)
+	SeedClassGalleries(db)
 	SeedPackages(db)
 	SeedInstructors(db)
 	SeedPayments(db)

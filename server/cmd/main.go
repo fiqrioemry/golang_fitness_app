@@ -77,7 +77,7 @@ func main() {
 
 	// Repository
 	instructorRepo := repositories.NewInstructorRepository(db)
-	instructorService := services.NewInstructorService(instructorRepo)
+	instructorService := services.NewInstructorService(instructorRepo, authRepo)
 	instructorHandler := handlers.NewInstructorHandler(instructorService)
 
 	// UserPackage
@@ -115,12 +115,11 @@ func main() {
 	reviewService := services.NewReviewService(reviewRepo)
 	reviewHandler := handlers.NewReviewHandler(reviewService)
 
-	routes.ReviewRoutes(r, reviewHandler)
-
 	routes.AuthRoutes(r, authHandler)
 	routes.TypeRoutes(r, typeHandler)
 	routes.ClassRoutes(r, classHandler)
 	routes.LevelRoutes(r, levelHandler)
+	routes.ReviewRoutes(r, reviewHandler)
 	routes.PackageRoutes(r, packageHandler)
 	routes.ProfileRoutes(r, profileHandler)
 	routes.PaymentRoutes(r, paymentHandler)

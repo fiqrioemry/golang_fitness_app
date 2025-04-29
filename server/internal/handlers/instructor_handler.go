@@ -18,13 +18,12 @@ func NewInstructorHandler(instructorService services.InstructorService) *Instruc
 }
 
 func (h *InstructorHandler) CreateInstructor(c *gin.Context) {
-	userID := utils.MustGetUserID(c)
 	var req dto.CreateInstructorRequest
 	if !utils.BindAndValidateJSON(c, &req) {
 		return
 	}
 
-	if err := h.instructorService.CreateInstructor(userID, req); err != nil {
+	if err := h.instructorService.CreateInstructor(req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create instructor", "error": err.Error()})
 		return
 	}
@@ -43,7 +42,6 @@ func (h *InstructorHandler) UpdateInstructor(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update instructor", "error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"message": "Instructor updated successfully"})
 }
 
@@ -77,5 +75,5 @@ func (h *InstructorHandler) GetAllInstructors(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"instructors": instructors})
+	c.JSON(http.StatusOK, instructors)
 }

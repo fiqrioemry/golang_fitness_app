@@ -26,13 +26,13 @@ func (h *PaymentHandler) CreatePayment(c *gin.Context) {
 
 	userID := utils.MustGetUserID(c)
 
-	res, err := h.paymentService.CreatePayment(userID, req)
+	response, err := h.paymentService.CreatePayment(userID, req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create payment", "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusCreated, response)
 }
 
 // Handle Midtrans Notification Webhook

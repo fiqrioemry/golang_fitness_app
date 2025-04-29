@@ -11,6 +11,6 @@ func ScheduleTemplateRoutes(r *gin.Engine, handler *handlers.ScheduleTemplateHan
 	template := r.Group("/api/schedule-templates")
 	template.Use(middleware.AuthRequired(), middleware.AdminOnly())
 	template.POST("", handler.CreateTemplate)
+	template.POST("/auto-generate", handler.AutoGenerateSchedules)
 
-	r.POST("/api/schedules/auto-generate", handler.AutoGenerateSchedules)
 }

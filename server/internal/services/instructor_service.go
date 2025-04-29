@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
@@ -9,25 +10,34 @@ import (
 )
 
 type InstructorService interface {
-	CreateInstructor(userID string, req dto.CreateInstructorRequest) error
 	UpdateInstructor(id string, req dto.UpdateInstructorRequest) error
 	DeleteInstructor(id string) error
 	GetInstructorByID(id string) (*dto.InstructorResponse, error)
 	GetAllInstructors() ([]dto.InstructorResponse, error)
+	CreateInstructor(req dto.CreateInstructorRequest) error
 }
 
 type instructorService struct {
-	repo repositories.InstructorRepository
+	repo     repositories.InstructorRepository
+	userRepo repositories.AuthRepository
 }
 
-func NewInstructorService(repo repositories.InstructorRepository) InstructorService {
-	return &instructorService{repo}
+func NewInstructorService(repo repositories.InstructorRepository, userRepo repositories.AuthRepository) InstructorService {
+	return &instructorService{repo, userRepo}
 }
 
-func (s *instructorService) CreateInstructor(userID string, req dto.CreateInstructorRequest) error {
-	userUUID, _ := uuid.Parse(userID)
+func (s *instructorService) CreateInstructor(req dto.CreateInstructorRequest) error {
+	user, err := s.userRepo.GetUserByID(req.UserID)
+	if err != nil {
+		return errors.New("user not found")
+	}
+	user.Role = "instructor"
+	if err := s.userRepo.UpdateUser(user); err != nil {
+		return err
+	}
+
 	instructor := models.Instructor{
-		UserID:         userUUID,
+		UserID:         uuid.MustParse(req.UserID),
 		Experience:     req.Experience,
 		Specialties:    req.Specialties,
 		Certifications: req.Certifications,
@@ -39,6 +49,10 @@ func (s *instructorService) UpdateInstructor(id string, req dto.UpdateInstructor
 	instructor, err := s.repo.GetInstructorByID(id)
 	if err != nil {
 		return err
+	}
+
+	if instructor.UserID.String() != req.UserID {
+		return errors.New("userId mismatch")
 	}
 
 	if req.Experience != 0 {
@@ -55,6 +69,17 @@ func (s *instructorService) UpdateInstructor(id string, req dto.UpdateInstructor
 }
 
 func (s *instructorService) DeleteInstructor(id string) error {
+	instructor, err := s.repo.GetInstructorByID(id)
+	if err != nil {
+		return err
+	}
+
+	user, err := s.userRepo.GetUserByID(instructor.UserID.String())
+	if err == nil {
+		user.Role = "customer"
+		_ = s.userRepo.UpdateUser(user)
+	}
+
 	return s.repo.DeleteInstructor(id)
 }
 

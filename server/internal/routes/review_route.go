@@ -12,5 +12,5 @@ func ReviewRoutes(r *gin.Engine, handler *handlers.ReviewHandler) {
 	review.Use(middleware.AuthRequired())
 
 	review.POST("", handler.CreateReview)
-	review.GET("/:classId", handler.GetReviewsByClass)
+	r.GET("/api/reviews/:classId", handler.GetReviewsByClass)
 }

@@ -44,7 +44,7 @@ func SeedUsers(db *gorm.DB) {
 			Role:     "instructor",
 			Profile: models.Profile{
 				Fullname: "Instructor One",
-				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Instructor1",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=AB",
 			},
 		},
 		{
@@ -54,7 +54,7 @@ func SeedUsers(db *gorm.DB) {
 			Role:     "instructor",
 			Profile: models.Profile{
 				Fullname: "Instructor Two",
-				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Instructor2",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=ZA",
 			},
 		},
 		{
@@ -64,7 +64,7 @@ func SeedUsers(db *gorm.DB) {
 			Role:     "instructor",
 			Profile: models.Profile{
 				Fullname: "Instructor Three",
-				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Instructor3",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=GH",
 			},
 		},
 	}
@@ -303,7 +303,7 @@ func SeedClasses(db *gorm.DB) {
 		{
 			ID:             uuid.New(),
 			Title:          "Yoga Beginners",
-			Image:          "https://example.com/yoga-beginner.jpg",
+			Image:          "https://placehold.co/400x400/blue/white",
 			Duration:       60,
 			Description:    "A gentle introduction to yoga.",
 			AdditionalList: []string{"Beginner", "Stretching", "Breathing"},
@@ -317,7 +317,7 @@ func SeedClasses(db *gorm.DB) {
 		{
 			ID:             uuid.New(),
 			Title:          "Strength Training - Intermediate",
-			Image:          "https://example.com/strength-training.jpg",
+			Image:          "https://placehold.co/400x400/blue/white",
 			Duration:       90,
 			Description:    "A strength-building session for intermediate athletes.",
 			AdditionalList: []string{"Intermediate", "Strength", "Weightlifting"},
@@ -331,7 +331,7 @@ func SeedClasses(db *gorm.DB) {
 		{
 			ID:             uuid.New(),
 			Title:          "Zumba Dance Party",
-			Image:          "https://example.com/zumba-dance.jpg",
+			Image:          "https://placehold.co/400x400/purple/white",
 			Duration:       60,
 			Description:    "A high-energy, fun dance workout.",
 			AdditionalList: []string{"Dance", "Cardio", "Party"},
@@ -345,7 +345,7 @@ func SeedClasses(db *gorm.DB) {
 		{
 			ID:             uuid.New(),
 			Title:          "Private Yoga Session",
-			Image:          "https://example.com/private-yoga.jpg",
+			Image:          "https://placehold.co/400x400/green/white",
 			Duration:       45,
 			Description:    "A one-on-one session with a yoga instructor.",
 			AdditionalList: []string{"Private", "Yoga", "Therapy"},
@@ -365,6 +365,56 @@ func SeedClasses(db *gorm.DB) {
 	}
 }
 
+func SeedClassGalleries(db *gorm.DB) {
+	var count int64
+	db.Model(&models.ClassGallery{}).Count(&count)
+
+	if count > 0 {
+		log.Println("ClassGalleries already seeded, skipping...")
+		return
+	}
+
+	var classes []models.Class
+	if err := db.Find(&classes).Error; err != nil {
+		log.Println("Failed to fetch classes:", err)
+		return
+	}
+
+	if len(classes) == 0 {
+		log.Println("No classes found for gallery seeding.")
+		return
+	}
+
+	var galleries []models.ClassGallery
+	for _, class := range classes {
+		gallery := models.ClassGallery{
+			ID:        uuid.New(),
+			ClassID:   class.ID,
+			URL:       "https://placehold.co/400x400?text=" + generateGalleryText(class.Title),
+			CreatedAt: time.Now(),
+		}
+		galleries = append(galleries, gallery)
+	}
+
+	if err := db.Create(&galleries).Error; err != nil {
+		log.Printf("failed seeding class galleries: %v", err)
+	} else {
+		log.Println("✅ ClassGalleries seeding completed!")
+	}
+}
+
+func generateGalleryText(title string) string {
+	if len(title) == 0 {
+		return "CLASS"
+	}
+	// Ambil kata pertama dari title untuk teks gallery
+	for i, r := range title {
+		if r == ' ' {
+			return title[:i]
+		}
+	}
+	return title
+}
 func SeedPackages(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Package{}).Count(&count)
@@ -383,7 +433,7 @@ func SeedPackages(db *gorm.DB) {
 			Credit:      1,
 			Expired:     intPtr(14), // 14 hari
 			Information: "Valid for 14 days after first booking.",
-			Image:       "https://example.com/package-trial.jpg",
+			Image:       "https://placehold.co/400x400/orange/white",
 			IsActive:    true,
 			CreatedAt:   time.Now(),
 		},
@@ -395,7 +445,7 @@ func SeedPackages(db *gorm.DB) {
 			Credit:      5,
 			Expired:     intPtr(60), // 2 bulan
 			Information: "Valid for 2 months after first booking.",
-			Image:       "https://example.com/package-5sessions.jpg",
+			Image:       "https://placehold.co/400x400/blue/white",
 			IsActive:    true,
 			CreatedAt:   time.Now(),
 		},
@@ -407,7 +457,7 @@ func SeedPackages(db *gorm.DB) {
 			Credit:      10,
 			Expired:     intPtr(120), // 4 bulan
 			Information: "Valid for 4 months after first booking.",
-			Image:       "https://example.com/package-10sessions.jpg",
+			Image:       "https://placehold.co/400x400/green/white",
 			IsActive:    true,
 			CreatedAt:   time.Now(),
 		},
@@ -419,7 +469,7 @@ func SeedPackages(db *gorm.DB) {
 			Credit:      1,
 			Expired:     intPtr(14),
 			Information: "Valid for 14 days after first booking.",
-			Image:       "https://example.com/package-ftm-promo.jpg",
+			Image:       "https://placehold.co/400x400/orange/white",
 			IsActive:    true,
 			CreatedAt:   time.Now(),
 		},
@@ -431,7 +481,7 @@ func SeedPackages(db *gorm.DB) {
 			Credit:      2,
 			Expired:     intPtr(20),
 			Information: "Valid for 20 days after first booking.",
-			Image:       "https://example.com/package-ftm-bundle.jpg",
+			Image:       "https://placehold.co/400x400/blue/white",
 			IsActive:    true,
 			CreatedAt:   time.Now(),
 		},
