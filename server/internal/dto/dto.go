@@ -258,3 +258,103 @@ type PackageDetailResponse struct {
 	IsActive    bool    `json:"isActive"`
 	Information string  `json:"information"`
 }
+
+// instructor
+
+type CreateInstructorRequest struct {
+	Experience     int    `json:"experience" binding:"required,min=0"`
+	Specialties    string `json:"specialties" binding:"required"`
+	Certifications string `json:"certifications"`
+}
+
+type UpdateInstructorRequest struct {
+	Experience     int    `json:"experience"`
+	Specialties    string `json:"specialties"`
+	Certifications string `json:"certifications"`
+}
+
+type InstructorResponse struct {
+	ID             string  `json:"id"`
+	UserID         string  `json:"userId"`
+	Fullname       string  `json:"fullname"`
+	Avatar         string  `json:"avatar"`
+	Experience     int     `json:"experience"`
+	Specialties    string  `json:"specialties"`
+	Certifications string  `json:"certifications"`
+	Rating         float64 `json:"rating"`
+	TotalClass     int     `json:"totalClass"`
+}
+
+// Create Payment Request (user beli package)
+type CreatePaymentRequest struct {
+	PackageID string `json:"packageId" binding:"required"`
+}
+
+// Response Setelah Create Payment
+type CreatePaymentResponse struct {
+	PaymentID string `json:"paymentId"`
+	SnapToken string `json:"snapToken"`
+}
+
+// Request Midtrans Webhook (notif dari Midtrans ke backend)
+type MidtransNotificationRequest struct {
+	TransactionStatus string `json:"transaction_status"`
+	OrderID           string `json:"order_id"`
+	PaymentType       string `json:"payment_type"`
+	FraudStatus       string `json:"fraud_status"`
+}
+
+// Payment Detail Response (optional buat lihat status payment)
+type PaymentResponse struct {
+	ID            string  `json:"id"`
+	UserID        string  `json:"userId"`
+	PackageID     string  `json:"packageId"`
+	PackageName   string  `json:"packageName"`
+	PaymentMethod string  `json:"paymentMethod"`
+	Status        string  `json:"status"`
+	Price         float64 `json:"price"`
+	PaidAt        string  `json:"paidAt"`
+}
+
+// user package
+type UserPackageResponse struct {
+	ID              string `json:"id"`
+	PackageName     string `json:"packageName"`
+	RemainingCredit int    `json:"remainingCredit"`
+	ExpiredAt       string `json:"expiredAt"`
+	PurchasedAt     string `json:"purchasedAt"`
+}
+
+type CreateClassScheduleRequest struct {
+	ClassID      string `json:"classId" binding:"required"`
+	InstructorID string `json:"instructorId" binding:"required"`
+	StartTime    string `json:"startTime" binding:"required,datetime=2006-01-02T15:04:05Z07:00"`
+	Capacity     int    `json:"capacity" binding:"required,gt=0"`
+}
+
+type UpdateClassScheduleRequest struct {
+	StartTime string `json:"startTime" binding:"omitempty,datetime=2006-01-02T15:04:05Z07:00"`
+	EndTime   string `json:"endTime" binding:"omitempty,datetime=2006-01-02T15:04:05Z07:00"`
+	Capacity  int    `json:"capacity" binding:"omitempty,gt=0"`
+}
+
+type ClassScheduleResponse struct {
+	ID             string `json:"id"`
+	ClassID        string `json:"classId"`
+	ClassTitle     string `json:"classTitle"`
+	InstructorID   string `json:"instructorId"`
+	InstructorName string `json:"instructorName"`
+	StartTime      string `json:"startTime"`
+	EndTime        string `json:"endTime"`
+	Capacity       int    `json:"capacity"`
+	BookedCount    int    `json:"bookedCount"`
+}
+
+type CreateScheduleTemplateRequest struct {
+	ClassID      string `json:"classId" binding:"required"`
+	InstructorID string `json:"instructorId" binding:"required"`
+	DayOfWeek    int    `json:"dayOfWeek" binding:"required,min=0,max=6"`
+	StartHour    int    `json:"startHour" binding:"required,min=0,max=23"`
+	StartMinute  int    `json:"startMinute" binding:"required,min=0,max=59"`
+	Capacity     int    `json:"capacity" binding:"required,gt=0"`
+}

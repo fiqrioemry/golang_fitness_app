@@ -27,6 +27,9 @@ func main() {
 	r.Use(middleware.Logger(), middleware.Recovery(), middleware.CORS(), middleware.RateLimiter(5, 10), middleware.LimitFileSize(5<<20))
 
 	db := config.DB
+
+	seeders.ResetDatabase(db)
+
 	// auth
 	authRepo := repositories.NewAuthRepository(db)
 	authService := services.NewAuthService(authRepo)
@@ -68,28 +71,49 @@ func main() {
 	locationHandler := handlers.NewLocationHandler(locationService)
 
 	// Repository
-	packageRepo := repositories.NewPackageRepository(config.DB)
+	packageRepo := repositories.NewPackageRepository(db)
 	packageService := services.NewPackageService(packageRepo)
 	packageHandler := handlers.NewPackageHandler(packageService)
+
+	// Repository
+	instructorRepo := repositories.NewInstructorRepository(db)
+	instructorService := services.NewInstructorService(instructorRepo)
+	instructorHandler := handlers.NewInstructorHandler(instructorService)
+
+	// UserPackage
+	userPackageRepo := repositories.NewUserPackageRepository(db)
+	userPackageService := services.NewUserPackageService(userPackageRepo)
+	userPackageHandler := handlers.NewUserPackageHandler(userPackageService)
+
+	// payment
+	paymentRepo := repositories.NewPaymentRepository(db)
+	paymentService := services.NewPaymentService(paymentRepo, packageRepo, userPackageRepo)
+	paymentHandler := handlers.NewPaymentHandler(paymentService)
+
+	// ClassSchedule
+	classScheduleRepo := repositories.NewClassScheduleRepository(db)
+	classScheduleService := services.NewClassScheduleService(classScheduleRepo, classRepo)
+	classScheduleHandler := handlers.NewClassScheduleHandler(classScheduleService)
+
+	// Schedule template
+	scheduleTemplateRepo := repositories.NewScheduleTemplateRepository(db)
+	scheduleTemplateService := services.NewScheduleTemplateService(scheduleTemplateRepo, classRepo, classScheduleRepo)
+	scheduleTemplateHandler := handlers.NewScheduleTemplateHandler(scheduleTemplateService)
 
 	routes.AuthRoutes(r, authHandler)
 	routes.TypeRoutes(r, typeHandler)
 	routes.ClassRoutes(r, classHandler)
 	routes.LevelRoutes(r, levelHandler)
+	routes.PackageRoutes(r, packageHandler)
 	routes.ProfileRoutes(r, profileHandler)
+	routes.PaymentRoutes(r, paymentHandler)
 	routes.CategoryRoutes(r, categoryHandler)
 	routes.LocationRoutes(r, locationHandler)
-	routes.PackageRoutes(r, packageHandler)
+	routes.InstructorRoutes(r, instructorHandler)
 	routes.SubcategoryRoutes(r, subcategoryHandler)
-
-	seeders.SeedUsers(db)
-	seeders.SeedCategories(db)
-	seeders.SeedSubcategories(db)
-	seeders.SeedTypes(db)
-	seeders.SeedLevels(db)
-	seeders.SeedLocations(db)
-	seeders.SeedClasses(db)
-	seeders.SeedPackages(db)
+	routes.UserPackageRoutes(r, userPackageHandler)
+	routes.ClassScheduleRoutes(r, classScheduleHandler)
+	routes.ScheduleTemplateRoutes(r, scheduleTemplateHandler)
 
 	port := os.Getenv("PORT")
 	log.Println("server running on port:", port)

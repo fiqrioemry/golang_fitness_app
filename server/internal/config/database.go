@@ -52,20 +52,27 @@ func InitDatabase() {
 	// 4. AutoMigrate
 	if err := DB.AutoMigrate(
 		&models.User{},
-		&models.Profile{},
 		&models.Token{},
-		&models.Location{},
+		&models.Profile{},
+		&models.Package{},
+		&models.PackageClass{},
+		&models.UserPackage{},
 		&models.Category{},
 		&models.Subcategory{},
 		&models.Type{},
 		&models.Level{},
 		&models.Class{},
-		&models.Package{},
-		&models.PackageClass{},
-		&models.UserPackage{},
+		&models.ClassGallery{},
 		&models.ClassSchedule{},
 		&models.Booking{},
 		&models.Payment{},
+		&models.Notification{},
+		&models.Voucher{},
+		&models.Review{},
+		&models.Attendance{},
+		&models.Instructor{},
+		&models.Location{},
+		&models.ScheduleTemplate{},
 	); err != nil {
 		panic("Migration failed: " + err.Error())
 	}

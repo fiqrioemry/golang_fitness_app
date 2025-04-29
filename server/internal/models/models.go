@@ -179,14 +179,35 @@ func (up *UserPackage) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+type Payment struct {
+	ID            uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	PackageID     uuid.UUID `gorm:"type:char(36);not null" json:"packageId"`
+	UserID        uuid.UUID `gorm:"type:char(36);not null" json:"userId"`
+	PaymentMethod string    `gorm:"type:varchar(50);not null" json:"paymentMethod"`
+	Status        string    `gorm:"type:varchar(20);default:'pending';check:status IN ('success', 'pending', 'failed')" json:"status"`
+	PaidAt        time.Time `gorm:"autoCreateTime" json:"paidAt"`
+}
+
+func (p *Payment) BeforeCreate(tx *gorm.DB) (err error) {
+	if p.ID == uuid.Nil {
+		p.ID = uuid.New()
+	}
+	return
+}
+
 type ClassSchedule struct {
 	ID           uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	ClassID      uuid.UUID `gorm:"type:char(36);not null" json:"classId"`
+	InstructorID uuid.UUID `gorm:"type:char(36);not null" json:"instructorId"`
 	Capacity     int       `gorm:"not null" json:"capacity"`
 	IsActive     bool      `gorm:"default:true" json:"isActive"`
-	InstructorID uuid.UUID `gorm:"type:char(36);not null" json:"instructorId"`
 	StartTime    time.Time `gorm:"not null" json:"startTime"`
 	EndTime      time.Time `gorm:"not null" json:"endTime"`
+
+	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
+	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`
+
+	BookedCount int `gorm:"-" json:"bookedCount"`
 }
 
 func (cs *ClassSchedule) BeforeCreate(tx *gorm.DB) (err error) {
@@ -208,22 +229,6 @@ type Booking struct {
 func (b *Booking) BeforeCreate(tx *gorm.DB) (err error) {
 	if b.ID == uuid.Nil {
 		b.ID = uuid.New()
-	}
-	return
-}
-
-type Payment struct {
-	ID            uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	PackageID     uuid.UUID `gorm:"type:char(36);not null" json:"packageId"`
-	UserID        uuid.UUID `gorm:"type:char(36);not null" json:"userId"`
-	PaymentMethod string    `gorm:"type:varchar(50);not null" json:"paymentMethod"`
-	Status        string    `gorm:"type:varchar(20);default:'pending';check:status IN ('success', 'pending', 'failed')" json:"status"`
-	PaidAt        time.Time `gorm:"autoCreateTime" json:"paidAt"`
-}
-
-func (p *Payment) BeforeCreate(tx *gorm.DB) (err error) {
-	if p.ID == uuid.Nil {
-		p.ID = uuid.New()
 	}
 	return
 }
@@ -289,6 +294,104 @@ type Level struct {
 func (l *Level) BeforeCreate(tx *gorm.DB) (err error) {
 	if l.ID == uuid.Nil {
 		l.ID = uuid.New()
+	}
+	return
+}
+
+type Notification struct {
+	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID    uuid.UUID      `gorm:"type:char(36);not null;index" json:"userId"`
+	Title     string         `gorm:"type:varchar(255);not null" json:"title"`
+	Message   string         `gorm:"type:text;not null" json:"message"`
+	IsRead    bool           `gorm:"default:false" json:"isRead"`
+	CreatedAt time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+func (n *Notification) BeforeCreate(tx *gorm.DB) (err error) {
+	if n.ID == uuid.Nil {
+		n.ID = uuid.New()
+	}
+	return
+}
+
+type Voucher struct {
+	ID           uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	Code         string         `gorm:"type:varchar(100);uniqueIndex;not null" json:"code"`
+	Description  string         `gorm:"type:text" json:"description"`
+	DiscountType string         `gorm:"type:varchar(20);not null" json:"discountType"` // "percentage" atau "fixed"
+	Discount     float64        `gorm:"not null" json:"discount"`                      // misal 10% atau 10000
+	MaxDiscount  *float64       `json:"maxDiscount,omitempty"`                         // untuk discount percentage
+	Quota        int            `gorm:"not null" json:"quota"`                         // berapa kali bisa digunakan
+	ExpiredAt    time.Time      `gorm:"not null" json:"expiredAt"`
+	CreatedAt    time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+type Review struct {
+	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID    uuid.UUID      `gorm:"type:char(36);not null;index" json:"userId"`
+	ClassID   uuid.UUID      `gorm:"type:char(36);not null;index" json:"classId"`
+	Rating    int            `gorm:"not null;check:rating >= 1 AND rating <= 5" json:"rating"` // rating 1-5
+	Comment   string         `gorm:"type:text" json:"comment"`
+	CreatedAt time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+func (r *Review) BeforeCreate(tx *gorm.DB) (err error) {
+	if r.ID == uuid.Nil {
+		r.ID = uuid.New()
+	}
+	return
+}
+
+type Attendance struct {
+	ID         uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID     uuid.UUID      `gorm:"type:char(36);not null;index" json:"userId"`
+	ScheduleID uuid.UUID      `gorm:"type:char(36);not null;index" json:"scheduleId"`
+	Status     string         `gorm:"type:varchar(20);not null;check:status IN ('attended', 'absent', 'cancelled')" json:"status"`
+	CheckedAt  *time.Time     `json:"checkedAt,omitempty"`
+	CreatedAt  time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+type Instructor struct {
+	ID             uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID         uuid.UUID      `gorm:"type:char(36);not null;uniqueIndex" json:"userId"`
+	Experience     int            `gorm:"not null;default:0" json:"experience"`
+	Specialties    string         `gorm:"type:text" json:"specialties"`
+	Rating         float64        `gorm:"type:decimal(2,1);default:5.0" json:"rating"`
+	TotalClass     int            `gorm:"not null;default:0" json:"totalClass"`
+	Certifications string         `gorm:"type:text" json:"certifications"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	UpdatedAt      time.Time      `gorm:"autoUpdateTime" json:"updatedAt"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
+
+	User User `gorm:"foreignKey:UserID"`
+}
+
+func (i *Instructor) BeforeCreate(tx *gorm.DB) (err error) {
+	if i.ID == uuid.Nil {
+		i.ID = uuid.New()
+	}
+	return
+}
+
+type ScheduleTemplate struct {
+	ID           uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	ClassID      uuid.UUID `gorm:"type:char(36);not null" json:"classId"`
+	InstructorID uuid.UUID `gorm:"type:char(36);not null" json:"instructorId"`
+	DayOfWeek    int       `gorm:"not null" json:"dayOfWeek"`   // 0=Sunday, 6=Saturday
+	StartHour    int       `gorm:"not null" json:"startHour"`   // 0-23
+	StartMinute  int       `gorm:"not null" json:"startMinute"` // 0-59
+	Capacity     int       `gorm:"not null" json:"capacity"`
+	IsActive     bool      `gorm:"default:true" json:"isActive"`
+	CreatedAt    time.Time `gorm:"autoCreateTime" json:"createdAt"`
+}
+
+func (s *ScheduleTemplate) BeforeCreate(tx *gorm.DB) (err error) {
+	if s.ID == uuid.Nil {
+		s.ID = uuid.New()
 	}
 	return
 }

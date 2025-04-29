@@ -3,6 +3,7 @@ package utils
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -58,4 +59,12 @@ func IsAdmin(role string) bool {
 
 func IsInstructor(role string) bool {
 	return role == "instructor"
+}
+
+func nextWeekday(t time.Time, weekday time.Weekday) time.Time {
+	daysUntil := (int(weekday) - int(t.Weekday()) + 7) % 7
+	if daysUntil == 0 {
+		daysUntil = 7
+	}
+	return t.AddDate(0, 0, daysUntil)
 }

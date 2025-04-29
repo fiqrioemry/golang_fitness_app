@@ -36,11 +36,48 @@ func SeedUsers(db *gorm.DB) {
 		},
 	}
 
+	instructorUsers := []models.User{
+		{
+			ID:       uuid.New(),
+			Email:    "instructor1@example.com",
+			Password: string(password),
+			Role:     "instructor",
+			Profile: models.Profile{
+				Fullname: "Instructor One",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Instructor1",
+			},
+		},
+		{
+			ID:       uuid.New(),
+			Email:    "instructor2@example.com",
+			Password: string(password),
+			Role:     "instructor",
+			Profile: models.Profile{
+				Fullname: "Instructor Two",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Instructor2",
+			},
+		},
+		{
+			ID:       uuid.New(),
+			Email:    "instructor3@example.com",
+			Password: string(password),
+			Role:     "instructor",
+			Profile: models.Profile{
+				Fullname: "Instructor Three",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Instructor3",
+			},
+		},
+	}
+
+	// Insert data
 	if err := db.Create(&adminUser).Error; err != nil {
 		log.Println("Failed to seed admin:", err)
 	}
 	if err := db.Create(&customerUser).Error; err != nil {
 		log.Println("Failed to seed customer:", err)
+	}
+	if err := db.Create(&instructorUsers).Error; err != nil {
+		log.Println("Failed to seed instructors:", err)
 	}
 
 	log.Println("✅ User seeding completed!")
@@ -409,4 +446,234 @@ func SeedPackages(db *gorm.DB) {
 
 func intPtr(i int) *int {
 	return &i
+}
+
+func SeedInstructors(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Instructor{}).Count(&count)
+
+	if count > 0 {
+		log.Println("Instructors already seeded, skipping...")
+		return
+	}
+
+	// Cari user dengan role instructor
+	var instructorsUser []models.User
+	if err := db.Where("role = ?", "instructor").Find(&instructorsUser).Error; err != nil {
+		log.Println("Failed to fetch instructor users:", err)
+		return
+	}
+
+	if len(instructorsUser) == 0 {
+		log.Println("No instructor users found, skipping instructor seeding...")
+		return
+	}
+
+	var instructors []models.Instructor
+	for _, user := range instructorsUser {
+		instructors = append(instructors, models.Instructor{
+			ID:             uuid.New(),
+			UserID:         user.ID,
+			Experience:     3,
+			Specialties:    "Yoga, Reformer Pilates",
+			Rating:         5.0,
+			TotalClass:     0,
+			Certifications: "Certified Yoga Teacher, Certified Reformer Pilates Instructor",
+		})
+	}
+
+	if err := db.Create(&instructors).Error; err != nil {
+		log.Printf("failed seeding instructors: %v", err)
+	} else {
+		log.Println("✅ Successfully seeded instructors!")
+	}
+}
+
+func SeedPayments(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Payment{}).Count(&count)
+
+	if count > 0 {
+		log.Println("Payments already seeded, skipping...")
+		return
+	}
+
+	// Fetch user dan package
+	var user models.User
+	var pkg models.Package
+	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
+		log.Println("Failed to find customer user:", err)
+		return
+	}
+	if err := db.First(&pkg).Error; err != nil {
+		log.Println("Failed to find package:", err)
+		return
+	}
+
+	payments := []models.Payment{
+		{
+			ID:            uuid.New(),
+			UserID:        user.ID,
+			PackageID:     pkg.ID,
+			PaymentMethod: "midtrans",
+			Status:        "success",
+			PaidAt:        time.Now(),
+		},
+	}
+
+	if err := db.Create(&payments).Error; err != nil {
+		log.Printf("failed seeding payments: %v", err)
+	} else {
+		log.Println("✅ Payments seeding completed!")
+	}
+}
+
+func SeedUserPackages(db *gorm.DB) {
+	var count int64
+	db.Model(&models.UserPackage{}).Count(&count)
+
+	if count > 0 {
+		log.Println("UserPackages already seeded, skipping...")
+		return
+	}
+
+	// Fetch user dan package
+	var user models.User
+	var pkg models.Package
+	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
+		log.Println("Failed to find customer user:", err)
+		return
+	}
+	if err := db.First(&pkg).Error; err != nil {
+		log.Println("Failed to find package:", err)
+		return
+	}
+
+	expired := time.Now().AddDate(0, 0, *pkg.Expired)
+
+	userPackages := []models.UserPackage{
+		{
+			ID:              uuid.New(),
+			UserID:          user.ID,
+			PackageID:       pkg.ID,
+			RemainingCredit: pkg.Credit,
+			PurchasedAt:     time.Now(),
+			ExpiredAt:       &expired,
+		},
+	}
+
+	if err := db.Create(&userPackages).Error; err != nil {
+		log.Printf("failed seeding user packages: %v", err)
+	} else {
+		log.Println("✅ UserPackages seeding completed!")
+	}
+}
+
+func SeedClassSchedules(db *gorm.DB) {
+	var count int64
+	db.Model(&models.ClassSchedule{}).Count(&count)
+
+	if count > 0 {
+		log.Println("ClassSchedules already seeded, skipping...")
+		return
+	}
+
+	// Fetch class dan instructor
+	var class models.Class
+	var instructor models.Instructor
+	if err := db.First(&class).Error; err != nil {
+		log.Println("Failed to find class:", err)
+		return
+	}
+	if err := db.First(&instructor).Error; err != nil {
+		log.Println("Failed to find instructor:", err)
+		return
+	}
+
+	startTime := time.Now().AddDate(0, 0, 2).Truncate(time.Hour).Add(10 * time.Hour) // 2 hari lagi jam 10:00
+	endTime := startTime.Add(time.Minute * time.Duration(class.Duration))
+
+	schedules := []models.ClassSchedule{
+		{
+			ID:           uuid.New(),
+			ClassID:      class.ID,
+			InstructorID: instructor.ID,
+			StartTime:    startTime,
+			EndTime:      endTime,
+			Capacity:     10,
+			IsActive:     true,
+		},
+	}
+
+	if err := db.Create(&schedules).Error; err != nil {
+		log.Printf("failed seeding class schedules: %v", err)
+	} else {
+		log.Println("✅ ClassSchedules seeding completed!")
+	}
+}
+
+func SeedScheduleTemplates(db *gorm.DB) {
+	var count int64
+	db.Model(&models.ScheduleTemplate{}).Count(&count)
+
+	if count > 0 {
+		log.Println("ScheduleTemplates already seeded, skipping...")
+		return
+	}
+
+	var classes []models.Class
+	var instructors []models.Instructor
+
+	if err := db.Find(&classes).Error; err != nil {
+		log.Println("Failed to fetch classes:", err)
+		return
+	}
+	if err := db.Find(&instructors).Error; err != nil {
+		log.Println("Failed to fetch instructors:", err)
+		return
+	}
+
+	if len(classes) == 0 || len(instructors) == 0 {
+		log.Println("Classes or Instructors not found, skipping seeding schedule templates.")
+		return
+	}
+
+	templates := []models.ScheduleTemplate{
+		{
+			ID:           uuid.New(),
+			ClassID:      classes[0].ID,
+			InstructorID: instructors[0].ID,
+			DayOfWeek:    1, // Monday
+			StartHour:    10,
+			StartMinute:  0,
+			Capacity:     10,
+			IsActive:     true,
+		},
+		{
+			ID:           uuid.New(),
+			ClassID:      classes[1%len(classes)].ID,
+			InstructorID: instructors[1%len(instructors)].ID,
+			DayOfWeek:    2, // Tuesday
+			StartHour:    14,
+			StartMinute:  30,
+			Capacity:     12,
+			IsActive:     true,
+		},
+		{
+			ID:           uuid.New(),
+			ClassID:      classes[2%len(classes)].ID,
+			InstructorID: instructors[2%len(instructors)].ID,
+			DayOfWeek:    4, // Thursday
+			StartHour:    18,
+			StartMinute:  0,
+			Capacity:     8,
+			IsActive:     true,
+		},
+	}
+
+	if err := db.Create(&templates).Error; err != nil {
+		log.Printf("failed seeding schedule templates: %v", err)
+	} else {
+		log.Println("✅ ScheduleTemplates seeding completed!")
+	}
 }
