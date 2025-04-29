@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Trash } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 
@@ -16,8 +16,11 @@ const FormDelete = ({ title, description, onClick, loading = false }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="btn btn-danger">
-          <Trash size={18} />
+        <button
+          type="button"
+          className="text-red-500 hover:text-red-700 transition"
+        >
+          <Trash2 className="w-4 h-4" />
         </button>
       </DialogTrigger>
 

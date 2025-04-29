@@ -48,4 +48,4 @@ const ErrorDialog = ({ open = true, onRetry }) => {
   );
 };
 
-export default ErrorDialog;
+export { ErrorDialog };

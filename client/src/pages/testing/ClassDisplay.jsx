@@ -1,45 +1,81 @@
 import React from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useClassesQuery } from "@/hooks/useClass";
-import FetchLoading from "@/components/ui/FetchLoading";
-import ErrorDialog from "@/components/ui/ErrorDialog";
+import { Loading } from "@/components/ui/Loading";
+import { Pencil, Trash2, Plus } from "lucide-react";
+import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import DeleteClass from "./DeleteClass";
+import UpdateClass from "./UpdateClass";
 
 const ClassDisplay = () => {
-  const [searchParams] = useSearchParams();
-  const filters = Object.fromEntries([...searchParams]);
+  const { data, isLoading, isError, refetch } = useClassesQuery();
+  const classes = data?.classes || [];
+  const navigate = useNavigate();
 
-  const {
-    data: classes,
-    isLoading,
-    isError,
-    refetch,
-  } = useClassesQuery(filters);
-
-  if (isLoading) {
-    return (
-      <div className="grid gap-4">
-        {Array.from({ length: 6 }).map((_, idx) => (
-          <div key={idx} className="p-4 border rounded animate-pulse">
-            <div className="h-6 bg-gray-300 rounded w-2/3 mb-2"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
+  if (isLoading) return <Loading />;
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <div className="grid gap-4">
-      {classes?.data?.length === 0 && <p>No classes found.</p>}
-      {classes?.data?.map((cls) => (
-        <div key={cls.id} className="p-4 border rounded">
-          <h3 className="font-bold">{cls.title}</h3>
-          <p>{cls.description}</p>
-        </div>
-      ))}
-    </div>
+    <section className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Manajemen Kelas</h2>
+        <button
+          onClick={() => navigate("/admin/class/create")}
+          className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition"
+        >
+          <Plus className="w-4 h-4" />
+          Tambah Kelas
+        </button>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white rounded-md shadow-sm text-sm">
+          <thead className="bg-gray-100 text-gray-700">
+            <tr>
+              <th className="p-3 text-left">Thumbnail</th>
+              <th className="p-3 text-left">Judul</th>
+              <th className="p-3 text-left">Durasi</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Tanggal Dibuat</th>
+              <th className="p-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {classes.map((classItem) => (
+              <tr key={classItem.id} className="border-t hover:bg-gray-50">
+                <td className="p-3">
+                  <img
+                    src={classItem.image}
+                    alt={classItem.title}
+                    className="w-16 h-16 object-cover rounded-md"
+                  />
+                </td>
+                <td className="p-3 font-medium">{classItem.title}</td>
+                <td className="p-3">{classItem.duration} menit</td>
+                <td className="p-3">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      classItem.isActive
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {classItem.isActive ? "Aktif" : "Tidak Aktif"}
+                  </span>
+                </td>
+                <td className="p-3">
+                  {new Date(classItem.createdAt).toLocaleDateString()}
+                </td>
+                <td className="p-3 text-center flex justify-center gap-2">
+                  <UpdateClass classes={classItem} />
+                  <DeleteClass classes={classItem} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 };
 

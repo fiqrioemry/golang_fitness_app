@@ -20,8 +20,11 @@ const UpdateAddress = ({ address }) => {
       schema={addressSchema}
       title="Update Address"
       buttonText={
-        <button className="btn btn-secondary">
-          <Edit2 className="text-white-500" size={18} />
+        <button
+          type="button"
+          className="text-primary hover:text-blue-600 transition"
+        >
+          <Pencil className="w-4 h-4" />
         </button>
       }
     >

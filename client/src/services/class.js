@@ -6,7 +6,6 @@ import { publicInstance, authInstance } from ".";
 // =====================
 
 export const getAllClasses = async (params) => {
-  console.log(params);
   const res = await publicInstance.get("/classes", { params });
   return res.data;
 };
@@ -22,8 +21,9 @@ export const getClassById = async (id) => {
 };
 
 export const createClass = async (formData) => {
-  const res = await authInstance.post("/classes", formData);
-  return res.data;
+  console.log(formData);
+  // const res = await authInstance.post("/classes", formData);
+  return "Pembuatan kelas berhasil";
 };
 
 export const updateClass = async (id, formData) => {

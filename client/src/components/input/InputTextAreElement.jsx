@@ -19,7 +19,7 @@ const InputTextareaElement = ({
       control={control}
       rules={rules}
       render={({ field, fieldState }) => (
-        <div className="space-y-1">
+        <div className="space-y-2">
           {label && (
             <label
               htmlFor={name}

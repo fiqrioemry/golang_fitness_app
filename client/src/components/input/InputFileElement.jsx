@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { PlusCircle, X } from "lucide-react";
 import { Controller, useFormContext } from "react-hook-form";
+import { PlusCircle, X } from "lucide-react";
 import { toast } from "sonner";
 
 const InputFileElement = ({
@@ -13,7 +13,6 @@ const InputFileElement = ({
 }) => {
   const { control } = useFormContext();
   const [isDragging, setIsDragging] = useState(false);
-  const actualMaxImages = isSingle ? 1 : maxImages;
 
   return (
     <Controller
@@ -34,25 +33,79 @@ const InputFileElement = ({
 
           if (validFiles.length === 0) return;
 
-          const updated = isSingle
-            ? [validFiles[0]]
-            : [...(field.value || []), ...validFiles].slice(0, actualMaxImages);
+          if (isSingle) {
+            field.onChange(validFiles[0]); // ✅ Single File
+          } else {
+            const updated = [
+              ...(field.value || []).filter((f) => f instanceof File),
+              ...validFiles,
+            ].slice(0, maxImages);
+            field.onChange(updated); // ✅ Array of Files
+          }
+        };
 
-          field.onChange(updated);
+        const handleRemoveImage = (img) => {
+          if (isSingle) {
+            field.onChange(null);
+          } else {
+            const updated = (field.value || []).filter(
+              (file) => file !== img && file instanceof File
+            );
+            field.onChange(updated);
+          }
         };
 
         const handleDrop = (e) => {
           e.preventDefault();
           setIsDragging(false);
-          if (e.dataTransfer.files.length) {
+          if (e.dataTransfer.files.length > 0) {
             handleFiles(e.dataTransfer.files);
             e.dataTransfer.clearData();
           }
         };
 
-        const handleRemoveImage = (img) => {
-          const updated = (field.value || []).filter((file) => file !== img);
-          field.onChange(updated);
+        const renderSinglePreview = () => {
+          if (!field.value || !(field.value instanceof File)) return null;
+          return (
+            <div className="relative w-full h-full">
+              <img
+                src={URL.createObjectURL(field.value)}
+                alt="preview"
+                className="object-cover w-full h-full"
+              />
+              <button
+                type="button"
+                onClick={() => handleRemoveImage(field.value)}
+                className="absolute top-2 right-2 p-1 rounded-full bg-white shadow hover:bg-red-500 hover:text-white transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          );
+        };
+
+        const renderMultiplePreview = () => {
+          return (field.value || [])
+            .filter((f) => f instanceof File)
+            .map((img, idx) => (
+              <div
+                key={idx}
+                className="relative w-32 h-32 border rounded-md overflow-hidden"
+              >
+                <img
+                  src={URL.createObjectURL(img)}
+                  alt="preview"
+                  className="object-cover w-full h-full"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(img)}
+                  className="absolute top-1 right-1 p-1 rounded-full bg-white shadow hover:bg-red-500 hover:text-white transition"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ));
         };
 
         return (
@@ -66,7 +119,6 @@ const InputFileElement = ({
               </label>
             )}
 
-            {/* Upload Area */}
             <div
               onDrop={handleDrop}
               onDragOver={(e) => {
@@ -81,68 +133,26 @@ const InputFileElement = ({
                 isSingle
                   ? "relative w-full h-64 flex items-center justify-center overflow-hidden"
                   : "flex flex-wrap gap-4 p-4"
-              } border-2 rounded-md border-dashed ${
+              } border-2 rounded-md ${
                 isDragging ? "border-primary bg-primary/10" : "border-primary"
               } transition`}
             >
               {isSingle ? (
-                <>
-                  {field.value?.length > 0 ? (
-                    <div className="relative w-full h-full">
-                      <img
-                        src={URL.createObjectURL(field.value[0])}
-                        alt="preview"
-                        className="object-cover w-full h-full"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(field.value[0])}
-                        className="absolute top-2 right-2 p-1 rounded-full bg-white shadow hover:bg-red-500 hover:text-white transition"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <label
-                      htmlFor={`${name}-upload`}
-                      className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-primary/10"
-                    >
-                      <PlusCircle className="text-primary mb-2" />
-                      <span className="text-primary text-sm">Select Image</span>
-                    </label>
-                  )}
-                  <input
-                    id={`${name}-upload`}
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFiles(e.target.files)}
-                    multiple={false}
-                    hidden
-                  />
-                </>
+                field.value ? (
+                  renderSinglePreview()
+                ) : (
+                  <label
+                    htmlFor={`${name}-upload`}
+                    className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-primary/10"
+                  >
+                    <PlusCircle className="text-primary mb-2" />
+                    <span className="text-primary text-sm">Select Image</span>
+                  </label>
+                )
               ) : (
                 <>
-                  {(field.value || []).map((img, idx) => (
-                    <div
-                      key={idx}
-                      className="relative w-32 h-32 border rounded-md overflow-hidden"
-                    >
-                      <img
-                        src={URL.createObjectURL(img)}
-                        alt="preview"
-                        className="object-cover w-full h-full"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(img)}
-                        className="absolute top-1 right-1 p-1 rounded-full bg-white shadow hover:bg-red-500 hover:text-white transition"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-
-                  {(!field.value || field.value.length < actualMaxImages) && (
+                  {renderMultiplePreview()}
+                  {(!field.value || field.value.length < maxImages) && (
                     <label
                       htmlFor={`${name}-upload`}
                       className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-primary rounded-md cursor-pointer hover:bg-primary/10 transition"
@@ -153,16 +163,16 @@ const InputFileElement = ({
                       </span>
                     </label>
                   )}
-                  <input
-                    id={`${name}-upload`}
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFiles(e.target.files)}
-                    multiple
-                    hidden
-                  />
                 </>
               )}
+              <input
+                id={`${name}-upload`}
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFiles(e.target.files)}
+                multiple={!isSingle}
+                hidden
+              />
             </div>
 
             {/* Error Message */}

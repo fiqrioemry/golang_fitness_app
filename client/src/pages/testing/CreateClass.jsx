@@ -11,7 +11,7 @@ import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { InputTextareaElement } from "@/components/input/InputTextAreElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
 
-const Home = () => {
+const CreateClass = () => {
   const { createClass } = useClassMutation();
 
   return (
@@ -89,4 +89,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default CreateClass;

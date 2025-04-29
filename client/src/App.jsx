@@ -12,6 +12,7 @@ import { Loading } from "@/components/ui/Loading";
 import { AuthRoute, NonAuthRoute } from "./middleware";
 import UserLayout from "./components/layout/UserLayout";
 import { Navigate, Route, Routes } from "react-router-dom";
+import ClassDisplay from "./pages/testing/ClassDisplay";
 
 function App() {
   const { isLoading } = useAuthMe();
@@ -22,6 +23,7 @@ function App() {
     <>
       <Toaster />
       <Routes>
+        <Route path="/class" element={<ClassDisplay />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route
