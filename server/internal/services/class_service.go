@@ -17,6 +17,8 @@ type ClassService interface {
 	GetClassByID(id string) (*dto.ClassDetailResponse, error)
 	GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassResponse, int64, error)
 	GetActiveClasses() ([]dto.ClassResponse, error)
+	AddClassGallery(galleries []models.ClassGallery) error
+	DeleteClassGallery(galleryID string) error
 }
 
 type classService struct {
@@ -64,7 +66,25 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 		CreatedAt:      time.Now(),
 	}
 
-	return s.repo.CreateClass(&class)
+	err = s.repo.CreateClass(&class)
+	if err != nil {
+		return err
+	}
+
+	if req.ImageURLs != nil && len(req.ImageURLs) > 0 {
+		var galleries []models.ClassGallery
+		for _, url := range req.ImageURLs {
+			galleries = append(galleries, models.ClassGallery{
+				ID:        uuid.New(),
+				ClassID:   class.ID,
+				URL:       url,
+				CreatedAt: time.Now(),
+			})
+		}
+		_ = s.repo.SaveClassGalleries(galleries)
+	}
+
+	return nil
 }
 
 func (s *classService) UpdateClass(id string, req dto.UpdateClassRequest) error {
@@ -269,4 +289,12 @@ func (s *classService) GetActiveClasses() ([]dto.ClassResponse, error) {
 	}
 
 	return result, nil
+}
+
+func (s *classService) AddClassGallery(galleries []models.ClassGallery) error {
+	return s.repo.SaveClassGalleries(galleries)
+}
+
+func (s *classService) DeleteClassGallery(galleryID string) error {
+	return s.repo.DeleteClassGalleryByID(galleryID)
 }

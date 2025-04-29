@@ -68,9 +68,6 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 	}
 
 	snapResp, err := config.SnapClient.CreateTransaction(snapReq)
-	if err != nil {
-		return nil, err
-	}
 
 	return &dto.CreatePaymentResponse{
 		PaymentID: paymentID.String(),
@@ -79,14 +76,14 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 }
 
 func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationRequest) error {
-	// Cari payment berdasarkan OrderID
+
 	payment, err := s.paymentRepo.GetPaymentByOrderID(req.OrderID)
 	if err != nil {
 		return err
 	}
 
 	if payment.Status == "success" {
-		return nil // ignore jika sudah success
+		return nil
 	}
 
 	if req.TransactionStatus == "settlement" || (req.TransactionStatus == "capture" && req.FraudStatus == "accept") {

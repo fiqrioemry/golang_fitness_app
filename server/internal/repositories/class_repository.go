@@ -13,6 +13,8 @@ type ClassRepository interface {
 	GetClassByID(id string) (*models.Class, error)
 	GetAllClasses(filter map[string]interface{}, search string, sort string, limit, offset int) ([]models.Class, int64, error)
 	GetActiveClasses() ([]models.Class, error)
+	SaveClassGalleries(galleries []models.ClassGallery) error
+	DeleteClassGalleryByID(id string) error
 }
 
 type classRepository struct {
@@ -90,4 +92,12 @@ func (r *classRepository) GetActiveClasses() ([]models.Class, error) {
 		return nil, err
 	}
 	return classes, nil
+}
+
+func (r *classRepository) SaveClassGalleries(galleries []models.ClassGallery) error {
+	return r.db.Create(&galleries).Error
+}
+
+func (r *classRepository) DeleteClassGalleryByID(id string) error {
+	return r.db.Delete(&models.ClassGallery{}, "id = ?", id).Error
 }

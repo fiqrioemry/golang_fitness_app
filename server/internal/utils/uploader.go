@@ -126,7 +126,6 @@ func UploadImageWithValidation(fileHeader *multipart.FileHeader) (string, error)
 	return imageURL, nil
 }
 
-// CleanupImageOnError menghapus gambar dari Cloudinary jika terjadi error
 func CleanupImageOnError(imageURL string) {
 	if imageURL != "" {
 		_ = DeleteFromCloudinary(imageURL)

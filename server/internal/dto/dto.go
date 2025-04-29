@@ -59,17 +59,19 @@ type UpdateProfileRequest struct {
 
 // class request
 type CreateClassRequest struct {
-	Title         string                `form:"title" binding:"required"`
-	Duration      int                   `form:"duration" binding:"required,min=15"`
-	Description   string                `form:"description" binding:"required"`
-	Additional    []string              `form:"additional[]"`
-	TypeID        string                `form:"typeId" binding:"required"`
-	LevelID       string                `form:"levelId" binding:"required"`
-	LocationID    string                `form:"locationId" binding:"required"`
-	CategoryID    string                `form:"categoryId" binding:"required"`
-	SubcategoryID string                `form:"subcategoryId" binding:"required"`
-	Image         *multipart.FileHeader `form:"image" binding:"required"`
-	ImageURL      string                `form:"-"`
+	Title         string                  `form:"title" binding:"required"`
+	Duration      int                     `form:"duration" binding:"required,min=15"`
+	Description   string                  `form:"description" binding:"required"`
+	Additional    []string                `form:"additional[]"`
+	TypeID        string                  `form:"typeId" binding:"required"`
+	LevelID       string                  `form:"levelId" binding:"required"`
+	LocationID    string                  `form:"locationId" binding:"required"`
+	CategoryID    string                  `form:"categoryId" binding:"required"`
+	SubcategoryID string                  `form:"subcategoryId" binding:"required"`
+	Image         *multipart.FileHeader   `form:"image" binding:"required"`
+	ImageURL      string                  `form:"-"`
+	Images        []*multipart.FileHeader `form:"images" binding:"omitempty"`
+	ImageURLs     []string                `form:"-"`
 }
 
 type UpdateClassRequest struct {
