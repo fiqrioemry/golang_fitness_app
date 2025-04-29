@@ -67,14 +67,20 @@ func main() {
 	locationService := services.NewLocationService(locationRepo)
 	locationHandler := handlers.NewLocationHandler(locationService)
 
+	// Repository
+	packageRepo := repositories.NewPackageRepository(config.DB)
+	packageService := services.NewPackageService(packageRepo)
+	packageHandler := handlers.NewPackageHandler(packageService)
+
 	routes.AuthRoutes(r, authHandler)
 	routes.TypeRoutes(r, typeHandler)
 	routes.ClassRoutes(r, classHandler)
 	routes.LevelRoutes(r, levelHandler)
 	routes.ProfileRoutes(r, profileHandler)
 	routes.CategoryRoutes(r, categoryHandler)
-	routes.SubcategoryRoutes(r, subcategoryHandler)
 	routes.LocationRoutes(r, locationHandler)
+	routes.PackageRoutes(r, packageHandler)
+	routes.SubcategoryRoutes(r, subcategoryHandler)
 
 	seeders.SeedUsers(db)
 	seeders.SeedCategories(db)
@@ -83,6 +89,7 @@ func main() {
 	seeders.SeedLevels(db)
 	seeders.SeedLocations(db)
 	seeders.SeedClasses(db)
+	seeders.SeedPackages(db)
 
 	port := os.Getenv("PORT")
 	log.Println("server running on port:", port)

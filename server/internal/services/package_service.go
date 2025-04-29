@@ -1,0 +1,124 @@
+package services
+
+import (
+	"server/internal/dto"
+	"server/internal/models"
+	"server/internal/repositories"
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type PackageService interface {
+	CreatePackage(req dto.CreatePackageRequest) error
+	UpdatePackage(id string, req dto.UpdatePackageRequest) error
+	DeletePackage(id string) error
+	GetAllPackages() ([]dto.PackageResponse, error)
+	GetPackageByID(id string) (*dto.PackageDetailResponse, error)
+}
+
+type packageService struct {
+	repo repositories.PackageRepository
+}
+
+func NewPackageService(repo repositories.PackageRepository) PackageService {
+	return &packageService{repo}
+}
+
+func (s *packageService) CreatePackage(req dto.CreatePackageRequest) error {
+	pkg := models.Package{
+		ID:          uuid.New(),
+		Name:        req.Name,
+		Description: req.Description,
+		Price:       req.Price,
+		Credit:      req.Credit,
+		Image:       req.ImageURL,
+		IsActive:    true,
+		Information: req.Information,
+		CreatedAt:   time.Now(),
+	}
+	if req.Expired > 0 {
+		pkg.Expired = &req.Expired
+	}
+	return s.repo.CreatePackage(&pkg)
+}
+
+func (s *packageService) UpdatePackage(id string, req dto.UpdatePackageRequest) error {
+	pkg, err := s.repo.GetPackageByID(id)
+	if err != nil {
+		return err
+	}
+
+	if req.Name != "" {
+		pkg.Name = req.Name
+	}
+	if req.Description != "" {
+		pkg.Description = req.Description
+	}
+	if req.Price != 0 {
+		pkg.Price = req.Price
+	}
+	if req.Credit != 0 {
+		pkg.Credit = req.Credit
+	}
+	if req.Information != "" {
+		pkg.Information = req.Information
+	}
+	if req.Expired != 0 {
+		pkg.Expired = &req.Expired
+	}
+	if req.ImageURL != "" {
+		pkg.Image = req.ImageURL
+	}
+
+	return s.repo.UpdatePackage(pkg)
+}
+
+func (s *packageService) DeletePackage(id string) error {
+	return s.repo.DeletePackage(id)
+}
+
+func (s *packageService) GetAllPackages() ([]dto.PackageResponse, error) {
+	packages, err := s.repo.GetAllPackages()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.PackageResponse
+	for _, p := range packages {
+		result = append(result, dto.PackageResponse{
+			ID:          p.ID.String(),
+			Name:        p.Name,
+			Description: p.Description,
+			Price:       p.Price,
+			Credit:      p.Credit,
+			Image:       p.Image,
+			IsActive:    p.IsActive,
+		})
+	}
+	return result, nil
+}
+
+func (s *packageService) GetPackageByID(id string) (*dto.PackageDetailResponse, error) {
+	pkg, err := s.repo.GetPackageByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	expired := 0
+	if pkg.Expired != nil {
+		expired = *pkg.Expired
+	}
+
+	return &dto.PackageDetailResponse{
+		ID:          pkg.ID.String(),
+		Name:        pkg.Name,
+		Description: pkg.Description,
+		Price:       pkg.Price,
+		Credit:      pkg.Credit,
+		Expired:     expired,
+		Image:       pkg.Image,
+		IsActive:    pkg.IsActive,
+		Information: pkg.Information,
+	}, nil
+}

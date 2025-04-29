@@ -133,6 +133,46 @@ func CleanupImageOnError(imageURL string) {
 	}
 }
 
+func UploadMultipleImagesWithValidation(fileHeaders []*multipart.FileHeader) ([]string, error) {
+	var uploadedURLs []string
+
+	for _, fileHeader := range fileHeaders {
+		if fileHeader == nil {
+			return nil, errors.New("one of the images is missing")
+		}
+
+		// Validate
+		if err := ValidateImageFile(fileHeader); err != nil {
+			return nil, err
+		}
+
+		// Open
+		file, err := fileHeader.Open()
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+
+		// Upload
+		imageURL, err := UploadToCloudinary(file)
+		if err != nil {
+			return nil, err
+		}
+
+		uploadedURLs = append(uploadedURLs, imageURL)
+	}
+
+	return uploadedURLs, nil
+}
+
+func CleanupImagesOnError(imageURLs []string) {
+	for _, url := range imageURLs {
+		if url != "" {
+			_ = DeleteFromCloudinary(url)
+		}
+	}
+}
+
 func UploadToLocal(file multipart.File, fileHeader *multipart.FileHeader) (string, error) {
 	uploadPath := "./uploads/"
 	err := os.MkdirAll(uploadPath, os.ModePerm)

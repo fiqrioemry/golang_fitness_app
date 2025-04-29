@@ -210,3 +210,51 @@ type LocationResponse struct {
 	Address     string `json:"address"`
 	GeoLocation string `json:"geoLocation"`
 }
+
+// package
+// Create
+type CreatePackageRequest struct {
+	Name        string                `form:"name" binding:"required,min=2"`
+	Description string                `form:"description" binding:"required"`
+	Price       float64               `form:"price" binding:"required,gt=0"`
+	Credit      int                   `form:"credit" binding:"required,gt=0"`
+	Expired     int                   `form:"expired"`
+	Information string                `form:"information"`
+	Image       *multipart.FileHeader `form:"image" binding:"required"`
+	ImageURL    string                `form:"-"`
+}
+
+// Update
+type UpdatePackageRequest struct {
+	Name        string                `form:"name"`
+	Description string                `form:"description"`
+	Price       float64               `form:"price"`
+	Credit      int                   `form:"credit"`
+	Expired     int                   `form:"expired"`
+	Information string                `form:"information"`
+	Image       *multipart.FileHeader `form:"image"`
+	ImageURL    string                `form:"-"`
+}
+
+// Response
+type PackageResponse struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	Credit      int     `json:"credit"`
+	Image       string  `json:"image"`
+	IsActive    bool    `json:"isActive"`
+}
+
+type PackageDetailResponse struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	Credit      int     `json:"credit"`
+	Expired     int     `json:"expired"`
+	Image       string  `json:"image"`
+	IsActive    bool    `json:"isActive"`
+	Information string  `json:"information"`
+}

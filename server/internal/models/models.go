@@ -83,13 +83,13 @@ type Class struct {
 	CreatedAt      time.Time `gorm:"autoCreateTime" json:"createdAt"`
 
 	// relationship
-	Gallery     ClassGallery `gorm:"foreignKey:classID"`
-	Type        Type         `gorm:"foreignKey:TypeID"`
-	Level       Level        `gorm:"foreignKey:LevelID"`
-	Category    Category     `gorm:"foreignKey:CategoryID"`
-	Subcategory Subcategory  `gorm:"foreignKey:SubcategoryID"`
-	Location    Location     `gorm:"foreignKey:LocationID"`
+	Type        Type        `gorm:"foreignKey:TypeID"`
+	Level       Level       `gorm:"foreignKey:LevelID"`
+	Category    Category    `gorm:"foreignKey:CategoryID"`
+	Subcategory Subcategory `gorm:"foreignKey:SubcategoryID"`
+	Location    Location    `gorm:"foreignKey:LocationID"`
 
+	// optional
 	Galleries []*ClassGallery `gorm:"foreignKey:ClassID" json:"galleries,omitempty"`
 }
 
@@ -138,7 +138,9 @@ type Package struct {
 	Price       float64   `gorm:"type:decimal(10,2);not null" json:"price"`
 	Credit      int       `gorm:"not null" json:"credit"`
 	Expired     *int      `json:"expired"`
-	Information string    `gorm:"type:text" json:"information"` // <- Fix: sebelumnya datatypes.JSON
+	Information string    `gorm:"type:text" json:"information"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 func (p *Package) BeforeCreate(tx *gorm.DB) (err error) {

@@ -2,6 +2,7 @@ package seeders
 
 import (
 	"log"
+	"time"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -311,11 +312,11 @@ func SeedClasses(db *gorm.DB) {
 			Duration:       45,
 			Description:    "A one-on-one session with a yoga instructor.",
 			AdditionalList: []string{"Private", "Yoga", "Therapy"},
-			TypeID:         types[1].ID,  // Personal Training
-			LevelID:        levels[0].ID, // Beginner
+			TypeID:         types[1].ID,
+			LevelID:        levels[0].ID,
 			LocationID:     locations[0].ID,
-			CategoryID:     categories[0].ID,    // Yoga
-			SubcategoryID:  subcategories[0].ID, // Vinyasa Yoga
+			CategoryID:     categories[0].ID,
+			SubcategoryID:  subcategories[0].ID,
 			IsActive:       true,
 		},
 	}
@@ -325,4 +326,87 @@ func SeedClasses(db *gorm.DB) {
 	} else {
 		log.Println("✅ Successfully seeded classes!")
 	}
+}
+
+func SeedPackages(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Package{}).Count(&count)
+
+	if count > 0 {
+		log.Println("Packages already seeded, skipping...")
+		return
+	}
+
+	packages := []models.Package{
+		{
+			ID:          uuid.New(),
+			Name:        "Trial Session",
+			Description: "1x Class Trial for new members.",
+			Price:       500000,
+			Credit:      1,
+			Expired:     intPtr(14), // 14 hari
+			Information: "Valid for 14 days after first booking.",
+			Image:       "https://example.com/package-trial.jpg",
+			IsActive:    true,
+			CreatedAt:   time.Now(),
+		},
+		{
+			ID:          uuid.New(),
+			Name:        "5 Sessions Package",
+			Description: "Enjoy 5 reformer classes package.",
+			Price:       2250000,
+			Credit:      5,
+			Expired:     intPtr(60), // 2 bulan
+			Information: "Valid for 2 months after first booking.",
+			Image:       "https://example.com/package-5sessions.jpg",
+			IsActive:    true,
+			CreatedAt:   time.Now(),
+		},
+		{
+			ID:          uuid.New(),
+			Name:        "10 Sessions Package",
+			Description: "Maximize your training with 10 sessions!",
+			Price:       4100000,
+			Credit:      10,
+			Expired:     intPtr(120), // 4 bulan
+			Information: "Valid for 4 months after first booking.",
+			Image:       "https://example.com/package-10sessions.jpg",
+			IsActive:    true,
+			CreatedAt:   time.Now(),
+		},
+		{
+			ID:          uuid.New(),
+			Name:        "FTM x SANE Single Visit Promo",
+			Description: "Special promo for FTM x SANE group class.",
+			Price:       100000,
+			Credit:      1,
+			Expired:     intPtr(14),
+			Information: "Valid for 14 days after first booking.",
+			Image:       "https://example.com/package-ftm-promo.jpg",
+			IsActive:    true,
+			CreatedAt:   time.Now(),
+		},
+		{
+			ID:          uuid.New(),
+			Name:        "FTM x SANE Bundle 2 Classes",
+			Description: "Bundle of 2 classes for group sessions.",
+			Price:       275000,
+			Credit:      2,
+			Expired:     intPtr(20),
+			Information: "Valid for 20 days after first booking.",
+			Image:       "https://example.com/package-ftm-bundle.jpg",
+			IsActive:    true,
+			CreatedAt:   time.Now(),
+		},
+	}
+
+	if err := db.Create(&packages).Error; err != nil {
+		log.Printf("failed seeding packages: %v", err)
+	} else {
+		log.Println("✅ Successfully seeded packages!")
+	}
+}
+
+func intPtr(i int) *int {
+	return &i
 }
