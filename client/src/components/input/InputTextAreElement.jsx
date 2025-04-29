@@ -1,12 +1,13 @@
-// src/components/input/SelectElement.jsx
+// src/components/input/InputTextareaElement.jsx
 
 import { Controller, useFormContext } from "react-hook-form";
 
-const SelectElement = ({
+const InputTextareaElement = ({
   name,
   label,
-  placeholder = "Select an option",
-  options = [],
+  rows = 4,
+  maxLength,
+  placeholder = "",
   disabled = false,
   rules = { required: true },
 }) => {
@@ -27,22 +28,15 @@ const SelectElement = ({
               {label}
             </label>
           )}
-          <select
+          <textarea
             id={name}
             {...field}
+            placeholder={placeholder}
             disabled={disabled}
-            className="w-full border p-2 rounded disabled:bg-gray-100"
-          >
-            <option value="">{placeholder}</option>
-            {options.map((option) => (
-              <option
-                key={option.id || option.value || option}
-                value={option.id || option.value || option}
-              >
-                {option.name || option.label || option}
-              </option>
-            ))}
-          </select>
+            rows={rows}
+            maxLength={maxLength}
+            className="w-full border p-2 rounded resize-none disabled:bg-gray-100"
+          />
           {fieldState.error && (
             <p className="text-red-500 text-xs mt-1">
               {fieldState.error.message}
@@ -54,4 +48,4 @@ const SelectElement = ({
   );
 };
 
-export { SelectElement };
+export { InputTextareaElement };

@@ -25,8 +25,11 @@ export const updateProfileSchema = z.object({
 
 // create class
 export const createClassSchema = z.object({
-  title: z.string(),
-  duration: z.number().min(15, "Durasi minimal 15 menit"),
+  title: z.string().min(6, "Title minimal 6 Karakter"),
+  duration: z
+    .number()
+    .min(15, "Durasi minimal 15 menit")
+    .max(180, "Durasi maksimal 180 menit"),
   description: z.string(),
   additional: z.array(z.string()).optional(),
   typeId: z.string(),
@@ -81,28 +84,28 @@ export const createCategorySchema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter"),
 });
 
-export const createLocationSchema = z.object({
+export const creatLocationSchema = z.object({
   name: z.string().min(2),
   address: z.string(),
   geoLocation: z.string(),
 });
 
-export const createReviewSchema = z.object({
+export const createReviewRequestSchema = z.object({
   classId: z.string(),
   rating: z.number().min(1).max(5),
   comment: z.string().optional(),
 });
 
-export const markAttendanceSchema = z.object({
+export const markAttendanceRequestSchema = z.object({
   bookingId: z.string(),
   status: z.enum(["attended", "absent", "cancelled"]),
 });
 
-export const createBookingSchema = z.object({
+export const createBookingRequestSchema = z.object({
   classScheduleId: z.string(),
 });
 
-export const createScheduleTemplateSchema = z.object({
+export const createScheduleTemplateRequestSchema = z.object({
   classId: z.string(),
   instructorId: z.string(),
   dayOfWeek: z.number().min(0).max(6),
@@ -111,45 +114,45 @@ export const createScheduleTemplateSchema = z.object({
   capacity: z.number().positive(),
 });
 
-export const updateClassScheduleSchema = z.object({
+export const updateClassScheduleRequestSchema = z.object({
   startTime: z.string().optional(),
   endTime: z.string().optional(),
   capacity: z.number().optional(),
 });
 
-export const createClassScheduleSchema = z.object({
+export const createClassScheduleRequestSchema = z.object({
   classId: z.string(),
   instructorId: z.string(),
   startTime: z.string(),
   capacity: z.number().positive(),
 });
 
-export const midtransNotificationSchema = z.object({
+export const midtransNotificationRequestSchema = z.object({
   transaction_status: z.string(),
   order_id: z.string(),
   payment_type: z.string(),
   fraud_status: z.string(),
 });
 
-export const createPaymentSchema = z.object({
+export const createPaymentRequestSchema = z.object({
   packageId: z.string(),
 });
 
-export const createInstructorSchema = z.object({
+export const createInstructorRequestSchema = z.object({
   userId: z.string(),
   experience: z.number().min(0),
   specialties: z.string(),
   certifications: z.string().optional(),
 });
 
-export const updateInstructorSchema = z.object({
+export const updateInstructorRequestSchema = z.object({
   userId: z.string(),
   experience: z.number().optional(),
   specialties: z.string().optional(),
   certifications: z.string().optional(),
 });
 
-export const createPackageSchema = z.object({
+export const createPackageRequestSchema = z.object({
   name: z.string().min(2),
   description: z.string(),
   price: z.number().positive(),
@@ -166,7 +169,7 @@ export const createPackageSchema = z.object({
     }),
 });
 
-export const updatePackageSchema = z.object({
+export const updatePackageRequestSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   price: z.number().optional(),

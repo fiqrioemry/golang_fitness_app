@@ -3,9 +3,9 @@ import { Loader2 } from "lucide-react";
 
 const SubmitButton = ({
   text = "Submit",
-  isLoading = false,
-  disabled = false,
   className = "",
+  disabled = false,
+  isLoading = false,
   ...props
 }) => {
   const baseClass =
@@ -18,8 +18,7 @@ const SubmitButton = ({
       className={`${baseClass} ${className}`}
       {...props}
     >
-      {isLoading && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
-      {text}
+      {isLoading ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : text}
     </button>
   );
 };

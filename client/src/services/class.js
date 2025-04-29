@@ -6,6 +6,7 @@ import { publicInstance, authInstance } from ".";
 // =====================
 
 export const getAllClasses = async (params) => {
+  console.log(params);
   const res = await publicInstance.get("/classes", { params });
   return res.data;
 };

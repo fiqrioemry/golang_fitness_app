@@ -3,13 +3,13 @@ import { PlusCircle, X } from "lucide-react";
 import { Controller, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 
-const UploadElement = ({
+const InputImageElement = ({
   name,
   label,
   maxImages = 5,
   maxSizeMB = 2,
+  isSingle = false,
   rules = { required: true },
-  isSingle = false, // 🆕 mode single/multi
 }) => {
   const { control } = useFormContext();
   const [isDragging, setIsDragging] = useState(false);
@@ -201,4 +201,4 @@ const UploadElement = ({
   );
 };
 
-export { UploadElement };
+export { InputImageElement };

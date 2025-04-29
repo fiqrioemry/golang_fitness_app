@@ -1,12 +1,11 @@
-// src/components/input/SelectElement.jsx
+// src/components/input/InputDateElement.jsx
 
 import { Controller, useFormContext } from "react-hook-form";
 
-const SelectElement = ({
+const InputDateElement = ({
   name,
   label,
-  placeholder = "Select an option",
-  options = [],
+  placeholder = "",
   disabled = false,
   rules = { required: true },
 }) => {
@@ -27,22 +26,14 @@ const SelectElement = ({
               {label}
             </label>
           )}
-          <select
+          <input
             id={name}
+            type="date"
             {...field}
+            placeholder={placeholder}
             disabled={disabled}
             className="w-full border p-2 rounded disabled:bg-gray-100"
-          >
-            <option value="">{placeholder}</option>
-            {options.map((option) => (
-              <option
-                key={option.id || option.value || option}
-                value={option.id || option.value || option}
-              >
-                {option.name || option.label || option}
-              </option>
-            ))}
-          </select>
+          />
           {fieldState.error && (
             <p className="text-red-500 text-xs mt-1">
               {fieldState.error.message}
@@ -54,4 +45,4 @@ const SelectElement = ({
   );
 };
 
-export { SelectElement };
+export { InputDateElement };

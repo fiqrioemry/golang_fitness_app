@@ -5,30 +5,26 @@ import { Controller, useFormContext } from "react-hook-form";
 const SelectElement = ({
   name,
   label,
-  placeholder = "Select an option",
   options = [],
   disabled = false,
-  rules = { required: true },
+  placeholder = "Select an option",
 }) => {
   const { control } = useFormContext();
 
   return (
     <Controller
-      name={name}
       control={control}
-      rules={rules}
+      name={name}
+      rules={{
+        required: true,
+        setValueAs: (value) => (value ? Number(value) : undefined),
+      }}
       render={({ field, fieldState }) => (
         <div className="space-y-1">
           {label && (
-            <label
-              htmlFor={name}
-              className="block text-sm font-medium text-gray-700"
-            >
-              {label}
-            </label>
+            <label className="block text-sm font-medium">{label}</label>
           )}
           <select
-            id={name}
             {...field}
             disabled={disabled}
             className="w-full border p-2 rounded disabled:bg-gray-100"
@@ -36,16 +32,17 @@ const SelectElement = ({
             <option value="">{placeholder}</option>
             {options.map((option) => (
               <option
-                key={option.id || option.value || option}
-                value={option.id || option.value || option}
+                key={option.id || option.name || option}
+                value={option.id || option.name || option}
               >
-                {option.name || option.label || option}
+                {option.name || option}
               </option>
             ))}
           </select>
+
           {fieldState.error && (
             <p className="text-red-500 text-xs mt-1">
-              {fieldState.error.message}
+              {fieldState.error.message || "This field is required"}
             </p>
           )}
         </div>
