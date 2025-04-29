@@ -100,19 +100,19 @@ func (h *ClassHandler) GetClassByID(c *gin.Context) {
 	}
 
 	classResponse := dto.ClassDetailResponse{
-		ID:             class.ID,
-		Title:          class.Title,
-		Image:          class.Image,
-		IsActive:       class.IsActive,
-		Duration:       class.Duration,
-		Description:    class.Description,
-		AdditionalList: class.AdditionalList,
-		Type:           class.Type,
-		Level:          class.Level,
-		Location:       class.Location,
-		Category:       class.Category,
-		Subcategory:    class.Subcategory,
-		CreatedAt:      class.CreatedAt,
+		ID:          class.ID,
+		Title:       class.Title,
+		Image:       class.Image,
+		IsActive:    class.IsActive,
+		Duration:    class.Duration,
+		Description: class.Description,
+		Additional:  class.Additional,
+		Type:        class.Type,
+		Level:       class.Level,
+		Location:    class.Location,
+		Category:    class.Category,
+		Subcategory: class.Subcategory,
+		CreatedAt:   class.CreatedAt,
 	}
 
 	c.JSON(http.StatusOK, classResponse)

@@ -131,17 +131,18 @@ func (c *Class) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Package struct {
-	ID          uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	Name        string    `gorm:"type:varchar(255);not null" json:"name"`
-	Description string    `gorm:"type:text;not null" json:"description"`
-	IsActive    bool      `gorm:"default:true" json:"isActive"`
-	Image       string    `gorm:"type:varchar(255)" json:"image"`
-	Price       float64   `gorm:"type:decimal(10,2);not null" json:"price"`
-	Credit      int       `gorm:"not null" json:"credit"`
-	Expired     *int      `json:"expired"`
-	Information string    `gorm:"type:text" json:"information"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID             uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	Name           string    `gorm:"type:varchar(255);not null" json:"name"`
+	Description    string    `gorm:"type:text;not null" json:"description"`
+	IsActive       bool      `gorm:"default:true" json:"isActive"`
+	Image          string    `gorm:"type:varchar(255)" json:"image"`
+	Price          float64   `gorm:"type:decimal(10,2);not null" json:"price"`
+	Credit         int       `gorm:"not null" json:"credit"`
+	Expired        *int      `json:"expired"`
+	Additional     string    `gorm:"type:longtext" json:"-"`
+	AdditionalList []string  `gorm:"-" json:"additional"`
+	CreatedAt      time.Time `json:"createdAt"`
+	UpdatedAt      time.Time `json:"updatedAt"`
 }
 
 func (p *Package) BeforeCreate(tx *gorm.DB) (err error) {
@@ -149,6 +150,27 @@ func (p *Package) BeforeCreate(tx *gorm.DB) (err error) {
 		p.ID = uuid.New()
 	}
 	return
+}
+func (p *Package) BeforeSave(tx *gorm.DB) error {
+	if p.AdditionalList != nil {
+		data, err := json.Marshal(p.AdditionalList)
+		if err != nil {
+			return err
+		}
+		p.Additional = string(data)
+	}
+	return nil
+}
+
+func (p *Package) AfterFind(tx *gorm.DB) error {
+	if p.Additional != "" {
+		var data []string
+		if err := json.Unmarshal([]byte(p.Additional), &data); err != nil {
+			return err
+		}
+		p.AdditionalList = data
+	}
+	return nil
 }
 
 type PackageClass struct {

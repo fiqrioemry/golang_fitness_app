@@ -415,6 +415,7 @@ func generateGalleryText(title string) string {
 	}
 	return title
 }
+
 func SeedPackages(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Package{}).Count(&count)
@@ -426,69 +427,69 @@ func SeedPackages(db *gorm.DB) {
 
 	packages := []models.Package{
 		{
-			ID:          uuid.New(),
-			Name:        "Trial Session",
-			Description: "1x Class Trial for new members.",
-			Price:       500000,
-			Credit:      1,
-			Expired:     intPtr(14), // 14 hari
-			Information: "Valid for 14 days after first booking.",
-			Image:       "https://placehold.co/400x400/orange/white",
-			IsActive:    true,
-			CreatedAt:   time.Now(),
+			ID:             uuid.New(),
+			Name:           "Trial Session",
+			Description:    "1x Class Trial for new members.",
+			Price:          500000,
+			Credit:         1,
+			Expired:        intPtr(14), // 14 hari
+			AdditionalList: []string{"Valid for 14 days after first booking."},
+			Image:          "https://placehold.co/400x400/orange/white",
+			IsActive:       true,
+			CreatedAt:      time.Now(),
 		},
 		{
-			ID:          uuid.New(),
-			Name:        "5 Sessions Package",
-			Description: "Enjoy 5 reformer classes package.",
-			Price:       2250000,
-			Credit:      5,
-			Expired:     intPtr(60), // 2 bulan
-			Information: "Valid for 2 months after first booking.",
-			Image:       "https://placehold.co/400x400/blue/white",
-			IsActive:    true,
-			CreatedAt:   time.Now(),
+			ID:             uuid.New(),
+			Name:           "5 Sessions Package",
+			Description:    "Enjoy 5 reformer classes package.",
+			Price:          2250000,
+			Credit:         5,
+			Expired:        intPtr(60), // 2 bulan
+			AdditionalList: []string{"Valid for 2 months after first booking.", "Cannot Be Refund"},
+			Image:          "https://placehold.co/400x400/blue/white",
+			IsActive:       true,
+			CreatedAt:      time.Now(),
 		},
 		{
-			ID:          uuid.New(),
-			Name:        "10 Sessions Package",
-			Description: "Maximize your training with 10 sessions!",
-			Price:       4100000,
-			Credit:      10,
-			Expired:     intPtr(120), // 4 bulan
-			Information: "Valid for 4 months after first booking.",
-			Image:       "https://placehold.co/400x400/green/white",
-			IsActive:    true,
-			CreatedAt:   time.Now(),
+			ID:             uuid.New(),
+			Name:           "10 Sessions Package",
+			Description:    "Maximize your training with 10 sessions!",
+			Price:          4100000,
+			Credit:         10,
+			Expired:        intPtr(120), // 4 bulan
+			AdditionalList: []string{"Valid for 4 months after first booking.", "Cannot Be Refund"},
+			Image:          "https://placehold.co/400x400/green/white",
+			IsActive:       true,
+			CreatedAt:      time.Now(),
 		},
 		{
-			ID:          uuid.New(),
-			Name:        "FTM x SANE Single Visit Promo",
-			Description: "Special promo for FTM x SANE group class.",
-			Price:       100000,
-			Credit:      1,
-			Expired:     intPtr(14),
-			Information: "Valid for 14 days after first booking.",
-			Image:       "https://placehold.co/400x400/orange/white",
-			IsActive:    true,
-			CreatedAt:   time.Now(),
+			ID:             uuid.New(),
+			Name:           "FTM x SANE Single Visit Promo",
+			Description:    "Special promo for FTM x SANE group class.",
+			Price:          100000,
+			Credit:         1,
+			Expired:        intPtr(14),
+			AdditionalList: []string{"Valid for 14 days after first booking."},
+			Image:          "https://placehold.co/400x400/orange/white",
+			IsActive:       true,
+			CreatedAt:      time.Now(),
 		},
 		{
-			ID:          uuid.New(),
-			Name:        "FTM x SANE Bundle 2 Classes",
-			Description: "Bundle of 2 classes for group sessions.",
-			Price:       275000,
-			Credit:      2,
-			Expired:     intPtr(20),
-			Information: "Valid for 20 days after first booking.",
-			Image:       "https://placehold.co/400x400/blue/white",
-			IsActive:    true,
-			CreatedAt:   time.Now(),
+			ID:             uuid.New(),
+			Name:           "FTM x SANE Bundle 2 Classes",
+			Description:    "Bundle of 2 classes for group sessions.",
+			Price:          275000,
+			Credit:         2,
+			Expired:        intPtr(20),
+			AdditionalList: []string{"Valid for 20 days after first booking."},
+			Image:          "https://placehold.co/400x400/blue/white",
+			IsActive:       true,
+			CreatedAt:      time.Now(),
 		},
 	}
 
 	if err := db.Create(&packages).Error; err != nil {
-		log.Printf("failed seeding packages: %v", err)
+		log.Printf("❌ Failed seeding packages: %v", err)
 	} else {
 		log.Println("✅ Successfully seeded packages!")
 	}

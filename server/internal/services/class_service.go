@@ -195,21 +195,21 @@ func (s *classService) GetClassByID(id string) (*dto.ClassDetailResponse, error)
 	}
 
 	return &dto.ClassDetailResponse{
-		ID:             class.ID.String(),
-		Title:          class.Title,
-		Image:          class.Image,
-		IsActive:       class.IsActive,
-		Duration:       class.Duration,
-		Description:    class.Description,
-		AdditionalList: class.AdditionalList,
-		Type:           class.Type.Name,
-		Level:          class.Level.Name,
-		Location:       class.Location.Name,
-		Category:       class.Category.Name,
-		Subcategory:    class.Subcategory.Name,
-		Galleries:      galleries,
-		Reviews:        reviews,
-		CreatedAt:      class.CreatedAt.Format(time.RFC3339),
+		ID:          class.ID.String(),
+		Title:       class.Title,
+		Image:       class.Image,
+		IsActive:    class.IsActive,
+		Duration:    class.Duration,
+		Description: class.Description,
+		Additional:  class.AdditionalList,
+		Type:        class.Type.Name,
+		Level:       class.Level.Name,
+		Location:    class.Location.Name,
+		Category:    class.Category.Name,
+		Subcategory: class.Subcategory.Name,
+		Galleries:   galleries,
+		Reviews:     reviews,
+		CreatedAt:   class.CreatedAt.Format(time.RFC3339),
 	}, nil
 
 }
@@ -246,19 +246,19 @@ func (s *classService) GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassRes
 	var result []dto.ClassResponse
 	for _, c := range classes {
 		result = append(result, dto.ClassResponse{
-			ID:             c.ID.String(),
-			Title:          c.Title,
-			Image:          c.Image,
-			IsActive:       c.IsActive,
-			Duration:       c.Duration,
-			Description:    c.Description,
-			AdditionalList: c.AdditionalList,
-			TypeID:         c.TypeID.String(),
-			LevelID:        c.LevelID.String(),
-			LocationID:     c.LocationID.String(),
-			CategoryID:     c.CategoryID.String(),
-			SubcategoryID:  c.SubcategoryID.String(),
-			CreatedAt:      c.CreatedAt.String(),
+			ID:            c.ID.String(),
+			Title:         c.Title,
+			Image:         c.Image,
+			IsActive:      c.IsActive,
+			Duration:      c.Duration,
+			Description:   c.Description,
+			Additional:    c.AdditionalList,
+			TypeID:        c.TypeID.String(),
+			LevelID:       c.LevelID.String(),
+			LocationID:    c.LocationID.String(),
+			CategoryID:    c.CategoryID.String(),
+			SubcategoryID: c.SubcategoryID.String(),
+			CreatedAt:     c.CreatedAt.String(),
 		})
 
 	}
@@ -275,19 +275,19 @@ func (s *classService) GetActiveClasses() ([]dto.ClassResponse, error) {
 	var result []dto.ClassResponse
 	for _, c := range classes {
 		result = append(result, dto.ClassResponse{
-			ID:             c.ID.String(),
-			Title:          c.Title,
-			Image:          c.Image,
-			IsActive:       c.IsActive,
-			Duration:       c.Duration,
-			Description:    c.Description,
-			AdditionalList: c.AdditionalList,
-			TypeID:         c.TypeID.String(),
-			LevelID:        c.LevelID.String(),
-			LocationID:     c.LocationID.String(),
-			CategoryID:     c.CategoryID.String(),
-			SubcategoryID:  c.SubcategoryID.String(),
-			CreatedAt:      c.CreatedAt.String(),
+			ID:            c.ID.String(),
+			Title:         c.Title,
+			Image:         c.Image,
+			IsActive:      c.IsActive,
+			Duration:      c.Duration,
+			Description:   c.Description,
+			Additional:    c.AdditionalList,
+			TypeID:        c.TypeID.String(),
+			LevelID:       c.LevelID.String(),
+			LocationID:    c.LocationID.String(),
+			CategoryID:    c.CategoryID.String(),
+			SubcategoryID: c.SubcategoryID.String(),
+			CreatedAt:     c.CreatedAt.String(),
 		})
 	}
 

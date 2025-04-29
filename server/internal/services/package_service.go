@@ -27,15 +27,15 @@ func NewPackageService(repo repositories.PackageRepository) PackageService {
 
 func (s *packageService) CreatePackage(req dto.CreatePackageRequest) error {
 	pkg := models.Package{
-		ID:          uuid.New(),
-		Name:        req.Name,
-		Description: req.Description,
-		Price:       req.Price,
-		Credit:      req.Credit,
-		Image:       req.ImageURL,
-		IsActive:    true,
-		Information: req.Information,
-		CreatedAt:   time.Now(),
+		ID:             uuid.New(),
+		Name:           req.Name,
+		Description:    req.Description,
+		Price:          req.Price,
+		Credit:         req.Credit,
+		Image:          req.ImageURL,
+		IsActive:       req.IsActive,
+		AdditionalList: req.Additional,
+		CreatedAt:      time.Now(),
 	}
 	if req.Expired > 0 {
 		pkg.Expired = &req.Expired
@@ -61,9 +61,11 @@ func (s *packageService) UpdatePackage(id string, req dto.UpdatePackageRequest) 
 	if req.Credit != 0 {
 		pkg.Credit = req.Credit
 	}
-	if req.Information != "" {
-		pkg.Information = req.Information
+	if len(req.Additional) > 0 {
+		pkg.AdditionalList = req.Additional
 	}
+	pkg.IsActive = req.IsActive
+
 	if req.Expired != 0 {
 		pkg.Expired = &req.Expired
 	}
@@ -94,6 +96,7 @@ func (s *packageService) GetAllPackages() ([]dto.PackageResponse, error) {
 			Credit:      p.Credit,
 			Image:       p.Image,
 			IsActive:    p.IsActive,
+			Additional:  p.AdditionalList,
 		})
 	}
 	return result, nil
@@ -119,6 +122,6 @@ func (s *packageService) GetPackageByID(id string) (*dto.PackageDetailResponse, 
 		Expired:     expired,
 		Image:       pkg.Image,
 		IsActive:    pkg.IsActive,
-		Information: pkg.Information,
+		Additional:  pkg.AdditionalList,
 	}, nil
 }

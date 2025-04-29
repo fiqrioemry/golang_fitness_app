@@ -88,7 +88,7 @@ func (h *PackageHandler) GetAllPackages(c *gin.Context) {
 		packages = []dto.PackageResponse{}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"packages": packages})
+	c.JSON(http.StatusOK, packages)
 }
 
 func (h *PackageHandler) GetPackageByID(c *gin.Context) {

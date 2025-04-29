@@ -102,21 +102,21 @@ type ClassQueryParam struct {
 }
 
 type ClassDetailResponse struct {
-	ID             string            `json:"id"`
-	Title          string            `json:"title"`
-	Image          string            `json:"image"`
-	IsActive       bool              `json:"isActive"`
-	Duration       int               `json:"duration"`
-	Description    string            `json:"description"`
-	AdditionalList []string          `json:"additional"`
-	Type           string            `json:"type"`
-	Level          string            `json:"level"`
-	Location       string            `json:"location"`
-	Category       string            `json:"category"`
-	Subcategory    string            `json:"subcategory"`
-	Galleries      []GalleryResponse `json:"galleries"`
-	Reviews        []ReviewResponse  `json:"reviews"`
-	CreatedAt      string            `json:"createdAt"`
+	ID          string            `json:"id"`
+	Title       string            `json:"title"`
+	Image       string            `json:"image"`
+	IsActive    bool              `json:"isActive"`
+	Duration    int               `json:"duration"`
+	Description string            `json:"description"`
+	Additional  []string          `json:"additional"`
+	Type        string            `json:"type"`
+	Level       string            `json:"level"`
+	Location    string            `json:"location"`
+	Category    string            `json:"category"`
+	Subcategory string            `json:"subcategory"`
+	Galleries   []GalleryResponse `json:"galleries"`
+	Reviews     []ReviewResponse  `json:"reviews"`
+	CreatedAt   string            `json:"createdAt"`
 }
 
 type GalleryResponse struct {
@@ -126,19 +126,19 @@ type GalleryResponse struct {
 }
 
 type ClassResponse struct {
-	ID             string   `json:"id"`
-	Title          string   `json:"title"`
-	Image          string   `json:"image"`
-	IsActive       bool     `json:"isActive"`
-	Duration       int      `json:"duration"`
-	Description    string   `json:"description"`
-	AdditionalList []string `json:"additional"`
-	TypeID         string   `json:"typeId"`
-	LevelID        string   `json:"levelId"`
-	LocationID     string   `json:"locationId"`
-	CategoryID     string   `json:"categoryId"`
-	SubcategoryID  string   `json:"subcategoryId"`
-	CreatedAt      string   `json:"createdAt"`
+	ID            string   `json:"id"`
+	Title         string   `json:"title"`
+	Image         string   `json:"image"`
+	IsActive      bool     `json:"isActive"`
+	Duration      int      `json:"duration"`
+	Description   string   `json:"description"`
+	Additional    []string `json:"additional"`
+	TypeID        string   `json:"typeId"`
+	LevelID       string   `json:"levelId"`
+	LocationID    string   `json:"locationId"`
+	CategoryID    string   `json:"categoryId"`
+	SubcategoryID string   `json:"subcategoryId"`
+	CreatedAt     string   `json:"createdAt"`
 }
 
 // Category
@@ -221,52 +221,53 @@ type LocationResponse struct {
 	GeoLocation string `json:"geoLocation"`
 }
 
-// package
-// Create
+// Package
+
 type CreatePackageRequest struct {
 	Name        string                `form:"name" binding:"required,min=2"`
 	Description string                `form:"description" binding:"required"`
 	Price       float64               `form:"price" binding:"required,gt=0"`
 	Credit      int                   `form:"credit" binding:"required,gt=0"`
 	Expired     int                   `form:"expired"`
-	Information string                `form:"information"`
+	Additional  []string              `form:"additional[]"`
+	IsActive    bool                  `form:"isActive"`
 	Image       *multipart.FileHeader `form:"image" binding:"required"`
 	ImageURL    string                `form:"-"`
 }
 
-// Update
 type UpdatePackageRequest struct {
 	Name        string                `form:"name"`
 	Description string                `form:"description"`
 	Price       float64               `form:"price"`
 	Credit      int                   `form:"credit"`
 	Expired     int                   `form:"expired"`
-	Information string                `form:"information"`
+	Additional  []string              `form:"additional[]"`
+	IsActive    bool                  `form:"isActive"`
 	Image       *multipart.FileHeader `form:"image"`
 	ImageURL    string                `form:"-"`
 }
 
-// Response
 type PackageResponse struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	Credit      int     `json:"credit"`
-	Image       string  `json:"image"`
-	IsActive    bool    `json:"isActive"`
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Price       float64  `json:"price"`
+	Credit      int      `json:"credit"`
+	Image       string   `json:"image"`
+	IsActive    bool     `json:"isActive"`
+	Additional  []string `json:"additional"`
 }
 
 type PackageDetailResponse struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	Credit      int     `json:"credit"`
-	Expired     int     `json:"expired"`
-	Image       string  `json:"image"`
-	IsActive    bool    `json:"isActive"`
-	Information string  `json:"information"`
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Price       float64  `json:"price"`
+	Credit      int      `json:"credit"`
+	Expired     int      `json:"expired"`
+	Image       string   `json:"image"`
+	IsActive    bool     `json:"isActive"`
+	Additional  []string `json:"additional"`
 }
 
 // instructor

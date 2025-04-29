@@ -70,7 +70,7 @@ func (h *CategoryHandler) GetAllCategories(c *gin.Context) {
 		categories = []dto.CategoryResponse{}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"categories": categories})
+	c.JSON(http.StatusOK, categories)
 }
 
 func (h *CategoryHandler) GetCategoryByID(c *gin.Context) {
