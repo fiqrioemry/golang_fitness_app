@@ -90,22 +90,22 @@ export const locationSchema = z.object({
   geoLocation: z.string(),
 });
 
-export const createReviewRequestSchema = z.object({
+export const createReviewSchema = z.object({
   classId: z.string(),
   rating: z.number().min(1).max(5),
   comment: z.string().optional(),
 });
 
-export const markAttendanceRequestSchema = z.object({
+export const markAttendanceSchema = z.object({
   bookingId: z.string(),
   status: z.enum(["attended", "absent", "cancelled"]),
 });
 
-export const createBookingRequestSchema = z.object({
+export const createBookingSchema = z.object({
   classScheduleId: z.string(),
 });
 
-export const createScheduleTemplateRequestSchema = z.object({
+export const createScheduleTemplateSchema = z.object({
   classId: z.string(),
   instructorId: z.string(),
   dayOfWeek: z.number().min(0).max(6),
@@ -114,38 +114,38 @@ export const createScheduleTemplateRequestSchema = z.object({
   capacity: z.number().positive(),
 });
 
-export const updateClassScheduleRequestSchema = z.object({
+export const updateClassScheduleSchema = z.object({
   startTime: z.string().optional(),
   endTime: z.string().optional(),
   capacity: z.number().optional(),
 });
 
-export const createClassScheduleRequestSchema = z.object({
+export const createClassScheduleSchema = z.object({
   classId: z.string(),
   instructorId: z.string(),
   startTime: z.string(),
   capacity: z.number().positive(),
 });
 
-export const midtransNotificationRequestSchema = z.object({
+export const midtransNotificationSchema = z.object({
   transaction_status: z.string(),
   order_id: z.string(),
   payment_type: z.string(),
   fraud_status: z.string(),
 });
 
-export const createPaymentRequestSchema = z.object({
+export const createPaymentSchema = z.object({
   packageId: z.string(),
 });
 
-export const createInstructorRequestSchema = z.object({
+export const createInstructorSchema = z.object({
   userId: z.string(),
   experience: z.number().min(0),
   specialties: z.string(),
   certifications: z.string().optional(),
 });
 
-export const updateInstructorRequestSchema = z.object({
+export const updateInstructorSchema = z.object({
   userId: z.string(),
   experience: z.number().optional(),
   specialties: z.string().optional(),

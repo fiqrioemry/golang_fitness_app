@@ -2,6 +2,8 @@
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/customer/Profile";
+import Classes from "./pages/Classes";
+import ClassDetail from "./pages/ClassDetail";
 import CreateClass from "./pages/classes/CreateClass";
 import CreatePackage from "./pages/packages/CreatePackage";
 import OptionsDisplay from "./pages/options/OptionsDisplay";
@@ -16,12 +18,15 @@ import { useAuthStore } from "./store/useAuthStore";
 import { AuthRoute, NonAuthRoute } from "./middleware";
 import UserLayout from "./components/layout/UserLayout";
 import { Navigate, Route, Routes } from "react-router-dom";
+import ScrollToTop from "./hooks/useScrollToTop";
 
 function App() {
-  const { checkingAuth, authMe } = useAuthStore();
+  const { checkingAuth, authMe, setCheckingAuth } = useAuthStore();
 
   useEffect(() => {
-    authMe();
+    const hasCookie = document.cookie.includes("accessToken=");
+    if (hasCookie) authMe();
+    else setCheckingAuth();
   }, []);
 
   if (checkingAuth) return <Loading />;
@@ -29,9 +34,12 @@ function App() {
   return (
     <>
       <Toaster />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="classes" element={<Classes />} />
+          <Route path="classes/:id" element={<ClassDetail />} />
           <Route
             path="user"
             element={
@@ -44,13 +52,11 @@ function App() {
             <Route index element={<Navigate to="profile" replace />} />
           </Route>
         </Route>
-
         <Route path="/options" element={<OptionsDisplay />} />
         <Route path="/classes" element={<ClassesDisplay />} />
         <Route path="/classes/add" element={<CreateClass />} />
         <Route path="/packages" element={<PackagesDisplay />} />
         <Route path="/packages/add" element={<CreatePackage />} />
-
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

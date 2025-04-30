@@ -1,44 +1,31 @@
 // src/store/useAuthStore.jsx
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import toast from "react-hot-toast";
 import auth from "@/services/auth";
+import toast from "react-hot-toast";
+import { persist } from "zustand/middleware";
 
 export const useAuthStore = create(
   persist(
     (set, get) => ({
-      step: 1,
       user: null,
       loading: false,
       checkingAuth: true,
 
       setUser: (user) => set({ user }),
 
-      resetStep: () => set({ step: 1 }),
-
       clearUser: () => set({ user: null }),
+
+      setCheckingAuth: () => set({ checkingAuth: false }),
 
       authMe: async () => {
         try {
           const { user } = await auth.getMe();
           set({ user });
-        } catch {
+        } catch (err) {
           set({ user: null });
         } finally {
           set({ checkingAuth: false });
-        }
-      },
-
-      sendOTP: async (email) => {
-        set({ loading: true });
-        try {
-          const { message } = await auth.sendOTP(email);
-          toast.success(message);
-        } catch (error) {
-          toast.error(error.message);
-        } finally {
-          set({ loading: false });
         }
       },
 
@@ -46,8 +33,8 @@ export const useAuthStore = create(
         set({ loading: true });
         try {
           const { message } = await auth.login(formData);
-          await get().authMe();
           toast.success(message);
+          await get().authMe();
         } catch (error) {
           toast.error(error.message);
         } finally {
@@ -57,8 +44,7 @@ export const useAuthStore = create(
 
       logout: async () => {
         try {
-          const { message } = await auth.logout();
-          toast.success(message);
+          await auth.logout();
           set({ user: null });
         } catch (error) {
           console.error(error.message);

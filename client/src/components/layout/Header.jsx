@@ -1,34 +1,66 @@
-import { LogIn } from "lucide-react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/useAuthStore";
-import UserDropdown from "@/components/header/UserDropdown";
+
 const Header = () => {
-  const { user } = useAuthStore();
-  const handleLoginClick = () => navigate("/signin");
+  const linkClass =
+    "hover:text-blue-600 font-medium transition-colors duration-200";
+  const activeClass =
+    "text-blue-600 font-semibold underline underline-offset-4";
 
   return (
-    <div className="h-14 relative z-50">
-      <header className="fixed w-full bg-white p-2 border-b shadow-sm">
-        <div className="flex items-center justify-between container mx-auto gap-4">
-          <Link to="/">
-            <h2 className="text-xl font-bold text-primary">WELLNESS APP</h2>
-          </Link>
-
-          <div className="flex items-center gap-4">
-            {/* User Dropdown Avatar & Login */}
-            {user ? (
-              <UserDropdown />
-            ) : (
-              <Button onClick={handleLoginClick}>
-                <LogIn className="w-4 h-4" />
-                Login
-              </Button>
-            )}
-          </div>
+    <header className="fixed top-0 w-full bg-white/70 backdrop-blur-md shadow z-50">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <NavLink to="/" className="text-2xl font-bold text-gray-800">
+          FitBook
+        </NavLink>
+        <div className="hidden md:flex gap-6 items-center">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `${linkClass} ${isActive ? activeClass : ""}`
+            }
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/classes"
+            className={({ isActive }) =>
+              `${linkClass} ${isActive ? activeClass : ""}`
+            }
+          >
+            Class
+          </NavLink>
+          <NavLink
+            to="/packages"
+            className={({ isActive }) =>
+              `${linkClass} ${isActive ? activeClass : ""}`
+            }
+          >
+            Package
+          </NavLink>
+          <NavLink
+            to="/schedule"
+            className={({ isActive }) =>
+              `${linkClass} ${isActive ? activeClass : ""}`
+            }
+          >
+            Schedule
+          </NavLink>
+          <NavLink
+            to="/location"
+            className={({ isActive }) =>
+              `${linkClass} ${isActive ? activeClass : ""}`
+            }
+          >
+            Locate Us
+          </NavLink>
+          <NavLink to="/get-started">
+            <Button className="px-5 py-2">Get Started</Button>
+          </NavLink>
         </div>
-      </header>
-    </div>
+      </div>
+    </header>
   );
 };
 

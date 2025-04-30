@@ -8,7 +8,7 @@ import { publicInstance, authInstance } from ".";
 // GET /api/categories
 export const getAllCategories = async () => {
   const res = await publicInstance.get("/categories");
-  return res.data.categories;
+  return res.data;
 };
 
 // GET /api/categories/:id

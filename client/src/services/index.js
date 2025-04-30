@@ -1,7 +1,6 @@
 // src/services/index.js
-
 import axios from "axios";
-import auth from "@/services/auth";
+import auth from "./auth";
 
 export const publicInstance = axios.create({
   baseURL: import.meta.env.VITE_API_SERVICES,
@@ -21,12 +20,19 @@ export const authInstance = axios.create({
 authInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
+    const originalRequest = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/refresh-token")
+    ) {
+      originalRequest._retry = true;
       try {
         await auth.refreshToken();
-        return authInstance(error.config);
+        return authInstance(originalRequest);
       } catch (refreshError) {
-        await auth.logout();
+        useAuthStore.getState().clearUser();
         return Promise.reject(refreshError);
       }
     }

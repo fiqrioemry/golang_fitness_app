@@ -9,12 +9,13 @@ import {
 const Footer = () => {
   return (
     <footer className="bg-background border-t text-muted-foreground">
-      <div className="container mx-auto px-4 py-10 grid gap-8 grid-cols-1 md:grid-cols-4 ">
+      <div className="container mx-auto px-4 py-10 grid gap-8 grid-cols-1 md:grid-cols-4">
         {/* Brand & Slogan */}
         <div>
-          <h2 className="text-xl font-bold text-primary">Ecommerce</h2>
+          <h2 className="text-xl font-bold text-primary">FitBook Studio</h2>
           <p className="text-sm mt-2">
-            Discover the best deals and shop your favorite products with ease.
+            Your go-to place for high-energy fitness classes and flexible
+            membership packages.
           </p>
         </div>
 
@@ -28,13 +29,18 @@ const Footer = () => {
               </a>
             </li>
             <li>
-              <a href="/products" className="hover:text-primary">
-                Products
+              <a href="/classes" className="hover:text-primary">
+                Classes
               </a>
             </li>
             <li>
-              <a href="/about" className="hover:text-primary">
-                About Us
+              <a href="/packages" className="hover:text-primary">
+                Packages
+              </a>
+            </li>
+            <li>
+              <a href="/schedule" className="hover:text-primary">
+                Schedule
               </a>
             </li>
             <li>
@@ -47,9 +53,9 @@ const Footer = () => {
 
         {/* Newsletter */}
         <div>
-          <h3 className="text-base font-semibold mb-2">Newsletter</h3>
+          <h3 className="text-base font-semibold mb-2">Join Our Community</h3>
           <p className="text-sm mb-3">
-            Get the latest updates and offers right into your inbox.
+            Get tips, promotions, and new class updates straight to your inbox.
           </p>
           <form className="flex flex-col gap-2">
             <input
@@ -71,39 +77,39 @@ const Footer = () => {
           <h3 className="text-base font-semibold mb-2">Connect with Us</h3>
           <div className="flex space-x-4 mt-2">
             <a
-              href="https://github.com/yourusername"
+              href="https://instagram.com/yourstudio"
               target="_blank"
-              rel="noopener noreferrer"
-              className="text-xl hover:text-primary transition"
-            >
-              <FaGithub />
-            </a>
-            <a
-              href="https://linkedin.com/in/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xl hover:text-primary transition"
-            >
-              <FaLinkedin />
-            </a>
-            <a
-              href="https://twitter.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xl hover:text-primary transition"
-            >
-              <FaTwitter />
-            </a>
-            <a
-              href="https://instagram.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
+              rel="noreferrer"
               className="text-xl hover:text-primary transition"
             >
               <FaInstagram />
             </a>
             <a
-              href="mailto:info@example.com"
+              href="https://linkedin.com/in/yourstudio"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xl hover:text-primary transition"
+            >
+              <FaLinkedin />
+            </a>
+            <a
+              href="https://twitter.com/yourstudio"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xl hover:text-primary transition"
+            >
+              <FaTwitter />
+            </a>
+            <a
+              href="https://github.com/yourstudio"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xl hover:text-primary transition"
+            >
+              <FaGithub />
+            </a>
+            <a
+              href="mailto:info@fitbookstudio.com"
               className="text-xl hover:text-primary transition"
             >
               <FaEnvelope />
@@ -112,8 +118,8 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="text-center text-xs text-muted-foreground mt-6 py-4 border-t">
-        &copy; {new Date().getFullYear()} Ecommerce. Built with ReactJS & Go.
+      <div className="py-6 text-center text-sm text-gray-500 border-t">
+        <p>&copy; 2025 FitBook Studio. All rights reserved.</p>
       </div>
     </footer>
   );

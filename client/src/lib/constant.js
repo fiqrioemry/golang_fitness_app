@@ -9,7 +9,7 @@ export const loginState = {
   password: "",
 };
 
-export const updateProfileState = {
+export const profileState = {
   fullname: "",
   birthday: "",
   gender: "",
@@ -54,7 +54,7 @@ export const locationState = {
   geoLocation: "",
 };
 
-export const createReviewState = {
+export const reviewState = {
   classId: "",
   rating: 0,
   comment: "",
@@ -65,7 +65,7 @@ export const markAttendanceState = {
   status: "",
 };
 
-export const createBookingState = {
+export const bookingState = {
   classScheduleId: "",
 };
 
@@ -98,7 +98,7 @@ export const midtransNotificationState = {
   fraud_status: "",
 };
 
-export const createPaymentState = {
+export const paymentState = {
   packageId: "",
 };
 
