@@ -17,8 +17,11 @@ type User struct {
 	UpdatedAt time.Time      `json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Profile Profile `gorm:"foreignKey:UserID" json:"profile"`
-	Tokens  []Token `gorm:"foreignKey:UserID" json:"-"`
+	Profile      Profile       `gorm:"foreignKey:UserID" json:"profile"`
+	Tokens       []Token       `gorm:"foreignKey:UserID" json:"-"`
+	Payments     []Payment     `gorm:"foreignKey:UserID" json:"payments,omitempty"`
+	UserPackages []UserPackage `gorm:"foreignKey:UserID" json:"packages,omitempty"`
+	Bookings     []Booking     `gorm:"foreignKey:UserID" json:"bookings,omitempty"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
@@ -193,6 +196,9 @@ type UserPackage struct {
 	RemainingCredit int        `gorm:"not null;default:0" json:"remainingCredit"`
 	ExpiredAt       *time.Time `json:"expiredAt"`
 	PurchasedAt     time.Time  `gorm:"autoCreateTime" json:"purchasedAt"`
+
+	User    User    `gorm:"foreignKey:UserID" json:"user"`
+	Package Package `gorm:"foreignKey:PackageID" json:"package"`
 }
 
 func (up *UserPackage) BeforeCreate(tx *gorm.DB) (err error) {
@@ -209,6 +215,8 @@ type Payment struct {
 	PaymentMethod string    `gorm:"type:varchar(50);not null" json:"paymentMethod"`
 	Status        string    `gorm:"type:varchar(20);default:'pending';check:status IN ('success', 'pending', 'failed')" json:"status"`
 	PaidAt        time.Time `gorm:"autoCreateTime" json:"paidAt"`
+
+	Package Package `gorm:"foreignKey:PackageID" json:"package"`
 }
 
 func (p *Payment) BeforeCreate(tx *gorm.DB) (err error) {
@@ -249,6 +257,7 @@ type Booking struct {
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 
 	ClassSchedule ClassSchedule `gorm:"foreignKey:ClassScheduleID" json:"classSchedule"`
+	User          User          `gorm:"foreignKey:UserID" json:"user"`
 }
 
 func (b *Booking) BeforeCreate(tx *gorm.DB) (err error) {

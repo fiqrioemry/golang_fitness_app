@@ -73,7 +73,7 @@ func SeedUsers(db *gorm.DB) {
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "elena.morris@example.com",
+			Email:    "elena.morrisaga@example.com",
 			Password: string(password),
 			Role:     "customer",
 			Profile: models.Profile{
@@ -113,7 +113,7 @@ func SeedUsers(db *gorm.DB) {
 			Password: string(password),
 			Role:     "instructor",
 			Profile: models.Profile{
-				Fullname: "Instructor One",
+				Fullname: "Nurmalasari Permata",
 				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=AB",
 			},
 		},
@@ -123,7 +123,7 @@ func SeedUsers(db *gorm.DB) {
 			Password: string(password),
 			Role:     "instructor",
 			Profile: models.Profile{
-				Fullname: "Instructor Two",
+				Fullname: "Eisenberg Josephine",
 				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=ZA",
 			},
 		},
@@ -133,17 +133,17 @@ func SeedUsers(db *gorm.DB) {
 			Password: string(password),
 			Role:     "instructor",
 			Profile: models.Profile{
-				Fullname: "Instructor Three",
+				Fullname: "David Lee",
 				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=GH",
 			},
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "instructor3@example.com",
+			Email:    "instructor4@example.com",
 			Password: string(password),
 			Role:     "instructor",
 			Profile: models.Profile{
-				Fullname: "Instructor Three",
+				Fullname: "Ellena Morris",
 				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=GH",
 			},
 		},
@@ -656,47 +656,99 @@ func SeedPayments(db *gorm.DB) {
 		log.Println("✅ Payments seeding completed!")
 	}
 }
-
 func SeedUserPackages(db *gorm.DB) {
 	var count int64
 	db.Model(&models.UserPackage{}).Count(&count)
-
 	if count > 0 {
 		log.Println("UserPackages already seeded, skipping...")
 		return
 	}
 
-	// Fetch user dan package
-	var user models.User
-	var pkg models.Package
-	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
-		log.Println("Failed to find customer user:", err)
-		return
-	}
-	if err := db.First(&pkg).Error; err != nil {
-		log.Println("Failed to find package:", err)
+	// Ambil 2 user customer pertama
+	var users []models.User
+	if err := db.Where("role = ?", "customer").Limit(2).Find(&users).Error; err != nil || len(users) < 2 {
+		log.Println("❌ Failed to fetch at least 2 customer users")
 		return
 	}
 
-	expired := time.Now().AddDate(0, 0, *pkg.Expired)
+	// Ambil 2 package aktif pertama
+	var packages []models.Package
+	if err := db.Where("is_active = ?", true).Limit(2).Find(&packages).Error; err != nil || len(packages) < 2 {
+		log.Println("❌ Failed to fetch at least 2 active packages")
+		return
+	}
 
-	userPackages := []models.UserPackage{
-		{
-			ID:              uuid.New(),
-			UserID:          user.ID,
-			PackageID:       pkg.ID,
-			RemainingCredit: pkg.Credit,
-			PurchasedAt:     time.Now(),
-			ExpiredAt:       &expired,
-		},
+	now := time.Now()
+	var userPackages []models.UserPackage
+
+	for _, user := range users {
+		for _, pkg := range packages {
+			expired := now.AddDate(0, 0, getExpiredDays(pkg))
+			userPackages = append(userPackages, models.UserPackage{
+				ID:              uuid.New(),
+				UserID:          user.ID,
+				PackageID:       pkg.ID,
+				RemainingCredit: pkg.Credit,
+				PurchasedAt:     now,
+				ExpiredAt:       &expired,
+			})
+		}
 	}
 
 	if err := db.Create(&userPackages).Error; err != nil {
-		log.Printf("failed seeding user packages: %v", err)
+		log.Printf("❌ Failed seeding user packages: %v", err)
 	} else {
 		log.Println("✅ UserPackages seeding completed!")
 	}
 }
+
+func getExpiredDays(pkg models.Package) int {
+	if pkg.Expired != nil {
+		return *pkg.Expired
+	}
+	return 30 // default expired 30 hari jika tidak ditentukan
+}
+
+// func SeedUserPackages(db *gorm.DB) {
+// 	var count int64
+// 	db.Model(&models.UserPackage{}).Count(&count)
+
+// 	if count > 0 {
+// 		log.Println("UserPackages already seeded, skipping...")
+// 		return
+// 	}
+
+// 	// Fetch user dan package
+// 	var user models.User
+// 	var pkg models.Package
+// 	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
+// 		log.Println("Failed to find customer user:", err)
+// 		return
+// 	}
+// 	if err := db.First(&pkg).Error; err != nil {
+// 		log.Println("Failed to find package:", err)
+// 		return
+// 	}
+
+// 	expired := time.Now().AddDate(0, 0, *pkg.Expired)
+
+// 	userPackages := []models.UserPackage{
+// 		{
+// 			ID:              uuid.New(),
+// 			UserID:          user.ID,
+// 			PackageID:       pkg.ID,
+// 			RemainingCredit: pkg.Credit,
+// 			PurchasedAt:     time.Now(),
+// 			ExpiredAt:       &expired,
+// 		},
+// 	}
+
+// 	if err := db.Create(&userPackages).Error; err != nil {
+// 		log.Printf("failed seeding user packages: %v", err)
+// 	} else {
+// 		log.Println("✅ UserPackages seeding completed!")
+// 	}
+// }
 
 func SeedClassSchedules(db *gorm.DB) {
 	var count int64

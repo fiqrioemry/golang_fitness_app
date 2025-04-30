@@ -13,6 +13,7 @@ type ProfileService interface {
 	GetUserByID(userID string) (*models.User, error)
 	UpdateProfile(userID string, req dto.UpdateProfileRequest) error
 	UpdateAvatar(userID string, file *multipart.FileHeader) (string, error)
+	GetUserTransactions(userID string, page, limit int) (*dto.TransactionListResponse, error)
 }
 
 type profileService struct {
@@ -82,4 +83,33 @@ func (s *profileService) UpdateAvatar(userID string, file *multipart.FileHeader)
 
 func isDiceBear(url string) bool {
 	return url != "" && (len(url) > 0 && (url[:30] == "https://api.dicebear.com" || url[:31] == "https://avatars.dicebear.com"))
+}
+
+func (s *profileService) GetUserTransactions(userID string, page, limit int) (*dto.TransactionListResponse, error) {
+	offset := (page - 1) * limit
+
+	payments, total, err := s.repo.GetUserTransactions(userID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	var transactions []dto.TransactionResponse
+	for _, p := range payments {
+		transactions = append(transactions, dto.TransactionResponse{
+			ID:            p.ID.String(),
+			PackageID:     p.PackageID.String(),
+			PackageName:   p.Package.Name,
+			PaymentMethod: p.PaymentMethod,
+			Status:        p.Status,
+			Price:         p.Package.Price,
+			PaidAt:        p.PaidAt.Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	return &dto.TransactionListResponse{
+		Transactions: transactions,
+		Total:        total,
+		Page:         page,
+		Limit:        limit,
+	}, nil
 }

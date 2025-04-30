@@ -27,12 +27,17 @@ func (r *bookingRepository) CreateBooking(booking *models.Booking) error {
 
 func (r *bookingRepository) GetBookingsByUserID(userID string) ([]models.Booking, error) {
 	var bookings []models.Booking
-	if err := r.db.Preload("ClassSchedule.Class").Where("user_id = ?", userID).Find(&bookings).Error; err != nil {
+	err := r.db.Preload("ClassSchedule.Class.Location").
+		Preload("ClassSchedule.Instructor.User.Profile").
+		Where("user_id = ?", userID).
+		Order("created_at desc").
+		Find(&bookings).Error
+
+	if err != nil {
 		return nil, err
 	}
 	return bookings, nil
 }
-
 func (r *bookingRepository) CountBookingBySchedule(scheduleID string) (int64, error) {
 	var count int64
 	err := r.db.Model(&models.Booking{}).Where("class_schedule_id = ?", scheduleID).Count(&count).Error
@@ -41,7 +46,7 @@ func (r *bookingRepository) CountBookingBySchedule(scheduleID string) (int64, er
 
 func (r *bookingRepository) GetBookingByID(id string) (*models.Booking, error) {
 	var booking models.Booking
-	if err := r.db.First(&booking, "id = ?", id).Error; err != nil {
+	if err := r.db.Preload("ClassSchedule.Instructor.User.Profile").First(&booking, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &booking, nil

@@ -85,13 +85,33 @@ func (s *bookingService) GetUserBookings(userID string) ([]dto.BookingResponse, 
 
 	var result []dto.BookingResponse
 	for _, b := range bookings {
+		schedule := b.ClassSchedule
+		class := schedule.Class
+		location := class.Location
+		instructor := schedule.Instructor
+		instructorName := instructor.User.Profile.Fullname
+
+		participantCount, err := s.bookingRepo.CountBookingBySchedule(schedule.ID.String())
+		if err != nil {
+			participantCount = 0
+		}
+
 		result = append(result, dto.BookingResponse{
-			ID:         b.ID.String(),
-			ClassTitle: b.ClassSchedule.Class.Title,
-			StartTime:  b.ClassSchedule.StartTime.Format(time.RFC3339),
-			EndTime:    b.ClassSchedule.EndTime.Format(time.RFC3339),
-			Status:     b.Status,
+			ID:               b.ID.String(),
+			Status:           b.Status,
+			BookedAt:         b.CreatedAt.Format("2006-01-02 15:04:05"),
+			ClassID:          class.ID.String(),
+			ClassTitle:       class.Title,
+			ClassImage:       class.Image,
+			Duration:         class.Duration,
+			StartTime:        schedule.StartTime.Format(time.RFC3339),
+			EndTime:          schedule.EndTime.Format(time.RFC3339),
+			LocationName:     location.Name,
+			LocationAddress:  location.Address,
+			InstructorName:   instructorName,
+			ParticipantCount: int(participantCount),
 		})
 	}
+
 	return result, nil
 }

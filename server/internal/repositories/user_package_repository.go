@@ -27,7 +27,7 @@ func (r *userPackageRepository) CreateUserPackage(userPackage *models.UserPackag
 
 func (r *userPackageRepository) GetUserPackagesByUserID(userID string) ([]models.UserPackage, error) {
 	var userPackages []models.UserPackage
-	if err := r.db.Where("user_id = ?", userID).Order("purchased_at desc").Find(&userPackages).Error; err != nil {
+	if err := r.db.Where("user_id = ?", userID).Order("purchased_at desc").Preload("Package").Preload("User").Find(&userPackages).Error; err != nil {
 		return nil, err
 	}
 	return userPackages, nil

@@ -38,26 +38,6 @@ type AuthMeResponse struct {
 	Role     string `json:"role"`
 }
 
-type ProfileResponse struct {
-	ID        string    `json:"id"`
-	Email     string    `json:"email"`
-	Fullname  string    `json:"fullname"`
-	Avatar    string    `json:"avatar"`
-	Gender    string    `json:"gender"`
-	Birthday  string    `json:"birthday"`
-	Bio       string    `json:"bio"`
-	Phone     string    `json:"phone"`
-	UpdatedAt time.Time `json:"joinedAt"`
-}
-
-type UpdateProfileRequest struct {
-	Fullname string `form:"fullname" binding:"required,min=5"`
-	Birthday string `form:"birthday"`
-	Gender   string `form:"gender"`
-	Phone    string `form:"phone"`
-	Bio      string `form:"bio"`
-}
-
 // class request
 type CreateClassRequest struct {
 	Title         string                  `form:"title" binding:"required"`
@@ -328,12 +308,13 @@ type PaymentResponse struct {
 	PaidAt        string  `json:"paidAt"`
 }
 
-// user package
 type UserPackageResponse struct {
 	ID              string `json:"id"`
+	PackageID       string `json:"packageId"`
 	PackageName     string `json:"packageName"`
 	RemainingCredit int    `json:"remainingCredit"`
-	ExpiredAt       string `json:"expiredAt"`
+	ExpiredAt       string `json:"expiredAt,omitempty"`
+	ExpiredInDays   int    `json:"expiredInDays,omitempty"`
 	PurchasedAt     string `json:"purchasedAt"`
 }
 
@@ -378,11 +359,22 @@ type CreateBookingRequest struct {
 }
 
 type BookingResponse struct {
-	ID         string `json:"id"`
+	ID       string `json:"id"`
+	Status   string `json:"status"`
+	BookedAt string `json:"bookedAt"`
+
+	ClassID    string `json:"classId"`
 	ClassTitle string `json:"classTitle"`
-	StartTime  string `json:"startTime"`
-	EndTime    string `json:"endTime"`
-	Status     string `json:"status"`
+	ClassImage string `json:"classImage"`
+	Duration   int    `json:"duration"`
+
+	StartTime       string `json:"startTime"`
+	EndTime         string `json:"endTime"`
+	LocationName    string `json:"locationName"`
+	LocationAddress string `json:"locationAddress"`
+
+	InstructorName   string `json:"instructorName"`
+	ParticipantCount int    `json:"participantCount"` // <-- jumlah peserta aktif
 }
 
 // Attendance
@@ -457,4 +449,42 @@ type UserStatsResponse struct {
 	Instructors  int64 `json:"instructors"`
 	Admins       int64 `json:"admins"`
 	NewThisMonth int64 `json:"newThisMonth"`
+}
+
+// profile information (profile, payment, bookings, packages) =======
+type ProfileResponse struct {
+	ID        string    `json:"id"`
+	Email     string    `json:"email"`
+	Fullname  string    `json:"fullname"`
+	Avatar    string    `json:"avatar"`
+	Gender    string    `json:"gender"`
+	Birthday  string    `json:"birthday"`
+	Bio       string    `json:"bio"`
+	Phone     string    `json:"phone"`
+	UpdatedAt time.Time `json:"joinedAt"`
+}
+
+type UpdateProfileRequest struct {
+	Fullname string `form:"fullname" binding:"required,min=5"`
+	Birthday string `form:"birthday"`
+	Gender   string `form:"gender"`
+	Phone    string `form:"phone"`
+	Bio      string `form:"bio"`
+}
+
+type TransactionResponse struct {
+	ID            string  `json:"id"`
+	PackageID     string  `json:"packageId"`
+	PackageName   string  `json:"packageName"`
+	PaymentMethod string  `json:"paymentMethod"`
+	Status        string  `json:"status"`
+	Price         float64 `json:"price"`
+	PaidAt        string  `json:"paidAt"`
+}
+
+type TransactionListResponse struct {
+	Transactions []TransactionResponse `json:"transactions"`
+	Total        int64                 `json:"total"`
+	Page         int                   `json:"page"`
+	Limit        int                   `json:"limit"`
 }

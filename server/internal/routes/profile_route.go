@@ -13,4 +13,5 @@ func ProfileRoutes(r *gin.Engine, handler *handlers.ProfileHandler) {
 	user.GET("/profile", handler.GetProfile)
 	user.PUT("/profile", handler.UpdateProfile)
 	user.PUT("/profile/avatar", handler.UpdateAvatar)
+	user.GET("/transactions", handler.GetUserTransactions)
 }
