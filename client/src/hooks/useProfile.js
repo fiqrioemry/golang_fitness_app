@@ -24,6 +24,24 @@ export const useUserPackagesQuery = () =>
   });
 
 // =====================
+// QUERY: USER TRANSACTIONS
+// =====================
+export const useUserTransactionsQuery = (page = 1, limit = 10) =>
+  useQuery({
+    queryKey: ["user", "transactions", page, limit],
+    queryFn: () => profileService.getUserTransactions(page, limit),
+  });
+
+// =====================
+// QUERY: USER BOOKINGS
+// =====================
+export const useUserBookingsQuery = (page = 1, limit = 10) =>
+  useQuery({
+    queryKey: ["user", "bookings", page, limit],
+    queryFn: () => profileService.getUserBookings(page, limit),
+  });
+
+// =====================
 // MUTATION: UPDATE PROFILE
 // =====================
 

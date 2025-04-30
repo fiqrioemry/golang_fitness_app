@@ -15,12 +15,23 @@ export const loginSchema = z.object({
 });
 
 // Update Profile
-export const updateProfileSchema = z.object({
-  fullname: z.string(),
+export const profileSchema = z.object({
+  fullname: z.string().min(6, "Nama lengkap minimal 5 karakter"),
   birthday: z.string(),
   gender: z.string(),
   phone: z.string(),
   bio: z.string(),
+});
+
+export const avatarSchema = z.object({
+  avatar: z
+    .instanceof(File)
+    .refine((file) => file.type.startsWith("image/"), {
+      message: "File harus berupa gambar",
+    })
+    .refine((file) => file.size <= 2 * 1024 * 1024, {
+      message: "Ukuran gambar maksimal 2MB",
+    }),
 });
 
 // create class

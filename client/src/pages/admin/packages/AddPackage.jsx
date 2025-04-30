@@ -77,9 +77,9 @@ const AddPackage = () => {
 
             <div>
               <InputFileElement
+                isSingle
                 name="image"
                 label="Thumbnail Paket"
-                isSingle
                 note="Rekomendasi: rasio 1:1 (400x400px)"
               />
             </div>

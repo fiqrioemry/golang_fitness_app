@@ -15,76 +15,103 @@ const AddClass = () => {
   const { createClass } = useClassMutation();
 
   return (
-    <section className="container mx-auto p-4">
-      <FormInput
-        className="w-full"
-        state={createClassState}
-        schema={createClassSchema}
-        action={createClass.mutateAsync}
-      >
-        <InputTextElement
-          name="title"
-          label="Title kelas"
-          placeholder="Masukkan nama kelas"
-        />
+    <section className="max-w-5xl mx-auto px-6 py-6 space-y-6">
+      <div className="space-y-1 text-center">
+        <h2 className="text-2xl font-bold">Tambah Kelas Baru</h2>
+        <p className="text-muted-foreground text-sm">
+          Isi form berikut untuk menambahkan kelas baru ke sistem.
+        </p>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <InputFileElement name="image" label="Thumbnail Kelas" isSingle />
-          <div>
+      <div className="bg-white border shadow-sm rounded-xl p-6">
+        <FormInput
+          text="Add new class"
+          className="space-y-6"
+          state={createClassState}
+          schema={createClassSchema}
+          action={createClass.mutateAsync}
+        >
+          {/* Section 1: Judul & Thumbnail */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <InputTextElement
+                name="title"
+                label="Judul Kelas"
+                placeholder="Masukkan nama kelas"
+              />
+              <InputTextareaElement
+                name="description"
+                label="Deskripsi"
+                placeholder="Deskripsi minimal 20 karakter"
+                maxLength={200}
+              />
+            </div>
+            <InputFileElement
+              name="image"
+              label="Thumbnail Kelas"
+              isSingle
+              note="Rasio disarankan: 4:3"
+            />
+          </div>
+
+          {/* Section 2: Lokasi, Durasi, Deskripsi */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <SelectElement
               label="Lokasi"
               data="location"
               name="locationId"
-              placeholder="Pilih Lokasi kelas "
+              placeholder="Pilih Lokasi kelas"
             />
             <InputNumberElement
               name="duration"
-              label="Durasi"
-              placeholder="Durasi waktu kelas dalam menit"
-            />
-
-            <InputTextareaElement
-              maxLength={200}
-              name="description"
-              label="Deskripsi kelas"
-              placeholder="Masukkan deskripsi kelas min. 20 karakter"
+              label="Durasi (menit)"
+              placeholder="Contoh: 60"
             />
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <SelectElement
-            name="categoryId"
-            data="category"
-            label="Kategori"
-            placeholder="Pilih Kategori kelas"
-          />
-          <SelectElement
-            name="levelId"
-            data="level"
-            label="Level"
-            placeholder="Pilih Tingkat Kesulitan "
-          />
-          <SelectElement
-            name="subcategoryId"
-            data="subcategory"
-            label="Sub-Kategori"
-            placeholder="Pilih Sub-Kategori kelas "
-          />
-          <SelectOptionsElement
-            data="type"
-            name="typeId"
-            label="Tipe kelas"
-            placeholder="Pilih Tipe Kelas "
-          />
-        </div>
 
-        <InputTagsElement
-          name="additional"
-          label="Informasi tambahan"
-          placeholder="Masukkan informasi, tekan enter untuk tambah"
-        />
-        <InputFileElement name="images" label="Gallery (Optional)" />
-      </FormInput>
+          {/* Section 3: Kategori, Level, Subkategori, Tipe */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <SelectElement
+              name="categoryId"
+              data="category"
+              label="Kategori"
+              placeholder="Pilih Kategori"
+            />
+            <SelectElement
+              name="levelId"
+              data="level"
+              label="Level"
+              placeholder="Tingkat Kesulitan"
+            />
+            <SelectElement
+              name="subcategoryId"
+              data="subcategory"
+              label="Sub-Kategori"
+              placeholder="Pilih Sub-Kategori"
+            />
+            <SelectOptionsElement
+              name="typeId"
+              data="type"
+              label="Tipe Kelas"
+              placeholder="Pilih Tipe"
+            />
+          </div>
+
+          {/* Section 4: Informasi Tambahan & Gallery */}
+          <div className="space-y-4">
+            <InputTagsElement
+              name="additional"
+              label="Informasi Tambahan"
+              placeholder="Tekan enter untuk tambah info"
+            />
+            <InputFileElement
+              name="images"
+              label="Galeri Tambahan (Opsional)"
+              note="Bisa unggah lebih dari satu gambar"
+            />
+          </div>
+        </FormInput>
+      </div>
     </section>
   );
 };

@@ -24,6 +24,14 @@ import ClassSchedules from "./pages/admin/classes/ClassSchedules";
 import AddInstructors from "./pages/admin/instructors/AddInstructors";
 import InstructorsList from "./pages/admin/instructors/InstructorsList";
 
+// customer pages
+import Packages from "./pages/Packages";
+import PackageDetail from "./pages/PackageDetail";
+import UserBookings from "./pages/customer/UserBookings";
+import UserPackages from "./pages/customer/UserPackages";
+import UserTransactions from "./pages/customer/UserTransactions";
+import UserNotifications from "./pages/customer/UserNotifications";
+
 // route config & support
 import { Toaster } from "sonner";
 import { useEffect } from "react";
@@ -32,11 +40,9 @@ import ScrollToTop from "./hooks/useScrollToTop";
 import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "./store/useAuthStore";
 import { AuthRoute, NonAuthRoute } from "./middleware";
-import UserLayout from "./components/layout/UserLayout";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./components/dashboard/AdminLayout";
-import Packages from "./pages/Packages";
-import PackageDetail from "./pages/PackageDetail";
+import CustomerLayout from "./components/customer/CustomerLayout";
 
 function App() {
   const { checkingAuth, authMe } = useAuthStore();
@@ -66,19 +72,25 @@ function App() {
           <Route path="packages" element={<Packages />} />
           <Route path="packages/:id" element={<PackageDetail />} />
           <Route path="classes/:id" element={<ClassDetail />} />
-          <Route
-            path="user"
-            element={
-              <AuthRoute>
-                <UserLayout />
-              </AuthRoute>
-            }
-          >
-            <Route path="profile" element={<Profile />} />
-            <Route index element={<Navigate to="profile" replace />} />
-          </Route>
         </Route>
 
+        {/* customer */}
+        <Route
+          path="/profile"
+          element={
+            <AuthRoute>
+              <CustomerLayout />
+            </AuthRoute>
+          }
+        >
+          <Route index element={<Profile />} />
+          <Route path="packages" element={<UserPackages />} />
+          <Route path="bookings" element={<UserBookings />} />
+          <Route path="transactions" element={<UserTransactions />} />
+          <Route path="notifications" element={<UserNotifications />} />
+        </Route>
+
+        {/* admin */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="classes" element={<ClassesList />} />
