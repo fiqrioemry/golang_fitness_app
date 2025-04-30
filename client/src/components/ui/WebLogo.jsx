@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 const WebLogo = () => {
   return (
     <Link to="/">
-      <h1 className="text-center text-primary">Ecommerce</h1>
+      <h3 className="text-center text-primary">Wellness-Studio</h3>
     </Link>
   );
 };
 
-export default WebLogo;
+export { WebLogo };

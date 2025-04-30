@@ -19,6 +19,8 @@ import { AuthRoute, NonAuthRoute } from "./middleware";
 import UserLayout from "./components/layout/UserLayout";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./hooks/useScrollToTop";
+import Dashboard from "./pages/admin/Dashboard";
+import AdminLayout from "./components/dashboard/AdminLayout";
 
 function App() {
   const { checkingAuth, authMe, setCheckingAuth } = useAuthStore();
@@ -52,11 +54,16 @@ function App() {
             <Route index element={<Navigate to="profile" replace />} />
           </Route>
         </Route>
-        <Route path="/options" element={<OptionsDisplay />} />
-        <Route path="/classes" element={<ClassesDisplay />} />
-        <Route path="/classes/add" element={<CreateClass />} />
-        <Route path="/packages" element={<PackagesDisplay />} />
-        <Route path="/packages/add" element={<CreatePackage />} />
+
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="options" element={<OptionsDisplay />} />
+          <Route path="classes" element={<ClassesDisplay />} />
+          <Route path="classes/add" element={<CreateClass />} />
+          <Route path="packages" element={<PackagesDisplay />} />
+          <Route path="packages/add" element={<CreatePackage />} />
+        </Route>
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
