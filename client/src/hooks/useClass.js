@@ -61,7 +61,8 @@ export const useClassMutation = () => {
     }),
 
     updateClass: useMutation({
-      mutationFn: ({ id, formData }) => classService.updateClass(id, formData),
+      mutationFn: ({ id, data }) => classService.updateClass(id, data),
+
       ...mutationOpts("Class updated", ({ id }) => {
         qc.invalidateQueries({ queryKey: ["class", id] });
         qc.invalidateQueries({ queryKey: ["classes"] });
@@ -74,8 +75,7 @@ export const useClassMutation = () => {
     }),
 
     uploadGallery: useMutation({
-      mutationFn: ({ id, formData }) =>
-        classService.uploadClassGallery(id, formData),
+      mutationFn: ({ id, data }) => classService.uploadClassGallery(id, data),
       ...mutationOpts("Gallery uploaded", ({ id }) => {
         qc.invalidateQueries({ queryKey: ["class", id] });
       }),

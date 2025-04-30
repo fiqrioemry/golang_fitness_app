@@ -1,7 +1,7 @@
 // src/hooks/useType.js
 import { toast } from "sonner";
-import * as typeService from "@/services/type";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import * as typeService from "@/services/type";
 
 // =====================
 // QUERIES
@@ -42,12 +42,12 @@ export const useTypeMutation = () => {
   });
 
   return {
-    createType: useMutation({
+    createOptions: useMutation({
       mutationFn: typeService.createType,
       ...mutationOpts("Type created successfully"),
     }),
 
-    updateType: useMutation({
+    updateOptions: useMutation({
       mutationFn: ({ id, data }) => typeService.updateType(id, data),
       ...mutationOpts("Type updated successfully", ({ id }) => {
         qc.invalidateQueries({ queryKey: ["type", id] });
@@ -55,7 +55,7 @@ export const useTypeMutation = () => {
       }),
     }),
 
-    deleteType: useMutation({
+    deleteOptions: useMutation({
       mutationFn: typeService.deleteType,
       ...mutationOpts("Type deleted successfully"),
     }),

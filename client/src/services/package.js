@@ -6,7 +6,7 @@ import { publicInstance, authInstance } from ".";
 
 export const getAllPackages = async () => {
   const res = await publicInstance.get("/packages");
-  return res.data;
+  return res.data.packages;
 };
 
 export const getPackageById = async (id) => {
@@ -14,13 +14,16 @@ export const getPackageById = async (id) => {
   return res.data;
 };
 
-export const createPackage = async (formData) => {
-  const res = await authInstance.post("/packages", formData);
+export const createPackage = async (data) => {
+  const res = await authInstance.post("/packages", data);
   return res.data;
 };
 
-export const updatePackage = async (id, formData) => {
-  const res = await authInstance.put(`/packages/${id}`, formData);
+export const updatePackage = async (id, data) => {
+  console.log(id);
+  console.log(data);
+  return "Package Deleted";
+  const res = await authInstance.put(`/packages/${id}`, data);
   return res.data;
 };
 

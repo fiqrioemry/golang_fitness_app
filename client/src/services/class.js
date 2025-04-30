@@ -20,14 +20,13 @@ export const getClassById = async (id) => {
   return res.data;
 };
 
-export const createClass = async (formData) => {
-  console.log(formData);
-  // const res = await authInstance.post("/classes", formData);
-  return "Pembuatan kelas berhasil";
+export const createClass = async (data) => {
+  const res = await authInstance.post("/classes", data);
+  return res.data;
 };
 
-export const updateClass = async (id, formData) => {
-  const res = await authInstance.put(`/classes/${id}`, formData);
+export const updateClass = async (id, data) => {
+  const res = await authInstance.put(`/classes/${id}`, data);
   return res.data;
 };
 

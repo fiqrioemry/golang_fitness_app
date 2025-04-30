@@ -80,11 +80,11 @@ export const updateClassSchema = z.object({
     .optional(),
 });
 
-export const createCategorySchema = z.object({
+export const optionSchema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter"),
 });
 
-export const creatLocationSchema = z.object({
+export const locationSchema = z.object({
   name: z.string().min(2),
   address: z.string(),
   geoLocation: z.string(),
@@ -152,13 +152,14 @@ export const updateInstructorRequestSchema = z.object({
   certifications: z.string().optional(),
 });
 
-export const createPackageRequestSchema = z.object({
+export const packageSchema = z.object({
   name: z.string().min(2),
   description: z.string(),
   price: z.number().positive(),
   credit: z.number().positive(),
+  isActive: z.boolean(),
   expired: z.number(),
-  information: z.string(),
+  information: z.array(z.string()).optional(),
   image: z
     .instanceof(File)
     .refine((file) => file.type.startsWith("image/"), {
@@ -167,22 +168,4 @@ export const createPackageRequestSchema = z.object({
     .refine((file) => file.size <= 2 * 1024 * 1024, {
       message: "Ukuran gambar maksimal 2MB",
     }),
-});
-
-export const updatePackageRequestSchema = z.object({
-  name: z.string().optional(),
-  description: z.string().optional(),
-  price: z.number().optional(),
-  credit: z.number().optional(),
-  expired: z.number().optional(),
-  information: z.string().optional(),
-  image: z
-    .instanceof(File)
-    .refine((file) => file.type.startsWith("image/"), {
-      message: "File harus berupa gambar",
-    })
-    .refine((file) => file.size <= 2 * 1024 * 1024, {
-      message: "Ukuran gambar maksimal 2MB",
-    })
-    .optional(),
 });

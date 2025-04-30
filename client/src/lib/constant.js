@@ -44,11 +44,11 @@ export const updateClassState = {
   image: undefined,
 };
 
-export const createCategoryState = {
+export const optionState = {
   name: "",
 };
 
-export const creatLocationState = {
+export const locationState = {
   name: "",
   address: "",
   geoLocation: "",
@@ -116,22 +116,13 @@ export const updateInstructorState = {
   certifications: "",
 };
 
-export const createPackageState = {
+export const packageState = {
   name: "",
   description: "",
   price: 0,
   credit: 0,
   expired: 0,
-  information: "",
+  information: [],
   image: undefined,
-};
-
-export const updatePackageState = {
-  name: "",
-  description: "",
-  price: 0,
-  credit: 0,
-  expired: 0,
-  information: "",
-  image: undefined,
+  isActive: true,
 };

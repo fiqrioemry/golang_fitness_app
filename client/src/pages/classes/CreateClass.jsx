@@ -8,7 +8,7 @@ import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { InputFileElement } from "@/components/input/InputFileElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
-import { InputTextareaElement } from "@/components/input/InputTextAreElement";
+import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
 
 const CreateClass = () => {

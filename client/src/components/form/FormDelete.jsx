@@ -12,7 +12,7 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 
-const FormDelete = ({ title, description, onClick, loading = false }) => {
+const FormDelete = ({ title, description, onDelete, loading = false }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -46,7 +46,7 @@ const FormDelete = ({ title, description, onClick, loading = false }) => {
               </DialogClose>
 
               <DialogClose asChild>
-                <Button variant="danger" className="w-32" onClick={onClick}>
+                <Button variant="danger" className="w-32" onClick={onDelete}>
                   Delete
                 </Button>
               </DialogClose>

@@ -42,12 +42,12 @@ export const useLocationMutation = () => {
   });
 
   return {
-    createLocation: useMutation({
+    createOptions: useMutation({
       mutationFn: locationService.createLocation,
       ...mutationOpts("Location created successfully"),
     }),
 
-    updateLocation: useMutation({
+    updateOptions: useMutation({
       mutationFn: ({ id, data }) => locationService.updateLocation(id, data),
       ...mutationOpts("Location updated", ({ id }) => {
         qc.invalidateQueries({ queryKey: ["location", id] });
@@ -55,7 +55,7 @@ export const useLocationMutation = () => {
       }),
     }),
 
-    deleteLocation: useMutation({
+    deleteOptions: useMutation({
       mutationFn: locationService.deleteLocation,
       ...mutationOpts("Location deleted"),
     }),

@@ -45,12 +45,12 @@ export const useCategoryMutation = () => {
   });
 
   return {
-    createCategory: useMutation({
+    createOptions: useMutation({
       mutationFn: category.createCategory,
       ...mutationOptions("Category created successfully"),
     }),
 
-    updateCategory: useMutation({
+    updateOptions: useMutation({
       mutationFn: ({ id, data }) => category.updateCategory(id, data),
       ...mutationOptions("Category updated successfully", ({ id }) => {
         queryClient.invalidateQueries({ queryKey: ["category", id] });
@@ -58,7 +58,7 @@ export const useCategoryMutation = () => {
       }),
     }),
 
-    deleteCategory: useMutation({
+    deleteOptions: useMutation({
       mutationFn: category.deleteCategory,
       ...mutationOptions("Category deleted successfully"),
     }),

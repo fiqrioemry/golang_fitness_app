@@ -1,10 +1,12 @@
 // src/hooks/useSelectOptions.js
-
-import { useTypesQuery } from "@/hooks/useType";
-import { useLevelsQuery } from "@/hooks/useLevel";
-import { useLocationsQuery } from "@/hooks/useLocation";
-import { useCategoriesQuery } from "@/hooks/useCategory";
-import { useSubcategoriesQuery } from "@/hooks/useSubcategories";
+import {
+  useSubcategoriesQuery,
+  useSubcategoryMutation,
+} from "@/hooks/useSubcategories";
+import { useTypesQuery, useTypeMutation } from "@/hooks/useType";
+import { useLevelsQuery, useLevelMutation } from "@/hooks/useLevel";
+import { useLocationsQuery, useLocationMutation } from "@/hooks/useLocation";
+import { useCategoriesQuery, useCategoryMutation } from "@/hooks/useCategory";
 
 export const useSelectOptions = (type) => {
   switch (type) {
@@ -18,6 +20,23 @@ export const useSelectOptions = (type) => {
       return useSubcategoriesQuery();
     case "type":
       return useTypesQuery();
+    default:
+      throw new Error(`Unknown select type: ${type}`);
+  }
+};
+
+export const useMutationOptions = (type) => {
+  switch (type) {
+    case "category":
+      return useCategoryMutation();
+    case "level":
+      return useLevelMutation();
+    case "location":
+      return useLocationMutation();
+    case "subcategory":
+      return useSubcategoryMutation();
+    case "type":
+      return useTypeMutation();
     default:
       throw new Error(`Unknown select type: ${type}`);
   }

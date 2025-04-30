@@ -1,27 +1,26 @@
 // src/components/address/UpdateClass.jsx
 import React from "react";
 import { createClassSchema } from "@/lib/schema";
-import { createClassState } from "@/lib/constant";
 import { useClassMutation } from "@/hooks/useClass";
 import { FormDialog } from "@/components/form/FormDialog";
 import { SwitchElement } from "@/components/input/SwitchElement";
-import { SelectElement } from "@/components/input/SelectElement";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { InputFileElement } from "@/components/input/InputFileElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
-import { InputTextareaElement } from "@/components/input/InputTextAreElement";
+import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
+import { Pencil } from "lucide-react";
 
-const UpdateClass = ({ classItem }) => {
+const UpdateClass = ({ classes }) => {
   const { updateClass, isLoading } = useClassMutation();
 
   return (
     <FormDialog
       loading={isLoading}
-      resourceId={classItem.id}
+      resourceId={classes.id}
       title="Perbaharui Kelas"
-      state={createClassState}
+      state={classes}
       schema={createClassSchema}
       action={updateClass.mutateAsync}
       buttonText={
@@ -41,7 +40,7 @@ const UpdateClass = ({ classItem }) => {
       <div className="grid grid-cols-2 gap-4">
         <InputFileElement name="image" label="Thumbnail Kelas" isSingle />
         <div>
-          <SelectElement
+          <SelectOptionsElement
             label="Lokasi"
             data="location"
             name="locationId"
@@ -62,19 +61,19 @@ const UpdateClass = ({ classItem }) => {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <SelectElement
+        <SelectOptionsElement
           name="categoryId"
           data="category"
           label="Kategori"
           placeholder="Pilih Kategori kelas"
         />
-        <SelectElement
+        <SelectOptionsElement
           name="levelId"
           data="level"
           label="Level"
           placeholder="Pilih Tingkat Kesulitan "
         />
-        <SelectElement
+        <SelectOptionsElement
           name="subcategoryId"
           data="subcategory"
           label="Sub-Kategori"

@@ -48,8 +48,7 @@ export const usePackageMutation = () => {
     }),
 
     updatePackage: useMutation({
-      mutationFn: ({ id, formData }) =>
-        packageService.updatePackage(id, formData),
+      mutationFn: ({ id, data }) => packageService.updatePackage(id, data),
       ...mutationOpts("Package updated successfully", ({ id }) => {
         qc.invalidateQueries({ queryKey: ["package", id] });
         qc.invalidateQueries({ queryKey: ["packages"] });

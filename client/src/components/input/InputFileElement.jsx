@@ -34,13 +34,15 @@ const InputFileElement = ({
           if (validFiles.length === 0) return;
 
           if (isSingle) {
-            field.onChange(validFiles[0]); // ✅ Single File
+            field.onChange(validFiles[0]);
           } else {
             const updated = [
-              ...(field.value || []).filter((f) => f instanceof File),
+              ...(field.value || []).filter(
+                (f) => f instanceof File || typeof f === "string"
+              ),
               ...validFiles,
             ].slice(0, maxImages);
-            field.onChange(updated); // ✅ Array of Files
+            field.onChange(updated);
           }
         };
 
@@ -48,9 +50,7 @@ const InputFileElement = ({
           if (isSingle) {
             field.onChange(null);
           } else {
-            const updated = (field.value || []).filter(
-              (file) => file !== img && file instanceof File
-            );
+            const updated = (field.value || []).filter((file) => file !== img);
             field.onChange(updated);
           }
         };
@@ -64,12 +64,23 @@ const InputFileElement = ({
           }
         };
 
+        const getImageURL = (item) => {
+          if (item instanceof File) {
+            return URL.createObjectURL(item);
+          }
+          if (typeof item === "string") {
+            return item;
+          }
+          return "";
+        };
+
         const renderSinglePreview = () => {
-          if (!field.value || !(field.value instanceof File)) return null;
+          if (!field.value) return null;
+          const url = getImageURL(field.value);
           return (
             <div className="relative w-full h-full">
               <img
-                src={URL.createObjectURL(field.value)}
+                src={url}
                 alt="preview"
                 className="object-cover w-full h-full"
               />
@@ -85,27 +96,25 @@ const InputFileElement = ({
         };
 
         const renderMultiplePreview = () => {
-          return (field.value || [])
-            .filter((f) => f instanceof File)
-            .map((img, idx) => (
-              <div
-                key={idx}
-                className="relative w-32 h-32 border rounded-md overflow-hidden"
+          return (field.value || []).map((img, idx) => (
+            <div
+              key={idx}
+              className="relative w-32 h-32 border rounded-md overflow-hidden"
+            >
+              <img
+                src={getImageURL(img)}
+                alt="preview"
+                className="object-cover w-full h-full"
+              />
+              <button
+                type="button"
+                onClick={() => handleRemoveImage(img)}
+                className="absolute top-1 right-1 p-1 rounded-full bg-white shadow hover:bg-red-500 hover:text-white transition"
               >
-                <img
-                  src={URL.createObjectURL(img)}
-                  alt="preview"
-                  className="object-cover w-full h-full"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(img)}
-                  className="absolute top-1 right-1 p-1 rounded-full bg-white shadow hover:bg-red-500 hover:text-white transition"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ));
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ));
         };
 
         return (
@@ -175,7 +184,6 @@ const InputFileElement = ({
               />
             </div>
 
-            {/* Error Message */}
             {fieldState.error && (
               <p className="text-red-500 text-xs mt-1">
                 {fieldState.error.message || "This field is required"}

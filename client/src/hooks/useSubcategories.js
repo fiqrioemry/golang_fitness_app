@@ -50,12 +50,12 @@ export const useSubcategoryMutation = () => {
   });
 
   return {
-    createSubcategory: useMutation({
+    createOptions: useMutation({
       mutationFn: subcategoryService.createSubcategory,
       ...mutationOpts("Subcategory created successfully"),
     }),
 
-    updateSubcategory: useMutation({
+    updateOptions: useMutation({
       mutationFn: ({ id, data }) =>
         subcategoryService.updateSubcategory(id, data),
       ...mutationOpts("Subcategory updated successfully", ({ id }) => {
@@ -64,7 +64,7 @@ export const useSubcategoryMutation = () => {
       }),
     }),
 
-    deleteSubcategory: useMutation({
+    deleteOptions: useMutation({
       mutationFn: subcategoryService.deleteSubcategory,
       ...mutationOpts("Subcategory deleted successfully"),
     }),

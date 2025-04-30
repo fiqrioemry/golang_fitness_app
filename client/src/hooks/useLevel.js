@@ -42,12 +42,12 @@ export const useLevelMutation = () => {
   });
 
   return {
-    createLevel: useMutation({
+    createOptions: useMutation({
       mutationFn: levelService.createLevel,
       ...mutationOpts("Level created successfully"),
     }),
 
-    updateLevel: useMutation({
+    updateOptions: useMutation({
       mutationFn: ({ id, data }) => levelService.updateLevel(id, data),
       ...mutationOpts("Level updated successfully", ({ id }) => {
         qc.invalidateQueries({ queryKey: ["level", id] });
@@ -55,7 +55,7 @@ export const useLevelMutation = () => {
       }),
     }),
 
-    deleteLevel: useMutation({
+    deleteOptions: useMutation({
       mutationFn: levelService.deleteLevel,
       ...mutationOpts("Level deleted successfully"),
     }),
