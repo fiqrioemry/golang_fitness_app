@@ -1,8 +1,8 @@
 // src/store/useAuthStore.jsx
 
+import { toast } from "sonner";
 import { create } from "zustand";
 import auth from "@/services/auth";
-import toast from "react-hot-toast";
 import { persist } from "zustand/middleware";
 
 export const useAuthStore = create(
@@ -20,7 +20,7 @@ export const useAuthStore = create(
 
       authMe: async () => {
         try {
-          const { user } = await auth.getMe();
+          const user = await auth.getMe();
           set({ user });
         } catch (err) {
           set({ user: null });
@@ -36,7 +36,8 @@ export const useAuthStore = create(
           toast.success(message);
           await get().authMe();
         } catch (error) {
-          toast.error(error.message);
+          console.log(error);
+          toast.error(error.response.data.message);
         } finally {
           set({ loading: false });
         }
@@ -45,7 +46,7 @@ export const useAuthStore = create(
       logout: async () => {
         try {
           await auth.logout();
-          set({ user: null });
+          get().clearUser();
         } catch (error) {
           console.error(error.message);
         }

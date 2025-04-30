@@ -25,7 +25,9 @@ export const register = async (data) => {
 
 // POST /api/auth/login
 export const login = async (data) => {
+  console.log(data);
   const res = await publicInstance.post("/auth/login", data);
+  console.log(res);
   return res.data;
 };
 

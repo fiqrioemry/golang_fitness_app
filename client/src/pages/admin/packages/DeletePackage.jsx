@@ -1,7 +1,22 @@
-import React from "react";
+/* eslint-disable react/prop-types */
+import { usePackageMutation } from "@/hooks/usePackage";
+import { FormDelete } from "@/components/form/FormDelete";
 
-const DeletePackage = () => {
-  return <div>DeletePackage</div>;
+const DeletePackage = ({ pkg }) => {
+  const { deletePackage, isLoading } = usePackageMutation();
+
+  const handleDeletePackage = () => {
+    deletePackage.mutateAsync(pkg.id);
+  };
+
+  return (
+    <FormDelete
+      loading={isLoading}
+      title="Delete Package"
+      onDelete={handleDeletePackage}
+      description="Are you sure want to delete this package ?"
+    />
+  );
 };
 
 export default DeletePackage;

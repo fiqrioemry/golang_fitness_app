@@ -1,34 +1,48 @@
 // src/App.jsx
+// public pages
 import Home from "./pages/Home";
-import NotFound from "./pages/NotFound";
-import Profile from "./pages/customer/Profile";
+import SignIn from "./pages/SignIn";
 import Classes from "./pages/Classes";
+import NotFound from "./pages/NotFound";
 import ClassDetail from "./pages/ClassDetail";
-import CreateClass from "./pages/classes/CreateClass";
-import CreatePackage from "./pages/packages/CreatePackage";
-import OptionsDisplay from "./pages/options/OptionsDisplay";
-import ClassesDisplay from "./pages/classes/ClassesDisplay";
-import PackagesDisplay from "./pages/packages/PackagesDisplay";
+import Profile from "./pages/customer/Profile";
 
-import { useEffect } from "react";
+// admin pages
+import Dashboard from "./pages/admin/Dashboard";
+import UsersList from "./pages/admin/UsersList";
+import AddClass from "./pages/admin/classes/AddClass";
+import BookingsList from "./pages/admin/BookingsList";
+import VouchersList from "./pages/admin/VouchersList";
+import ReviewsLists from "./pages/admin/ReviewsLists";
+import Notifications from "./pages/admin/Notifications";
+import AddPackage from "./pages/admin/packages/AddPackage";
+import ClassesList from "./pages/admin/classes/ClassesList";
+import ClassOptions from "./pages/admin/classes/ClassOptions";
+import TransactionsList from "./pages/admin/TransactionsList";
+import PackagesList from "./pages/admin/packages/PackagesList";
+import ClassSchedules from "./pages/admin/classes/ClassSchedules";
+import AddInstructors from "./pages/admin/instructors/AddInstructors";
+import InstructorsList from "./pages/admin/instructors/InstructorsList";
+
+// route config & support
 import { Toaster } from "sonner";
+import { useEffect } from "react";
 import Layout from "./components/layout/Layout";
+import ScrollToTop from "./hooks/useScrollToTop";
 import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "./store/useAuthStore";
 import { AuthRoute, NonAuthRoute } from "./middleware";
 import UserLayout from "./components/layout/UserLayout";
 import { Navigate, Route, Routes } from "react-router-dom";
-import ScrollToTop from "./hooks/useScrollToTop";
-import Dashboard from "./pages/admin/Dashboard";
 import AdminLayout from "./components/dashboard/AdminLayout";
+import Packages from "./pages/Packages";
+import PackageDetail from "./pages/PackageDetail";
 
 function App() {
-  const { checkingAuth, authMe, setCheckingAuth } = useAuthStore();
+  const { checkingAuth, authMe } = useAuthStore();
 
   useEffect(() => {
-    const hasCookie = document.cookie.includes("accessToken=");
-    if (hasCookie) authMe();
-    else setCheckingAuth();
+    authMe();
   }, []);
 
   if (checkingAuth) return <Loading />;
@@ -38,9 +52,19 @@ function App() {
       <Toaster />
       <ScrollToTop />
       <Routes>
+        <Route
+          path="/signin"
+          element={
+            <NonAuthRoute>
+              <SignIn />
+            </NonAuthRoute>
+          }
+        />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="classes" element={<Classes />} />
+          <Route path="packages" element={<Packages />} />
+          <Route path="packages/:id" element={<PackageDetail />} />
           <Route path="classes/:id" element={<ClassDetail />} />
           <Route
             path="user"
@@ -56,12 +80,22 @@ function App() {
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="options" element={<OptionsDisplay />} />
-          <Route path="classes" element={<ClassesDisplay />} />
-          <Route path="classes/add" element={<CreateClass />} />
-          <Route path="packages" element={<PackagesDisplay />} />
-          <Route path="packages/add" element={<CreatePackage />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="classes" element={<ClassesList />} />
+          <Route path="classes/add" element={<AddClass />} />
+          <Route path="classes/options" element={<ClassOptions />} />
+          <Route path="classes/schedules" element={<ClassSchedules />} />
+          <Route path="instructors" element={<InstructorsList />} />
+          <Route path="instructors/add" element={<AddInstructors />} />
+          <Route path="users" element={<UsersList />} />
+          <Route path="reviews" element={<ReviewsLists />} />
+          <Route path="vouchers" element={<VouchersList />} />
+          <Route path="bookings" element={<BookingsList />} />
+          <Route path="packages" element={<PackagesList />} />
+          <Route path="packages/add" element={<AddPackage />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="transactions" element={<TransactionsList />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

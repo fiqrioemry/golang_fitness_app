@@ -17,7 +17,7 @@ const FormInput = ({
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit} className="grid-cols-2 space-y-2">
+      <form onSubmit={handleSubmit} className="grid-cols-2 space-y-2 space-y-4">
         {children}
         <SubmitButton
           text={text}

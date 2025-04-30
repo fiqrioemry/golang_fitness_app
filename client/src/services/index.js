@@ -4,6 +4,7 @@ import auth from "./auth";
 
 export const publicInstance = axios.create({
   baseURL: import.meta.env.VITE_API_SERVICES,
+  withCredentials: true,
   headers: {
     "X-API-Key": import.meta.env.VITE_API_KEY,
   },

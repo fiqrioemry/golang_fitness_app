@@ -11,7 +11,7 @@ const Input = ({
   ...rest
 }) => {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 w-full">
       {label && (
         <label htmlFor={name} className="label">
           {label}

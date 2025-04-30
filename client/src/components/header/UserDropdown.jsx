@@ -1,49 +1,48 @@
-// src/components/header/UserDropdown.jsx
-
 import {
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
-import { LogOut, User, MapPin } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const UserDropdown = () => {
-  const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
+
+  if (!user) return null;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/signin");
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <img
-          src={user.profile?.avatar}
-          alt={user.profile?.fullname}
-          className="w-8 h-8 rounded-full object-cover cursor-pointer"
-        />
+        <Avatar className="cursor-pointer">
+          <AvatarImage src={user.avatar} alt={user.fullname} />
+          <AvatarFallback>
+            {user.fullname?.charAt(0).toUpperCase() || "U"}
+          </AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
-
-      <DropdownMenuContent align="end" className="w-48 shadow-lg rounded-xl">
-        <DropdownMenuItem
-          onClick={() => navigate("/user/profile")}
-          className="cursor-pointer"
-        >
-          <User className="w-4 h-4 mr-2" />
+      <DropdownMenuContent className="w-48" align="end">
+        <DropdownMenuLabel>{user.fullname}</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => navigate("/profile")}>
           Profile
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => navigate("/user/address")}
-          className="cursor-pointer"
-        >
-          <MapPin className="w-4 h-4 mr-2" />
-          Address
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => logout()}
-          className="cursor-pointer text-red-500"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
+        {user.role === "admin" && (
+          <DropdownMenuItem onClick={() => navigate("/admin/dashboard")}>
+            Admin Panel
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleLogout} className="text-red-600">
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>

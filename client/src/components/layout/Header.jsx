@@ -1,7 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/useAuthStore";
+import UserDropdown from "@/components/header/UserDropdown";
 
 const Header = () => {
+  const { user } = useAuthStore();
   const linkClass =
     "hover:text-blue-600 font-medium transition-colors duration-200";
   const activeClass =
@@ -55,9 +58,13 @@ const Header = () => {
           >
             Locate Us
           </NavLink>
-          <NavLink to="/get-started">
-            <Button className="px-5 py-2">Get Started</Button>
-          </NavLink>
+          {user ? (
+            <UserDropdown />
+          ) : (
+            <NavLink to="/signin">
+              <Button className="px-5 py-2">Get Started</Button>
+            </NavLink>
+          )}
         </div>
       </div>
     </header>

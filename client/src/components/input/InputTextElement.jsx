@@ -6,6 +6,7 @@ const InputTextElement = ({
   name,
   label,
   maxLength,
+  type = "text",
   placeholder = "",
   disabled = false,
   rules = { required: true },
@@ -47,7 +48,7 @@ const InputTextElement = ({
             )}
             <input
               id={name}
-              type="text"
+              type={type}
               {...field}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}

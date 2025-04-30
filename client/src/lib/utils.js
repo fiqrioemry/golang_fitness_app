@@ -13,3 +13,25 @@ export const formatRupiah = (number) => {
     maximumFractionDigits: 0,
   }).format(number);
 };
+
+// src/lib/
+
+export const formatDateTime = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleString("en-GB", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+export const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-GB", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+};
