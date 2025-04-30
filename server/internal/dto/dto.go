@@ -35,6 +35,7 @@ type AuthMeResponse struct {
 	Email    string `json:"email"`
 	Fullname string `json:"fullname"`
 	Avatar   string `json:"avatar"`
+	Role     string `json:"role"`
 }
 
 type ProfileResponse struct {
@@ -102,21 +103,21 @@ type ClassQueryParam struct {
 }
 
 type ClassDetailResponse struct {
-	ID          string            `json:"id"`
-	Title       string            `json:"title"`
-	Image       string            `json:"image"`
-	IsActive    bool              `json:"isActive"`
-	Duration    int               `json:"duration"`
-	Description string            `json:"description"`
-	Additional  []string          `json:"additional"`
-	Type        string            `json:"type"`
-	Level       string            `json:"level"`
-	Location    string            `json:"location"`
-	Category    string            `json:"category"`
-	Subcategory string            `json:"subcategory"`
-	Galleries   []GalleryResponse `json:"galleries"`
-	Reviews     []ReviewResponse  `json:"reviews"`
-	CreatedAt   string            `json:"createdAt"`
+	ID          string           `json:"id"`
+	Title       string           `json:"title"`
+	Image       string           `json:"image"`
+	IsActive    bool             `json:"isActive"`
+	Duration    int              `json:"duration"`
+	Description string           `json:"description"`
+	Additional  []string         `json:"additional"`
+	Type        string           `json:"type"`
+	Level       string           `json:"level"`
+	Location    string           `json:"location"`
+	Category    string           `json:"category"`
+	Subcategory string           `json:"subcategory"`
+	Galleries   []string         `json:"galleries"`
+	Reviews     []ReviewResponse `json:"reviews"`
+	CreatedAt   string           `json:"createdAt"`
 }
 
 type GalleryResponse struct {
@@ -415,4 +416,45 @@ type ReviewResponse struct {
 	Rating     int    `json:"rating"`
 	Comment    string `json:"comment"`
 	CreatedAt  string `json:"createdAt"`
+}
+
+// internal/dto/user_dto.go
+type UserQueryParam struct {
+	Q     string `form:"q"`
+	Role  string `form:"role"`
+	Sort  string `form:"sort"`
+	Page  int    `form:"page,default=1"`
+	Limit int    `form:"limit,default=10"`
+}
+
+type UserListResponse struct {
+	ID        string `json:"id"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+	Fullname  string `json:"fullname"`
+	Phone     string `json:"phone"`
+	Avatar    string `json:"avatar"`
+	CreatedAt string `json:"createdAt"`
+}
+
+type UserDetailResponse struct {
+	ID        string `json:"id"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+	Fullname  string `json:"fullname"`
+	Phone     string `json:"phone"`
+	Avatar    string `json:"avatar"`
+	Gender    string `json:"gender"`
+	Birthday  string `json:"birthday,omitempty"`
+	Bio       string `json:"bio"`
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
+}
+
+type UserStatsResponse struct {
+	Total        int64 `json:"total"`
+	Customers    int64 `json:"customers"`
+	Instructors  int64 `json:"instructors"`
+	Admins       int64 `json:"admins"`
+	NewThisMonth int64 `json:"newThisMonth"`
 }

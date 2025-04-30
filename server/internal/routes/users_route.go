@@ -1,0 +1,18 @@
+// internal/routes/user_route.go
+package routes
+
+import (
+	"server/internal/handlers"
+	"server/internal/middleware"
+
+	"github.com/gin-gonic/gin"
+)
+
+func UserRoutes(r *gin.Engine, handler *handlers.UserHandler) {
+	admin := r.Group("/api/admin/users")
+	admin.Use(middleware.AuthRequired(), middleware.AdminOnly())
+
+	admin.GET("", handler.GetAllUsers)
+	admin.GET("/stats", handler.GetUserStats)
+	admin.GET(":id", handler.GetUserDetail)
+}

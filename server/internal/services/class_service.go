@@ -173,13 +173,10 @@ func (s *classService) GetClassByID(id string) (*dto.ClassDetailResponse, error)
 	if err != nil {
 		return nil, err
 	}
-	galleries := make([]dto.GalleryResponse, len(class.Galleries))
-	for i, g := range class.Galleries {
-		galleries[i] = dto.GalleryResponse{
-			ID:        g.ID.String(),
-			ImageURL:  g.URL,
-			CreatedAt: g.CreatedAt.Format(time.RFC3339),
-		}
+
+	var galleries []string
+	for _, g := range class.Galleries {
+		galleries = append(galleries, g.URL)
 	}
 
 	reviews := make([]dto.ReviewResponse, len(class.Reviews))

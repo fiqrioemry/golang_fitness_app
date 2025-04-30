@@ -70,22 +70,15 @@ func DecodeRefreshToken(tokenStr string) (string, error) {
 }
 
 func SetRefreshTokenCookie(c *gin.Context, refreshToken string) {
-	c.SetCookie(
-		"refreshToken",
-		refreshToken,
-		7*24*3600, // 7 hari
-		"/",
-		"",   // domain kosong (pakai domain API)
-		true, // Secure
-		true, // HttpOnly
-	)
+	domain := os.Getenv("COOKIE_DOMAIN")
+	c.SetCookie("refreshToken", refreshToken, 7*24*3600, "/", domain, true, true)
 }
 
 func ClearRefreshTokenCookie(c *gin.Context) {
 	c.SetCookie(
 		"refreshToken",
 		"",
-		-1, // expire segera
+		-1,
 		"/",
 		"",
 		true,
@@ -94,15 +87,8 @@ func ClearRefreshTokenCookie(c *gin.Context) {
 }
 
 func SetAccessTokenCookie(c *gin.Context, accessToken string) {
-	c.SetCookie(
-		"accessToken",
-		accessToken,
-		1*3600, // 1 jam
-		"/",
-		"",
-		true,
-		true,
-	)
+	domain := os.Getenv("COOKIE_DOMAIN")
+	c.SetCookie("accessToken", accessToken, 3600, "/", domain, true, true)
 }
 
 func ClearAccessTokenCookie(c *gin.Context) {

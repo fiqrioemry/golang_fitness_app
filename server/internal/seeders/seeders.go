@@ -1,6 +1,7 @@
 package seeders
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -25,14 +26,83 @@ func SeedUsers(db *gorm.DB) {
 		},
 	}
 
-	customerUser := models.User{
-		ID:       uuid.New(),
-		Email:    "customer@example.com",
-		Password: string(password),
-		Role:     "customer",
-		Profile: models.Profile{
-			Fullname: "Customer User",
-			Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Customer",
+	customerUsers := []models.User{
+		{
+			ID:       uuid.New(),
+			Email:    "customer@example.com",
+			Password: string(password),
+			Role:     "customer",
+			Profile: models.Profile{
+				Fullname: "Customer User",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Customer",
+				Gender:   "female",
+			},
+		},
+		{
+			ID:       uuid.New(),
+			Email:    "elena.morris@example.com",
+			Password: string(password),
+			Role:     "customer",
+			Profile: models.Profile{
+				Fullname: "Elena Morris",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=EM",
+				Gender:   "female",
+			},
+		},
+		{
+			ID:       uuid.New(),
+			Email:    "brandon.tan@example.com",
+			Password: string(password),
+			Role:     "customer",
+			Profile: models.Profile{
+				Fullname: "Brandon Tan",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=BT",
+				Gender:   "male",
+			},
+		},
+		{
+			ID:       uuid.New(),
+			Email:    "yuki.sato@example.com",
+			Password: string(password),
+			Role:     "customer",
+			Profile: models.Profile{
+				Fullname: "Yuki Sato",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=YS",
+				Gender:   "female",
+			},
+		},
+		{
+			ID:       uuid.New(),
+			Email:    "elena.morris@example.com",
+			Password: string(password),
+			Role:     "customer",
+			Profile: models.Profile{
+				Fullname: "Elena Morris",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=EM",
+				Gender:   "female",
+			},
+		},
+		{
+			ID:       uuid.New(),
+			Email:    "elvis.presley@example.com",
+			Password: string(password),
+			Role:     "customer",
+			Profile: models.Profile{
+				Fullname: "Elvis Presley",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=BT",
+				Gender:   "male",
+			},
+		},
+		{
+			ID:       uuid.New(),
+			Email:    "david.jovovich@example.com",
+			Password: string(password),
+			Role:     "customer",
+			Profile: models.Profile{
+				Fullname: "David Jovovich",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=BT",
+				Gender:   "male",
+			},
 		},
 	}
 
@@ -67,14 +137,23 @@ func SeedUsers(db *gorm.DB) {
 				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=GH",
 			},
 		},
+		{
+			ID:       uuid.New(),
+			Email:    "instructor3@example.com",
+			Password: string(password),
+			Role:     "instructor",
+			Profile: models.Profile{
+				Fullname: "Instructor Three",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=GH",
+			},
+		},
 	}
 
-	// Insert data
 	if err := db.Create(&adminUser).Error; err != nil {
 		log.Println("Failed to seed admin:", err)
 	}
-	if err := db.Create(&customerUser).Error; err != nil {
-		log.Println("Failed to seed customer:", err)
+	if err := db.Create(&customerUsers).Error; err != nil {
+		log.Println("Failed to seed customers:", err)
 	}
 	if err := db.Create(&instructorUsers).Error; err != nil {
 		log.Println("Failed to seed instructors:", err)
@@ -82,7 +161,6 @@ func SeedUsers(db *gorm.DB) {
 
 	log.Println("✅ User seeding completed!")
 }
-
 func SeedCategories(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Category{}).Count(&count)
@@ -368,7 +446,6 @@ func SeedClasses(db *gorm.DB) {
 func SeedClassGalleries(db *gorm.DB) {
 	var count int64
 	db.Model(&models.ClassGallery{}).Count(&count)
-
 	if count > 0 {
 		log.Println("ClassGalleries already seeded, skipping...")
 		return
@@ -387,13 +464,14 @@ func SeedClassGalleries(db *gorm.DB) {
 
 	var galleries []models.ClassGallery
 	for _, class := range classes {
-		gallery := models.ClassGallery{
-			ID:        uuid.New(),
-			ClassID:   class.ID,
-			URL:       "https://placehold.co/400x400?text=" + generateGalleryText(class.Title),
-			CreatedAt: time.Now(),
+		for i := 1; i <= 3; i++ {
+			galleries = append(galleries, models.ClassGallery{
+				ID:        uuid.New(),
+				ClassID:   class.ID,
+				URL:       fmt.Sprintf("https://placehold.co/400x400?text=%s+Img%d", generateGalleryText(class.Title), i),
+				CreatedAt: time.Now(),
+			})
 		}
-		galleries = append(galleries, gallery)
 	}
 
 	if err := db.Create(&galleries).Error; err != nil {

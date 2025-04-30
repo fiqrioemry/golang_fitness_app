@@ -35,6 +35,10 @@ func main() {
 	authService := services.NewAuthService(authRepo)
 	authHandler := handlers.NewAuthHandler(authService)
 
+	userRepo := repositories.NewUserRepository(db)
+	userService := services.NewUserService(userRepo)
+	userHandler := handlers.NewUserHandler(userService)
+
 	// profile
 	profileRepo := repositories.NewProfileRepository(db)
 	profileService := services.NewProfileService(profileRepo)
@@ -116,6 +120,7 @@ func main() {
 	reviewHandler := handlers.NewReviewHandler(reviewService)
 
 	routes.AuthRoutes(r, authHandler)
+	routes.UserRoutes(r, userHandler)
 	routes.TypeRoutes(r, typeHandler)
 	routes.ClassRoutes(r, classHandler)
 	routes.LevelRoutes(r, levelHandler)

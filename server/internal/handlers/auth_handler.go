@@ -133,6 +133,7 @@ func (h *AuthHandler) AuthMe(c *gin.Context) {
 		Email:    user.Email,
 		Fullname: user.Profile.Fullname,
 		Avatar:   user.Profile.Avatar,
+		Role:     user.Role,
 	}
 
 	c.JSON(http.StatusOK, response)

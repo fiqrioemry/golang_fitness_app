@@ -113,6 +113,8 @@ func (h *ClassHandler) GetClassByID(c *gin.Context) {
 		Category:    class.Category,
 		Subcategory: class.Subcategory,
 		CreatedAt:   class.CreatedAt,
+		Galleries:   class.Galleries,
+		Reviews:     class.Reviews,
 	}
 
 	c.JSON(http.StatusOK, classResponse)
