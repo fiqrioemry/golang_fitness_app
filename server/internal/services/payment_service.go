@@ -23,13 +23,15 @@ type paymentService struct {
 	paymentRepo     repositories.PaymentRepository
 	packageRepo     repositories.PackageRepository
 	userPackageRepo repositories.UserPackageRepository
+	authRepo        repositories.AuthRepository
 }
 
-func NewPaymentService(paymentRepo repositories.PaymentRepository, packageRepo repositories.PackageRepository, userPackageRepo repositories.UserPackageRepository) PaymentService {
+func NewPaymentService(paymentRepo repositories.PaymentRepository, packageRepo repositories.PackageRepository, userPackageRepo repositories.UserPackageRepository, authRepo repositories.AuthRepository) PaymentService {
 	return &paymentService{
 		paymentRepo:     paymentRepo,
 		packageRepo:     packageRepo,
 		userPackageRepo: userPackageRepo,
+		authRepo:        authRepo,
 	}
 }
 
@@ -40,6 +42,11 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 		return nil, errors.New("package not found")
 	}
 
+	user, err := s.authRepo.GetUserByID(userID)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
 	// Generate Payment ID
 	paymentID := uuid.New()
 
@@ -48,7 +55,7 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 		ID:            paymentID,
 		PackageID:     pkg.ID,
 		UserID:        uuid.MustParse(userID),
-		PaymentMethod: "midtrans",
+		PaymentMethod: "-",
 		Status:        "pending",
 		PaidAt:        time.Now(),
 	}
@@ -64,7 +71,7 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 			GrossAmt: int64(pkg.Price),
 		},
 		CustomerDetail: &midtrans.CustomerDetails{
-			Email: "customer.email@example.com",
+			Email: user.Email,
 		},
 	}
 
@@ -79,21 +86,27 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 }
 
 func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationRequest) error {
-
 	payment, err := s.paymentRepo.GetPaymentByOrderID(req.OrderID)
 	if err != nil {
 		return err
 	}
 
+	// Skip if already success
 	if payment.Status == "success" {
 		return nil
 	}
 
-	if req.TransactionStatus == "settlement" || (req.TransactionStatus == "capture" && req.FraudStatus == "accept") {
-		payment.Status = "success"
-	} else if req.TransactionStatus == "pending" {
+	// Update method from webhook
+	payment.PaymentMethod = req.PaymentType
+
+	switch req.TransactionStatus {
+	case "settlement", "capture":
+		if req.FraudStatus == "accept" || req.FraudStatus == "" {
+			payment.Status = "success"
+		}
+	case "pending":
 		payment.Status = "pending"
-	} else {
+	default:
 		payment.Status = "failed"
 	}
 
@@ -101,6 +114,7 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 		return err
 	}
 
+	// On success, create UserPackage
 	if payment.Status == "success" {
 		pkg, err := s.packageRepo.GetPackageByID(payment.PackageID.String())
 		if err != nil {
@@ -108,7 +122,6 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 		}
 
 		expired := time.Now().AddDate(0, 0, pkg.Expired)
-
 		userPackage := models.UserPackage{
 			ID:              uuid.New(),
 			UserID:          payment.UserID,

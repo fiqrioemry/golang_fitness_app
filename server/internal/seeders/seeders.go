@@ -639,7 +639,7 @@ func SeedPayments(db *gorm.DB) {
 			ID:            uuid.New(),
 			UserID:        user.ID,
 			PackageID:     pkg.ID,
-			PaymentMethod: "midtrans",
+			PaymentMethod: "bank_transfer",
 			Status:        "success",
 			PaidAt:        time.Now(),
 		},

@@ -90,7 +90,7 @@ func main() {
 
 	// Payment
 	paymentRepo := repositories.NewPaymentRepository(db)
-	paymentService := services.NewPaymentService(paymentRepo, packageRepo, userPackageRepo)
+	paymentService := services.NewPaymentService(paymentRepo, packageRepo, userPackageRepo, authRepo)
 	paymentHandler := handlers.NewPaymentHandler(paymentService)
 
 	// ClassSchedule
