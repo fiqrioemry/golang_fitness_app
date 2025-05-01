@@ -25,7 +25,7 @@ import { Eye, ArrowDown, ArrowUp } from "lucide-react";
 import { Pagination } from "@/components/ui/Pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import UserDetailDialog from "@/components/dashboard/UserDetailDialog";
+import UserDetailDialog from "@/components/admin/UserDetailDialog";
 
 const UsersList = () => {
   const limit = 10;

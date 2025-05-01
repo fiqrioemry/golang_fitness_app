@@ -34,11 +34,3 @@ export const deleteCategory = async (id) => {
   const res = await authInstance.delete(`/categories/${id}`);
   return res.data;
 };
-
-export default {
-  getAllCategories,
-  getCategoryById,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-};

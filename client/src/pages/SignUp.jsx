@@ -10,7 +10,7 @@ import { registerSchema, sendOTPSchema, verifyOTPSchema } from "@/lib/schema";
 import { sendOTPState, verifyOTPState, registerState } from "@/lib/constant";
 
 const SignUp = () => {
-  const { register, step, loading, resetStep } = useAuthStore();
+  const { register, step, loading, resetStep, sendOTP } = useAuthStore();
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [sentEmail, setSentEmail] = useState("");
@@ -34,7 +34,7 @@ const SignUp = () => {
 
   const handleResendOTP = () => {
     if (!canResend || !sentEmail) return;
-    register({ email: sentEmail });
+    sendOTP({ email: sentEmail });
     setCountdown(60);
     setCanResend(false);
   };
@@ -140,6 +140,7 @@ const SignUp = () => {
                 <div className="text-sm text-right mt-2">
                   {canResend ? (
                     <button
+                      type="button"
                       onClick={handleResendOTP}
                       className="text-blue-600 hover:underline"
                     >

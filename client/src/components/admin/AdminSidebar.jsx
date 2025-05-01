@@ -1,4 +1,29 @@
 import {
+  Plus,
+  List,
+  Bell,
+  Clock,
+  Users,
+  Package,
+  Dumbbell,
+  UserPlus,
+  BookUser,
+  Calendar,
+  BarChart2,
+  LayoutList,
+  ShoppingCart,
+  TicketPercent,
+  MessageSquare,
+  ClipboardCheck,
+} from "lucide-react";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
+
+import {
   Sidebar,
   SidebarMenu,
   SidebarHeader,
@@ -9,31 +34,13 @@ import { cn } from "@/lib/utils";
 import { WebLogo } from "@/components/ui/WebLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Link, useLocation } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/components/ui/accordion";
-import {
-  BarChart2,
-  Users,
-  Dumbbell,
-  Clock,
-  Package,
-  ShoppingCart,
-  UserPlus,
-  CalendarClock,
-  Plus,
-  List,
-  Bell,
-  LayoutList,
-  TicketPercent,
-  BookUser,
-  MessageSquare,
-  ClipboardCheck,
-  Calendar,
-} from "lucide-react";
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 const NavItem = ({ to, icon: Icon, title, active }) => (
   <Link
@@ -125,7 +132,7 @@ const accordionMenus = [
 ];
 
 const AdminSidebar = () => {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -133,7 +140,7 @@ const AdminSidebar = () => {
     <Sidebar>
       <SidebarContent className="p-4 space-y-4 text-sm text-gray-700">
         <SidebarHeader className="mb-4">
-          <WebLogo />
+          <h2>admin panel</h2>
         </SidebarHeader>
 
         <SidebarMenu className="space-y-1">
@@ -170,10 +177,28 @@ const AdminSidebar = () => {
       </SidebarContent>
 
       <SidebarFooter className="p-4 text-xs text-gray-500">
-        <div>
-          Logged in as <strong>{user?.fullname || "Admin"}</strong>
-        </div>
-        <div className="truncate">{user?.email || "admin@gmail.com"}</div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 p-2 rounded-md transition">
+              <Avatar className="w-9 h-9">
+                <AvatarImage src={user?.avatar} alt={user?.fullname} />
+                <AvatarFallback>{user?.fullname?.[0] || "A"}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col text-left">
+                <span className="text-sm font-medium text-gray-700">
+                  {user?.fullname || "Admin"}
+                </span>
+                <span className="text-xs text-muted-foreground truncate max-w-[140px]">
+                  {user?.email || "admin@gmail.com"}
+                </span>
+              </div>
+            </div>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent side="top" align="start" className="w-40">
+            <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarFooter>
     </Sidebar>
   );

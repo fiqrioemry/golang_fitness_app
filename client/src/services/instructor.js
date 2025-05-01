@@ -25,11 +25,3 @@ export const deleteInstructor = async (id) => {
   const res = await authInstance.delete(`/instructors/${id}`);
   return res.data;
 };
-
-export default {
-  deleteInstructor,
-  updateInstructor,
-  createInstructor,
-  getInstructorById,
-  getAllInstructors,
-};

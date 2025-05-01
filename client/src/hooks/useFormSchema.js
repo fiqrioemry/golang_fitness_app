@@ -13,17 +13,3 @@ export function useFormSchema({ state, schema, action }) {
 
   return { methods, handleSubmit };
 }
-
-// // src/hooks/useFormSchema.jsx
-// import { useForm } from "react-hook-form";
-// import { zodResolver } from "@hookform/resolvers/zod";
-
-// export function useFormSchema({ state, schema }) {
-//   const methods = useForm({
-//     resolver: zodResolver(schema),
-//     defaultValues: state,
-//     mode: "onChange",
-//   });
-
-//   return { methods };
-// }

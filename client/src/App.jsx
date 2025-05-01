@@ -2,12 +2,15 @@
 // public pages
 import Home from "./pages/Home";
 import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 import Classes from "./pages/Classes";
 import NotFound from "./pages/NotFound";
+import Schedules from "./pages/Schedules";
 import ClassDetail from "./pages/ClassDetail";
 import Profile from "./pages/customer/Profile";
 
 // admin pages
+
 import Dashboard from "./pages/admin/Dashboard";
 import UsersList from "./pages/admin/UsersList";
 import AddClass from "./pages/admin/classes/AddClass";
@@ -35,16 +38,16 @@ import UserNotifications from "./pages/customer/UserNotifications";
 // route config & support
 import { Toaster } from "sonner";
 import { useEffect } from "react";
-import Layout from "./components/layout/Layout";
 import ScrollToTop from "./hooks/useScrollToTop";
 import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "./store/useAuthStore";
-import { AuthRoute, NonAuthRoute } from "./middleware";
 import { Navigate, Route, Routes } from "react-router-dom";
-import AdminLayout from "./components/dashboard/AdminLayout";
+import { AdminRoute, AuthRoute, NonAuthRoute, PublicRoute } from "./middleware";
+
+// pages layout
+import PublicLayout from "./components/public/PublicLayout";
+import AdminLayout from "./components/admin/AdminLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
-import Schedules from "./pages/Schedules";
-import SignUp from "./pages/SignUp";
 
 function App() {
   const { checkingAuth, authMe } = useAuthStore();
@@ -68,7 +71,6 @@ function App() {
             </NonAuthRoute>
           }
         />
-
         <Route
           path="/signup"
           element={
@@ -78,7 +80,14 @@ function App() {
           }
         />
         {/* Public */}
-        <Route path="/" element={<Layout />}>
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <PublicLayout />
+            </PublicRoute>
+          }
+        >
           <Route index element={<Home />} />
           <Route path="classes" element={<Classes />} />
           <Route path="packages" element={<Packages />} />
@@ -104,22 +113,29 @@ function App() {
         </Route>
 
         {/* admin */}
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route path="users" element={<UsersList />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="classes" element={<ClassesList />} />
           <Route path="classes/add" element={<AddClass />} />
-          <Route path="classes/options" element={<ClassOptions />} />
-          <Route path="classes/schedules" element={<ClassSchedules />} />
-          <Route path="instructors" element={<InstructorsList />} />
-          <Route path="instructors/add" element={<AddInstructors />} />
-          <Route path="users" element={<UsersList />} />
           <Route path="reviews" element={<ReviewsLists />} />
           <Route path="vouchers" element={<VouchersList />} />
           <Route path="bookings" element={<BookingsList />} />
           <Route path="packages" element={<PackagesList />} />
           <Route path="packages/add" element={<AddPackage />} />
+          <Route path="instructors" element={<InstructorsList />} />
           <Route path="notifications" element={<Notifications />} />
+          <Route path="classes/options" element={<ClassOptions />} />
           <Route path="transactions" element={<TransactionsList />} />
+          <Route path="instructors/add" element={<AddInstructors />} />
+          <Route path="classes/schedules" element={<ClassSchedules />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 

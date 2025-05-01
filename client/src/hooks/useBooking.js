@@ -1,17 +1,7 @@
 // src/hooks/useBooking.js
 import { toast } from "sonner";
-import booking from "@/services/booking";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-// =====================
-// GET /api/bookings
-// =====================
-export const useUserBookingsQuery = () =>
-  useQuery({
-    queryKey: ["bookings"],
-    queryFn: booking.getUserBookings,
-    keepPreviousData: true,
-  });
+import * as booking from "@/services/booking";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // =====================
 // POST /api/bookings

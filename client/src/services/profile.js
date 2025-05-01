@@ -21,7 +21,7 @@ export const updateAvatar = async (formData) => {
 // GET /api/user/packages
 export const getUserPackages = async () => {
   const res = await authInstance.get("/user/packages");
-  return res.data.packages;
+  return res.data;
 };
 
 // GET /api/user/transactions
@@ -29,7 +29,7 @@ export const getUserTransactions = async (page = 1, limit = 10) => {
   const res = await authInstance.get("/user/transactions", {
     params: { page, limit },
   });
-  return res.data.transactions;
+  return res.data;
 };
 
 // GET /api/user/bookings
@@ -37,5 +37,5 @@ export const getUserBookings = async (page = 1, limit = 10) => {
   const res = await authInstance.get("/user/bookings", {
     params: { page, limit },
   });
-  return res.data.bookings;
+  return res.data;
 };

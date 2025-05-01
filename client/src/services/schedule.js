@@ -18,8 +18,3 @@ export const autoGenerateSchedules = async (data) => {
   );
   return res.data;
 };
-
-export default {
-  createTemplate,
-  autoGenerateSchedules,
-};

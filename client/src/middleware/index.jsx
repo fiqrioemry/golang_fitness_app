@@ -17,6 +17,36 @@ export const AuthRoute = ({ children }) => {
   return <Fragment>{children}</Fragment>;
 };
 
+export const AdminRoute = ({ children }) => {
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (!user || user.role !== "admin") {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  if (!user || user.role !== "admin") return null;
+
+  return <Fragment>{children}</Fragment>;
+};
+
+export const PublicRoute = ({ children }) => {
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (user && user.role === "admin") {
+      navigate("/admin/dashboard");
+    }
+  }, [user, navigate]);
+
+  if (user && user.role === "admin") return null;
+
+  return <Fragment>{children}</Fragment>;
+};
+
 export const NonAuthRoute = ({ children }) => {
   const navigate = useNavigate();
   const { user } = useAuthStore();

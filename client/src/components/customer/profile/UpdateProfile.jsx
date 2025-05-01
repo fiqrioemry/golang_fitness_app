@@ -1,15 +1,15 @@
 import React from "react";
+import { Pencil } from "lucide-react";
 import { profileSchema } from "@/lib/schema";
+import { Button } from "@/components/ui/button";
+import { useProfileMutation } from "@/hooks/useProfile";
 import { FormDialog } from "@/components/form/FormDialog";
 import { SelectElement } from "@/components/input/SelectElement";
 import { InputDateElement } from "@/components/input/InputDateElement";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
-import { useProfileMutation } from "@/hooks/useProfile";
-import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
 
-const UpdateProfile = ({ profile }) => {
+export const UpdateProfile = ({ profile }) => {
   const { updateProfile } = useProfileMutation();
   return (
     <FormDialog
@@ -53,5 +53,3 @@ const UpdateProfile = ({ profile }) => {
     </FormDialog>
   );
 };
-
-export default UpdateProfile;

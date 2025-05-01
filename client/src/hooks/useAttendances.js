@@ -1,6 +1,6 @@
 // src/hooks/useAttendances.js
 import { toast } from "sonner";
-import attendance from "@/services/attendance";
+import * as attendance from "@/services/attendance";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useAttendancesQuery = () =>

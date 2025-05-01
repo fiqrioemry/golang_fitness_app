@@ -1,56 +1,38 @@
 import React from "react";
-import { Badge } from "@/components/ui/badge";
 import { Loading } from "@/components/ui/Loading";
-import { Card, CardContent } from "@/components/ui/card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { formatRupiah, formatDateTime } from "@/lib/utils";
 import { useUserTransactionsQuery } from "@/hooks/useProfile";
+import { NoTransaction } from "@/components/customer/transactions/NoTransaction";
+import { TransactionCard } from "@/components/customer/transactions/TransactionCard";
 
 const UserTransactions = () => {
   const {
-    data: transactions = [],
+    data: response,
     isLoading,
     isError,
     refetch,
   } = useUserTransactionsQuery();
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
+  const transactions = response.transactions || [];
+
   return (
-    <section className="max-w-3xl mx-auto px-4 py-6">
-      <h2 className="text-2xl font-semibold mb-6">Transaction History</h2>
+    <section className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+      <div className="space-y-1 text-center">
+        <h2 className="text-2xl font-bold">Transaction History</h2>
+        <p className="text-muted-foreground text-sm">
+          All your recent payment activities and package purchases are listed
+          here. Stay updated with your transaction status and history.
+        </p>
+      </div>
 
       {transactions.length === 0 ? (
-        <p className="text-muted-foreground">No transactions yet.</p>
+        <NoTransaction />
       ) : (
-        <div className="space-y-4">
-          {transactions.map((tx) => (
-            <Card key={tx.id} className="shadow-sm border rounded-2xl">
-              <CardContent className="p-5">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-lg font-medium">{tx.packageName}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Paid at: {formatDateTime(tx.paidAt)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Method: {tx.paymentMethod.toUpperCase()}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-semibold text-primary">
-                      {formatRupiah(tx.price)}
-                    </p>
-                    <Badge variant="success" className="mt-1 capitalize">
-                      {tx.status}
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <TransactionCard transactions={transactions} />
       )}
     </section>
   );

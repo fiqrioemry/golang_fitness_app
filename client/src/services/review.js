@@ -15,8 +15,3 @@ export const getReviewsByClass = async (classId) => {
   const res = await publicInstance.get(`/reviews/${classId}`);
   return res.data;
 };
-
-export default {
-  createReview,
-  getReviewsByClass,
-};

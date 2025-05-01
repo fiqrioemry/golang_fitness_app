@@ -33,11 +33,3 @@ export const deleteType = async (id) => {
   const res = await authInstance.delete(`/types/${id}`);
   return res.data;
 };
-
-export default {
-  getAllTypes,
-  getTypeById,
-  createType,
-  updateType,
-  deleteType,
-};

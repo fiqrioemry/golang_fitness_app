@@ -16,8 +16,3 @@ export const getUserBookings = async () => {
   const res = await authInstance.get("/bookings");
   return res.data;
 };
-
-export default {
-  getUserBookings,
-  createBooking,
-};

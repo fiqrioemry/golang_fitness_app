@@ -14,7 +14,6 @@ export const sendOTP = async (data) => {
 // POST /api/auth/verify-otp
 export const verifyOTP = async (data) => {
   const res = await publicInstance.post("/auth/verify-otp", data);
-  console.log(res);
   return res.data;
 };
 
@@ -48,4 +47,12 @@ export const getMe = async () => {
   return res.data;
 };
 
-export default { getMe, refreshToken, logout, login, verifyOTP, sendOTP };
+export default {
+  getMe,
+  register,
+  refreshToken,
+  logout,
+  login,
+  verifyOTP,
+  sendOTP,
+};

@@ -1,6 +1,6 @@
 // src/hooks/useCategory.js
 import { toast } from "sonner";
-import category from "@/services/categories";
+import * as category from "@/services/categories";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // =====================

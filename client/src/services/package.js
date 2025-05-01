@@ -6,7 +6,7 @@ import { publicInstance, authInstance } from ".";
 
 export const getAllPackages = async () => {
   const res = await publicInstance.get("/packages");
-  return res.data;
+  return res.data.packages;
 };
 
 export const getPackageById = async (id) => {

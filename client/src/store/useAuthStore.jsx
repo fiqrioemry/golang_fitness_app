@@ -53,7 +53,18 @@ export const useAuthStore = create(
         }
       },
 
-      register: async (formData, navigate) => {
+      sendOTP: async (formData) => {
+        set({ loading: true });
+        try {
+          const { message } = await auth.sendOTP(formData);
+          toast.success(message);
+        } catch (error) {
+          toast.error(error.response.data.message);
+        } finally {
+          set({ loading: false });
+        }
+      },
+      register: async (formData) => {
         set({ loading: true });
         try {
           const step = get().step;
@@ -68,11 +79,12 @@ export const useAuthStore = create(
           } else if (step === 3) {
             const { message } = await auth.register(formData);
             toast.success(message);
+            await get().authMe();
             set({ step: 1 });
-            navigate("/signin");
           }
         } catch (error) {
-          toast.error(error.message);
+          console.log("registering error", error);
+          toast.error(error.response.data.message);
         } finally {
           set({ loading: false });
         }

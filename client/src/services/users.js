@@ -11,7 +11,7 @@ import { authInstance } from ".";
  */
 export const getAllUsers = async (params) => {
   const res = await authInstance.get("/admin/users", { params });
-  console.log(res   );
+  console.log(res);
   return res.data;
 };
 
@@ -29,10 +29,4 @@ export const getUserDetail = async (id) => {
 export const getUserStats = async () => {
   const res = await authInstance.get("/admin/users/stats");
   return res.data;
-};
-
-export default {
-  getAllUsers,
-  getUserDetail,
-  getUserStats,
 };
