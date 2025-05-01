@@ -1,4 +1,4 @@
-// src/components/address/UpdateClass.jsx
+// src/components/address/UpdatePackage.jsx
 import React from "react";
 import { Pencil } from "lucide-react";
 import { packageSchema } from "@/lib/schema";
@@ -19,7 +19,7 @@ const UpdatePackage = ({ pkg }) => {
       state={pkg}
       loading={isLoading}
       resourceId={pkg.id}
-      title="Perbaharui Package"
+      title="Update Package"
       schema={packageSchema}
       action={updatePackage.mutateAsync}
       buttonText={
@@ -33,38 +33,37 @@ const UpdatePackage = ({ pkg }) => {
     >
       <InputTextElement
         name="name"
-        label="Nama Paket"
-        placeholder="Masukkan nama paket"
+        label="Package Name"
+        placeholder="Enter package name"
       />
       <InputTextareaElement
         maxLength={200}
         name="description"
-        label="Deskripsi Paket"
-        placeholder="Masukkan deskripsi paket min. 20 karakter"
+        label="Package Description"
+        placeholder="Enter package description (min. 20 characters)"
       />
-
       <InputNumberElement
         name="price"
-        label="Harga paket"
-        placeholder="Harga paket dalam satuan Rp"
+        label="Package Price"
+        placeholder="Price in IDR"
       />
       <InputNumberElement
         name="credit"
         label="Credit"
-        placeholder="Jumlah credit dalam satuan Unit"
+        placeholder="Total credits in unit"
       />
       <InputNumberElement
         name="expired"
-        label="Waktu Expired"
-        placeholder="Durasi waktu expired paket dalam hari"
+        label="Expiration Time"
+        placeholder="Package expiration duration in days"
       />
       <InputTagsElement
-        name="information"
-        label="Informasi paket"
-        placeholder="Masukkan informasi, tekan enter untuk tambah"
+        name="additional"
+        label="Additional Information"
+        placeholder="Enter info, press enter to add"
       />
-      <InputFileElement name="image" label="Gambar Thumbnail" isSingle />
-      <SwitchElement name="isActive" label="Atur sebagai Paket aktif" />
+      <InputFileElement name="image" label="Thumbnail Image" isSingle />
+      <SwitchElement name="isActive" label="Set as active package" />
     </FormDialog>
   );
 };
