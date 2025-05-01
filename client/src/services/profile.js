@@ -1,3 +1,5 @@
+import { authInstance } from ".";
+
 // GET /api/user/profile
 export const getProfile = async () => {
   const res = await authInstance.get("/user/profile");
@@ -19,7 +21,7 @@ export const updateAvatar = async (formData) => {
 // GET /api/user/packages
 export const getUserPackages = async () => {
   const res = await authInstance.get("/user/packages");
-  return res.data;
+  return res.data.packages;
 };
 
 // GET /api/user/transactions
@@ -27,7 +29,7 @@ export const getUserTransactions = async (page = 1, limit = 10) => {
   const res = await authInstance.get("/user/transactions", {
     params: { page, limit },
   });
-  return res.data;
+  return res.data.transactions;
 };
 
 // GET /api/user/bookings
@@ -35,5 +37,5 @@ export const getUserBookings = async (page = 1, limit = 10) => {
   const res = await authInstance.get("/user/bookings", {
     params: { page, limit },
   });
-  return res.data;
+  return res.data.bookings;
 };

@@ -11,6 +11,7 @@ export const useAuthStore = create(
       user: null,
       loading: false,
       checkingAuth: true,
+      resetStep: () => set({ step: 1 }),
 
       setUser: (user) => set({ user }),
 

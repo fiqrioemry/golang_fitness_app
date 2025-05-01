@@ -43,6 +43,8 @@ import { AuthRoute, NonAuthRoute } from "./middleware";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./components/dashboard/AdminLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
+import Schedules from "./pages/Schedules";
+import SignUp from "./pages/SignUp";
 
 function App() {
   const { checkingAuth, authMe } = useAuthStore();
@@ -66,12 +68,23 @@ function App() {
             </NonAuthRoute>
           }
         />
+
+        <Route
+          path="/signup"
+          element={
+            <NonAuthRoute>
+              <SignUp />
+            </NonAuthRoute>
+          }
+        />
+        {/* Public */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="classes" element={<Classes />} />
           <Route path="packages" element={<Packages />} />
-          <Route path="packages/:id" element={<PackageDetail />} />
+          <Route path="schedules" element={<Schedules />} />
           <Route path="classes/:id" element={<ClassDetail />} />
+          <Route path="packages/:id" element={<PackageDetail />} />
         </Route>
 
         {/* customer */}

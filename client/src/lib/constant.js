@@ -2,8 +2,17 @@ export const registerState = {
   email: "",
   password: "",
   fullname: "",
+  otp: "",
 };
 
+export const sendOTPState = {
+  email: "",
+};
+
+export const verifyOTPState = {
+  email: "",
+  otp: "",
+};
 export const loginState = {
   email: "",
   password: "",

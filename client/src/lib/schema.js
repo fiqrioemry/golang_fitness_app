@@ -1,12 +1,22 @@
 // src/lib/schema.js
 import { z } from "zod";
 
-// Register
+// Register ========
+export const sendOTPSchema = z.object({
+  email: z.string().email("Email tidak valid"),
+});
+
+export const verifyOTPSchema = z.object({
+  email: z.string().email(),
+  otp: z.string().min(6, "OTP code minimal 6"),
+});
+
 export const registerSchema = z.object({
   email: z.string().email("Email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),
   fullname: z.string(),
 });
+//=====================
 
 // Login
 export const loginSchema = z.object({

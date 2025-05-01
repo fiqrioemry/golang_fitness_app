@@ -11,7 +11,7 @@ import { authInstance } from ".";
  */
 export const getAllUsers = async (params) => {
   const res = await authInstance.get("/admin/users", { params });
-  console.log(res);
+  console.log(res   );
   return res.data;
 };
 

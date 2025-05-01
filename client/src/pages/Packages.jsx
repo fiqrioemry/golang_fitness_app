@@ -19,12 +19,12 @@ const Packages = () => {
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="px-4 py-10 max-w-7xl mx-auto">
+    <section className="min-h-screen px-4 py-10 max-w-7xl mx-auto">
       <h2 className="text-3xl font-bold text-center mb-10">
         Choose Your Package
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="min-h-screen grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {packages.map((pkg) => (
           <div
             key={pkg.id}

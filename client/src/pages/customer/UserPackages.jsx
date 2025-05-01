@@ -3,8 +3,9 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Loading } from "@/components/ui/Loading";
 import { CalendarCheck, Clock } from "lucide-react";
-import { useUserPackagesQuery } from "@/hooks/useProfile";
+
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { useUserPackagesQuery } from "../../hooks/useProfile";
 
 const UserPackages = () => {
   const {
@@ -15,7 +16,10 @@ const UserPackages = () => {
   } = useUserPackagesQuery();
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
+
+  console.log(userPackages);
 
   return (
     <section className="max-w-4xl mx-auto px-4 py-8 space-y-6">
@@ -26,7 +30,7 @@ const UserPackages = () => {
         </p>
       </div>
 
-      {userPackages.length !== 0 ? (
+      {userPackages.length === 0 ? (
         <div className="text-center py-16 space-y-4 border border-dashed border-gray-300 rounded-xl bg-muted/50">
           <div className="flex items-center justify-center">
             <img className="h-72" src="/no-packages.webp" alt="no-packages" />

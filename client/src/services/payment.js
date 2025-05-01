@@ -7,7 +7,15 @@ import { publicInstance, authInstance } from ".";
 
 // POST /api/payments (auth required)
 export const createPayment = async (data) => {
+  // console.log("data", data);
+  // const response = {
+  //   paymentId: "123",
+  //   snapToken: "https://www.ahmadfiqrioemry.com",
+  // };
+  // return response;
+  console.log("purchasement", data);
   const res = await authInstance.post("/payments", data);
+  console.log("response payment", res);
   return res.data;
 };
 

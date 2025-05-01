@@ -9,7 +9,7 @@ import {
 const Footer = () => {
   return (
     <footer className="bg-background border-t text-muted-foreground">
-      <div className="container mx-auto px-4 py-10 grid gap-8 grid-cols-1 md:grid-cols-4">
+      <div className=" max-w-7xl mx-auto px-4 py-10 grid gap-8 grid-cols-1 md:grid-cols-4">
         {/* Brand & Slogan */}
         <div>
           <h2 className="text-xl font-bold text-primary">FitBook Studio</h2>
