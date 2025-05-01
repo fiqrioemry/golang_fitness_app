@@ -4,7 +4,7 @@ import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useUserBookingsQuery } from "@/hooks/useProfile";
 import { BookingCard } from "@/components/customer/bookings/BookingCard";
-import { NoBooking } from "../../components/customer/bookings/NoBooking";
+import { NoBooking } from "@/components/customer/bookings/NoBooking";
 
 const UserBookings = () => {
   const {

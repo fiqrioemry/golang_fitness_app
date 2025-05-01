@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { packageState } from "@/lib/constant";
 import { usePackageMutation } from "@/hooks/usePackage";
 import { FormInput } from "@/components/form/FormInput";
@@ -9,69 +8,72 @@ import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
+import { packageSchema } from "../../../lib/schema";
 
 const AddPackage = () => {
-  const { createPackage } = usePackageMutation();
+  const { createPackage, isLoading } = usePackageMutation();
 
   return (
-    <section className="max-w-5xl mx-auto px-6 py-10 space-y-8">
+    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
       <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Tambah Paket Baru</h2>
+        <h2 className="text-2xl font-bold">Add New Package</h2>
         <p className="text-muted-foreground text-sm">
-          Lengkapi informasi paket yang akan ditawarkan kepada pelanggan.
+          Complete the package information to offer it to users.
         </p>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border p-6">
         <FormInput
-          className="space-y-6"
+          className="w-72"
+          isLoading={isLoading}
           state={packageState}
-          schema={packageState}
+          schema={packageSchema}
+          text={"Submit New Package"}
           action={createPackage.mutateAsync}
         >
-          {/* Informasi Utama */}
+          {/* Main Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <InputTextElement
                 name="name"
-                label="Nama Paket"
-                placeholder="Masukkan nama paket"
+                label="Package Name"
+                placeholder="Enter the package name"
               />
               <InputTextareaElement
                 name="description"
-                label="Deskripsi Paket"
-                placeholder="Deskripsi minimal 20 karakter"
+                label="Package Description"
+                placeholder="Minimum 20 characters"
                 maxLength={200}
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <InputNumberElement
                   name="price"
-                  label="Harga (Rp)"
-                  placeholder="Contoh: 500000"
+                  label="Price (Rp)"
+                  placeholder="e.g. 500000"
                 />
                 <InputNumberElement
                   name="credit"
-                  label="Jumlah Credit"
-                  placeholder="Contoh: 5"
+                  label="Total Credit"
+                  placeholder="e.g. 5"
                 />
                 <InputNumberElement
                   name="expired"
-                  label="Expired (hari)"
-                  placeholder="Contoh: 60"
+                  label="Expiry (days)"
+                  placeholder="e.g. 60"
                 />
               </div>
 
               <InputTagsElement
-                name="information"
-                label="Informasi Tambahan"
-                placeholder="Contoh: Tidak dapat direfund, tekan Enter"
+                name="additional"
+                label="Additional Information"
+                placeholder="e.g. Non-refundable, press Enter"
               />
 
               <SwitchElement
                 name="isActive"
-                label="Status Aktif"
-                description="Aktifkan agar paket tampil di halaman pembelian user."
+                label="Active Status"
+                description="Enable to display this package on the user purchase page."
               />
             </div>
 
@@ -79,8 +81,8 @@ const AddPackage = () => {
               <InputFileElement
                 isSingle
                 name="image"
-                label="Thumbnail Paket"
-                note="Rekomendasi: rasio 1:1 (400x400px)"
+                label="Package Thumbnail"
+                note="Recommended: 1:1 ratio (400x400px)"
               />
             </div>
           </div>

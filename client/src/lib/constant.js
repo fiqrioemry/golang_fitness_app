@@ -131,7 +131,7 @@ export const packageState = {
   price: 0,
   credit: 0,
   expired: 0,
-  information: [],
-  image: undefined,
   isActive: true,
+  additional: [],
+  image: undefined,
 };

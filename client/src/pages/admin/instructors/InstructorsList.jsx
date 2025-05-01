@@ -1,11 +1,11 @@
 import React from "react";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import { useInstructorsQuery } from "@/hooks/useInstructor";
+import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Star, Pencil, Trash2, Plus } from "lucide-react";
+import { useInstructorsQuery } from "@/hooks/useInstructor";
+import { Star, Pencil, Trash2, CirclePlus } from "lucide-react";
 
 const InstructorsList = () => {
   const navigate = useNavigate();
@@ -20,13 +20,20 @@ const InstructorsList = () => {
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-10 space-y-6">
-      {/* Header + Action */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Daftar Instruktur</h2>
+    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+      {/* Header */}
+      <div className="space-y-1 text-center">
+        <h2 className="text-2xl font-bold">Instructors List</h2>
+        <p className="text-muted-foreground text-sm">
+          Manage all instructors registered on the platform, including their
+          expertise, certifications, and teaching activity.
+        </p>
+      </div>
+
+      <div className="flex justify-end">
         <Button onClick={() => navigate("/admin/instructors/add")}>
-          <Plus className="w-4 h-4 mr-2" />
-          Tambah Instruktur
+          <CirclePlus className="w-4 h-4 mr-2" />
+          Add Instructor
         </Button>
       </div>
 
@@ -46,7 +53,7 @@ const InstructorsList = () => {
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">{inst.fullname}</h3>
                 <p className="text-sm text-muted-foreground">
-                  {inst.experience} tahun pengalaman
+                  {inst.experience} years of experience
                 </p>
                 <div className="mt-1 flex items-center gap-1 text-yellow-500 text-sm">
                   {[...Array(inst.rating)].map((_, i) => (
@@ -61,15 +68,19 @@ const InstructorsList = () => {
 
             <div className="border-t px-4 py-3 space-y-1 text-sm text-muted-foreground">
               <p>
-                <span className="font-medium text-gray-800">Spesialisasi:</span>{" "}
+                <span className="font-medium text-gray-800">Specialties:</span>{" "}
                 {inst.specialties}
               </p>
               <p>
-                <span className="font-medium text-gray-800">Sertifikasi:</span>{" "}
+                <span className="font-medium text-gray-800">
+                  Certifications:
+                </span>{" "}
                 {inst.certifications}
               </p>
               <p>
-                <span className="font-medium text-gray-800">Total Kelas:</span>{" "}
+                <span className="font-medium text-gray-800">
+                  Total Classes:
+                </span>{" "}
                 <Badge variant="outline">{inst.totalClass}</Badge>
               </p>
             </div>
@@ -87,8 +98,8 @@ const InstructorsList = () => {
                 variant="destructive"
                 size="sm"
                 onClick={() => {
-                  // Trigger modal/hook delete here
                   console.log("Delete", inst.id);
+                  // You can hook modal delete here
                 }}
               >
                 <Trash2 className="w-4 h-4 mr-1" />

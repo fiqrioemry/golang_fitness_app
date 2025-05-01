@@ -41,6 +41,7 @@ const PackageDetail = () => {
                 console.error("Error", result);
               },
               onClose: function () {
+                navigate("/user/trans");
                 toast.info(
                   "You closed the payment popup before completing the transaction."
                 );

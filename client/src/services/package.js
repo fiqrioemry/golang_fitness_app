@@ -6,7 +6,7 @@ import { publicInstance, authInstance } from ".";
 
 export const getAllPackages = async () => {
   const res = await publicInstance.get("/packages");
-  return res.data.packages;
+  return res.data;
 };
 
 export const getPackageById = async (id) => {
@@ -15,6 +15,7 @@ export const getPackageById = async (id) => {
 };
 
 export const createPackage = async (data) => {
+  console.log(data);
   const res = await authInstance.post("/packages", data);
   return res.data;
 };

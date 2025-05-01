@@ -15,6 +15,7 @@ import {
   TicketPercent,
   MessageSquare,
   ClipboardCheck,
+  LogOut,
 } from "lucide-react";
 import {
   Accordion,
@@ -31,7 +32,6 @@ import {
   SidebarContent,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { WebLogo } from "@/components/ui/WebLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Link, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -57,13 +57,40 @@ const NavItem = ({ to, icon: Icon, title, active }) => (
   </Link>
 );
 
-const accordionMenus = [
+const directMenus = [
   {
-    value: "user",
+    to: "/admin/users",
     icon: Users,
     title: "Users",
-    children: [{ to: "/admin/users", title: "User List", icon: List }],
   },
+  {
+    to: "/admin/bookings",
+    icon: LayoutList,
+    title: "Bookings",
+  },
+  {
+    to: "/admin/transactions",
+    icon: ShoppingCart,
+    title: "Transactions",
+  },
+  {
+    to: "/admin/vouchers",
+    icon: TicketPercent,
+    title: "Vouchers",
+  },
+  {
+    to: "/admin/reviews",
+    icon: MessageSquare,
+    title: "Reviews",
+  },
+  {
+    to: "/admin/notifications",
+    icon: Bell,
+    title: "Notifications",
+  },
+];
+
+const accordionMenus = [
   {
     value: "instructor",
     icon: BookUser,
@@ -93,48 +120,12 @@ const accordionMenus = [
       { to: "/admin/packages/add", title: "Add Package", icon: Plus },
     ],
   },
-  {
-    value: "booking",
-    icon: LayoutList,
-    title: "Booking",
-    children: [
-      { to: "/admin/bookings", title: "All Bookings", icon: ClipboardCheck },
-    ],
-  },
-  {
-    value: "transaction",
-    icon: ShoppingCart,
-    title: "Transactions",
-    children: [
-      { to: "/admin/transactions", title: "Payments", icon: ShoppingCart },
-    ],
-  },
-  {
-    value: "voucher",
-    icon: TicketPercent,
-    title: "Vouchers",
-    children: [{ to: "/admin/vouchers", title: "Voucher List", icon: List }],
-  },
-  {
-    value: "review",
-    icon: MessageSquare,
-    title: "Reviews",
-    children: [{ to: "/admin/reviews", title: "Review List", icon: List }],
-  },
-  {
-    value: "notification",
-    icon: Bell,
-    title: "Notifications",
-    children: [
-      { to: "/admin/notifications", title: "Notification List", icon: List },
-    ],
-  },
 ];
 
 const AdminSidebar = () => {
-  const { user, logout } = useAuthStore();
   const location = useLocation();
   const currentPath = location.pathname;
+  const { user, logout } = useAuthStore();
 
   return (
     <Sidebar>
@@ -150,6 +141,16 @@ const AdminSidebar = () => {
             icon={BarChart2}
             active={currentPath === "/admin"}
           />
+
+          {directMenus.map((item) => (
+            <NavItem
+              key={item.to}
+              to={item.to}
+              icon={item.icon}
+              title={item.title}
+              active={currentPath === item.to}
+            />
+          ))}
 
           <Accordion type="multiple" className="space-y-1">
             {accordionMenus.map((menu) => (
@@ -195,8 +196,11 @@ const AdminSidebar = () => {
             </div>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent side="top" align="start" className="w-40">
-            <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+          <DropdownMenuContent side="top" align="start" className="w-60">
+            <DropdownMenuItem onClick={logout}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarFooter>

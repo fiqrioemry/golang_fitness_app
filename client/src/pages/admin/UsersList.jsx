@@ -52,8 +52,14 @@ const UsersList = () => {
   };
 
   return (
-    <section className="px-6 py-8 space-y-6">
-      <h2 className="text-2xl font-bold">Daftar Pengguna</h2>
+    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+      <div className="space-y-1 text-center">
+        <h2 className="text-2xl font-bold">User List</h2>
+        <p className="text-muted-foreground text-sm">
+          Manage all registered users, monitor their activities, and maintain
+          platform integrity efficiently.
+        </p>
+      </div>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-2/3">
           <Input

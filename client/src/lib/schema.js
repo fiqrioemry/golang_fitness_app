@@ -180,7 +180,7 @@ export const packageSchema = z.object({
   credit: z.number().positive(),
   isActive: z.boolean(),
   expired: z.number(),
-  information: z.array(z.string()).optional(),
+  additional: z.array(z.string()).optional(),
   image: z
     .instanceof(File)
     .refine((file) => file.type.startsWith("image/"), {

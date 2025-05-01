@@ -1,4 +1,3 @@
-// src/pages/admin/ClassesOptions.jsx
 import React, { useState } from "react";
 import AddOptions from "./options/AddOptions";
 import { Loading } from "@/components/ui/loading";
@@ -46,15 +45,14 @@ const ClassOptions = () => {
   };
 
   return (
-    <section className="p-6 space-y-6">
+    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Class Options</h2>
-          <p className="text-gray-600 text-sm">
-            Kelola semua data statis seperti kategori, lokasi, tipe dan lainnya
-          </p>
-        </div>
+      <div className="space-y-1 text-center">
+        <h2 className="text-2xl font-bold">Class Options</h2>
+        <p className="text-muted-foreground text-sm">
+          Manage all static data such as class types, categories, levels, and
+          locations.
+        </p>
       </div>
 
       {/* Tabs */}
@@ -109,7 +107,7 @@ const ClassOptions = () => {
 
           {options.length === 0 && (
             <p className="text-sm text-gray-500 col-span-full">
-              Data tidak ditemukan.
+              No data found.
             </p>
           )}
         </div>

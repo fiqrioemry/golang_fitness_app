@@ -16,9 +16,15 @@ const ClassesList = () => {
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Manajemen Kelas</h2>
+    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+      <div className="space-y-1 text-center">
+        <h2 className="text-2xl font-bold">Classes Management</h2>
+        <p className="text-muted-foreground text-sm">
+          View, add, and manage training packages available for purchase by
+          users.
+        </p>
+      </div>
+      <div className="flex justify-end">
         <button
           onClick={() => navigate("/admin/classes/add")}
           className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition"
@@ -27,7 +33,6 @@ const ClassesList = () => {
           Tambah Kelas
         </button>
       </div>
-
       <div className="overflow-x-auto">
         <>
           {/* Desktop Table */}

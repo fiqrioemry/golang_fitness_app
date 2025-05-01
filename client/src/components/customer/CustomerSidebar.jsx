@@ -6,10 +6,24 @@ import {
   SidebarContent,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { WebLogo } from "@/components/ui/WebLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, Package, ShoppingCart, Bell, User } from "lucide-react";
+import {
+  Calendar,
+  Package,
+  ShoppingCart,
+  Bell,
+  User,
+  LogOut,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const NavItem = ({ to, icon: Icon, title, active }) => (
   <Link
@@ -25,9 +39,9 @@ const NavItem = ({ to, icon: Icon, title, active }) => (
 );
 
 const CustomerSidebar = () => {
-  const { user } = useAuthStore();
   const location = useLocation();
   const currentPath = location.pathname;
+  const { user, logout } = useAuthStore();
 
   return (
     <Sidebar>
@@ -71,10 +85,31 @@ const CustomerSidebar = () => {
       </SidebarContent>
 
       <SidebarFooter className="p-4 text-xs text-gray-500">
-        <div>
-          Logged in as <strong>{user?.fullname || "Customer"}</strong>
-        </div>
-        <div className="truncate">{user?.email || "customer@example.com"}</div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 p-2 rounded-md transition">
+              <Avatar className="w-9 h-9">
+                <AvatarImage src={user?.avatar} alt={user?.fullname} />
+                <AvatarFallback>{user?.fullname?.[0] || "A"}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col text-left">
+                <span className="text-sm font-medium text-gray-700">
+                  {user?.fullname || "Admin"}
+                </span>
+                <span className="text-xs text-muted-foreground truncate max-w-[140px]">
+                  {user?.email || "admin@gmail.com"}
+                </span>
+              </div>
+            </div>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent side="top" align="start" className="w-60">
+            <DropdownMenuItem onClick={logout}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarFooter>
     </Sidebar>
   );

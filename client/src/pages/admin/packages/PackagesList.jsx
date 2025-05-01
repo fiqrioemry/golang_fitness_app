@@ -1,6 +1,7 @@
 import React from "react";
-import { Plus } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
 import { usePackagesQuery } from "@/hooks/usePackage";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
@@ -14,39 +15,40 @@ const PackagesList = () => {
     isError,
     refetch,
   } = usePackagesQuery();
+
   const navigate = useNavigate();
 
   if (isLoading) return <Loading />;
-
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-10 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold">Manajemen Paket</h2>
-        <button
-          onClick={() => navigate("/packages/add")}
-          className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition"
-        >
-          <Plus className="w-4 h-4" />
-          Tambah Paket
-        </button>
+    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+      <div className="space-y-1 text-center">
+        <h2 className="text-2xl font-bold">Package Management</h2>
+        <p className="text-muted-foreground text-sm">
+          View, add, and manage training packages available for purchase by
+          users.
+        </p>
+      </div>
+      <div className="flex justify-end">
+        <Button onClick={() => navigate("/admin/packages/add")}>
+          <CirclePlus className="w-4 h-4 mr-2" />
+          Add Package
+        </Button>
       </div>
 
-      {/* Tabel */}
       {/* Desktop Table */}
       <div className="hidden md:block overflow-x-auto border rounded-xl shadow-sm">
         <table className="min-w-full bg-white text-sm">
           <thead className="bg-muted/40 text-muted-foreground text-xs uppercase">
             <tr>
               <th className="p-3 text-left">Thumbnail</th>
-              <th className="p-3 text-left">Nama Paket</th>
-              <th className="p-3 text-left">Deskripsi</th>
-              <th className="p-3 text-left">Harga</th>
+              <th className="p-3 text-left">Package Name</th>
+              <th className="p-3 text-left">Description</th>
+              <th className="p-3 text-left">Price</th>
               <th className="p-3 text-left">Credit</th>
               <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-center">Aksi</th>
+              <th className="p-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -66,7 +68,7 @@ const PackagesList = () => {
                 <td className="p-3 text-primary font-semibold">
                   Rp {pkg.price.toLocaleString("id-ID")}
                 </td>
-                <td className="p-3">{pkg.credit} sesi</td>
+                <td className="p-3">{pkg.credit} sessions</td>
                 <td className="p-3">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -75,7 +77,7 @@ const PackagesList = () => {
                         : "bg-red-100 text-red-700"
                     }`}
                   >
-                    {pkg.isActive ? "Aktif" : "Tidak Aktif"}
+                    {pkg.isActive ? "Active" : "Inactive"}
                   </span>
                 </td>
                 <td className="p-3 text-center">
@@ -110,11 +112,12 @@ const PackagesList = () => {
 
             <div className="text-sm space-y-1 mb-3">
               <p>
-                <span className="font-medium">Harga:</span> Rp{" "}
+                <span className="font-medium">Price:</span> Rp{" "}
                 {pkg.price.toLocaleString("id-ID")}
               </p>
               <p>
-                <span className="font-medium">Credit:</span> {pkg.credit} sesi
+                <span className="font-medium">Credit:</span> {pkg.credit}{" "}
+                sessions
               </p>
               <p>
                 <span className="font-medium">Status:</span>{" "}
@@ -125,7 +128,7 @@ const PackagesList = () => {
                       : "bg-red-100 text-red-700"
                   }`}
                 >
-                  {pkg.isActive ? "Aktif" : "Tidak Aktif"}
+                  {pkg.isActive ? "Active" : "Inactive"}
                 </span>
               </p>
             </div>
