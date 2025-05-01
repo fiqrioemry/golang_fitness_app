@@ -95,6 +95,7 @@ func (s *packageService) GetAllPackages() ([]dto.PackageResponse, error) {
 			Price:       p.Price,
 			Credit:      p.Credit,
 			Image:       p.Image,
+			Expired:     *p.Expired,
 			IsActive:    p.IsActive,
 			Additional:  p.AdditionalList,
 		})

@@ -234,6 +234,7 @@ type PackageResponse struct {
 	Description string   `json:"description"`
 	Price       float64  `json:"price"`
 	Credit      int      `json:"credit"`
+	Expired     int      `json:"expired"`
 	Image       string   `json:"image"`
 	IsActive    bool     `json:"isActive"`
 	Additional  []string `json:"additional"`

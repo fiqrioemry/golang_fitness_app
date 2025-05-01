@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -78,14 +79,25 @@ func extractPublicID(imageURL string) (string, error) {
 	return publicID, nil
 }
 
-func ValidateImageFile(file *multipart.FileHeader) error {
-	if file.Size > MaxFileSize {
-		return errors.New("file size is too large, Maximum 1MB")
+func ValidateImageFile(fileHeader *multipart.FileHeader) error {
+	if fileHeader.Size > MaxFileSize {
+		return errors.New("file size is too large, maximum 1MB")
 	}
 
-	fileType := file.Header.Get("Content-Type")
-	if !isAllowedImageType(fileType) {
-		return errors.New("invalid File format, only JPG, PNG, GIF, and WEBP are allowed")
+	file, err := fileHeader.Open()
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	buffer := make([]byte, 512)
+	if _, err := file.Read(buffer); err != nil {
+		return err
+	}
+
+	mimeType := http.DetectContentType(buffer)
+	if !isAllowedImageType(mimeType) {
+		return fmt.Errorf("invalid file format: %s. Only JPG, PNG, GIF, and WEBP are allowed", mimeType)
 	}
 
 	return nil
@@ -99,25 +111,31 @@ func isAllowedImageType(fileType string) bool {
 	}
 	return false
 }
-
 func UploadImageWithValidation(fileHeader *multipart.FileHeader) (string, error) {
 	if fileHeader == nil {
 		return "", errors.New("no image file provided")
 	}
 
-	// Validate size and type
-	if err := ValidateImageFile(fileHeader); err != nil {
-		return "", err
-	}
-
-	// Open file
 	file, err := fileHeader.Open()
 	if err != nil {
 		return "", err
 	}
 	defer file.Close()
 
-	// Upload to Cloudinary
+	buffer := make([]byte, 512)
+	if _, err := file.Read(buffer); err != nil {
+		return "", err
+	}
+
+	mimeType := http.DetectContentType(buffer)
+	if !isAllowedImageType(mimeType) {
+		return "", fmt.Errorf("invalid file format: %s. Only JPG, PNG, GIF, and WEBP are allowed", mimeType)
+	}
+
+	if _, err := file.Seek(0, 0); err != nil {
+		return "", err
+	}
+
 	imageURL, err := UploadToCloudinary(file)
 	if err != nil {
 		return "", err
@@ -140,19 +158,16 @@ func UploadMultipleImagesWithValidation(fileHeaders []*multipart.FileHeader) ([]
 			return nil, errors.New("one of the images is missing")
 		}
 
-		// Validate
 		if err := ValidateImageFile(fileHeader); err != nil {
 			return nil, err
 		}
 
-		// Open
 		file, err := fileHeader.Open()
 		if err != nil {
 			return nil, err
 		}
 		defer file.Close()
 
-		// Upload
 		imageURL, err := UploadToCloudinary(file)
 		if err != nil {
 			return nil, err
@@ -200,3 +215,42 @@ func UploadToLocal(file multipart.File, fileHeader *multipart.FileHeader) (strin
 
 	return filePath, nil
 }
+
+// func ValidateImageFile(file *multipart.FileHeader) error {
+// 	if file.Size > MaxFileSize {
+// 		return errors.New("file size is too large, Maximum 1MB")
+// 	}
+
+// 	fileType := file.Header.Get("Content-Type")
+// 	if !isAllowedImageType(fileType) {
+// 		return errors.New("invalid File format, only JPG, PNG, GIF, and WEBP are allowed")
+// 	}
+
+// 	return nil
+// }
+
+// func UploadImageWithValidation(fileHeader *multipart.FileHeader) (string, error) {
+// 	if fileHeader == nil {
+// 		return "", errors.New("no image file provided")
+// 	}
+
+// 	// Validate size and type
+// 	if err := ValidateImageFile(fileHeader); err != nil {
+// 		return "", err
+// 	}
+
+// 	// Open file
+// 	file, err := fileHeader.Open()
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	defer file.Close()
+
+// 	// Upload to Cloudinary
+// 	imageURL, err := UploadToCloudinary(file)
+// 	if err != nil {
+// 		return "", err
+// 	}
+
+// 	return imageURL, nil
+// }
