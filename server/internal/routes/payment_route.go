@@ -8,12 +8,10 @@ import (
 )
 
 func PaymentRoutes(r *gin.Engine, handler *handlers.PaymentHandler) {
-	payment := r.Group("/api/payments")
+	p := r.Group("/api/payments")
+	p.POST("", middleware.AuthRequired(), handler.CreatePayment)
+	p.POST("/midtrans/notification", handler.HandlePaymentNotification)
 
-	// User - create payment
-	payment.Use(middleware.AuthRequired())
-	payment.POST("", handler.CreatePayment)
-
-	// Webhook - Midtrans notification (public, tanpa auth)
-	r.POST("/api/payments/notification", handler.HandlePaymentNotification)
+	admin := p.Use(middleware.AuthRequired(), middleware.AdminOnly())
+	admin.GET("", handler.GetAllUserPayments)
 }

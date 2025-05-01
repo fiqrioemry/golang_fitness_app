@@ -64,6 +64,7 @@ func (s *packageService) UpdatePackage(id string, req dto.UpdatePackageRequest) 
 	if len(req.Additional) > 0 {
 		pkg.AdditionalList = req.Additional
 	}
+
 	pkg.IsActive = req.IsActive
 
 	if req.Expired != 0 {

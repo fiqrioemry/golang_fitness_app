@@ -35,7 +35,6 @@ func (h *PaymentHandler) CreatePayment(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
-// Handle Midtrans Notification Webhook
 func (h *PaymentHandler) HandlePaymentNotification(c *gin.Context) {
 	var notif dto.MidtransNotificationRequest
 	if !utils.BindAndValidateJSON(c, &notif) {
@@ -48,4 +47,20 @@ func (h *PaymentHandler) HandlePaymentNotification(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Notification processed successfully"})
+}
+
+func (h *PaymentHandler) GetAllUserPayments(c *gin.Context) {
+	var q dto.PaymentQueryParam
+	if err := c.ShouldBindQuery(&q); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid query params", "error": err.Error()})
+		return
+	}
+
+	resp, err := h.paymentService.GetAllUserPayments(q.Q, q.Page, q.Limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch payments", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
 }

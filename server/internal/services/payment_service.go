@@ -14,8 +14,9 @@ import (
 )
 
 type PaymentService interface {
-	CreatePayment(userID string, req dto.CreatePaymentRequest) (*dto.CreatePaymentResponse, error)
 	HandlePaymentNotification(req dto.MidtransNotificationRequest) error
+	GetAllUserPayments(query string, page, limit int) (*dto.AdminPaymentListResponse, error)
+	CreatePayment(userID string, req dto.CreatePaymentRequest) (*dto.CreatePaymentResponse, error)
 }
 
 type paymentService struct {
@@ -123,4 +124,35 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 	}
 
 	return nil
+}
+
+func (s *paymentService) GetAllUserPayments(query string, page, limit int) (*dto.AdminPaymentListResponse, error) {
+	offset := (page - 1) * limit
+	payments, total, err := s.paymentRepo.GetAllUserPayments(query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []dto.AdminPaymentResponse
+	for _, p := range payments {
+		results = append(results, dto.AdminPaymentResponse{
+			ID:            p.ID.String(),
+			UserID:        p.UserID.String(),
+			UserEmail:     p.User.Email,
+			Fullname:      p.User.Profile.Fullname,
+			PackageID:     p.PackageID.String(),
+			PackageName:   p.Package.Name,
+			Price:         p.Package.Price,
+			PaymentMethod: p.PaymentMethod,
+			Status:        p.Status,
+			PaidAt:        p.PaidAt.Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	return &dto.AdminPaymentListResponse{
+		Payments: results,
+		Total:    total,
+		Page:     page,
+		Limit:    limit,
+	}, nil
 }

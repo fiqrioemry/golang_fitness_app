@@ -280,19 +280,17 @@ type InstructorResponse struct {
 	TotalClass     int     `json:"totalClass"`
 }
 
-// Create Payment Request (user beli package)
+// Payment ================================
 type CreatePaymentRequest struct {
 	PackageID string `json:"packageId" binding:"required"`
 }
 
-// Response Setelah Create Payment
 type CreatePaymentResponse struct {
 	PaymentID string `json:"paymentId"`
 	SnapToken string `json:"snapToken"`
 	SnapURL   string `json:"snapUrl"`
 }
 
-// Request Midtrans Webhook (notif dari Midtrans ke backend)
 type MidtransNotificationRequest struct {
 	TransactionStatus string `json:"transaction_status"`
 	OrderID           string `json:"order_id"`
@@ -300,7 +298,6 @@ type MidtransNotificationRequest struct {
 	FraudStatus       string `json:"fraud_status"`
 }
 
-// Payment Detail Response (optional buat lihat status payment)
 type PaymentResponse struct {
 	ID            string  `json:"id"`
 	UserID        string  `json:"userId"`
@@ -311,6 +308,34 @@ type PaymentResponse struct {
 	Price         float64 `json:"price"`
 	PaidAt        string  `json:"paidAt"`
 }
+
+type PaymentQueryParam struct {
+	Q     string `form:"q"`
+	Page  int    `form:"page,default=1"`
+	Limit int    `form:"limit,default=10"`
+}
+
+type AdminPaymentResponse struct {
+	ID            string  `json:"id"`
+	UserID        string  `json:"userId"`
+	UserEmail     string  `json:"userEmail"`
+	Fullname      string  `json:"fullname"`
+	PackageID     string  `json:"packageId"`
+	PackageName   string  `json:"packageName"`
+	Price         float64 `json:"price"`
+	PaymentMethod string  `json:"paymentMethod"`
+	Status        string  `json:"status"`
+	PaidAt        string  `json:"paidAt"`
+}
+
+type AdminPaymentListResponse struct {
+	Payments []AdminPaymentResponse `json:"payments"`
+	Total    int64                  `json:"total"`
+	Page     int                    `json:"page"`
+	Limit    int                    `json:"limit"`
+}
+
+// ========================================
 
 type CreateClassScheduleRequest struct {
 	ClassID      string `json:"classId" binding:"required"`

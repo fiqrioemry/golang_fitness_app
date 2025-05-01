@@ -217,6 +217,7 @@ type Payment struct {
 	PaidAt        time.Time `gorm:"autoCreateTime" json:"paidAt"`
 
 	Package Package `gorm:"foreignKey:PackageID" json:"package"`
+	User    User    `gorm:"foreignKey:UserID" json:"user"`
 }
 
 func (p *Payment) BeforeCreate(tx *gorm.DB) (err error) {
