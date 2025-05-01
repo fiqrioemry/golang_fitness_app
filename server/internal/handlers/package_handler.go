@@ -23,6 +23,12 @@ func (h *PackageHandler) CreatePackage(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input", "error": err.Error()})
 		return
 	}
+	parsedBool, err := utils.ParseBoolFormField(c, "isActive")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid value for isActive", "error": err.Error()})
+		return
+	}
+	req.IsActive = parsedBool
 
 	imageURL, err := utils.UploadImageWithValidation(req.Image)
 	if err != nil {
@@ -48,7 +54,14 @@ func (h *PackageHandler) UpdatePackage(c *gin.Context) {
 		return
 	}
 
-	if req.Image != nil {
+	parsedBool, err := utils.ParseBoolFormField(c, "isActive")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid value for isActive", "error": err.Error()})
+		return
+	}
+	req.IsActive = parsedBool
+
+	if req.Image != nil && req.Image.Filename != "" {
 		imageURL, err := utils.UploadImageWithValidation(req.Image)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "Image upload failed", "error": err.Error()})

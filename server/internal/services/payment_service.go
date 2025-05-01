@@ -106,7 +106,7 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 			return err
 		}
 
-		expired := time.Now().AddDate(0, 0, *pkg.Expired)
+		expired := time.Now().AddDate(0, 0, pkg.Expired)
 
 		userPackage := models.UserPackage{
 			ID:              uuid.New(),

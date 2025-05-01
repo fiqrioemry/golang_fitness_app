@@ -62,7 +62,7 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 		LocationID:     locationID,
 		CategoryID:     categoryID,
 		SubcategoryID:  subcategoryID,
-		IsActive:       true,
+		IsActive:       req.IsActive,
 		CreatedAt:      time.Now(),
 	}
 
@@ -96,6 +96,8 @@ func (s *classService) UpdateClass(id string, req dto.UpdateClassRequest) error 
 		return err
 	}
 
+	class.IsActive = req.IsActive
+
 	if req.Title != "" {
 		class.Title = req.Title
 	}
@@ -116,6 +118,7 @@ func (s *classService) UpdateClass(id string, req dto.UpdateClassRequest) error 
 		levelID, _ := uuid.Parse(req.LevelID)
 		class.LevelID = levelID
 	}
+
 	if req.LocationID != "" {
 		locationID, _ := uuid.Parse(req.LocationID)
 		class.LocationID = locationID
@@ -130,28 +133,9 @@ func (s *classService) UpdateClass(id string, req dto.UpdateClassRequest) error 
 		class.SubcategoryID = subcategoryID
 	}
 
-	if req.Image != nil {
-		file, err := req.Image.Open()
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
-		newImageUrl, err := utils.UploadToCloudinary(file)
-		if err != nil {
-			return err
-		}
-
-		if req.ImageURL != "" {
-			if class.Image != "" {
-				_ = utils.DeleteFromCloudinary(class.Image)
-			}
-			class.Image = req.ImageURL
-		}
-
-		class.Image = newImageUrl
+	if req.ImageURL != "" {
+		class.Image = req.ImageURL
 	}
-
 	return s.repo.UpdateClass(class)
 }
 

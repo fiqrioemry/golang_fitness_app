@@ -59,3 +59,11 @@ func IsAdmin(role string) bool {
 func IsInstructor(role string) bool {
 	return role == "instructor"
 }
+
+func ParseBoolFormField(c *gin.Context, field string) (bool, error) {
+	val := c.PostForm(field)
+	if val == "" {
+		return false, nil
+	}
+	return strconv.ParseBool(val)
+}

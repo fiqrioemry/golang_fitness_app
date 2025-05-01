@@ -26,6 +26,13 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 		return
 	}
 
+	parsedBool, err := utils.ParseBoolFormField(c, "isActive")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid value for isActive", "error": err.Error()})
+		return
+	}
+	req.IsActive = parsedBool
+
 	if len(req.Images) > 0 {
 		uploadedImageURLs, err := utils.UploadMultipleImagesWithValidation(req.Images)
 		if err != nil {
@@ -59,7 +66,14 @@ func (h *ClassHandler) UpdateClass(c *gin.Context) {
 		return
 	}
 
-	if req.Image != nil {
+	parsedBool, err := utils.ParseBoolFormField(c, "isActive")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid value for isActive", "error": err.Error()})
+		return
+	}
+	req.IsActive = parsedBool
+
+	if req.Image != nil && req.Image.Filename != "" {
 		imageURL, err := utils.UploadImageWithValidation(req.Image)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "Image upload failed", "error": err.Error()})

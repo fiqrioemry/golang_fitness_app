@@ -37,8 +37,8 @@ func (s *packageService) CreatePackage(req dto.CreatePackageRequest) error {
 		AdditionalList: req.Additional,
 		CreatedAt:      time.Now(),
 	}
-	if req.Expired > 0 {
-		pkg.Expired = &req.Expired
+	if req.Expired != 0 {
+		pkg.Expired = req.Expired
 	}
 	return s.repo.CreatePackage(&pkg)
 }
@@ -67,7 +67,7 @@ func (s *packageService) UpdatePackage(id string, req dto.UpdatePackageRequest) 
 	pkg.IsActive = req.IsActive
 
 	if req.Expired != 0 {
-		pkg.Expired = &req.Expired
+		pkg.Expired = req.Expired
 	}
 	if req.ImageURL != "" {
 		pkg.Image = req.ImageURL
@@ -95,7 +95,7 @@ func (s *packageService) GetAllPackages() ([]dto.PackageResponse, error) {
 			Price:       p.Price,
 			Credit:      p.Credit,
 			Image:       p.Image,
-			Expired:     *p.Expired,
+			Expired:     p.Expired,
 			IsActive:    p.IsActive,
 			Additional:  p.AdditionalList,
 		})
@@ -109,18 +109,13 @@ func (s *packageService) GetPackageByID(id string) (*dto.PackageDetailResponse, 
 		return nil, err
 	}
 
-	expired := 0
-	if pkg.Expired != nil {
-		expired = *pkg.Expired
-	}
-
 	return &dto.PackageDetailResponse{
 		ID:          pkg.ID.String(),
 		Name:        pkg.Name,
 		Description: pkg.Description,
 		Price:       pkg.Price,
 		Credit:      pkg.Credit,
-		Expired:     expired,
+		Expired:     pkg.Expired,
 		Image:       pkg.Image,
 		IsActive:    pkg.IsActive,
 		Additional:  pkg.AdditionalList,

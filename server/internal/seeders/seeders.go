@@ -509,7 +509,7 @@ func SeedPackages(db *gorm.DB) {
 			Description:    "1x Class Trial for new members.",
 			Price:          500000,
 			Credit:         1,
-			Expired:        intPtr(14), // 14 hari
+			Expired:        14, // 14 hari
 			AdditionalList: []string{"Valid for 14 days after first booking."},
 			Image:          "https://placehold.co/400x400/orange/white",
 			IsActive:       true,
@@ -521,7 +521,7 @@ func SeedPackages(db *gorm.DB) {
 			Description:    "Enjoy 5 reformer classes package.",
 			Price:          2250000,
 			Credit:         5,
-			Expired:        intPtr(60), // 2 bulan
+			Expired:        60, // 2 bulan
 			AdditionalList: []string{"Valid for 2 months after first booking.", "Cannot Be Refund"},
 			Image:          "https://placehold.co/400x400/blue/white",
 			IsActive:       true,
@@ -533,7 +533,7 @@ func SeedPackages(db *gorm.DB) {
 			Description:    "Maximize your training with 10 sessions!",
 			Price:          4100000,
 			Credit:         10,
-			Expired:        intPtr(120), // 4 bulan
+			Expired:        120, // 4 bulan
 			AdditionalList: []string{"Valid for 4 months after first booking.", "Cannot Be Refund"},
 			Image:          "https://placehold.co/400x400/green/white",
 			IsActive:       true,
@@ -545,7 +545,7 @@ func SeedPackages(db *gorm.DB) {
 			Description:    "Special promo for FTM x SANE group class.",
 			Price:          100000,
 			Credit:         1,
-			Expired:        intPtr(14),
+			Expired:        14,
 			AdditionalList: []string{"Valid for 14 days after first booking."},
 			Image:          "https://placehold.co/400x400/orange/white",
 			IsActive:       true,
@@ -557,7 +557,7 @@ func SeedPackages(db *gorm.DB) {
 			Description:    "Bundle of 2 classes for group sessions.",
 			Price:          275000,
 			Credit:         2,
-			Expired:        intPtr(20),
+			Expired:        20,
 			AdditionalList: []string{"Valid for 20 days after first booking."},
 			Image:          "https://placehold.co/400x400/blue/white",
 			IsActive:       true,
@@ -570,10 +570,6 @@ func SeedPackages(db *gorm.DB) {
 	} else {
 		log.Println("✅ Successfully seeded packages!")
 	}
-}
-
-func intPtr(i int) *int {
-	return &i
 }
 
 func SeedInstructors(db *gorm.DB) {
@@ -703,10 +699,7 @@ func SeedUserPackages(db *gorm.DB) {
 }
 
 func getExpiredDays(pkg models.Package) int {
-	if pkg.Expired != nil {
-		return *pkg.Expired
-	}
-	return 30 // default expired 30 hari jika tidak ditentukan
+	return 30
 }
 
 func SeedClassSchedules(db *gorm.DB) {

@@ -141,7 +141,7 @@ type Package struct {
 	Image          string    `gorm:"type:varchar(255)" json:"image"`
 	Price          float64   `gorm:"type:decimal(10,2);not null" json:"price"`
 	Credit         int       `gorm:"not null" json:"credit"`
-	Expired        *int      `json:"expired"`
+	Expired        int       `json:"expired"`
 	Additional     string    `gorm:"type:longtext" json:"-"`
 	AdditionalList []string  `gorm:"-" json:"additional"`
 	CreatedAt      time.Time `json:"createdAt"`

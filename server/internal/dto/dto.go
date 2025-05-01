@@ -44,6 +44,7 @@ type CreateClassRequest struct {
 	Duration      int                     `form:"duration" binding:"required,min=15"`
 	Description   string                  `form:"description" binding:"required"`
 	Additional    []string                `form:"additional[]"`
+	IsActive      bool                    `form:"isActive"`
 	TypeID        string                  `form:"typeId" binding:"required"`
 	LevelID       string                  `form:"levelId" binding:"required"`
 	LocationID    string                  `form:"locationId" binding:"required"`
@@ -58,6 +59,7 @@ type CreateClassRequest struct {
 type UpdateClassRequest struct {
 	Title         string                `form:"title"`
 	Duration      int                   `form:"duration"`
+	IsActive      bool                  `form:"isActive"`
 	Description   string                `form:"description"`
 	Additional    []string              `form:"additional[]"`
 	TypeID        string                `form:"typeId"`
@@ -205,11 +207,11 @@ type LocationResponse struct {
 // Package
 
 type CreatePackageRequest struct {
-	Name        string                `form:"name" binding:"required,min=2"`
+	Name        string                `form:"name" binding:"required,min=6"`
 	Description string                `form:"description" binding:"required"`
 	Price       float64               `form:"price" binding:"required,gt=0"`
 	Credit      int                   `form:"credit" binding:"required,gt=0"`
-	Expired     int                   `form:"expired"`
+	Expired     int                   `form:"expired" binding:"required,gt=0"`
 	Additional  []string              `form:"additional[]"`
 	IsActive    bool                  `form:"isActive"`
 	Image       *multipart.FileHeader `form:"image" binding:"required"`
@@ -217,14 +219,14 @@ type CreatePackageRequest struct {
 }
 
 type UpdatePackageRequest struct {
-	Name        string                `form:"name"`
-	Description string                `form:"description"`
-	Price       float64               `form:"price"`
-	Credit      int                   `form:"credit"`
-	Expired     int                   `form:"expired"`
+	Name        string                `form:"name" binding:"required,min=6"`
+	Description string                `form:"description" binding:"required"`
+	Price       float64               `form:"price" binding:"required,gt=0"`
+	Credit      int                   `form:"credit" binding:"required,gt=0"`
+	Expired     int                   `form:"expired" binding:"required,gt=0"`
 	Additional  []string              `form:"additional[]"`
 	IsActive    bool                  `form:"isActive"`
-	Image       *multipart.FileHeader `form:"image"`
+	Image       *multipart.FileHeader `form:"image" binding:"required"`
 	ImageURL    string                `form:"-"`
 }
 
