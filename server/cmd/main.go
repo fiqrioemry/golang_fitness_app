@@ -22,6 +22,7 @@ func main() {
 	config.InitRedis()
 	config.InitMailer()
 	config.InitCloudinary()
+	config.InitMidtrans()
 
 	r := gin.Default()
 	r.Use(middleware.Logger(), middleware.Recovery(), middleware.CORS(), middleware.RateLimiter(5, 10), middleware.LimitFileSize(5<<20))
@@ -86,8 +87,6 @@ func main() {
 
 	// UserPackage
 	userPackageRepo := repositories.NewUserPackageRepository(db)
-	userPackageService := services.NewUserPackageService(userPackageRepo)
-	userPackageHandler := handlers.NewUserPackageHandler(userPackageService)
 
 	// Payment
 	paymentRepo := repositories.NewPaymentRepository(db)
@@ -134,7 +133,6 @@ func main() {
 	routes.InstructorRoutes(r, instructorHandler)
 	routes.AttendanceRoutes(r, attendanceHandler)
 	routes.SubcategoryRoutes(r, subcategoryHandler)
-	routes.UserPackageRoutes(r, userPackageHandler)
 	routes.ClassScheduleRoutes(r, classScheduleHandler)
 	routes.ScheduleTemplateRoutes(r, scheduleTemplateHandler)
 

@@ -10,6 +10,8 @@ type ProfileRepository interface {
 	GetUserByID(userID string) (*models.User, error)
 	UpdateUser(user *models.User) error
 	GetUserTransactions(userID string, limit, offset int) ([]models.Payment, int64, error)
+	GetUserPackages(userID string, limit, offset int) ([]models.UserPackage, int64, error)
+	GetUserBookings(userID string, limit, offset int) ([]models.Booking, int64, error)
 }
 
 type profileRepository struct {
@@ -49,4 +51,39 @@ func (r *profileRepository) GetUserTransactions(userID string, limit, offset int
 	}
 
 	return payments, count, nil
+}
+
+func (r *profileRepository) GetUserPackages(userID string, limit, offset int) ([]models.UserPackage, int64, error) {
+	var data []models.UserPackage
+	var count int64
+
+	query := r.db.Model(&models.UserPackage{}).
+		Preload("Package").
+		Where("user_id = ?", userID)
+
+	if err := query.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+	if err := query.Order("purchased_at DESC").Limit(limit).Offset(offset).Find(&data).Error; err != nil {
+		return nil, 0, err
+	}
+	return data, count, nil
+}
+
+func (r *profileRepository) GetUserBookings(userID string, limit, offset int) ([]models.Booking, int64, error) {
+	var data []models.Booking
+	var count int64
+
+	query := r.db.Model(&models.Booking{}).
+		Preload("ClassSchedule.Class.Location").
+		Preload("ClassSchedule.Instructor.User.Profile").
+		Where("user_id = ?", userID)
+
+	if err := query.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+	if err := query.Order("created_at DESC").Limit(limit).Offset(offset).Find(&data).Error; err != nil {
+		return nil, 0, err
+	}
+	return data, count, nil
 }

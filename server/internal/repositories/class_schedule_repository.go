@@ -1,17 +1,20 @@
 package repositories
 
 import (
+	"server/internal/dto"
 	"server/internal/models"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type ClassScheduleRepository interface {
+	DeleteClassSchedule(id string) error
+	GetClassSchedules() ([]models.ClassSchedule, error)
 	CreateClassSchedule(schedule *models.ClassSchedule) error
 	UpdateClassSchedule(schedule *models.ClassSchedule) error
-	DeleteClassSchedule(id string) error
 	GetClassScheduleByID(id string) (*models.ClassSchedule, error)
-	GetClassSchedules() ([]models.ClassSchedule, error)
+	GetClassSchedulesWithFilter(filter dto.ClassScheduleQueryParam) ([]models.ClassSchedule, error)
 }
 
 type classScheduleRepository struct {
@@ -45,6 +48,30 @@ func (r *classScheduleRepository) GetClassScheduleByID(id string) (*models.Class
 func (r *classScheduleRepository) GetClassSchedules() ([]models.ClassSchedule, error) {
 	var schedules []models.ClassSchedule
 	if err := r.db.Preload("Class").Preload("Instructor.User.Profile").Order("start_time asc").Find(&schedules).Error; err != nil {
+		return nil, err
+	}
+	return schedules, nil
+}
+
+func (r *classScheduleRepository) GetClassSchedulesWithFilter(filter dto.ClassScheduleQueryParam) ([]models.ClassSchedule, error) {
+	var schedules []models.ClassSchedule
+	db := r.db.
+		Preload("Class.Category").
+		Preload("Instructor.User.Profile").
+		Order("start_time asc")
+
+	if filter.StartDate != "" {
+		if date, err := time.Parse("2006-01-02", filter.StartDate); err == nil {
+			db = db.Where("start_time >= ?", date)
+		}
+	}
+
+	if filter.CategoryID != "" {
+		db = db.Joins("JOIN classes ON classes.id = class_schedules.class_id").
+			Where("classes.category_id = ?", filter.CategoryID)
+	}
+
+	if err := db.Find(&schedules).Error; err != nil {
 		return nil, err
 	}
 	return schedules, nil

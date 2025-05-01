@@ -77,7 +77,6 @@ func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 	return nil
 }
 
-// Helper untuk cari tanggal weekday berikutnya
 func nextWeekday(t time.Time, weekday time.Weekday) time.Time {
 	daysUntil := (int(weekday) - int(t.Weekday()) + 7) % 7
 	if daysUntil == 0 {

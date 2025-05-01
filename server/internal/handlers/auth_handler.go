@@ -24,7 +24,7 @@ func (h *AuthHandler) SendOTP(c *gin.Context) {
 	}
 
 	if err := h.authService.SendOTP(req.Email); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -42,8 +42,8 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "email already registered", "error": err.Error()})
 		return
 	}
-
 	utils.SetAccessTokenCookie(c, tokens.AccessToken)
+
 	utils.SetRefreshTokenCookie(c, tokens.RefreshToken)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Register Successfully"})

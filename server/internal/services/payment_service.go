@@ -63,7 +63,7 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 			GrossAmt: int64(pkg.Price),
 		},
 		CustomerDetail: &midtrans.CustomerDetails{
-			Email: "",
+			Email: "customer.email@example.com",
 		},
 	}
 
@@ -72,7 +72,9 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 	return &dto.CreatePaymentResponse{
 		PaymentID: paymentID.String(),
 		SnapToken: snapResp.Token,
+		SnapURL:   snapResp.RedirectURL,
 	}, nil
+
 }
 
 func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationRequest) error {
@@ -98,15 +100,12 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 		return err
 	}
 
-	// Jika sukses baru buat UserPackage
 	if payment.Status == "success" {
-		// Fetch Package info
 		pkg, err := s.packageRepo.GetPackageByID(payment.PackageID.String())
 		if err != nil {
 			return err
 		}
 
-		// Buat UserPackage baru
 		expired := time.Now().AddDate(0, 0, *pkg.Expired)
 
 		userPackage := models.UserPackage{

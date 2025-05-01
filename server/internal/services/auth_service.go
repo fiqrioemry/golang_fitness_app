@@ -129,7 +129,6 @@ func (s *authService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
 		return nil, errors.New("invalid credentials")
 	}
 
-	// generate tokens
 	accessToken, err := utils.GenerateAccessToken(user.ID.String(), user.Role)
 	if err != nil {
 		return nil, err

@@ -26,7 +26,6 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 		return
 	}
 
-	// upload optional gallery images
 	if len(req.Images) > 0 {
 		uploadedImageURLs, err := utils.UploadMultipleImagesWithValidation(req.Images)
 		if err != nil {
@@ -36,7 +35,6 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 		req.ImageURLs = uploadedImageURLs
 	}
 
-	// upload cover image
 	singleImageURL, err := utils.UploadImageWithValidation(req.Image)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Image upload failed", "error": err.Error()})

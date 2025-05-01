@@ -161,6 +161,7 @@ func SeedUsers(db *gorm.DB) {
 
 	log.Println("✅ User seeding completed!")
 }
+
 func SeedCategories(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Category{}).Count(&count)
@@ -345,7 +346,6 @@ func SeedClasses(db *gorm.DB) {
 		return
 	}
 
-	// Fetch necessary related data
 	var categories []models.Category
 	if err := db.Find(&categories).Error; err != nil {
 		log.Printf("failed to fetch categories: %v", err)
@@ -485,7 +485,6 @@ func generateGalleryText(title string) string {
 	if len(title) == 0 {
 		return "CLASS"
 	}
-	// Ambil kata pertama dari title untuk teks gallery
 	for i, r := range title {
 		if r == ' ' {
 			return title[:i]
@@ -656,6 +655,7 @@ func SeedPayments(db *gorm.DB) {
 		log.Println("✅ Payments seeding completed!")
 	}
 }
+
 func SeedUserPackages(db *gorm.DB) {
 	var count int64
 	db.Model(&models.UserPackage{}).Count(&count)
@@ -709,47 +709,6 @@ func getExpiredDays(pkg models.Package) int {
 	return 30 // default expired 30 hari jika tidak ditentukan
 }
 
-// func SeedUserPackages(db *gorm.DB) {
-// 	var count int64
-// 	db.Model(&models.UserPackage{}).Count(&count)
-
-// 	if count > 0 {
-// 		log.Println("UserPackages already seeded, skipping...")
-// 		return
-// 	}
-
-// 	// Fetch user dan package
-// 	var user models.User
-// 	var pkg models.Package
-// 	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
-// 		log.Println("Failed to find customer user:", err)
-// 		return
-// 	}
-// 	if err := db.First(&pkg).Error; err != nil {
-// 		log.Println("Failed to find package:", err)
-// 		return
-// 	}
-
-// 	expired := time.Now().AddDate(0, 0, *pkg.Expired)
-
-// 	userPackages := []models.UserPackage{
-// 		{
-// 			ID:              uuid.New(),
-// 			UserID:          user.ID,
-// 			PackageID:       pkg.ID,
-// 			RemainingCredit: pkg.Credit,
-// 			PurchasedAt:     time.Now(),
-// 			ExpiredAt:       &expired,
-// 		},
-// 	}
-
-// 	if err := db.Create(&userPackages).Error; err != nil {
-// 		log.Printf("failed seeding user packages: %v", err)
-// 	} else {
-// 		log.Println("✅ UserPackages seeding completed!")
-// 	}
-// }
-
 func SeedClassSchedules(db *gorm.DB) {
 	var count int64
 	db.Model(&models.ClassSchedule{}).Count(&count)
@@ -759,9 +718,10 @@ func SeedClassSchedules(db *gorm.DB) {
 		return
 	}
 
-	// Fetch class dan instructor
 	var class models.Class
+
 	var instructor models.Instructor
+
 	if err := db.First(&class).Error; err != nil {
 		log.Println("Failed to find class:", err)
 		return
@@ -771,7 +731,7 @@ func SeedClassSchedules(db *gorm.DB) {
 		return
 	}
 
-	startTime := time.Now().AddDate(0, 0, 2).Truncate(time.Hour).Add(10 * time.Hour) // 2 hari lagi jam 10:00
+	startTime := time.Now().AddDate(0, 0, 2).Truncate(time.Hour).Add(10 * time.Hour)
 	endTime := startTime.Add(time.Minute * time.Duration(class.Duration))
 
 	schedules := []models.ClassSchedule{
@@ -785,6 +745,47 @@ func SeedClassSchedules(db *gorm.DB) {
 			IsActive:     true,
 		},
 	}
+
+	now := time.Now()
+
+	schedules = append(schedules,
+		models.ClassSchedule{
+			ID:           uuid.New(),
+			ClassID:      class.ID,
+			InstructorID: instructor.ID,
+			StartTime:    now.AddDate(0, 0, 4).Truncate(time.Hour).Add(8 * time.Hour),
+			EndTime:      now.AddDate(0, 0, 4).Truncate(time.Hour).Add(9 * time.Hour),
+			Capacity:     12,
+			IsActive:     true,
+		},
+		models.ClassSchedule{
+			ID:           uuid.New(),
+			ClassID:      class.ID,
+			InstructorID: instructor.ID,
+			StartTime:    now.AddDate(0, 0, 6).Truncate(time.Hour).Add(13 * time.Hour),
+			EndTime:      now.AddDate(0, 0, 6).Truncate(time.Hour).Add(14 * time.Hour),
+			Capacity:     8,
+			IsActive:     true,
+		},
+		models.ClassSchedule{
+			ID:           uuid.New(),
+			ClassID:      class.ID,
+			InstructorID: instructor.ID,
+			StartTime:    now.AddDate(0, 1, 0).Truncate(time.Hour).Add(18 * time.Hour),
+			EndTime:      now.AddDate(0, 1, 0).Truncate(time.Hour).Add(19 * time.Hour),
+			Capacity:     10,
+			IsActive:     true,
+		},
+		models.ClassSchedule{
+			ID:           uuid.New(),
+			ClassID:      class.ID,
+			InstructorID: instructor.ID,
+			StartTime:    now.AddDate(0, 0, 10).Truncate(time.Hour).Add(7 * time.Hour),
+			EndTime:      now.AddDate(0, 0, 10).Truncate(time.Hour).Add(8 * time.Hour),
+			Capacity:     6,
+			IsActive:     true,
+		},
+	)
 
 	if err := db.Create(&schedules).Error; err != nil {
 		log.Printf("failed seeding class schedules: %v", err)
@@ -824,7 +825,7 @@ func SeedScheduleTemplates(db *gorm.DB) {
 			ID:           uuid.New(),
 			ClassID:      classes[0].ID,
 			InstructorID: instructors[0].ID,
-			DayOfWeek:    1, // Monday
+			DayOfWeek:    1,
 			StartHour:    10,
 			StartMinute:  0,
 			Capacity:     10,
@@ -834,7 +835,7 @@ func SeedScheduleTemplates(db *gorm.DB) {
 			ID:           uuid.New(),
 			ClassID:      classes[1%len(classes)].ID,
 			InstructorID: instructors[1%len(instructors)].ID,
-			DayOfWeek:    2, // Tuesday
+			DayOfWeek:    2,
 			StartHour:    14,
 			StartMinute:  30,
 			Capacity:     12,
@@ -844,7 +845,7 @@ func SeedScheduleTemplates(db *gorm.DB) {
 			ID:           uuid.New(),
 			ClassID:      classes[2%len(classes)].ID,
 			InstructorID: instructors[2%len(instructors)].ID,
-			DayOfWeek:    4, // Thursday
+			DayOfWeek:    4,
 			StartHour:    18,
 			StartMinute:  0,
 			Capacity:     8,

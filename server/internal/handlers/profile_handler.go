@@ -93,3 +93,31 @@ func (h *ProfileHandler) GetUserTransactions(c *gin.Context) {
 
 	c.JSON(http.StatusOK, resp)
 }
+
+func (h *ProfileHandler) GetUserPackages(c *gin.Context) {
+	userID := utils.MustGetUserID(c)
+	page := utils.GetQueryInt(c, "page", 1)
+	limit := utils.GetQueryInt(c, "limit", 10)
+
+	resp, err := h.profileService.GetUserPackages(userID, page, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch packages", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *ProfileHandler) GetUserBookings(c *gin.Context) {
+	userID := utils.MustGetUserID(c)
+	page := utils.GetQueryInt(c, "page", 1)
+	limit := utils.GetQueryInt(c, "limit", 10)
+
+	resp, err := h.profileService.GetUserBookings(userID, page, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch bookings", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}

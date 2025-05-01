@@ -286,6 +286,7 @@ type CreatePaymentRequest struct {
 type CreatePaymentResponse struct {
 	PaymentID string `json:"paymentId"`
 	SnapToken string `json:"snapToken"`
+	SnapURL   string `json:"snapUrl"`
 }
 
 // Request Midtrans Webhook (notif dari Midtrans ke backend)
@@ -308,16 +309,6 @@ type PaymentResponse struct {
 	PaidAt        string  `json:"paidAt"`
 }
 
-type UserPackageResponse struct {
-	ID              string `json:"id"`
-	PackageID       string `json:"packageId"`
-	PackageName     string `json:"packageName"`
-	RemainingCredit int    `json:"remainingCredit"`
-	ExpiredAt       string `json:"expiredAt,omitempty"`
-	ExpiredInDays   int    `json:"expiredInDays,omitempty"`
-	PurchasedAt     string `json:"purchasedAt"`
-}
-
 type CreateClassScheduleRequest struct {
 	ClassID      string `json:"classId" binding:"required"`
 	InstructorID string `json:"instructorId" binding:"required"`
@@ -335,12 +326,18 @@ type ClassScheduleResponse struct {
 	ID             string `json:"id"`
 	ClassID        string `json:"classId"`
 	ClassTitle     string `json:"classTitle"`
+	CategoryName   string `json:"categoryName"`
 	InstructorID   string `json:"instructorId"`
 	InstructorName string `json:"instructorName"`
 	StartTime      string `json:"startTime"`
 	EndTime        string `json:"endTime"`
 	Capacity       int    `json:"capacity"`
 	BookedCount    int    `json:"bookedCount"`
+}
+
+type ClassScheduleQueryParam struct {
+	StartDate  string `form:"startDate"`
+	CategoryID string `form:"categoryId"`
 }
 
 type CreateScheduleTemplateRequest struct {
@@ -487,4 +484,28 @@ type TransactionListResponse struct {
 	Total        int64                 `json:"total"`
 	Page         int                   `json:"page"`
 	Limit        int                   `json:"limit"`
+}
+
+type UserPackageListResponse struct {
+	Packages []UserPackageResponse `json:"packages"`
+	Total    int64                 `json:"total"`
+	Page     int                   `json:"page"`
+	Limit    int                   `json:"limit"`
+}
+
+type UserPackageResponse struct {
+	ID              string `json:"id"`
+	PackageID       string `json:"packageId"`
+	PackageName     string `json:"packageName"`
+	RemainingCredit int    `json:"remainingCredit"`
+	ExpiredAt       string `json:"expiredAt,omitempty"`
+	ExpiredInDays   int    `json:"expiredInDays,omitempty"`
+	PurchasedAt     string `json:"purchasedAt"`
+}
+
+type BookingListResponse struct {
+	Bookings []BookingResponse `json:"bookings"`
+	Total    int64             `json:"total"`
+	Page     int               `json:"page"`
+	Limit    int               `json:"limit"`
 }
