@@ -13,7 +13,7 @@ export const useCreateBookingMutation = () => {
     mutationFn: booking.createBooking,
     onSuccess: () => {
       toast.success("Booking created successfully");
-      queryClient.invalidateQueries({ queryKey: ["bookings"] }); // Refetch daftar booking
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Failed to create booking");

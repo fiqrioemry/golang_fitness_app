@@ -14,6 +14,7 @@ const FormInput = ({
   children,
 }) => {
   const { methods, handleSubmit } = useFormSchema({ state, schema, action });
+  console.log("FormInput", isLoading);
 
   return (
     <FormProvider {...methods}>

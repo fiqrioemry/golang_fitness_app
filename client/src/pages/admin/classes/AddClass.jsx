@@ -1,9 +1,8 @@
 import React from "react";
-import { createClassSchema } from "@/lib/schema";
-import { createClassState } from "@/lib/constant";
+import { classSchema } from "@/lib/schema";
+import { classState } from "@/lib/constant";
 import { useClassMutation } from "@/hooks/useClass";
 import { FormInput } from "@/components/form/FormInput";
-import { SelectElement } from "@/components/input/SelectElement";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { InputFileElement } from "@/components/input/InputFileElement";
@@ -27,11 +26,11 @@ const AddClass = () => {
         <FormInput
           text="Add New Class"
           className="w-72"
-          state={createClassState}
-          schema={createClassSchema}
+          state={classState}
+          schema={classSchema}
+          isLoading={createClass.isPending}
           action={createClass.mutateAsync}
         >
-          {/* Section 1: Title & Thumbnail */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <InputTextElement
@@ -47,19 +46,18 @@ const AddClass = () => {
               />
             </div>
             <InputFileElement
+              isSingle
               name="image"
               label="Class Thumbnail"
-              isSingle
-              note="Recommended ratio: 4:3"
+              note="Recommended: 1:1 ratio (400x400px)"
             />
           </div>
 
-          {/* Section 2: Location, Duration */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <SelectElement
-              label="Location"
-              data="location"
+            <SelectOptionsElement
               name="locationId"
+              data="location"
+              label="Location"
               placeholder="Select class location"
             />
             <InputNumberElement
@@ -69,21 +67,20 @@ const AddClass = () => {
             />
           </div>
 
-          {/* Section 3: Category, Level, Subcategory, Type */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <SelectElement
+            <SelectOptionsElement
               name="categoryId"
               data="category"
               label="Category"
               placeholder="Select category"
             />
-            <SelectElement
+            <SelectOptionsElement
               name="levelId"
               data="level"
               label="Level"
               placeholder="Select difficulty level"
             />
-            <SelectElement
+            <SelectOptionsElement
               name="subcategoryId"
               data="subcategory"
               label="Subcategory"
@@ -97,7 +94,6 @@ const AddClass = () => {
             />
           </div>
 
-          {/* Section 4: Additional Info & Gallery */}
           <div className="space-y-4">
             <InputTagsElement
               name="additional"

@@ -35,6 +35,7 @@ export const formatDate = (dateStr) => {
     day: "2-digit",
   });
 };
+
 export const buildFormData = (data) => {
   const formData = new FormData();
 

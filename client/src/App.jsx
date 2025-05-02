@@ -48,6 +48,7 @@ import { AdminRoute, AuthRoute, NonAuthRoute, PublicRoute } from "./middleware";
 import PublicLayout from "./components/public/PublicLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
+import About from "./pages/About";
 
 function App() {
   const { checkingAuth, authMe } = useAuthStore();
@@ -89,6 +90,7 @@ function App() {
           }
         >
           <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
           <Route path="classes" element={<Classes />} />
           <Route path="packages" element={<Packages />} />
           <Route path="schedules" element={<Schedules />} />

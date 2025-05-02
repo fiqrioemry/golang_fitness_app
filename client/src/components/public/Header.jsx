@@ -52,12 +52,12 @@ const Header = () => {
               Schedule
             </NavLink>
             <NavLink
-              to="/location"
+              to="/about"
               className={({ isActive }) =>
                 `${linkClass} ${isActive ? activeClass : ""}`
               }
             >
-              Locate Us
+              About Us
             </NavLink>
             {user ? (
               <UserDropdown />

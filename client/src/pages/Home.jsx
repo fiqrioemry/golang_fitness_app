@@ -14,12 +14,13 @@ export default function Home() {
               Train Better. Live Stronger.
             </h1>
             <p className="text-xl text-white mb-6">
-              Kelas Fitness Premium dengan Jadwal Fleksibel di Lokasi Strategis
+              Discover, schedule, and attend classes that energize your
+              lifestyle — all in one beautifully simple platform.
             </p>
             <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <Button className="text-lg px-6 py-3">🎟️ Book a Class</Button>
+              <Button className="text-lg px-6 py-3"> Book a Class</Button>
               <Button variant="outline" className="text-lg px-6 py-3">
-                📦 See Our Packages
+                See Our Packages
               </Button>
             </div>
           </div>
@@ -118,17 +119,53 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Map + Footer */}
-      <section className="py-16 px-4 bg-gray-100">
-        <h2 className="text-3xl font-semibold text-center mb-8">
-          Visit Our Studio
-        </h2>
-        <div className="max-w-4xl mx-auto">
-          <img
-            src="https://placehold.co/800x400"
-            alt="map"
-            className="rounded-xl w-full"
-          />
+      {/* Visit Our Studio */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto space-y-10">
+          <div className="text-center space-y-2">
+            <h3 className="text-3xl font-bold text-gray-800">
+              Visit Our Studio
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-xl mx-auto">
+              Experience the space where wellness begins. Drop by and feel the
+              calm, the energy, and the inspiration.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            {/* Map section */}
+            <div className="w-full h-80 rounded-xl overflow-hidden shadow-lg ring-1 ring-gray-200">
+              <iframe
+                title="Studio Map"
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                src="https://www.google.com/maps?q=40.712776,-74.005974&z=15&output=embed"
+              ></iframe>
+            </div>
+
+            {/* Studio info */}
+            <div className="p-6 space-y-4">
+              <h4 className="text-xl font-semibold text-gray-800">
+                Fitness Studio A
+              </h4>
+              <p className="text-sm text-gray-600">
+                <span className="font-medium">Address:</span> 123 Fitness St,
+                New York, NY
+              </p>
+              <p className="text-sm text-gray-600">
+                <span className="font-medium">Hours:</span> Open daily from{" "}
+                <strong>6AM – 10PM</strong>
+              </p>
+              <p className="text-sm text-gray-600">
+                Come join our in-studio classes or simply drop in for a tour and
+                meet our instructors in person!
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </main>

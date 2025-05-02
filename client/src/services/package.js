@@ -1,5 +1,5 @@
 import { publicInstance, authInstance } from ".";
-import { buildFormData } from "../lib/utils";
+import { buildFormData } from "@/lib/utils";
 
 // =====================
 // PACKAGE (Public + Admin)
@@ -16,17 +16,13 @@ export const getPackageById = async (id) => {
 };
 
 export const createPackage = async (data) => {
-  console.log(data);
   const formData = buildFormData(data);
-  console.log(formData);
   const res = await authInstance.post("/packages", formData);
   return res.data;
 };
 
 export const updatePackage = async (id, data) => {
-  console.log(data);
   const formData = buildFormData(data);
-  console.log(formData);
   const res = await authInstance.put(`/packages/${id}`, formData);
   return res.data;
 };

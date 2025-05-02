@@ -1,32 +1,42 @@
-// src/lib/schema.js
 import { z } from "zod";
 
-// Register ========
+const imageItemSchema = z.union([
+  z
+    .instanceof(File)
+    .refine((file) => file.type.startsWith("image/"), {
+      message: "File must be an image",
+    })
+    .refine((file) => file.size <= 2 * 1024 * 1024, {
+      message: "Image size must be less than or equal to 2MB",
+    }),
+  z.string().url(),
+]);
+
+// Register
 export const sendOTPSchema = z.object({
-  email: z.string().email("Email tidak valid"),
+  email: z.string().email("Invalid email address"),
 });
 
 export const verifyOTPSchema = z.object({
-  email: z.string().email(),
-  otp: z.string().min(6, "OTP code minimal 6"),
+  email: z.string().email("Invalid email address"),
+  otp: z.string().min(6, "OTP code must be at least 6 characters"),
 });
 
 export const registerSchema = z.object({
-  email: z.string().email("Email tidak valid"),
-  password: z.string().min(6, "Password minimal 6 karakter"),
-  fullname: z.string(),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  fullname: z.string().min(1, "Full name is required"),
 });
-//=====================
 
 // Login
 export const loginSchema = z.object({
-  email: z.string().email("Email tidak valid"),
-  password: z.string().min(6, "Password minimal 6 karakter"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 // Update Profile
 export const profileSchema = z.object({
-  fullname: z.string().min(6, "Nama lengkap minimal 5 karakter"),
+  fullname: z.string().min(6, "Full name must be at least 6 characters"),
   birthday: z.string(),
   gender: z.string(),
   phone: z.string(),
@@ -34,101 +44,66 @@ export const profileSchema = z.object({
 });
 
 export const avatarSchema = z.object({
-  avatar: z
-    .instanceof(File)
-    .refine((file) => file.type.startsWith("image/"), {
-      message: "File harus berupa gambar",
-    })
-    .refine((file) => file.size <= 2 * 1024 * 1024, {
-      message: "Ukuran gambar maksimal 2MB",
-    }),
+  avatar: z.union([z.instanceof(File), z.string().url()]),
 });
 
-// create class
-export const createClassSchema = z.object({
-  title: z.string().min(6, "Title minimal 6 Karakter"),
+// Create Class
+export const classSchema = z.object({
+  title: z.string().min(6, "Title must be at least 6 characters"),
   duration: z
     .number()
-    .min(15, "Durasi minimal 15 menit")
-    .max(180, "Durasi maksimal 180 menit"),
-  description: z.string(),
+    .min(15, "Minimum duration is 15 minutes")
+    .max(180, "Maximum duration is 180 minutes"),
+  description: z.string().min(1, "Description is required"),
   additional: z.array(z.string()).optional(),
-  typeId: z.string(),
-  levelId: z.string(),
-  locationId: z.string(),
-  categoryId: z.string(),
-  subcategoryId: z.string(),
-  image: z
-    .instanceof(File)
-    .refine((file) => file.type.startsWith("image/"), {
-      message: "File harus berupa gambar",
-    })
-    .refine((file) => file.size <= 2 * 1024 * 1024, {
-      message: "Ukuran gambar maksimal 2MB",
-    }),
-  images: z
-    .array(
-      z
-        .instanceof(File)
-        .refine((file) => file.type.startsWith("image/"), {
-          message: "File harus berupa gambar",
-        })
-        .refine((file) => file.size <= 2 * 1024 * 1024, {
-          message: "Ukuran gambar maksimal 2MB",
-        })
-    )
-    .optional(),
+  typeId: z.string().min(1, "Type is required"),
+  levelId: z.string().min(1, "Level is required"),
+  locationId: z.string().min(1, "Location is required"),
+  categoryId: z.string().min(1, "Category is required"),
+  subcategoryId: z.string().min(1, "Subcategory is required"),
+  image: z.union([z.instanceof(File), z.string().url()]),
+  images: z.array(imageItemSchema).optional(),
 });
 
-export const updateClassSchema = z.object({
-  title: z.string().optional(),
-  duration: z.number().optional(),
-  description: z.string().optional(),
+export const packageSchema = z.object({
+  name: z.string().min(6, "Package name must be at least 6 characters"),
+  description: z.string().min(20, "Description must be at least 20 characters"),
+  price: z.number().positive("Price must be greater than 0"),
+  credit: z.number().positive("Credit must be greater than 0"),
+  isActive: z.boolean(),
+  expired: z.number().min(1, "Expiry duration is required"),
   additional: z.array(z.string()).optional(),
-  typeId: z.string().optional(),
-  levelId: z.string().optional(),
-  locationId: z.string().optional(),
-  categoryId: z.string().optional(),
-  subcategoryId: z.string().optional(),
-  image: z
-    .instanceof(File)
-    .refine((file) => file.type.startsWith("image/"), {
-      message: "File harus berupa gambar",
-    })
-    .refine((file) => file.size <= 2 * 1024 * 1024, {
-      message: "Ukuran gambar maksimal 2MB",
-    })
-    .optional(),
+  image: z.union([z.instanceof(File), z.string().url()]),
 });
 
 export const optionSchema = z.object({
-  name: z.string().min(2, "Nama minimal 2 karakter"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
 });
 
 export const locationSchema = z.object({
-  name: z.string().min(2),
-  address: z.string(),
-  geoLocation: z.string(),
+  name: z.string().min(2, "Location name is required"),
+  address: z.string().min(1, "Address is required"),
+  geoLocation: z.string().min(1, "Geolocation is required"),
 });
 
 export const createReviewSchema = z.object({
-  classId: z.string(),
+  classId: z.string().min(1, "Class is required"),
   rating: z.number().min(1).max(5),
   comment: z.string().optional(),
 });
 
 export const markAttendanceSchema = z.object({
-  bookingId: z.string(),
+  bookingId: z.string().min(1, "Booking ID is required"),
   status: z.enum(["attended", "absent", "cancelled"]),
 });
 
 export const createBookingSchema = z.object({
-  classScheduleId: z.string(),
+  classScheduleId: z.string().min(1, "Class Schedule is required"),
 });
 
 export const createScheduleTemplateSchema = z.object({
-  classId: z.string(),
-  instructorId: z.string(),
+  classId: z.string().min(1, "Class is required"),
+  instructorId: z.string().min(1, "Instructor is required"),
   dayOfWeek: z.number().min(0).max(6),
   startHour: z.number().min(0).max(23),
   startMinute: z.number().min(0).max(59),
@@ -142,9 +117,9 @@ export const updateClassScheduleSchema = z.object({
 });
 
 export const createClassScheduleSchema = z.object({
-  classId: z.string(),
-  instructorId: z.string(),
-  startTime: z.string(),
+  classId: z.string().min(1, "Class is required"),
+  instructorId: z.string().min(1, "Instructor is required"),
+  startTime: z.string().min(1, "Start time is required"),
   capacity: z.number().positive(),
 });
 
@@ -156,37 +131,19 @@ export const midtransNotificationSchema = z.object({
 });
 
 export const createPaymentSchema = z.object({
-  packageId: z.string(),
+  packageId: z.string().min(1, "Package is required"),
 });
 
 export const createInstructorSchema = z.object({
-  userId: z.string(),
-  experience: z.number().min(0),
-  specialties: z.string(),
+  userId: z.string().min(1, "User is required"),
+  experience: z.number().min(1, "Minimum 1 year experience required"),
+  specialties: z.string().min(1, "Specialties are required"),
   certifications: z.string().optional(),
 });
 
 export const updateInstructorSchema = z.object({
-  userId: z.string(),
+  userId: z.string().min(1, "User is required"),
   experience: z.number().optional(),
   specialties: z.string().optional(),
   certifications: z.string().optional(),
-});
-
-export const packageSchema = z.object({
-  name: z.string().min(2),
-  description: z.string(),
-  price: z.number().positive(),
-  credit: z.number().positive(),
-  isActive: z.boolean(),
-  expired: z.number(),
-  additional: z.array(z.string()).optional(),
-  image: z
-    .instanceof(File)
-    .refine((file) => file.type.startsWith("image/"), {
-      message: "File harus berupa gambar",
-    })
-    .refine((file) => file.size <= 2 * 1024 * 1024, {
-      message: "Ukuran gambar maksimal 2MB",
-    }),
 });

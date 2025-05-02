@@ -9,6 +9,7 @@ import { InputFileElement } from "@/components/input/InputFileElement";
 export const UploadAvatar = ({ profile }) => {
   const { updateAvatar } = useProfileMutation();
 
+  console.log(profile.avatar);
   return (
     <div className="relative flex flex-col justify-center items-center space-y-4">
       <img

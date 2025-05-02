@@ -2,16 +2,13 @@
 import * as userService from "@/services/users";
 import { useQuery } from "@tanstack/react-query";
 
-// ============================
-// QUERY HOOKS
-// ============================
-
 // GET /api/admin/users
 export const useUsersQuery = (params = {}) =>
   useQuery({
     queryKey: ["admin-users", params],
     queryFn: () => userService.getAllUsers(params),
     keepPreviousData: true,
+    staleTime: 0,
   });
 
 // GET /api/admin/users/:id
@@ -28,7 +25,3 @@ export const useUserStatsQuery = () =>
     queryKey: ["admin-user-stats"],
     queryFn: userService.getUserStats,
   });
-
-// ============================
-// MUTATION HOOKS (Coming Soon)
-// ============================

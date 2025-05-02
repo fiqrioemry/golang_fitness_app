@@ -1,6 +1,5 @@
-// src/components/address/UpdateClass.jsx
 import React from "react";
-import { createClassSchema } from "@/lib/schema";
+import { classSchema } from "@/lib/schema";
 import { useClassMutation } from "@/hooks/useClass";
 import { FormDialog } from "@/components/form/FormDialog";
 import { SwitchElement } from "@/components/input/SwitchElement";
@@ -19,9 +18,9 @@ const UpdateClass = ({ classes }) => {
     <FormDialog
       loading={isLoading}
       resourceId={classes.id}
-      title="Perbaharui Kelas"
+      title="Update Class"
       state={classes}
-      schema={createClassSchema}
+      schema={classSchema}
       action={updateClass.mutateAsync}
       buttonText={
         <button
@@ -34,29 +33,29 @@ const UpdateClass = ({ classes }) => {
     >
       <InputTextElement
         name="title"
-        label="Title kelas"
-        placeholder="Masukkan nama kelas"
+        label="Class Title"
+        placeholder="Enter class title"
       />
       <div className="grid grid-cols-2 gap-4">
-        <InputFileElement name="image" label="Thumbnail Kelas" isSingle />
+        <InputFileElement name="image" label="Class Thumbnail" isSingle />
         <div>
           <SelectOptionsElement
-            label="Lokasi"
+            label="Location"
             data="location"
             name="locationId"
-            placeholder="Pilih Lokasi kelas "
+            placeholder="Select class location"
           />
           <InputNumberElement
             name="duration"
-            label="Durasi"
-            placeholder="Durasi waktu kelas dalam menit"
+            label="Duration"
+            placeholder="Class duration in minutes"
           />
 
           <InputTextareaElement
             maxLength={200}
             name="description"
-            label="Deskripsi kelas"
-            placeholder="Masukkan deskripsi kelas min. 20 karakter"
+            label="Class Description"
+            placeholder="Enter class description (min. 20 characters)"
           />
         </div>
       </div>
@@ -64,35 +63,35 @@ const UpdateClass = ({ classes }) => {
         <SelectOptionsElement
           name="categoryId"
           data="category"
-          label="Kategori"
-          placeholder="Pilih Kategori kelas"
+          label="Category"
+          placeholder="Select class category"
         />
         <SelectOptionsElement
           name="levelId"
           data="level"
           label="Level"
-          placeholder="Pilih Tingkat Kesulitan "
+          placeholder="Select difficulty level"
         />
         <SelectOptionsElement
           name="subcategoryId"
           data="subcategory"
-          label="Sub-Kategori"
-          placeholder="Pilih Sub-Kategori kelas "
+          label="Subcategory"
+          placeholder="Select class subcategory"
         />
         <SelectOptionsElement
           data="type"
           name="typeId"
-          label="Tipe kelas"
-          placeholder="Pilih Tipe Kelas "
+          label="Class Type"
+          placeholder="Select class type"
         />
       </div>
       <InputTagsElement
         name="additional"
-        label="Informasi tambahan"
-        placeholder="Masukkan informasi, tekan enter untuk tambah"
+        label="Additional Information"
+        placeholder="Enter info, press enter to add"
       />
       <InputFileElement name="images" label="Gallery (Optional)" />
-      <SwitchElement name="isActive" label="Atur sebagai kelas aktif" />
+      <SwitchElement name="isActive" label="Set as active class" />
     </FormDialog>
   );
 };

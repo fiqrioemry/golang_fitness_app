@@ -1,4 +1,5 @@
 import { authInstance } from ".";
+import { buildFormData } from "@/lib/utils";
 
 // GET /api/user/profile
 export const getProfile = async () => {
@@ -13,7 +14,8 @@ export const updateProfile = async (data) => {
 };
 
 // PUT /api/user/profile/avatar
-export const updateAvatar = async (formData) => {
+export const updateAvatar = async (data) => {
+  const formData = buildFormData(data);
   const res = await authInstance.put("/user/profile/avatar", formData);
   return res.data;
 };

@@ -9,7 +9,11 @@ export function useFormSchema({ state, schema, action }) {
     mode: "onChange",
   });
 
-  const handleSubmit = methods.handleSubmit(action);
+  const handleSubmit = methods.handleSubmit(async (data) => {
+    const res = await action(data);
+
+    if (res !== false) methods.reset();
+  });
 
   return { methods, handleSubmit };
 }

@@ -1,5 +1,6 @@
 // src/services/class.js
 import { publicInstance, authInstance } from ".";
+import { buildFormData } from "@/lib/utils";
 
 // =====================
 // CLASS (Public + Admin)
@@ -21,12 +22,14 @@ export const getClassById = async (id) => {
 };
 
 export const createClass = async (data) => {
-  const res = await authInstance.post("/classes", data);
+  const formData = buildFormData(data);
+  const res = await authInstance.post("/classes", formData);
   return res.data;
 };
 
 export const updateClass = async (id, data) => {
-  const res = await authInstance.put(`/classes/${id}`, data);
+  const formData = buildFormData(data);
+  const res = await authInstance.put(`/classes/${id}`, formData);
   return res.data;
 };
 

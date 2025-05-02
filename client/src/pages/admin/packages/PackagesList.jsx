@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,13 +10,16 @@ import UpdatePackage from "@/pages/admin/packages/UpdatePackage";
 
 const PackagesList = () => {
   const {
-    data: packages = [],
-    isLoading,
     isError,
     refetch,
+    isLoading,
+    data: packages = [],
   } = usePackagesQuery();
 
   const navigate = useNavigate();
+  useEffect(() => {
+    refetch();
+  }, []);
 
   if (isLoading) return <Loading />;
   if (isError) return <ErrorDialog onRetry={refetch} />;

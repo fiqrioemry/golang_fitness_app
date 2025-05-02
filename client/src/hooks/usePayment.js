@@ -1,11 +1,17 @@
 // src/hooks/usePayment.js
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
 import * as paymentService from "@/services/payment";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-// =====================
-// MUTATION HOOKS
-// =====================
+// GET /api/payments?q=&page=&limit= (admin only)
+export const useAdminPaymentsQuery = (params) => {
+  return useQuery({
+    queryKey: ["admin-payments", params],
+    queryFn: () => paymentService.getAllUserPayments(params),
+    keepPreviousData: true,
+    staleTime: 0,
+  });
+};
 
 // POST /api/payments (auth required)
 export const useCreatePaymentMutation = () =>

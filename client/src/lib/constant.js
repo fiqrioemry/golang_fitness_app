@@ -26,7 +26,7 @@ export const profileState = {
   bio: "",
 };
 
-export const createClassState = {
+export const classState = {
   title: "",
   duration: 0,
   description: "",

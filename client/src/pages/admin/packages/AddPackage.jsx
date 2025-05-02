@@ -1,5 +1,7 @@
 import React from "react";
+import { packageSchema } from "@/lib/schema";
 import { packageState } from "@/lib/constant";
+import { useNavigate } from "react-router-dom";
 import { usePackageMutation } from "@/hooks/usePackage";
 import { FormInput } from "@/components/form/FormInput";
 import { SwitchElement } from "@/components/input/SwitchElement";
@@ -8,10 +10,9 @@ import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
-import { packageSchema } from "../../../lib/schema";
 
 const AddPackage = () => {
-  const { createPackage, isLoading } = usePackageMutation();
+  const { createPackage } = usePackageMutation();
 
   return (
     <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
@@ -25,10 +26,10 @@ const AddPackage = () => {
       <div className="bg-white rounded-xl shadow-sm border p-6">
         <FormInput
           className="w-72"
-          isLoading={isLoading}
           state={packageState}
           schema={packageSchema}
           text={"Submit New Package"}
+          isLoading={createPackage.isPending}
           action={createPackage.mutateAsync}
         >
           {/* Main Information */}
