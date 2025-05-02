@@ -164,7 +164,7 @@ func UploadMultipleImagesWithValidation(fileHeaders []*multipart.FileHeader) ([]
 
 		file, err := fileHeader.Open()
 		if err != nil {
-			return nil, err
+			continue
 		}
 		defer file.Close()
 

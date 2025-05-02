@@ -73,7 +73,7 @@ type Class struct {
 	ID             uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	Title          string    `gorm:"type:varchar(255);not null" json:"title"`
 	Image          string    `gorm:"type:varchar(255);not null" json:"image"`
-	IsActive       bool      `gorm:"default:true" json:"isActive"`
+	IsActive       bool      `gorm:"not null;default:true" json:"isActive"`
 	Duration       int       `gorm:"not null" json:"duration"`
 	Description    string    `gorm:"type:text" json:"description"`
 	Additional     string    `gorm:"type:longtext" json:"-"`
@@ -134,18 +134,19 @@ func (c *Class) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Package struct {
-	ID             uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	Name           string    `gorm:"type:varchar(255);not null" json:"name"`
-	Description    string    `gorm:"type:text;not null" json:"description"`
-	IsActive       bool      `gorm:"default:true" json:"isActive"`
-	Image          string    `gorm:"type:varchar(255)" json:"image"`
-	Price          float64   `gorm:"type:decimal(10,2);not null" json:"price"`
-	Credit         int       `gorm:"not null" json:"credit"`
-	Expired        int       `json:"expired"`
-	Additional     string    `gorm:"type:longtext" json:"-"`
-	AdditionalList []string  `gorm:"-" json:"additional"`
-	CreatedAt      time.Time `json:"createdAt"`
-	UpdatedAt      time.Time `json:"updatedAt"`
+	ID             uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	Name           string         `gorm:"type:varchar(255);not null" json:"name"`
+	Description    string         `gorm:"type:text;not null" json:"description"`
+	IsActive       bool           `gorm:"not null;default:true" json:"isActive"`
+	Image          string         `gorm:"type:varchar(255)" json:"image"`
+	Price          float64        `gorm:"type:decimal(10,2);not null" json:"price"`
+	Credit         int            `gorm:"not null" json:"credit"`
+	Expired        int            `json:"expired"`
+	Additional     string         `gorm:"type:longtext" json:"-"`
+	AdditionalList []string       `gorm:"-" json:"additional"`
+	CreatedAt      time.Time      `json:"createdAt"`
+	UpdatedAt      time.Time      `json:"updatedAt"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (p *Package) BeforeCreate(tx *gorm.DB) (err error) {
@@ -273,6 +274,8 @@ type Location struct {
 	Name        string    `gorm:"type:varchar(255);not null" json:"name"`
 	Address     string    `gorm:"type:varchar(255);not null" json:"address"`
 	GeoLocation string    `gorm:"type:varchar(255);not null" json:"geoLocation"`
+
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (l *Location) BeforeCreate(tx *gorm.DB) (err error) {
@@ -285,6 +288,8 @@ func (l *Location) BeforeCreate(tx *gorm.DB) (err error) {
 type Category struct {
 	ID   uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	Name string    `gorm:"type:varchar(255);not null" json:"name"`
+
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
@@ -295,9 +300,10 @@ func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Subcategory struct {
-	ID         uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	Name       string    `gorm:"type:varchar(255);not null" json:"name"`
-	CategoryID uuid.UUID `gorm:"type:char(36);not null" json:"categoryId"`
+	ID         uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	Name       string         `gorm:"type:varchar(255);not null" json:"name"`
+	CategoryID uuid.UUID      `gorm:"type:char(36);not null" json:"categoryId"`
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Category Category `gorm:"foreignKey:CategoryID"`
 }
@@ -310,8 +316,9 @@ func (s *Subcategory) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Type struct {
-	ID   uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	Name string    `gorm:"type:varchar(255);not null" json:"name"`
+	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	Name      string         `gorm:"type:varchar(255);not null" json:"name"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (t *Type) BeforeCreate(tx *gorm.DB) (err error) {
@@ -322,8 +329,9 @@ func (t *Type) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Level struct {
-	ID   uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	Name string    `gorm:"type:varchar(255);not null" json:"name"`
+	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	Name      string         `gorm:"type:varchar(255);not null" json:"name"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (l *Level) BeforeCreate(tx *gorm.DB) (err error) {

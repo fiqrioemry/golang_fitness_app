@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
@@ -70,6 +71,7 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("imageURLs", req.ImageURLs)
 
 	if len(req.ImageURLs) > 0 {
 		var galleries []models.ClassGallery
@@ -81,6 +83,7 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 				CreatedAt: time.Now(),
 			})
 		}
+
 		if err := s.repo.SaveClassGalleries(galleries); err != nil {
 			return err
 		}
@@ -226,6 +229,11 @@ func (s *classService) GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassRes
 
 	var result []dto.ClassResponse
 	for _, c := range classes {
+		var galleries []string
+		for _, g := range c.Galleries {
+			galleries = append(galleries, g.URL)
+		}
+
 		result = append(result, dto.ClassResponse{
 			ID:            c.ID.String(),
 			Title:         c.Title,
@@ -239,7 +247,8 @@ func (s *classService) GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassRes
 			LocationID:    c.LocationID.String(),
 			CategoryID:    c.CategoryID.String(),
 			SubcategoryID: c.SubcategoryID.String(),
-			CreatedAt:     c.CreatedAt.String(),
+			CreatedAt:     c.CreatedAt.Format(time.RFC3339),
+			Galleries:     galleries,
 		})
 
 	}

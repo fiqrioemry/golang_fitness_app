@@ -119,6 +119,7 @@ type ClassResponse struct {
 	TypeID        string   `json:"typeId"`
 	LevelID       string   `json:"levelId"`
 	LocationID    string   `json:"locationId"`
+	Galleries     []string `json:"galleries"`
 	CategoryID    string   `json:"categoryId"`
 	SubcategoryID string   `json:"subcategoryId"`
 	CreatedAt     string   `json:"createdAt"`

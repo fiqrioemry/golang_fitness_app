@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
@@ -26,6 +27,8 @@ func NewPackageService(repo repositories.PackageRepository) PackageService {
 }
 
 func (s *packageService) CreatePackage(req dto.CreatePackageRequest) error {
+	fmt.Println("DEBUG IsActive in service:", req.IsActive)
+
 	pkg := models.Package{
 		ID:             uuid.New(),
 		Name:           req.Name,
@@ -40,6 +43,7 @@ func (s *packageService) CreatePackage(req dto.CreatePackageRequest) error {
 	if req.Expired != 0 {
 		pkg.Expired = req.Expired
 	}
+	fmt.Println("DEBUG IsActive in service:", pkg.IsActive)
 	return s.repo.CreatePackage(&pkg)
 }
 

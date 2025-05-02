@@ -33,8 +33,15 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 	}
 	req.IsActive = parsedBool
 
-	if len(req.Images) > 0 {
-		uploadedImageURLs, err := utils.UploadMultipleImagesWithValidation(req.Images)
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid multipart form"})
+		return
+	}
+
+	if form != nil && len(form.File["images"]) > 0 {
+		files := form.File["images"]
+		uploadedImageURLs, err := utils.UploadMultipleImagesWithValidation(files)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "Gallery images upload failed", "error": err.Error()})
 			return

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"server/internal/dto"
 	"server/internal/services"
@@ -35,8 +36,9 @@ func (h *PackageHandler) CreatePackage(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Image upload failed", "error": err.Error()})
 		return
 	}
+	fmt.Println("DEBUG IsActive before parsed:", req.IsActive)
 	req.ImageURL = imageURL
-
+	fmt.Println("DEBUG IsActive after parsed:", req.IsActive)
 	if err := h.packageService.CreatePackage(req); err != nil {
 		utils.CleanupImageOnError(imageURL)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create package", "error": err.Error()})
@@ -59,6 +61,7 @@ func (h *PackageHandler) UpdatePackage(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid value for isActive", "error": err.Error()})
 		return
 	}
+
 	req.IsActive = parsedBool
 
 	if req.Image != nil && req.Image.Filename != "" {

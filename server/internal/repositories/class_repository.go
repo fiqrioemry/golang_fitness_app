@@ -79,7 +79,7 @@ func (r *classRepository) GetAllClasses(filter map[string]interface{}, search st
 	}
 
 	db.Count(&count)
-	if err := db.Limit(limit).Offset(offset).Find(&classes).Error; err != nil {
+	if err := db.Preload("Galleries").Limit(limit).Offset(offset).Find(&classes).Error; err != nil {
 		return nil, 0, err
 	}
 
