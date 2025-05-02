@@ -36,7 +36,7 @@ func (r *packageRepository) DeletePackage(id string) error {
 
 func (r *packageRepository) GetAllPackages() ([]models.Package, error) {
 	var packages []models.Package
-	if err := r.db.Order("created_at desc").Find(&packages).Error; err != nil {
+	if err := r.db.Preload("Classes").Order("created_at desc").Find(&packages).Error; err != nil {
 		return nil, err
 	}
 	return packages, nil
@@ -44,7 +44,7 @@ func (r *packageRepository) GetAllPackages() ([]models.Package, error) {
 
 func (r *packageRepository) GetPackageByID(id string) (*models.Package, error) {
 	var pkg models.Package
-	if err := r.db.First(&pkg, "id = ?", id).Error; err != nil {
+	if err := r.db.Preload("Classes").First(&pkg, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &pkg, nil

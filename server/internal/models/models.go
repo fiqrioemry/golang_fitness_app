@@ -91,6 +91,7 @@ type Class struct {
 	Category    Category    `gorm:"foreignKey:CategoryID"`
 	Subcategory Subcategory `gorm:"foreignKey:SubcategoryID"`
 	Location    Location    `gorm:"foreignKey:LocationID"`
+	Packages    []Package   `gorm:"many2many:package_classes;" json:"packages,omitempty"`
 
 	// optional
 	Galleries []*ClassGallery `gorm:"foreignKey:ClassID" json:"galleries,omitempty"`
@@ -141,12 +142,15 @@ type Package struct {
 	Image          string         `gorm:"type:varchar(255)" json:"image"`
 	Price          float64        `gorm:"type:decimal(10,2);not null" json:"price"`
 	Credit         int            `gorm:"not null" json:"credit"`
+	Discount       float64        `gorm:"not null;default:0" json:"discount"`
 	Expired        int            `json:"expired"`
 	Additional     string         `gorm:"type:longtext" json:"-"`
 	AdditionalList []string       `gorm:"-" json:"additional"`
 	CreatedAt      time.Time      `json:"createdAt"`
 	UpdatedAt      time.Time      `json:"updatedAt"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
+
+	Classes []Class `gorm:"many2many:package_classes;" json:"classes,omitempty"`
 }
 
 func (p *Package) BeforeCreate(tx *gorm.DB) (err error) {

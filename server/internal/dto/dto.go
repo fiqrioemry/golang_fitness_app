@@ -205,16 +205,17 @@ type LocationResponse struct {
 	GeoLocation string `json:"geoLocation"`
 }
 
-// Package
-
+// PACKAGE ==========================
 type CreatePackageRequest struct {
 	Name        string                `form:"name" binding:"required,min=6"`
 	Description string                `form:"description" binding:"required"`
 	Price       float64               `form:"price" binding:"required,gt=0"`
 	Credit      int                   `form:"credit" binding:"required,gt=0"`
 	Expired     int                   `form:"expired" binding:"required,gt=0"`
+	Discount    float64               `form:"discount"`
 	Additional  []string              `form:"additional[]"`
 	IsActive    bool                  `form:"isActive"`
+	ClassIDs    []string              `form:"classIds[]"`
 	Image       *multipart.FileHeader `form:"image" binding:"required"`
 	ImageURL    string                `form:"-"`
 }
@@ -225,37 +226,52 @@ type UpdatePackageRequest struct {
 	Price       float64               `form:"price" binding:"required,gt=0"`
 	Credit      int                   `form:"credit" binding:"required,gt=0"`
 	Expired     int                   `form:"expired" binding:"required,gt=0"`
+	Discount    float64               `form:"discount"`
 	Additional  []string              `form:"additional[]"`
 	IsActive    bool                  `form:"isActive"`
+	ClassIDs    []string              `form:"classIds[]"`
 	Image       *multipart.FileHeader `form:"image" binding:"required"`
 	ImageURL    string                `form:"-"`
 }
 
 type PackageResponse struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Price       float64  `json:"price"`
-	Credit      int      `json:"credit"`
-	Expired     int      `json:"expired"`
-	Image       string   `json:"image"`
-	IsActive    bool     `json:"isActive"`
-	Additional  []string `json:"additional"`
+	ID          string                 `json:"id"`
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Price       float64                `json:"price"`
+	Credit      int                    `json:"credit"`
+	Expired     int                    `json:"expired"`
+	Image       string                 `json:"image"`
+	Discount    float64                `form:"discount"`
+	IsActive    bool                   `json:"isActive"`
+	Additional  []string               `json:"additional"`
+	Classes     []ClassSummaryResponse `json:"classes"`
 }
 
 type PackageDetailResponse struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Price       float64  `json:"price"`
-	Credit      int      `json:"credit"`
-	Expired     int      `json:"expired"`
-	Image       string   `json:"image"`
-	IsActive    bool     `json:"isActive"`
-	Additional  []string `json:"additional"`
+	ID          string                 `json:"id"`
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Price       float64                `json:"price"`
+	Credit      int                    `json:"credit"`
+	Expired     int                    `json:"expired"`
+	Discount    float64                `form:"discount"`
+	Image       string                 `json:"image"`
+	IsActive    bool                   `json:"isActive"`
+	Additional  []string               `json:"additional"`
+	Classes     []ClassSummaryResponse `json:"classes"`
 }
 
-// instructor
+type ClassSummaryResponse struct {
+	ID       string `json:"id"`
+	Title    string `json:"title"`
+	Image    string `json:"image"`
+	Duration int    `json:"duration"`
+}
+
+// PACKAGE ==========================
+
+// INSTRUCTOR ==========================
 type CreateInstructorRequest struct {
 	UserID         string `json:"userId" binding:"required,uuid"`
 	Experience     int    `json:"experience" binding:"required,min=0"`
@@ -281,7 +297,9 @@ type InstructorResponse struct {
 	TotalClass     int     `json:"totalClass"`
 }
 
-// Payment ================================
+// INSTRUCTOR ==========================
+
+// PAYMENT ================================
 type CreatePaymentRequest struct {
 	PackageID string `json:"packageId" binding:"required"`
 }
@@ -336,8 +354,9 @@ type AdminPaymentListResponse struct {
 	Limit    int                    `json:"limit"`
 }
 
-// ========================================
+// PAYMENT ===========================
 
+// CLASS-SCHEDULE ====================
 type CreateClassScheduleRequest struct {
 	ClassID      string `json:"classId" binding:"required"`
 	InstructorID string `json:"instructorId" binding:"required"`
@@ -378,7 +397,9 @@ type CreateScheduleTemplateRequest struct {
 	Capacity     int    `json:"capacity" binding:"required,gt=0"`
 }
 
-// booking
+// CLASS-SCHEDULE =====================
+
+// BOOKINGS ===========================
 
 type CreateBookingRequest struct {
 	ClassScheduleID string `json:"classScheduleId" binding:"required"`
@@ -400,11 +421,10 @@ type BookingResponse struct {
 	LocationAddress string `json:"locationAddress"`
 
 	InstructorName   string `json:"instructorName"`
-	ParticipantCount int    `json:"participantCount"` // <-- jumlah peserta aktif
+	ParticipantCount int    `json:"participantCount"`
 }
 
-// Attendance
-
+// ATTENDANCE ==========================
 type MarkAttendanceRequest struct {
 	BookingID string `json:"bookingId" binding:"required"`
 	Status    string `json:"status" binding:"required,oneof=attended absent cancelled"`
@@ -420,7 +440,9 @@ type AttendanceResponse struct {
 	CheckedAt    string `json:"checkedAt"`
 }
 
-// Review
+// ATTENDANCE ==========================
+
+// REVIEWS ==========================
 type CreateReviewRequest struct {
 	ClassID string `json:"classId" binding:"required"`
 	Rating  int    `json:"rating" binding:"required,min=1,max=5"`
@@ -436,7 +458,9 @@ type ReviewResponse struct {
 	CreatedAt  string `json:"createdAt"`
 }
 
-// internal/dto/user_dto.go
+// ATTENDANCE ==========================
+
+// USER-LIST ==========================
 type UserQueryParam struct {
 	Q     string `form:"q"`
 	Role  string `form:"role"`
@@ -477,7 +501,8 @@ type UserStatsResponse struct {
 	NewThisMonth int64 `json:"newThisMonth"`
 }
 
-// profile information (profile, payment, bookings, packages) =======
+// USER-LIST ==========================
+
 type ProfileResponse struct {
 	ID        string    `json:"id"`
 	Email     string    `json:"email"`
