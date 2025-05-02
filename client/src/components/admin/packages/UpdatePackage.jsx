@@ -1,6 +1,5 @@
 // src/components/address/UpdatePackage.jsx
 import React from "react";
-import { Pencil } from "lucide-react";
 import { packageSchema } from "@/lib/schema";
 import { usePackageMutation } from "@/hooks/usePackage";
 import { FormDialog } from "@/components/form/FormDialog";
@@ -12,24 +11,17 @@ import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
 const UpdatePackage = ({ pkg }) => {
-  const { updatePackage, isLoading } = usePackageMutation();
+  const { updatePackage } = usePackageMutation();
+  const { isPending, mutateAsync } = updatePackage;
 
   return (
     <FormDialog
       state={pkg}
-      loading={isLoading}
+      loading={isPending}
       resourceId={pkg.id}
+      action={mutateAsync}
       title="Update Package"
       schema={packageSchema}
-      action={updatePackage.mutateAsync}
-      buttonText={
-        <button
-          type="button"
-          className="text-primary hover:text-blue-600 transition"
-        >
-          <Pencil className="w-4 h-4" />
-        </button>
-      }
     >
       <InputTextElement
         name="name"
@@ -57,6 +49,13 @@ const UpdatePackage = ({ pkg }) => {
         label="Expiration Time"
         placeholder="Package expiration duration in days"
       />
+      <InputNumberElement
+        name="discount"
+        label="Discount"
+        min={0}
+        max={99}
+        placeholder="Discount in percent"
+      />
       <InputTagsElement
         name="additional"
         label="Additional Information"
@@ -68,4 +67,4 @@ const UpdatePackage = ({ pkg }) => {
   );
 };
 
-export default UpdatePackage;
+export { UpdatePackage };

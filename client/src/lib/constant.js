@@ -35,6 +35,7 @@ export const classState = {
   levelId: "",
   locationId: "",
   categoryId: "",
+  isActive: true,
   subcategoryId: "",
   image: undefined,
   images: undefined,
@@ -55,6 +56,11 @@ export const updateClassState = {
 
 export const optionState = {
   name: "",
+};
+
+export const subcategoryState = {
+  name: "",
+  categoryId: "",
 };
 
 export const locationState = {
@@ -111,14 +117,7 @@ export const paymentState = {
   packageId: "",
 };
 
-export const createInstructorState = {
-  userId: "",
-  experience: 0,
-  specialties: "",
-  certifications: "",
-};
-
-export const updateInstructorState = {
+export const instructorState = {
   userId: "",
   experience: 0,
   specialties: "",
@@ -134,4 +133,6 @@ export const packageState = {
   isActive: true,
   additional: [],
   image: undefined,
+  discount: 0,
+  classIds: [],
 };

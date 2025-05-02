@@ -1,7 +1,7 @@
 // src/components/form/FormInput.jsx
 import React from "react";
-import { FormProvider } from "react-hook-form";
 import { SubmitButton } from "./SubmitButton";
+import { FormProvider } from "react-hook-form";
 import { useFormSchema } from "@/hooks/useFormSchema";
 
 const FormInput = ({
@@ -14,7 +14,6 @@ const FormInput = ({
   children,
 }) => {
   const { methods, handleSubmit } = useFormSchema({ state, schema, action });
-  console.log("FormInput", isLoading);
 
   return (
     <FormProvider {...methods}>

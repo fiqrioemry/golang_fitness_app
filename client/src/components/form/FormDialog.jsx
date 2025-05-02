@@ -12,6 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { useState, useCallback, useMemo, useEffect } from "react";
+import { Pencil } from "lucide-react";
 
 export function FormDialog({
   title,
@@ -22,7 +23,7 @@ export function FormDialog({
   resourceId = null,
   loading = false,
   shouldReset = true,
-  buttonText = "Update",
+  buttonText = "",
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -79,7 +80,18 @@ export function FormDialog({
         open={isOpen}
         onOpenChange={(open) => (!open ? handleCancel() : setIsOpen(open))}
       >
-        <DialogTrigger asChild>{buttonText}</DialogTrigger>
+        <DialogTrigger asChild>
+          {buttonText === "" ? (
+            <button
+              type="button"
+              className="text-primary hover:text-blue-600 transition"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+          ) : (
+            buttonText
+          )}
+        </DialogTrigger>
 
         <DialogContent className="sm:max-w-lg overflow-hidden rounded-xl p-0">
           {loading ? (

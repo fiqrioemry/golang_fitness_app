@@ -65,7 +65,7 @@ const SignUp = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 bg-white rounded-xl shadow-lg overflow-hidden max-w-4xl w-full">
         {/* Left Side */}
         <div className="hidden md:block bg-blue-600 p-8 text-white text-center">
-          <h2 className="text-3xl font-bold mb-4">Welcome Back!</h2>
+          <h2 className="text-3xl font-bold mb-4">Stay Strong With Us!</h2>
           <p className="text-sm">Stay Fit and Join us now</p>
           <img
             src="/signup-wallpaper.webp"

@@ -2,8 +2,15 @@ import React from "react";
 
 const Dashboard = () => {
   return (
-    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
-      <h1>HALAMAN DASHBOARD</h1>
+    <section className="section">
+      <div>
+        <h2>Dashboard under construction</h2>
+        <img
+          className="h-96 object-container"
+          src="/under-construction.svg"
+          alt="under-construction"
+        />
+      </div>
     </section>
   );
 };

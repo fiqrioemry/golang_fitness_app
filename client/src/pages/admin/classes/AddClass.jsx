@@ -14,7 +14,7 @@ const AddClass = () => {
   const { createClass } = useClassMutation();
 
   return (
-    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+    <section className="section">
       <div className="space-y-1 text-center">
         <h2 className="text-2xl font-bold">Add New Class</h2>
         <p className="text-muted-foreground text-sm">

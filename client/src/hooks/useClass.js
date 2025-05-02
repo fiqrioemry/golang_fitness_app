@@ -2,10 +2,6 @@ import { toast } from "sonner";
 import * as classService from "@/services/class";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// ============================
-// QUERY HOOKS
-// ============================
-
 // GET /api/classes
 export const useClassesQuery = (params = {}) =>
   useQuery({
@@ -35,10 +31,6 @@ export const useSchedulesQuery = () =>
     queryKey: ["schedules"],
     queryFn: classService.getAllClassSchedules,
   });
-
-// ============================
-// MUTATION HOOKS
-// ============================
 
 export const useClassMutation = () => {
   const qc = useQueryClient();

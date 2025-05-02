@@ -33,69 +33,100 @@ const Packages = () => {
       </div>
 
       <div className="min-h-screen grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {packages.map((pkg) => (
-          <div
-            key={pkg.id}
-            className="relative bg-white rounded-2xl shadow-md border overflow-hidden flex flex-col transition-transform hover:scale-[1.02]"
-          >
-            {/* SOLD OUT Ribbon */}
-            {!pkg.isActive && (
-              <div className="absolute top-3 -left-12 w-40 rotate-[-45deg] bg-red-600 text-white text-center text-xs font-bold py-1 shadow-lg z-10">
-                SOLD OUT
-              </div>
-            )}
+        {packages.map((pkg) => {
+          const hasDiscount = pkg.Discount > 0;
+          const discountedPrice = pkg.price * (1 - pkg.Discount / 100);
 
-            {/* Image */}
-            <img
-              src={pkg.image}
-              alt={pkg.name}
-              className={`w-full h-48 object-cover ${
-                !pkg.isActive ? "opacity-50" : ""
-              }`}
-            />
-
-            {/* Content */}
-            <div className="p-5 flex flex-col flex-grow">
-              <h3 className="text-lg font-bold mb-1 line-clamp-1">
-                {pkg.name}
-              </h3>
-              <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-                {pkg.description}
-              </p>
-
-              <div className="grid grid-cols-2 gap-2 text-sm mb-4">
-                <p>
-                  <span className="font-medium text-gray-700">Credit:</span>{" "}
-                  {pkg.credit}
-                </p>
-                <p>
-                  <span className="font-medium text-gray-700">Price:</span> Rp{" "}
-                  {pkg.price.toLocaleString("id-ID")}
-                </p>
-              </div>
-
-              {pkg.additional.length > 0 && (
-                <ul className="text-xs text-muted-foreground list-disc pl-4 mb-4 space-y-1 flex-1">
-                  {pkg.additional.map((item, i) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                </ul>
+          return (
+            <div
+              key={pkg.id}
+              className="relative bg-white rounded-2xl shadow-sm border hover:shadow-md transition-all duration-200 flex flex-col"
+            >
+              {/* DISCOUNT BADGE */}
+              {hasDiscount && (
+                <div className="absolute top-3 left-3 z-10 bg-gradient-to-r from-green-500 to-lime-500 text-white text-[11px] font-semibold px-2 py-1 rounded-full shadow-md">
+                  {pkg.Discount} % OFF
+                </div>
               )}
+              {/* SOLD OUT Ribbon */}
+              {!pkg.isActive && (
+                <div className="absolute top-3 -left-12 w-40 rotate-[-45deg] bg-red-600 text-white text-center text-xs font-bold py-1 shadow-lg z-10">
+                  SOLD OUT
+                </div>
+              )}
+              {/* IMAGE */}
+              <div className="relative">
+                <img
+                  src={pkg.image}
+                  alt={pkg.name}
+                  className={`w-full h-48 object-cover rounded-t-2xl ${
+                    !pkg.isActive ? "opacity-50 grayscale" : ""
+                  }`}
+                />
+              </div>
+              {/* CONTENT */}
+              <div className="p-5 flex flex-col flex-grow space-y-2">
+                <div>
+                  <h3 className="text-lg font-semibold line-clamp-1">
+                    {pkg.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {pkg.description}
+                  </p>
+                </div>
 
-              <button
-                onClick={() => navigate(`/packages/${pkg.id}`)}
-                className={`mt-auto font-medium rounded-lg px-4 py-2 transition-colors ${
-                  pkg.isActive
-                    ? "bg-blue-600 hover:bg-blue-700 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-                disabled={!pkg.isActive}
-              >
-                {pkg.isActive ? "Buy Now" : "Unavailable"}
-              </button>
+                <div className="flex items-center gap-3 text-sm mt-1">
+                  <p>
+                    <span className="text-gray-500">Credit:</span>{" "}
+                    <span className="font-medium">{pkg.credit}</span>
+                  </p>
+                  <p>
+                    <span className="text-gray-500">Duration:</span>{" "}
+                    <span className="font-medium">{pkg.expired} days</span>
+                  </p>
+                </div>
+
+                {/* PRICE DISPLAY */}
+                <div className="mt-1">
+                  {hasDiscount ? (
+                    <div className="text-base font-semibold text-green-600">
+                      Rp {discountedPrice.toLocaleString("id-ID")}
+                      <span className="ml-2 text-sm text-gray-400 line-through font-normal">
+                        Rp {pkg.price.toLocaleString("id-ID")}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="text-base font-semibold text-gray-800">
+                      Rp {pkg.price.toLocaleString("id-ID")}
+                    </div>
+                  )}
+                </div>
+
+                {/* ADDITIONAL INFO */}
+                {pkg.additional.length > 0 && (
+                  <ul className="text-xs text-muted-foreground list-disc pl-4 mt-2 space-y-1 flex-1">
+                    {pkg.additional.map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+
+                {/* BUTTON */}
+                <button
+                  onClick={() => navigate(`/packages/${pkg.id}`)}
+                  className={`mt-auto w-full text-sm font-medium rounded-lg px-4 py-2 transition-colors ${
+                    pkg.isActive
+                      ? "bg-primary text-white hover:bg-primary/90"
+                      : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  }`}
+                  disabled={!pkg.isActive}
+                >
+                  {pkg.isActive ? "Buy Now" : "Unavailable"}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

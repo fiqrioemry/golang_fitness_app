@@ -43,9 +43,15 @@ export const buildFormData = (data) => {
     if (value === undefined || value === null) return;
 
     if (Array.isArray(value)) {
-      value.forEach((item) => {
-        formData.append(`${key}[]`, item);
-      });
+      if (value.length > 0 && value[0] instanceof File) {
+        value.forEach((file) => {
+          formData.append(key, file);
+        });
+      } else {
+        value.forEach((item) => {
+          formData.append(`${key}[]`, item);
+        });
+      }
     } else if (value instanceof File) {
       formData.append(key, value);
     } else {

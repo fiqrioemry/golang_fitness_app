@@ -3,24 +3,27 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
+import { Star, CirclePlus } from "lucide-react";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useInstructorsQuery } from "@/hooks/useInstructor";
-import { Star, Pencil, Trash2, CirclePlus } from "lucide-react";
+import { EditInstructor } from "@/components/admin/instructors/EditInstructor";
+import { DeleteInstructor } from "@/components/admin/instructors/DeleteInstructor";
 
 const InstructorsList = () => {
-  const navigate = useNavigate();
   const {
     data: instructors = [],
     isLoading,
     isError,
     refetch,
   } = useInstructorsQuery();
+  const navigate = useNavigate();
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+    <section className="section">
       {/* Header */}
       <div className="space-y-1 text-center">
         <h2 className="text-2xl font-bold">Instructors List</h2>
@@ -86,25 +89,8 @@ const InstructorsList = () => {
             </div>
 
             <div className="border-t p-4 flex justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(`/instructors/edit/${inst.id}`)}
-              >
-                <Pencil className="w-4 h-4 mr-1" />
-                Edit
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => {
-                  console.log("Delete", inst.id);
-                  // You can hook modal delete here
-                }}
-              >
-                <Trash2 className="w-4 h-4 mr-1" />
-                Delete
-              </Button>
+              <EditInstructor instructor={inst} />
+              <DeleteInstructor instructor={inst} />
             </div>
           </div>
         ))}

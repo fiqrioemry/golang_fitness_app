@@ -28,6 +28,7 @@ export const createClass = async (data) => {
 };
 
 export const updateClass = async (id, data) => {
+  console.log(data);
   const formData = buildFormData(data);
   const res = await authInstance.put(`/classes/${id}`, formData);
   return res.data;

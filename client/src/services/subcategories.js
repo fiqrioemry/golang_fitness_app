@@ -24,6 +24,7 @@ export const getSubcategoriesByCategory = async (categoryId) => {
 
 // POST /api/subcategories (Admin Only)
 export const createSubcategory = async (data) => {
+  console.log(data);
   const res = await authInstance.post("/subcategories", data);
   return res.data;
 };

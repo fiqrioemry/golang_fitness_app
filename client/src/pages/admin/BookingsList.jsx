@@ -1,7 +1,18 @@
 import React from "react";
 
 const BookingsList = () => {
-  return <div>BookingsList</div>;
+  return (
+    <section className="h-screen section">
+      <div>
+        <h2>bookings under construction</h2>
+        <img
+          className="h-96 object-container"
+          src="/under-construction.svg"
+          alt="under-construction"
+        />
+      </div>
+    </section>
+  );
 };
 
 export default BookingsList;

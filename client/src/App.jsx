@@ -1,6 +1,6 @@
-// src/App.jsx
 // public pages
 import Home from "./pages/Home";
+import About from "./pages/About";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Classes from "./pages/Classes";
@@ -10,19 +10,18 @@ import ClassDetail from "./pages/ClassDetail";
 import Profile from "./pages/customer/Profile";
 
 // admin pages
-
 import Dashboard from "./pages/admin/Dashboard";
 import UsersList from "./pages/admin/UsersList";
 import AddClass from "./pages/admin/classes/AddClass";
 import BookingsList from "./pages/admin/BookingsList";
 import VouchersList from "./pages/admin/VouchersList";
 import ReviewsLists from "./pages/admin/ReviewsLists";
-import Notifications from "./pages/admin/Notifications";
 import AddPackage from "./pages/admin/packages/AddPackage";
 import ClassesList from "./pages/admin/classes/ClassesList";
 import ClassOptions from "./pages/admin/classes/ClassOptions";
 import TransactionsList from "./pages/admin/TransactionsList";
 import PackagesList from "./pages/admin/packages/PackagesList";
+import NotificationsList from "./pages/admin/NotificationsList";
 import ClassSchedules from "./pages/admin/classes/ClassSchedules";
 import AddInstructors from "./pages/admin/instructors/AddInstructors";
 import InstructorsList from "./pages/admin/instructors/InstructorsList";
@@ -48,7 +47,6 @@ import { AdminRoute, AuthRoute, NonAuthRoute, PublicRoute } from "./middleware";
 import PublicLayout from "./components/public/PublicLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
-import About from "./pages/About";
 
 function App() {
   const { checkingAuth, authMe } = useAuthStore();
@@ -133,10 +131,10 @@ function App() {
           <Route path="packages" element={<PackagesList />} />
           <Route path="packages/add" element={<AddPackage />} />
           <Route path="instructors" element={<InstructorsList />} />
-          <Route path="notifications" element={<Notifications />} />
           <Route path="classes/options" element={<ClassOptions />} />
           <Route path="transactions" element={<TransactionsList />} />
           <Route path="instructors/add" element={<AddInstructors />} />
+          <Route path="notifications" element={<NotificationsList />} />
           <Route path="classes/schedules" element={<ClassSchedules />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>

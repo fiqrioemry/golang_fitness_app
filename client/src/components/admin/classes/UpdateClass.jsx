@@ -9,27 +9,20 @@ import { InputFileElement } from "@/components/input/InputFileElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
-import { Pencil } from "lucide-react";
 
 const UpdateClass = ({ classes }) => {
-  const { updateClass, isLoading } = useClassMutation();
+  const { updateClass } = useClassMutation();
+
+  const { isPending, mutateAsync } = updateClass;
 
   return (
     <FormDialog
-      loading={isLoading}
-      resourceId={classes.id}
-      title="Update Class"
       state={classes}
+      loading={isPending}
       schema={classSchema}
-      action={updateClass.mutateAsync}
-      buttonText={
-        <button
-          type="button"
-          className="text-primary hover:text-blue-600 transition"
-        >
-          <Pencil className="w-4 h-4" />
-        </button>
-      }
+      action={mutateAsync}
+      title="Update Class"
+      resourceId={classes.id}
     >
       <InputTextElement
         name="title"
@@ -90,10 +83,10 @@ const UpdateClass = ({ classes }) => {
         label="Additional Information"
         placeholder="Enter info, press enter to add"
       />
-      <InputFileElement name="images" label="Gallery (Optional)" />
+      <InputFileElement name="galleries" label="Gallery (Optional)" />
       <SwitchElement name="isActive" label="Set as active class" />
     </FormDialog>
   );
 };
 
-export default UpdateClass;
+export { UpdateClass };

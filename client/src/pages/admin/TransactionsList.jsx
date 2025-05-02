@@ -36,7 +36,7 @@ const TransactionsList = () => {
   const total = typeof response.total === "number" ? response.total : 0;
 
   return (
-    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+    <section className="section">
       <div className="space-y-1 text-center">
         <h2 className="text-2xl font-bold">Transaction List</h2>
         <p className="text-muted-foreground text-sm">

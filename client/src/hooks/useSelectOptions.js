@@ -3,6 +3,7 @@ import {
   useSubcategoriesQuery,
   useSubcategoryMutation,
 } from "@/hooks/useSubcategories";
+import { useClassesQuery } from "./useClass";
 import { useTypesQuery, useTypeMutation } from "@/hooks/useType";
 import { useLevelsQuery, useLevelMutation } from "@/hooks/useLevel";
 import { useLocationsQuery, useLocationMutation } from "@/hooks/useLocation";
@@ -20,6 +21,8 @@ export const useSelectOptions = (type) => {
       return useSubcategoriesQuery();
     case "type":
       return useTypesQuery();
+    case "class":
+      return useClassesQuery({ limit: 20 });
     default:
       throw new Error(`Unknown select type: ${type}`);
   }

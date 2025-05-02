@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
 import { usePackagesQuery } from "@/hooks/usePackage";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import DeletePackage from "@/pages/admin/packages/DeletePackage";
-import UpdatePackage from "@/pages/admin/packages/UpdatePackage";
+import { DeletePackage } from "@/components/admin/packages/DeletePackage";
+import { UpdatePackage } from "@/components/admin/packages/UpdatePackage";
 
 const PackagesList = () => {
   const {
@@ -25,7 +25,7 @@ const PackagesList = () => {
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+    <section className="section">
       <div className="space-y-1 text-center">
         <h2 className="text-2xl font-bold">Package Management</h2>
         <p className="text-muted-foreground text-sm">

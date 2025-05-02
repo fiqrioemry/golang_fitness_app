@@ -3,15 +3,16 @@ import { usePackageMutation } from "@/hooks/usePackage";
 import { FormDelete } from "@/components/form/FormDelete";
 
 const DeletePackage = ({ pkg }) => {
-  const { deletePackage, isLoading } = usePackageMutation();
+  const { deletePackage } = usePackageMutation();
+  const { mutateAsync, isPending } = deletePackage;
 
   const handleDeletePackage = () => {
-    deletePackage.mutateAsync(pkg.id);
+    mutateAsync(pkg.id);
   };
 
   return (
     <FormDelete
-      loading={isLoading}
+      loading={isPending}
       title="Delete Package"
       onDelete={handleDeletePackage}
       description="Are you sure want to delete this package ?"
@@ -19,4 +20,4 @@ const DeletePackage = ({ pkg }) => {
   );
 };
 
-export default DeletePackage;
+export { DeletePackage };

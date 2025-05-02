@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import AddOptions from "./options/AddOptions";
 import { Loading } from "@/components/ui/loading";
-import UpdateOptions from "./options/UpdateOptions";
-import DeleteOptions from "./options/DeleteOptions";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useSelectOptions } from "@/hooks/useSelectOptions";
+import { AddOptions } from "@/components/admin/classes/AddOptions";
+import { UpdateOptions } from "@/components/admin/classes/UpdateOptions";
+import { DeleteOptions } from "@/components/admin/classes/DeleteOptions";
 
 const tabs = [
   { label: "Type", type: "type" },
@@ -24,6 +24,7 @@ const ClassOptions = () => {
   } = useSelectOptions(activeTab);
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const renderMap = (geoLocation) => {
@@ -45,7 +46,7 @@ const ClassOptions = () => {
   };
 
   return (
-    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+    <section className="section">
       {/* Header */}
       <div className="space-y-1 text-center">
         <h2 className="text-2xl font-bold">Class Options</h2>

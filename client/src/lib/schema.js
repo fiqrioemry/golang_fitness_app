@@ -63,6 +63,7 @@ export const classSchema = z.object({
   subcategoryId: z.string().min(1, "Subcategory is required"),
   image: z.union([z.instanceof(File), z.string().url()]),
   images: z.array(imageItemSchema).optional(),
+  isActive: z.boolean().optional(),
 });
 
 export const packageSchema = z.object({
@@ -70,14 +71,24 @@ export const packageSchema = z.object({
   description: z.string().min(20, "Description must be at least 20 characters"),
   price: z.number().positive("Price must be greater than 0"),
   credit: z.number().positive("Credit must be greater than 0"),
+  discount: z
+    .number()
+    .min(0, "Discount cannot be negative")
+    .max(100, "Discount cannot exceed 100"),
   isActive: z.boolean(),
   expired: z.number().min(1, "Expiry duration is required"),
   additional: z.array(z.string()).optional(),
   image: z.union([z.instanceof(File), z.string().url()]),
+  isActive: z.boolean().optional(),
 });
 
 export const optionSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
+});
+
+export const subcategorySchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  categoryId: z.string().min(1, "Category is required"),
 });
 
 export const locationSchema = z.object({
@@ -134,14 +145,7 @@ export const createPaymentSchema = z.object({
   packageId: z.string().min(1, "Package is required"),
 });
 
-export const createInstructorSchema = z.object({
-  userId: z.string().min(1, "User is required"),
-  experience: z.number().min(1, "Minimum 1 year experience required"),
-  specialties: z.string().min(1, "Specialties are required"),
-  certifications: z.string().optional(),
-});
-
-export const updateInstructorSchema = z.object({
+export const instructorSchema = z.object({
   userId: z.string().min(1, "User is required"),
   experience: z.number().optional(),
   specialties: z.string().optional(),

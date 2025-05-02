@@ -1,10 +1,10 @@
 import React from "react";
 
-const ReviewsLists = () => {
+const NotificationsList = () => {
   return (
     <section className="h-screen section">
       <div>
-        <h2>reviews under construction</h2>
+        <h2>notification under construction</h2>
         <img
           className="h-96 object-container"
           src="/under-construction.svg"
@@ -15,4 +15,4 @@ const ReviewsLists = () => {
   );
 };
 
-export default ReviewsLists;
+export default NotificationsList;

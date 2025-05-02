@@ -19,4 +19,4 @@ const DeleteOptions = ({ option, activeTab }) => {
   );
 };
 
-export default DeleteOptions;
+export { DeleteOptions };

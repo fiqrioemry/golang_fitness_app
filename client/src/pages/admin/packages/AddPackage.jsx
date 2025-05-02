@@ -1,21 +1,20 @@
 import React from "react";
 import { packageSchema } from "@/lib/schema";
 import { packageState } from "@/lib/constant";
-import { useNavigate } from "react-router-dom";
 import { usePackageMutation } from "@/hooks/usePackage";
 import { FormInput } from "@/components/form/FormInput";
-import { SwitchElement } from "@/components/input/SwitchElement";
 import { InputFileElement } from "@/components/input/InputFileElement";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
+import { MultiSelectElement } from "@/components/input/MultiSelectElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
 const AddPackage = () => {
   const { createPackage } = usePackageMutation();
 
   return (
-    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+    <section className="section">
       <div className="space-y-1 text-center">
         <h2 className="text-2xl font-bold">Add New Package</h2>
         <p className="text-muted-foreground text-sm">
@@ -25,10 +24,10 @@ const AddPackage = () => {
 
       <div className="bg-white rounded-xl shadow-sm border p-6">
         <FormInput
-          className="w-72"
+          className="w-full md:w-72"
           state={packageState}
           schema={packageSchema}
-          text={"Submit New Package"}
+          text={"Add New Package"}
           isLoading={createPackage.isPending}
           action={createPackage.mutateAsync}
         >
@@ -47,7 +46,7 @@ const AddPackage = () => {
                 maxLength={200}
               />
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <InputNumberElement
                   name="price"
                   label="Price (Rp)"
@@ -60,21 +59,25 @@ const AddPackage = () => {
                 />
                 <InputNumberElement
                   name="expired"
-                  label="Expiry (days)"
+                  label="Expired"
                   placeholder="e.g. 60"
                 />
+                <InputNumberElement
+                  name="discount"
+                  maxLength={2}
+                  label="Discount"
+                  placeholder="e.g. 10 (10%)"
+                />
               </div>
-
+              <MultiSelectElement
+                name="classIds"
+                label="Accessible Classes"
+                data="class"
+              />
               <InputTagsElement
                 name="additional"
                 label="Additional Information"
                 placeholder="e.g. Non-refundable, press Enter"
-              />
-
-              <SwitchElement
-                name="isActive"
-                label="Active Status"
-                description="Enable to display this package on the user purchase page."
               />
             </div>
 

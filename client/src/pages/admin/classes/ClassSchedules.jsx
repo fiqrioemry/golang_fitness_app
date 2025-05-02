@@ -1,7 +1,7 @@
 import React from "react";
 
 const ClassSchedules = () => {
-  return <div>ClassSchedules</div>;
+  return <section className="section">ClassSchedules</section>;
 };
 
 export default ClassSchedules;

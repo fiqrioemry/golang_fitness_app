@@ -20,4 +20,4 @@ const DeleteClass = ({ classes }) => {
   );
 };
 
-export default DeleteClass;
+export { DeleteClass };

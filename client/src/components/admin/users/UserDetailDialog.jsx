@@ -85,4 +85,4 @@ const UserDetailDialog = ({ userId, trigger }) => {
   );
 };
 
-export default UserDetailDialog;
+export { UserDetailDialog };

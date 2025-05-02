@@ -25,7 +25,7 @@ import { Eye, ArrowDown, ArrowUp } from "lucide-react";
 import { Pagination } from "@/components/ui/Pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import UserDetailDialog from "@/components/admin/UserDetailDialog";
+import { UserDetailDialog } from "@/components/admin/users/UserDetailDialog";
 
 const UsersList = () => {
   const limit = 10;
@@ -52,7 +52,7 @@ const UsersList = () => {
   };
 
   return (
-    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+    <section className="section">
       <div className="space-y-1 text-center">
         <h2 className="text-2xl font-bold">User List</h2>
         <p className="text-muted-foreground text-sm">

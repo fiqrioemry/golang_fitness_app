@@ -1,7 +1,7 @@
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Controller, useFormContext } from "react-hook-form";
 import { useSelectOptions } from "@/hooks/useSelectOptions";
+import { Controller, useFormContext } from "react-hook-form";
 
 const SelectOptionsElement = ({
   name,

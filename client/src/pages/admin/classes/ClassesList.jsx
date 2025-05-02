@@ -1,11 +1,11 @@
 import { Plus } from "lucide-react";
-import DeleteClass from "./DeleteClass";
-import UpdateClass from "./UpdateClass";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loading } from "@/components/ui/Loading";
 import { useClassesQuery } from "@/hooks/useClass";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { DeleteClass } from "@/components/admin/classes/DeleteClass";
+import { UpdateClass } from "@/components/admin/classes/UpdateClass";
 
 const ClassesList = () => {
   const navigate = useNavigate();
@@ -20,8 +20,9 @@ const ClassesList = () => {
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const classes = data?.classes || [];
+
   return (
-    <section className="max-w-8xl mx-auto px-4 py-8 space-y-6">
+    <section className="section">
       <div className="space-y-1 text-center">
         <h2 className="text-2xl font-bold">Class Management</h2>
         <p className="text-muted-foreground text-sm">

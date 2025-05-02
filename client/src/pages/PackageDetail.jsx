@@ -62,9 +62,14 @@ const PackageDetail = () => {
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
-  const tax = pkg.price * 0.05;
+  const discountedPrice =
+    pkg.Discount && pkg.Discount > 0
+      ? pkg.price * (1 - pkg.Discount / 100)
+      : pkg.price;
 
-  const totalPrice = pkg.price + tax;
+  const tax = discountedPrice * 0.1;
+
+  const totalPrice = discountedPrice + tax;
 
   return (
     <>
@@ -91,10 +96,29 @@ const PackageDetail = () => {
             <div>
               <h2 className="text-3xl font-bold mb-1">{pkg.name}</h2>
               <p className="text-muted-foreground text-sm">{pkg.description}</p>
-              <div className="mt-2">
+              <div className="mt-2 flex items-center gap-2 flex-wrap">
                 <Badge variant="outline">
-                  {pkg.credit} Credits • Rp {pkg.price.toLocaleString("id-ID")}
+                  {pkg.credit} Credits •{" "}
+                  {pkg.Discount > 0 ? (
+                    <>
+                      <span className="line-through text-red-500 ml-1">
+                        Rp {pkg.price.toLocaleString("id-ID")}
+                      </span>
+                      <span className="ml-2 text-green-600 font-semibold">
+                        Rp {discountedPrice.toLocaleString("id-ID")}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="ml-1">
+                      Rp {pkg.price.toLocaleString("id-ID")}
+                    </span>
+                  )}
                 </Badge>
+                {pkg.Discount > 0 && (
+                  <Badge className="bg-green-600 text-white">
+                    {pkg.Discount}% Discount
+                  </Badge>
+                )}
               </div>
             </div>
 
@@ -109,6 +133,33 @@ const PackageDetail = () => {
                 ))}
               </ul>
             </div>
+            {pkg.classes && pkg.classes.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-3">
+                  🧘 Classes Included in This Package
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {pkg.classes.map((cls) => (
+                    <div
+                      key={cls.id}
+                      className="flex items-center gap-4 bg-gray-50 border rounded-xl p-3 shadow-sm"
+                    >
+                      <img
+                        src={cls.image}
+                        alt={cls.title}
+                        className="w-16 h-16 rounded object-cover border"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{cls.title}</p>
+                        <p className="text-muted-foreground text-xs">
+                          {cls.duration} minutes
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="bg-white border shadow-md rounded-2xl p-5 sticky top-24 space-y-4">
@@ -116,10 +167,29 @@ const PackageDetail = () => {
 
             <div className="text-sm text-muted-foreground flex justify-between">
               <span>Base Price</span>
-              <span>Rp {pkg.price.toLocaleString("id-ID")}</span>
+              {pkg.Discount > 0 ? (
+                <span>
+                  <span className="line-through text-red-500 mr-1">
+                    Rp {pkg.price.toLocaleString("id-ID")}
+                  </span>
+                  <span className="text-green-600 font-semibold">
+                    Rp {discountedPrice.toLocaleString("id-ID")}
+                  </span>
+                </span>
+              ) : (
+                <span>Rp {pkg.price.toLocaleString("id-ID")}</span>
+              )}
             </div>
+
+            {pkg.Discount > 0 && (
+              <div className="text-sm text-green-600 flex justify-between">
+                <span> Discount</span>
+                <span>-{pkg.Discount}%</span>
+              </div>
+            )}
+
             <div className="text-sm text-muted-foreground flex justify-between">
-              <span>Tax (5%)</span>
+              <span>Tax (10%)</span>
               <span>Rp {tax.toLocaleString("id-ID")}</span>
             </div>
 
