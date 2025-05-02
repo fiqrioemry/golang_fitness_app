@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	"server/internal/models"
+	"server/internal/utils"
 )
 
 func SeedUsers(db *gorm.DB) {
@@ -509,6 +510,7 @@ func SeedPackages(db *gorm.DB) {
 			Description:    "1x Class Trial for new members.",
 			Price:          500000,
 			Credit:         1,
+			Discount:       25,
 			Expired:        14, // 14 hari
 			AdditionalList: []string{"Valid for 14 days after first booking."},
 			Image:          "https://placehold.co/400x400/orange/white",
@@ -521,6 +523,7 @@ func SeedPackages(db *gorm.DB) {
 			Description:    "Enjoy 5 reformer classes package.",
 			Price:          2250000,
 			Credit:         5,
+			Discount:       15,
 			Expired:        60, // 2 bulan
 			AdditionalList: []string{"Valid for 2 months after first booking.", "Cannot Be Refund"},
 			Image:          "https://placehold.co/400x400/blue/white",
@@ -533,6 +536,7 @@ func SeedPackages(db *gorm.DB) {
 			Description:    "Maximize your training with 10 sessions!",
 			Price:          4100000,
 			Credit:         10,
+			Discount:       0,
 			Expired:        120, // 4 bulan
 			AdditionalList: []string{"Valid for 4 months after first booking.", "Cannot Be Refund"},
 			Image:          "https://placehold.co/400x400/green/white",
@@ -545,6 +549,7 @@ func SeedPackages(db *gorm.DB) {
 			Description:    "Special promo for FTM x SANE group class.",
 			Price:          100000,
 			Credit:         1,
+			Discount:       5,
 			Expired:        14,
 			AdditionalList: []string{"Valid for 14 days after first booking."},
 			Image:          "https://placehold.co/400x400/orange/white",
@@ -557,6 +562,7 @@ func SeedPackages(db *gorm.DB) {
 			Description:    "Bundle of 2 classes for group sessions.",
 			Price:          275000,
 			Credit:         2,
+			Discount:       0,
 			Expired:        20,
 			AdditionalList: []string{"Valid for 20 days after first booking."},
 			Image:          "https://placehold.co/400x400/blue/white",
@@ -570,6 +576,32 @@ func SeedPackages(db *gorm.DB) {
 	} else {
 		log.Println("✅ Successfully seeded packages!")
 	}
+
+	var firstPackage models.Package
+
+	var classes []models.Class
+
+	if err := db.First(&firstPackage).Error; err != nil {
+		log.Println("❌ Failed to fetch first package:", err)
+		return
+	}
+	if err := db.Limit(2).Find(&classes).Error; err != nil {
+		log.Println("❌ Failed to fetch 2 classes:", err)
+		return
+	}
+
+	if len(classes) < 2 {
+		log.Println("❌ Not enough classes for seeding package_classes")
+		return
+	}
+
+	// GORM many2many: cukup assign ID class ke relasi slice
+	if err := db.Model(&firstPackage).Association("Classes").Replace(&classes); err != nil {
+		log.Println("❌ Failed to associate package with classes:", err)
+		return
+	}
+
+	log.Println("✅ Successfully associated 1 package with 2 classes!")
 }
 
 func SeedInstructors(db *gorm.DB) {
@@ -622,8 +654,8 @@ func SeedPayments(db *gorm.DB) {
 		return
 	}
 
-	// Fetch user dan package
 	var user models.User
+
 	var pkg models.Package
 	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
 		log.Println("Failed to find customer user:", err)
@@ -633,6 +665,11 @@ func SeedPayments(db *gorm.DB) {
 		log.Println("Failed to find package:", err)
 		return
 	}
+	taxRate := utils.GetTaxRate()
+	discounted := pkg.Price * (1 - pkg.Discount/100)
+	base := discounted
+	tax := base * taxRate
+	total := base + tax
 
 	payments := []models.Payment{
 		{
@@ -640,6 +677,9 @@ func SeedPayments(db *gorm.DB) {
 			UserID:        user.ID,
 			PackageID:     pkg.ID,
 			PaymentMethod: "bank_transfer",
+			BasePrice:     base,
+			Tax:           tax,
+			Total:         total,
 			Status:        "success",
 			PaidAt:        time.Now(),
 		},

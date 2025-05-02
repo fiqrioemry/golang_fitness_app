@@ -220,6 +220,9 @@ type Payment struct {
 	PaymentMethod string    `gorm:"type:varchar(50);not null" json:"paymentMethod"`
 	Status        string    `gorm:"type:varchar(20);default:'pending';check:status IN ('success', 'pending', 'failed')" json:"status"`
 	PaidAt        time.Time `gorm:"autoCreateTime" json:"paidAt"`
+	BasePrice     float64   `gorm:"type:decimal(10,2);not null"`
+	Tax           float64   `gorm:"type:decimal(10,2);not null"`
+	Total         float64   `gorm:"type:decimal(10,2);not null"`
 
 	Package Package `gorm:"foreignKey:PackageID" json:"package"`
 	User    User    `gorm:"foreignKey:UserID" json:"user"`

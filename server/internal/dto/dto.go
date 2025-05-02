@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// AUTHENTICATION  ==============
 type RegisterRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
@@ -38,7 +39,9 @@ type AuthMeResponse struct {
 	Role     string `json:"role"`
 }
 
-// class request
+// AUTHENTICATION  =============
+
+// CLASS  ======================
 type CreateClassRequest struct {
 	Title         string                  `form:"title" binding:"required"`
 	Duration      int                     `form:"duration" binding:"required,min=15"`
@@ -71,7 +74,6 @@ type UpdateClassRequest struct {
 	ImageURL      string                `form:"-"`
 }
 
-// class response
 type ClassQueryParam struct {
 	Q          string `form:"q"`
 	TypeID     string `form:"typeId"`
@@ -125,7 +127,9 @@ type ClassResponse struct {
 	CreatedAt     string   `json:"createdAt"`
 }
 
-// Category
+// CLASS  ========================
+
+// CLASS CATEGORY ================
 type CreateCategoryRequest struct {
 	Name string `json:"name" binding:"required,min=2"`
 }
@@ -139,8 +143,9 @@ type CategoryResponse struct {
 	Name string `json:"name"`
 }
 
-// Subcategory
+// CLASS CATEGORY ================
 
+// CLASS SUBCATEGORY =============
 type CreateSubcategoryRequest struct {
 	Name       string `json:"name" binding:"required,min=2"`
 	CategoryID string `json:"categoryId" binding:"required"`
@@ -157,7 +162,9 @@ type SubcategoryResponse struct {
 	CategoryID string `json:"categoryId"`
 }
 
-// Type class
+// CLASS SUBCATEGORY =============
+
+// CLASS TYPE ====================
 type CreateTypeRequest struct {
 	Name string `json:"name" binding:"required,min=2"`
 }
@@ -171,7 +178,9 @@ type TypeResponse struct {
 	Name string `json:"name"`
 }
 
-// Level class
+// CLASS TYPE ===================
+
+// CLASS LEVEL ==================
 type CreateLevelRequest struct {
 	Name string `json:"name" binding:"required,min=2"`
 }
@@ -185,7 +194,9 @@ type LevelResponse struct {
 	Name string `json:"name"`
 }
 
-// location
+// CLASS LEVEL ==================
+
+// LOCATION =====================
 type CreateLocationRequest struct {
 	Name        string `json:"name" binding:"required,min=2"`
 	Address     string `json:"address" binding:"required"`
@@ -204,6 +215,8 @@ type LocationResponse struct {
 	Address     string `json:"address"`
 	GeoLocation string `json:"geoLocation"`
 }
+
+// LOCATION =========================
 
 // PACKAGE ==========================
 type CreatePackageRequest struct {
@@ -529,6 +542,8 @@ type TransactionResponse struct {
 	PackageName   string  `json:"packageName"`
 	PaymentMethod string  `json:"paymentMethod"`
 	Status        string  `json:"status"`
+	BasePrice     float64 `json:"basePrice"`
+	Tax           float64 `json:"taxRate"`
 	Price         float64 `json:"price"`
 	PaidAt        string  `json:"paidAt"`
 }

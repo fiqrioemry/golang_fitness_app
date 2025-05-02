@@ -2,6 +2,7 @@ package utils
 
 import (
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -66,4 +67,16 @@ func ParseBoolFormField(c *gin.Context, field string) (bool, error) {
 		return false, nil
 	}
 	return strconv.ParseBool(val)
+}
+
+func GetTaxRate() float64 {
+	val := os.Getenv("PAYMENT_TAX_RATE")
+	if val == "" {
+		return 0.05
+	}
+	rate, err := strconv.ParseFloat(val, 64)
+	if err != nil || rate < 0 {
+		return 0.05
+	}
+	return rate
 }

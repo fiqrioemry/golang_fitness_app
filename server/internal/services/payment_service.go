@@ -6,6 +6,7 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
+	"server/internal/utils"
 	"time"
 
 	"github.com/google/uuid"
@@ -36,7 +37,6 @@ func NewPaymentService(paymentRepo repositories.PaymentRepository, packageRepo r
 }
 
 func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentRequest) (*dto.CreatePaymentResponse, error) {
-	// Fetch package info
 	pkg, err := s.packageRepo.GetPackageByID(req.PackageID)
 	if err != nil {
 		return nil, errors.New("package not found")
@@ -47,10 +47,13 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 		return nil, errors.New("user not found")
 	}
 
-	// Generate Payment ID
-	paymentID := uuid.New()
+	taxRate := utils.GetTaxRate()
+	discounted := pkg.Price * (1 - pkg.Discount/100)
+	base := discounted
+	tax := base * taxRate
+	total := base + tax
 
-	// Create Payment record
+	paymentID := uuid.New()
 	payment := models.Payment{
 		ID:            paymentID,
 		PackageID:     pkg.ID,
@@ -58,17 +61,19 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 		PaymentMethod: "-",
 		Status:        "pending",
 		PaidAt:        time.Now(),
+		BasePrice:     base,
+		Tax:           tax,
+		Total:         total,
 	}
 
 	if err := s.paymentRepo.CreatePayment(&payment); err != nil {
 		return nil, err
 	}
 
-	// Create Midtrans Snap request
 	snapReq := &snap.Request{
 		TransactionDetails: midtrans.TransactionDetails{
 			OrderID:  paymentID.String(),
-			GrossAmt: int64(pkg.Price),
+			GrossAmt: int64(total),
 		},
 		CustomerDetail: &midtrans.CustomerDetails{
 			Email: user.Email,
@@ -76,15 +81,16 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 	}
 
 	snapResp, err := config.SnapClient.CreateTransaction(snapReq)
+	if err != nil {
+		return nil, err
+	}
 
 	return &dto.CreatePaymentResponse{
 		PaymentID: paymentID.String(),
 		SnapToken: snapResp.Token,
 		SnapURL:   snapResp.RedirectURL,
 	}, nil
-
 }
-
 func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationRequest) error {
 	payment, err := s.paymentRepo.GetPaymentByOrderID(req.OrderID)
 	if err != nil {

@@ -99,6 +99,7 @@ func (s *profileService) GetUserTransactions(userID string, page, limit int) (*d
 		payments = make([]models.Payment, 0)
 	}
 
+	taxRate := utils.GetTaxRate()
 	var transactions []dto.TransactionResponse
 	for _, p := range payments {
 		transactions = append(transactions, dto.TransactionResponse{
@@ -107,7 +108,9 @@ func (s *profileService) GetUserTransactions(userID string, page, limit int) (*d
 			PackageName:   p.Package.Name,
 			PaymentMethod: p.PaymentMethod,
 			Status:        p.Status,
-			Price:         p.Package.Price,
+			BasePrice:     p.BasePrice,
+			Tax:           taxRate,
+			Price:         p.Total,
 			PaidAt:        p.PaidAt.Format("2006-01-02 15:04:05"),
 		})
 	}
