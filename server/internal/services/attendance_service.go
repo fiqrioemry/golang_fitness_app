@@ -67,13 +67,13 @@ func (s *attendanceService) GetAllAttendances() ([]dto.AttendanceResponse, error
 			checkedAt = a.CheckedAt.Format(time.RFC3339)
 		}
 		result = append(result, dto.AttendanceResponse{
-			ID:           a.ID.String(),
-			ClassTitle:   a.ClassSchedule.Class.Title,
-			UserFullname: a.User.Profile.Fullname,
-			StartTime:    a.ClassSchedule.StartTime.Format(time.RFC3339),
-			EndTime:      a.ClassSchedule.EndTime.Format(time.RFC3339),
-			Status:       a.Status,
-			CheckedAt:    checkedAt,
+			ID:          a.ID.String(),
+			ClassName:   a.ClassSchedule.Class.Title,
+			Fullname:    a.User.Profile.Fullname,
+			StartHour:   a.ClassSchedule.StartHour,
+			StartMinute: a.ClassSchedule.StartMinute,
+			Status:      a.Status,
+			CheckedAt:   checkedAt,
 		})
 	}
 	return result, nil
@@ -99,15 +99,15 @@ func (s *attendanceService) ExportAttendancesToExcel() (*excelize.File, error) {
 	// Isi data
 	for i, a := range attendances {
 		row := i + 2
-		startTime := a.ClassSchedule.StartTime.Format("2006-01-02 15:04")
-		endTime := a.ClassSchedule.EndTime.Format("2006-01-02 15:04")
+		startHour := a.ClassSchedule.StartHour
+		startMinute := a.ClassSchedule.StartMinute
 
 		values := []interface{}{
 			i + 1,
 			a.User.Profile.Fullname,
 			a.ClassSchedule.Class.Title,
-			startTime,
-			endTime,
+			startHour,
+			startMinute,
 			a.Status,
 		}
 

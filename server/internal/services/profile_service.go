@@ -176,19 +176,18 @@ func (s *profileService) GetUserBookings(userID string, page, limit int) (*dto.B
 		instructor := cs.Instructor.User.Profile
 
 		responses = append(responses, dto.BookingResponse{
-			ID:               b.ID.String(),
-			Status:           b.Status,
-			BookedAt:         b.CreatedAt.Format("2006-01-02 15:04:05"),
-			ClassID:          c.ID.String(),
-			ClassTitle:       c.Title,
-			ClassImage:       c.Image,
-			Duration:         c.Duration,
-			StartTime:        cs.StartTime.Format("2006-01-02 15:04"),
-			EndTime:          cs.EndTime.Format("2006-01-02 15:04"),
-			LocationName:     loc.Name,
-			LocationAddress:  loc.Address,
-			InstructorName:   instructor.Fullname,
-			ParticipantCount: cs.BookedCount,
+			ID:          b.ID.String(),
+			Status:      b.Status,
+			BookedAt:    b.CreatedAt.Format("2006-01-02 15:04:05"),
+			ClassID:     c.ID.String(),
+			ClassTitle:  c.Title,
+			ClassImage:  c.Image,
+			Duration:    c.Duration,
+			StartHour:   cs.StartHour,
+			StartMinute: cs.StartMinute,
+			Location:    loc.Name,
+			Instructor:  instructor.Fullname,
+			Participant: cs.BookedCount,
 		})
 	}
 

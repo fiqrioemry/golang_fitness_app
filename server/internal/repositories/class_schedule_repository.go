@@ -47,7 +47,13 @@ func (r *classScheduleRepository) GetClassScheduleByID(id string) (*models.Class
 
 func (r *classScheduleRepository) GetClassSchedules() ([]models.ClassSchedule, error) {
 	var schedules []models.ClassSchedule
-	if err := r.db.Preload("Class").Preload("Instructor.User.Profile").Order("start_time asc").Find(&schedules).Error; err != nil {
+	if err := r.db.
+		Preload("Class").
+		Preload("Instructor.User.Profile").
+		Order("date asc").
+		Order("start_hour asc").
+		Order("start_minute asc").
+		Find(&schedules).Error; err != nil {
 		return nil, err
 	}
 	return schedules, nil
@@ -58,7 +64,8 @@ func (r *classScheduleRepository) GetClassSchedulesWithFilter(filter dto.ClassSc
 	db := r.db.
 		Preload("Class.Category").
 		Preload("Instructor.User.Profile").
-		Order("start_time asc")
+		Order("start_hour asc").
+		Order("start_minute asc")
 
 	if filter.StartDate != "" {
 		if date, err := time.Parse("2006-01-02", filter.StartDate); err == nil {

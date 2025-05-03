@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -241,8 +242,10 @@ type ClassSchedule struct {
 	InstructorID uuid.UUID `gorm:"type:char(36);not null" json:"instructorId"`
 	Capacity     int       `gorm:"not null" json:"capacity"`
 	IsActive     bool      `gorm:"default:true" json:"isActive"`
-	StartTime    time.Time `gorm:"not null" json:"startTime"`
-	EndTime      time.Time `gorm:"not null" json:"endTime"`
+	Color        string    `gorm:"type:varchar(20)" json:"color"`
+	Date         time.Time `gorm:"not null" json:"date"`
+	StartHour    int       `json:"startHour"`
+	StartMinute  int       `json:"startMinute"`
 
 	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
 	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`
@@ -253,6 +256,44 @@ type ClassSchedule struct {
 func (cs *ClassSchedule) BeforeCreate(tx *gorm.DB) (err error) {
 	if cs.ID == uuid.Nil {
 		cs.ID = uuid.New()
+	}
+	return
+}
+
+type ScheduleTemplate struct {
+	ID           uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	ClassID      uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
+	InstructorID uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
+	DayOfWeeks   datatypes.JSON `gorm:"type:json" json:"dayOfWeeks"`
+	StartHour    int            `gorm:"not null" json:"startHour"`   // 0-23
+	StartMinute  int            `gorm:"not null" json:"startMinute"` // 0-59
+	Capacity     int            `gorm:"not null" json:"capacity"`
+	IsActive     bool           `gorm:"default:true" json:"isActive"`
+	CreatedAt    time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+}
+
+func (s *ScheduleTemplate) BeforeCreate(tx *gorm.DB) (err error) {
+	if s.ID == uuid.Nil {
+		s.ID = uuid.New()
+	}
+	return
+}
+
+type RecurrenceRule struct {
+	ID         uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	TemplateID uuid.UUID      `gorm:"type:char(36);not null;index" json:"templateId"`
+	Frequency  string         `gorm:"type:enum('recurring','non-recurring');not null" json:"frequency"`
+	EndType    string         `gorm:"type:enum('never','until');not null" json:"endType"` // never or until
+	EndDate    *time.Time     `json:"endDate,omitempty"`
+	CreatedAt  time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
+
+	Template ScheduleTemplate `gorm:"foreignKey:TemplateID"`
+}
+
+func (r *RecurrenceRule) BeforeCreate(tx *gorm.DB) (err error) {
+	if r.ID == uuid.Nil {
+		r.ID = uuid.New()
 	}
 	return
 }
@@ -428,25 +469,6 @@ type Instructor struct {
 func (i *Instructor) BeforeCreate(tx *gorm.DB) (err error) {
 	if i.ID == uuid.Nil {
 		i.ID = uuid.New()
-	}
-	return
-}
-
-type ScheduleTemplate struct {
-	ID           uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	ClassID      uuid.UUID `gorm:"type:char(36);not null" json:"classId"`
-	InstructorID uuid.UUID `gorm:"type:char(36);not null" json:"instructorId"`
-	DayOfWeek    int       `gorm:"not null" json:"dayOfWeek"`   // 0=Sunday, 6=Saturday
-	StartHour    int       `gorm:"not null" json:"startHour"`   // 0-23
-	StartMinute  int       `gorm:"not null" json:"startMinute"` // 0-59
-	Capacity     int       `gorm:"not null" json:"capacity"`
-	IsActive     bool      `gorm:"default:true" json:"isActive"`
-	CreatedAt    time.Time `gorm:"autoCreateTime" json:"createdAt"`
-}
-
-func (s *ScheduleTemplate) BeforeCreate(tx *gorm.DB) (err error) {
-	if s.ID == uuid.Nil {
-		s.ID = uuid.New()
 	}
 	return
 }

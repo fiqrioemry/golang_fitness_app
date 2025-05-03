@@ -12,5 +12,8 @@ func ScheduleTemplateRoutes(r *gin.Engine, handler *handlers.ScheduleTemplateHan
 	template.Use(middleware.AuthRequired(), middleware.AdminOnly())
 	template.POST("", handler.CreateTemplate)
 	template.POST("/auto-generate", handler.AutoGenerateSchedules)
+	template.POST("/recurring", handler.CreateRecurringScheduleTemplate)
+	template.PUT("/:id", handler.UpdateTemplate)
+	template.DELETE("/:id", handler.DeleteTemplate)
 
 }

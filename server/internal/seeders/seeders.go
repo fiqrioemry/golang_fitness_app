@@ -1,12 +1,14 @@
 package seeders
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 
 	"server/internal/models"
@@ -741,22 +743,20 @@ func SeedUserPackages(db *gorm.DB) {
 func getExpiredDays(pkg models.Package) int {
 	return 30
 }
-
 func SeedClassSchedules(db *gorm.DB) {
 	var count int64
 	db.Model(&models.ClassSchedule{}).Count(&count)
-
 	if count > 0 {
 		log.Println("ClassSchedules already seeded, skipping...")
 		return
 	}
 
-	var class models.Class
-
+	var classes []models.Class
 	var instructor models.Instructor
 
-	if err := db.First(&class).Error; err != nil {
-		log.Println("Failed to find class:", err)
+	// Ambil minimal 2 class & 1 instructor
+	if err := db.Limit(2).Find(&classes).Error; err != nil || len(classes) < 2 {
+		log.Println("Failed to find classes:", err)
 		return
 	}
 	if err := db.First(&instructor).Error; err != nil {
@@ -764,61 +764,74 @@ func SeedClassSchedules(db *gorm.DB) {
 		return
 	}
 
-	startTime := time.Now().AddDate(0, 0, 2).Truncate(time.Hour).Add(10 * time.Hour)
-	endTime := startTime.Add(time.Minute * time.Duration(class.Duration))
-
-	schedules := []models.ClassSchedule{
-		{
-			ID:           uuid.New(),
-			ClassID:      class.ID,
-			InstructorID: instructor.ID,
-			StartTime:    startTime,
-			EndTime:      endTime,
-			Capacity:     10,
-			IsActive:     true,
-		},
+	colors := []string{
+		"#f87171", "#fb923c", "#60a5fa", "#a78bfa", "#4ade80",
+		"#f472b6", "#34d399", "#fbbf24", "#c084fc", "#10b981",
 	}
 
 	now := time.Now()
+	date := now.AddDate(0, 0, 2).Truncate(24 * time.Hour)
 
-	schedules = append(schedules,
-		models.ClassSchedule{
-			ID:           uuid.New(),
-			ClassID:      class.ID,
-			InstructorID: instructor.ID,
-			StartTime:    now.AddDate(0, 0, 4).Truncate(time.Hour).Add(8 * time.Hour),
-			EndTime:      now.AddDate(0, 0, 4).Truncate(time.Hour).Add(9 * time.Hour),
-			Capacity:     12,
-			IsActive:     true,
+	schedules := []models.ClassSchedule{
+		// Awal
+		{
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
+			Date: date, StartHour: 10, StartMinute: 0, Capacity: 10,
+			IsActive: true, Color: colors[0],
 		},
-		models.ClassSchedule{
-			ID:           uuid.New(),
-			ClassID:      class.ID,
-			InstructorID: instructor.ID,
-			StartTime:    now.AddDate(0, 0, 6).Truncate(time.Hour).Add(13 * time.Hour),
-			EndTime:      now.AddDate(0, 0, 6).Truncate(time.Hour).Add(14 * time.Hour),
-			Capacity:     8,
-			IsActive:     true,
+		{
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
+			Date: date.AddDate(0, 0, 2), StartHour: 9, StartMinute: 30, Capacity: 12,
+			IsActive: true, Color: colors[1],
 		},
-		models.ClassSchedule{
-			ID:           uuid.New(),
-			ClassID:      class.ID,
-			InstructorID: instructor.ID,
-			StartTime:    now.AddDate(0, 1, 0).Truncate(time.Hour).Add(18 * time.Hour),
-			EndTime:      now.AddDate(0, 1, 0).Truncate(time.Hour).Add(19 * time.Hour),
-			Capacity:     10,
-			IsActive:     true,
+		{
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
+			Date: date.AddDate(0, 0, 2), StartHour: 11, StartMinute: 30, Capacity: 8,
+			IsActive: true, Color: colors[2],
 		},
-		models.ClassSchedule{
-			ID:           uuid.New(),
-			ClassID:      class.ID,
-			InstructorID: instructor.ID,
-			StartTime:    now.AddDate(0, 0, 10).Truncate(time.Hour).Add(7 * time.Hour),
-			EndTime:      now.AddDate(0, 0, 10).Truncate(time.Hour).Add(8 * time.Hour),
-			Capacity:     6,
-			IsActive:     true,
+		{
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
+			Date: date.AddDate(0, 0, 2), StartHour: 14, StartMinute: 30, Capacity: 10,
+			IsActive: true, Color: colors[3],
 		},
-	)
+		{
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
+			Date: date.AddDate(0, 0, 2), StartHour: 12, StartMinute: 30, Capacity: 6,
+			IsActive: true, Color: colors[4],
+		},
+
+		{
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
+			Date: date.AddDate(0, 0, 3), StartHour: 9, StartMinute: 45, Capacity: 15,
+			IsActive: true, Color: colors[5],
+		},
+		{
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
+			Date: date.AddDate(0, 0, 3), StartHour: 11, StartMinute: 0, Capacity: 10,
+			IsActive: true, Color: colors[6],
+		},
+		{
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
+			Date: date.AddDate(0, 0, 3), StartHour: 13, StartMinute: 30, Capacity: 12,
+			IsActive: true, Color: colors[7],
+		},
+		{
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
+			Date: date.AddDate(0, 0, 3), StartHour: 15, StartMinute: 15, Capacity: 8,
+			IsActive: true, Color: colors[8],
+		},
+
+		{
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
+			Date: date.AddDate(0, 0, 4), StartHour: 10, StartMinute: 0, Capacity: 20,
+			IsActive: true, Color: colors[9],
+		},
+		{
+			ID: uuid.New(), ClassID: classes[1].ID, InstructorID: instructor.ID,
+			Date: date.AddDate(0, 0, 4), StartHour: 10, StartMinute: 0, Capacity: 20,
+			IsActive: true, Color: colors[0],
+		},
+	}
 
 	if err := db.Create(&schedules).Error; err != nil {
 		log.Printf("failed seeding class schedules: %v", err)
@@ -830,7 +843,6 @@ func SeedClassSchedules(db *gorm.DB) {
 func SeedScheduleTemplates(db *gorm.DB) {
 	var count int64
 	db.Model(&models.ScheduleTemplate{}).Count(&count)
-
 	if count > 0 {
 		log.Println("ScheduleTemplates already seeded, skipping...")
 		return
@@ -838,19 +850,18 @@ func SeedScheduleTemplates(db *gorm.DB) {
 
 	var classes []models.Class
 	var instructors []models.Instructor
-
-	if err := db.Find(&classes).Error; err != nil {
+	if err := db.Find(&classes).Error; err != nil || len(classes) == 0 {
 		log.Println("Failed to fetch classes:", err)
 		return
 	}
-	if err := db.Find(&instructors).Error; err != nil {
+	if err := db.Find(&instructors).Error; err != nil || len(instructors) == 0 {
 		log.Println("Failed to fetch instructors:", err)
 		return
 	}
 
-	if len(classes) == 0 || len(instructors) == 0 {
-		log.Println("Classes or Instructors not found, skipping seeding schedule templates.")
-		return
+	jsonDays := func(days []int) datatypes.JSON {
+		j, _ := json.Marshal(days)
+		return j
 	}
 
 	templates := []models.ScheduleTemplate{
@@ -858,7 +869,7 @@ func SeedScheduleTemplates(db *gorm.DB) {
 			ID:           uuid.New(),
 			ClassID:      classes[0].ID,
 			InstructorID: instructors[0].ID,
-			DayOfWeek:    1,
+			DayOfWeeks:   jsonDays([]int{1, 3, 5}),
 			StartHour:    10,
 			StartMinute:  0,
 			Capacity:     10,
@@ -868,7 +879,7 @@ func SeedScheduleTemplates(db *gorm.DB) {
 			ID:           uuid.New(),
 			ClassID:      classes[1%len(classes)].ID,
 			InstructorID: instructors[1%len(instructors)].ID,
-			DayOfWeek:    2,
+			DayOfWeeks:   jsonDays([]int{2}), // Selasa
 			StartHour:    14,
 			StartMinute:  30,
 			Capacity:     12,
@@ -878,10 +889,62 @@ func SeedScheduleTemplates(db *gorm.DB) {
 			ID:           uuid.New(),
 			ClassID:      classes[2%len(classes)].ID,
 			InstructorID: instructors[2%len(instructors)].ID,
-			DayOfWeek:    4,
+			DayOfWeeks:   jsonDays([]int{0, 6}), // Minggu, Sabtu
 			StartHour:    18,
 			StartMinute:  0,
 			Capacity:     8,
+			IsActive:     true,
+		},
+		// Tambahan 4 data baru
+		{
+			ID:           uuid.New(),
+			ClassID:      classes[0].ID,
+			InstructorID: instructors[0].ID,
+			DayOfWeeks:   jsonDays([]int{1}),
+			StartHour:    9,
+			StartMinute:  0,
+			Capacity:     15,
+			IsActive:     true,
+		},
+		{
+			ID:           uuid.New(),
+			ClassID:      classes[1].ID,
+			InstructorID: instructors[1].ID,
+			DayOfWeeks:   jsonDays([]int{3}),
+			StartHour:    11,
+			StartMinute:  30,
+			Capacity:     20,
+			IsActive:     true,
+		},
+		{
+			ID:           uuid.New(),
+			ClassID:      classes[2].ID,
+			InstructorID: instructors[2].ID,
+			DayOfWeeks:   jsonDays([]int{5}),
+			StartHour:    15,
+			StartMinute:  0,
+			Capacity:     18,
+			IsActive:     true,
+		},
+		// Bentrok di hari dan jam yang sama
+		{
+			ID:           uuid.New(),
+			ClassID:      classes[0].ID,
+			InstructorID: instructors[0].ID,
+			DayOfWeeks:   jsonDays([]int{4}),
+			StartHour:    13,
+			StartMinute:  0,
+			Capacity:     10,
+			IsActive:     true,
+		},
+		{
+			ID:           uuid.New(),
+			ClassID:      classes[1].ID,
+			InstructorID: instructors[1].ID,
+			DayOfWeeks:   jsonDays([]int{4}),
+			StartHour:    13,
+			StartMinute:  0,
+			Capacity:     10,
 			IsActive:     true,
 		},
 	}

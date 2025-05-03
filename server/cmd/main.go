@@ -14,7 +14,16 @@ import (
 	"server/internal/middleware"
 
 	"github.com/gin-gonic/gin"
+	"github.com/robfig/cron/v3"
 )
+
+func startCronJobs(service services.ScheduleTemplateService) {
+	c := cron.New()
+	c.AddFunc("0 2 * * *", func() {
+		_ = service.AutoGenerateSchedules()
+	})
+	c.Start()
+}
 
 func main() {
 	utils.LoadEnv()
@@ -117,6 +126,9 @@ func main() {
 	reviewRepo := repositories.NewReviewRepository(db)
 	reviewService := services.NewReviewService(reviewRepo)
 	reviewHandler := handlers.NewReviewHandler(reviewService)
+
+	// cron job daily
+	startCronJobs(scheduleTemplateService)
 
 	routes.AuthRoutes(r, authHandler)
 	routes.UserRoutes(r, userHandler)
