@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { format, startOfWeek, endOfWeek } from "date-fns";
 
-const ClassScheduleHead = ({ label, onNavigate, date }) => {
+const ClassScheduleHead = ({ onNavigate, date }) => {
   const start = startOfWeek(date, { weekStartsOn: 6 });
   const end = endOfWeek(date, { weekStartsOn: 6 });
   return (

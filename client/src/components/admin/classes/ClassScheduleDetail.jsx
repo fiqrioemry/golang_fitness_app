@@ -1,9 +1,10 @@
 import React from "react";
+import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DeleteClassSchedule } from "./DeleteClassSchedule";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Pencil, Trash } from "lucide-react";
 
-const ClassScheduleDetail = ({ open, onClose, event }) => {
+const ClassScheduleDetail = ({ open, onClose, event, onUpdate }) => {
   if (!event) return null;
 
   const { title, start, end, resource } = event;
@@ -24,13 +25,10 @@ const ClassScheduleDetail = ({ open, onClose, event }) => {
           {resource?.capacity}
         </p>
         <div className="mt-4 flex gap-4 justify-end">
-          <Button variant="destructive">
-            <Trash />
-            Delete Schedule
-          </Button>
-          <Button variant="outline">
+          <DeleteClassSchedule schedule={resource} />
+          <Button onClick={onUpdate} variant="outline">
             <Pencil />
-            Update Schedule
+            <span>Update</span>
           </Button>
         </div>
       </DialogContent>

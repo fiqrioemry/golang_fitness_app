@@ -20,12 +20,11 @@ export function FormSheet({
   schema,
   action,
   children,
+  open,
+  setOpen,
   resourceId = null,
   loading = false,
   shouldReset = true,
-  buttonText = "Open Form",
-  open,
-  setOpen,
 }) {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -101,7 +100,7 @@ export function FormSheet({
             </div>
           </div>
         </div>
-      )}{" "}
+      )}
       <Sheet
         open={open}
         onOpenChange={(val) => (!val ? handleCancel() : setOpen(val))}

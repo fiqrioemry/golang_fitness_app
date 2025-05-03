@@ -152,7 +152,7 @@ export const bookingSchema = z.object({
   classScheduleId: z.string().min(1, "Class Schedule is required"),
 });
 
-export const classScheduleSchema = z.object({
+export const scheduleSchema = z.object({
   classId: z.string().min(1, "Class is required"),
   date: z.string().min(1, "Date is required"),
   instructorId: z.string().min(1, "Instructor is required"),

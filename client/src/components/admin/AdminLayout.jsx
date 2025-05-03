@@ -20,7 +20,7 @@ const AdminLayout = () => {
           <Separator orientation="vertical" className="mr-2 h-4" />
         </header>
         <div className="flex flex-1 flex-col bg-muted">
-          <div className="container mx-auto py-3 md:py-6 px-2">
+          <div className="py-3 md:py-6">
             <Outlet />
           </div>
         </div>

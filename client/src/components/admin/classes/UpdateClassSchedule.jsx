@@ -1,3 +1,4 @@
+import React from "react";
 import { scheduleSchema } from "@/lib/schema";
 import { useScheduleMutation } from "@/hooks/useClass";
 import { FormSheet } from "@/components/form/FormSheet";
@@ -8,32 +9,24 @@ import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
 import { SelectCalendarElement } from "@/components/input/SelectCalendarElement";
 
-const AddClassSchedule = ({ open, setOpen, defaultDateTime }) => {
-  const { createSchedule } = useScheduleMutation();
-  const { isPending, mutateAsync } = createSchedule;
+const UpdateClassSchedule = ({ open, setOpen, schedule }) => {
+  const { updateSchedule } = useScheduleMutation();
 
-  const initialState = {
-    classId: "",
-    instructorId: "",
-    date: defaultDateTime ? defaultDateTime.toISOString().split("T")[0] : "",
-    startHour: defaultDateTime?.getHours() || 0,
-    startMinute: defaultDateTime?.getMinutes() || 0,
-    capacity: 1,
-    isActive: true,
-    colorCode: "#4ade80",
-  };
+  const { isPending, mutateAsync } = updateSchedule;
 
   return (
     <FormSheet
       open={open}
       setOpen={setOpen}
+      state={schedule}
       loading={isPending}
-      state={initialState}
-      action={mutateAsync}
       schema={scheduleSchema}
-      title="Create Class Schedule"
+      action={mutateAsync}
+      title="Update Schedule"
+      resourceId={schedule.id}
     >
       <SelectCalendarElement name="date" label="Event Date" />
+
       <ColorPickerElement name="colorCode" label="Cardboard Color" />
       <SelectOptionsElement
         data="class"
@@ -70,4 +63,4 @@ const AddClassSchedule = ({ open, setOpen, defaultDateTime }) => {
   );
 };
 
-export { AddClassSchedule };
+export { UpdateClassSchedule };

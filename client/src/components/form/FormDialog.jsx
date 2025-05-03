@@ -22,8 +22,8 @@ export function FormDialog({
   children,
   resourceId = null,
   loading = false,
+  icon = true,
   shouldReset = true,
-  buttonText = "",
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -81,7 +81,7 @@ export function FormDialog({
         onOpenChange={(open) => (!open ? handleCancel() : setIsOpen(open))}
       >
         <DialogTrigger asChild>
-          {buttonText === "" ? (
+          {icon ? (
             <button
               type="button"
               className="text-primary hover:text-blue-600 transition"
@@ -89,7 +89,10 @@ export function FormDialog({
               <Pencil className="w-4 h-4" />
             </button>
           ) : (
-            buttonText
+            <Button variant="destructive" type="button">
+              <Pencil className="w-4 h-4" />
+              <span>Update</span>
+            </Button>
           )}
         </DialogTrigger>
 

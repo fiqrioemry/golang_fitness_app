@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-// src/components/form/FormDelete.jsx
 import {
   Dialog,
   DialogTrigger,
@@ -12,16 +10,29 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 
-const FormDelete = ({ title, description, onDelete, loading = false }) => {
+const FormDelete = ({
+  title,
+  description,
+  icon = true,
+  onDelete,
+  loading = false,
+}) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button
-          type="button"
-          className="text-red-500 hover:text-red-700 transition"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
+        {icon ? (
+          <button
+            type="button"
+            className="text-red-500 hover:text-red-700 transition"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        ) : (
+          <Button variant="destructive" type="button">
+            <Trash2 className="w-4 h-4" />
+            <span>Delete</span>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md rounded-xl p-6 space-y-6">
@@ -46,7 +57,11 @@ const FormDelete = ({ title, description, onDelete, loading = false }) => {
               </DialogClose>
 
               <DialogClose asChild>
-                <Button variant="danger" className="w-32" onClick={onDelete}>
+                <Button
+                  variant="destructive"
+                  className="w-32"
+                  onClick={onDelete}
+                >
                   Delete
                 </Button>
               </DialogClose>

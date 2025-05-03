@@ -4,10 +4,12 @@ import { useSchedulesQuery } from "@/hooks/useClass";
 import { AddClassSchedule } from "@/components/admin/classes/AddClassSchedule";
 import { ClassScheduleDetail } from "@/components/admin/classes/ClassScheduleDetail";
 import { ClassScheduleCalendar } from "@/components/admin/classes/ClassScheduleCalendar";
+import { UpdateClassSchedule } from "../../../components/admin/classes/UpdateClassSchedule";
 
 const ClassSchedule = () => {
   const [events, setEvents] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [updateFormOpen, setUpdateFormOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -18,6 +20,11 @@ const ClassSchedule = () => {
     setIsFormOpen(true);
   };
 
+  const handleSelectUpdate = (event) => {
+    setSelectedEvent(event);
+    setIsDetailOpen(false);
+    setUpdateFormOpen(true);
+  };
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
     setIsDetailOpen(true);
@@ -50,16 +57,12 @@ const ClassSchedule = () => {
   }, [schedules]);
 
   if (isLoading) return <Loading />;
-
+  console.log(selectedEvent);
   return (
-    <section className="p-4">
+    <section>
       <div className="space-y-1 text-center mb-4">
         <h2 className="text-2xl font-bold">Class Schedules Event</h2>
-        <p className="text-muted-foreground text-sm">
-          Create and manage an event for your upcoming classes
-        </p>
       </div>
-
       <AddClassSchedule
         open={isFormOpen}
         setOpen={setIsFormOpen}
@@ -67,6 +70,7 @@ const ClassSchedule = () => {
       />
       <ClassScheduleDetail
         open={isDetailOpen}
+        onUpdate={handleSelectUpdate}
         onClose={() => setIsDetailOpen(false)}
         event={selectedEvent}
       />

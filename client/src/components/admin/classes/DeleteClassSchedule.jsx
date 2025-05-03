@@ -1,21 +1,20 @@
-/* eslint-disable react/prop-types */
-// src/pages/classes/DeleteClass.jsx
-import { useClassMutation } from "@/hooks/useClass";
+import { useScheduleMutation } from "@/hooks/useClass";
 import { FormDelete } from "@/components/form/FormDelete";
 
 const DeleteClassSchedule = ({ schedule }) => {
-  const { deleteClass, isLoading } = useClassMutation();
+  const { deleteSchedule, isPending } = useScheduleMutation();
 
-  const handleDeleteClass = () => {
-    deleteClass.mutateAsync(schedule.id);
+  const handleDeleteSchedule = () => {
+    deleteSchedule.mutateAsync(schedule.id);
   };
 
   return (
     <FormDelete
-      loading={isLoading}
-      title="Delete Class"
-      onDelete={handleDeleteClass}
-      description="Are you sure want to delete this classes ?"
+      icon={false}
+      loading={isPending}
+      title="Delete Schedule"
+      onDelete={handleDeleteSchedule}
+      description="Are you sure want to delete this Schedule?"
     />
   );
 };
