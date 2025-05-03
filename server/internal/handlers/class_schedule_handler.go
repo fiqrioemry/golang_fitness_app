@@ -67,9 +67,9 @@ func (h *ClassScheduleHandler) CreateClassSchedule(c *gin.Context) {
 	}
 
 	for _, day := range req.RecurringDays {
-		dayEnum := utils.ParseDayOfWeek(day)
+		dayEnum := day
 		if dayEnum == -1 {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid day in recurringDays: " + day})
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid day in recurringDays "})
 			return
 		}
 

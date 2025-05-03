@@ -73,6 +73,7 @@ func InitDatabase() {
 		&models.Instructor{},
 		&models.Location{},
 		&models.ScheduleTemplate{},
+		&models.RecurrenceRule{},
 	); err != nil {
 		panic("Migration failed: " + err.Error())
 	}
