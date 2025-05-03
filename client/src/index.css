@@ -211,3 +211,60 @@
 ::-webkit-scrollbar {
   display: none;
 }
+
+.rbc-calendar {
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .rbc-time-view {
+    min-width: 700px;
+  }
+}
+
+.rbc-time-view,
+.rbc-timeslot-group,
+.rbc-day-slot,
+.rbc-time-slot,
+.rbc-time-header,
+.rbc-time-header-cell,
+.rbc-time-header-content,
+.rbc-time-content {
+  box-sizing: border-box !important;
+}
+
+.rbc-time-header-cell,
+.rbc-day-slot .rbc-time-slot {
+  border-right: 1px solid #e5e7eb !important; /* Tailwind border-gray-200 */
+}
+
+.rbc-time-header-content,
+.rbc-timeslot-group {
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.rbc-time-content > * + * {
+  border-left: 1px solid #e5e7eb !important;
+}
+
+.rbc-time-view {
+  border-top: 1px solid #e5e7eb;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rbc-time-gutter,
+.rbc-time-header-gutter {
+  border-right: 1px solid #e5e7eb !important;
+}
+
+/* Optional: rapikan event */
+.rbc-event {
+  padding: 2px 4px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+.rbc-allday-cell {
+  display: none !important;
+}

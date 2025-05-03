@@ -4,6 +4,7 @@ import {
   useSubcategoryMutation,
 } from "@/hooks/useSubcategories";
 import { useClassesQuery } from "./useClass";
+import { useInstructorsQuery } from "./useInstructor";
 import { useTypesQuery, useTypeMutation } from "@/hooks/useType";
 import { useLevelsQuery, useLevelMutation } from "@/hooks/useLevel";
 import { useLocationsQuery, useLocationMutation } from "@/hooks/useLocation";
@@ -11,23 +12,35 @@ import { useCategoriesQuery, useCategoryMutation } from "@/hooks/useCategory";
 
 export const useSelectOptions = (type) => {
   switch (type) {
-    case "category":
+    case "category": {
       return useCategoriesQuery();
-    case "level":
+    }
+    case "level": {
       return useLevelsQuery();
-    case "location":
+    }
+    case "location": {
       return useLocationsQuery();
-    case "subcategory":
+    }
+    case "subcategory": {
       return useSubcategoriesQuery();
-    case "type":
+    }
+    case "type": {
       return useTypesQuery();
-    case "class":
-      return useClassesQuery({ limit: 20 });
+    }
+    case "instructor":
+      return useInstructorsQuery();
+
+    case "class": {
+      const { data = {}, ...rest } = useClassesQuery({ limit: 20 });
+      return {
+        data: data.classes || [],
+        ...rest,
+      };
+    }
     default:
       throw new Error(`Unknown select type: ${type}`);
   }
 };
-
 export const useMutationOptions = (type) => {
   switch (type) {
     case "category":

@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { FormInput } from "@/components/form/FormInput";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { SwitchElement } from "@/components/input/SwitchElement";
+import { InputDateElement } from "../components/input/InputDateElement";
 
 const SignIn = () => {
   const { login, loading } = useAuthStore();
@@ -54,7 +55,7 @@ const SignIn = () => {
           </FormInput>
 
           <p className="text-sm text-center mt-6 text-gray-600">
-            Belum punya akun?{" "}
+            Belum punya akun?
             <Link
               to="/signup"
               className="text-blue-600 hover:underline font-medium"

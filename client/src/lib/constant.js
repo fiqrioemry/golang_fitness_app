@@ -99,13 +99,6 @@ export const updateClassScheduleState = {
   capacity: 0,
 };
 
-export const createClassScheduleState = {
-  classId: "",
-  instructorId: "",
-  startTime: "",
-  capacity: 0,
-};
-
 export const midtransNotificationState = {
   transaction_status: "",
   order_id: "",

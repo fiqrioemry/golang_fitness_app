@@ -10,6 +10,7 @@ import ClassDetail from "./pages/ClassDetail";
 import Profile from "./pages/customer/Profile";
 
 // admin pages
+
 import Dashboard from "./pages/admin/Dashboard";
 import UsersList from "./pages/admin/UsersList";
 import AddClass from "./pages/admin/classes/AddClass";
@@ -91,7 +92,6 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="classes" element={<Classes />} />
           <Route path="packages" element={<Packages />} />
-          <Route path="schedules" element={<Schedules />} />
           <Route path="classes/:id" element={<ClassDetail />} />
           <Route path="packages/:id" element={<PackageDetail />} />
         </Route>

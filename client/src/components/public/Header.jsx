@@ -12,7 +12,7 @@ const Header = () => {
 
   return (
     <div className="h-14">
-      <header className="fixed top-0 w-full bg-white/70 backdrop-blur-md shadow z-50">
+      <header className="fixed top-0 w-full bg-white/70 backdrop-blur-md shadow z-20">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <NavLink to="/" className="text-2xl font-bold text-gray-800">
             FitBook

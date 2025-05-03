@@ -34,7 +34,7 @@ export const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-// Update Profile
+// profiles
 export const profileSchema = z.object({
   fullname: z.string().min(6, "Full name must be at least 6 characters"),
   birthday: z.string(),
@@ -47,7 +47,7 @@ export const avatarSchema = z.object({
   avatar: z.union([z.instanceof(File), z.string().url()]),
 });
 
-// Create Class
+// classes
 export const classSchema = z.object({
   title: z.string().min(6, "Title must be at least 6 characters"),
   duration: z
@@ -66,6 +66,7 @@ export const classSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+// package
 export const packageSchema = z.object({
   name: z.string().min(6, "Package name must be at least 6 characters"),
   description: z.string().min(20, "Description must be at least 20 characters"),
@@ -82,6 +83,7 @@ export const packageSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+// options
 export const optionSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
 });
@@ -97,19 +99,22 @@ export const locationSchema = z.object({
   geoLocation: z.string().min(1, "Geolocation is required"),
 });
 
-export const createReviewSchema = z.object({
-  classId: z.string().min(1, "Class is required"),
-  rating: z.number().min(1).max(5),
-  comment: z.string().optional(),
+export const instructorSchema = z.object({
+  userId: z.string().min(1, "User is required"),
+  experience: z.number().optional(),
+  specialties: z.string().optional(),
+  certifications: z.string().optional(),
 });
 
-export const markAttendanceSchema = z.object({
-  bookingId: z.string().min(1, "Booking ID is required"),
-  status: z.enum(["attended", "absent", "cancelled"]),
+export const midtransNotificationSchema = z.object({
+  transaction_status: z.string(),
+  order_id: z.string(),
+  payment_type: z.string(),
+  fraud_status: z.string(),
 });
 
-export const createBookingSchema = z.object({
-  classScheduleId: z.string().min(1, "Class Schedule is required"),
+export const createPaymentSchema = z.object({
+  packageId: z.string().min(1, "Package is required"),
 });
 
 export const createScheduleTemplateSchema = z.object({
@@ -133,21 +138,26 @@ export const createClassScheduleSchema = z.object({
   startTime: z.string().min(1, "Start time is required"),
   capacity: z.number().positive(),
 });
-
-export const midtransNotificationSchema = z.object({
-  transaction_status: z.string(),
-  order_id: z.string(),
-  payment_type: z.string(),
-  fraud_status: z.string(),
+export const markAttendanceSchema = z.object({
+  bookingId: z.string().min(1, "Booking ID is required"),
+  status: z.enum(["attended", "absent", "cancelled"]),
+});
+export const reviewSchema = z.object({
+  classId: z.string().min(1, "Class is required"),
+  rating: z.number().min(1).max(5),
+  comment: z.string().optional(),
 });
 
-export const createPaymentSchema = z.object({
-  packageId: z.string().min(1, "Package is required"),
+export const bookingSchema = z.object({
+  classScheduleId: z.string().min(1, "Class Schedule is required"),
 });
 
-export const instructorSchema = z.object({
-  userId: z.string().min(1, "User is required"),
-  experience: z.number().optional(),
-  specialties: z.string().optional(),
-  certifications: z.string().optional(),
+export const classScheduleSchema = z.object({
+  classId: z.string().min(1, "Class is required"),
+  date: z.string().min(1, "Date is required"),
+  instructorId: z.string().min(1, "Instructor is required"),
+  startHour: z.number().min(8).max(17),
+  startMinute: z.number().min(0).max(45),
+  capacity: z.number().min(0, "Capacity must be more than 0"),
+  isActive: z.boolean().optional(),
 });

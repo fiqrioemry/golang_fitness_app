@@ -3,6 +3,7 @@ import { publicInstance, authInstance } from ".";
 
 export const getAllInstructors = async () => {
   const res = await publicInstance.get("/instructors");
+  console.log(res);
   return res.data;
 };
 

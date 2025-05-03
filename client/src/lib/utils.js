@@ -1,5 +1,8 @@
 import { clsx } from "clsx";
+import id from "date-fns/locale/id";
 import { twMerge } from "tailwind-merge";
+import { dateFnsLocalizer } from "react-big-calendar";
+import { format, parse, getDay } from "date-fns";
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -61,3 +64,11 @@ export const buildFormData = (data) => {
 
   return formData;
 };
+
+export const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek: () => new Date(), // ✅ Mulai dari Today
+  getDay,
+  locales: { id },
+});

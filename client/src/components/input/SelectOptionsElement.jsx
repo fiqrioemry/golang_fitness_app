@@ -43,7 +43,7 @@ const SelectOptionsElement = ({
                 key={option.id || option.value || option}
                 value={option.id || option.value || option}
               >
-                {option.name || option.label || option}
+                {option.name || option.title || option.fullname || option}
               </option>
             ))}
           </select>

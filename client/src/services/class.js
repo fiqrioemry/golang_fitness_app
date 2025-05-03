@@ -2,38 +2,38 @@
 import { publicInstance, authInstance } from ".";
 import { buildFormData } from "@/lib/utils";
 
-// =====================
-// CLASS (Public + Admin)
-// =====================
-
 export const getAllClasses = async (params) => {
   const res = await publicInstance.get("/classes", { params });
   return res.data;
 };
 
+// GET /api/classes/active
 export const getActiveClasses = async () => {
   const res = await publicInstance.get("/classes/active");
   return res.data;
 };
 
+// GET /api/classes/:id
 export const getClassById = async (id) => {
   const res = await publicInstance.get(`/classes/${id}`);
   return res.data;
 };
 
+// POST /api/classes
 export const createClass = async (data) => {
   const formData = buildFormData(data);
   const res = await authInstance.post("/classes", formData);
   return res.data;
 };
 
+// PUT /api/classes/:id
 export const updateClass = async (id, data) => {
-  console.log(data);
   const formData = buildFormData(data);
   const res = await authInstance.put(`/classes/${id}`, formData);
   return res.data;
 };
 
+// DELETE /api/classes/:id
 export const deleteClass = async (id) => {
   const res = await authInstance.delete(`/classes/${id}`);
   return res.data;
@@ -49,10 +49,6 @@ export const deleteClassGallery = async (id, galleryId) => {
   return res.data;
 };
 
-// =====================
-// CLASS SCHEDULE (Public + Admin)
-// =====================
-
 // GET /api/schedules
 export const getAllClassSchedules = async () => {
   const res = await publicInstance.get("/schedules");
@@ -61,6 +57,8 @@ export const getAllClassSchedules = async () => {
 
 // POST /api/schedules (Admin Only)
 export const createClassSchedule = async (data) => {
+  console.log(data);
+  return "success";
   const res = await authInstance.post("/schedules", data);
   return res.data;
 };
@@ -76,10 +74,6 @@ export const deleteClassSchedule = async (id) => {
   const res = await authInstance.delete(`/schedules/${id}`);
   return res.data;
 };
-
-// =====================
-// SCHEDULE TEMPLATE (Admin Only)
-// =====================
 
 // POST /api/schedule-templates
 export const createTemplate = async (data) => {

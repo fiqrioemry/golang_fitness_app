@@ -1,5 +1,3 @@
-// src/components/input/SelectElement.jsx
-
 import { Controller, useFormContext } from "react-hook-form";
 
 const SelectElement = ({
@@ -9,6 +7,7 @@ const SelectElement = ({
   options = [],
   disabled = false,
   rules = { required: true },
+  isNumeric = false, // ✅ tambahkan opsi numeric
 }) => {
   const { control } = useFormContext();
 
@@ -29,7 +28,11 @@ const SelectElement = ({
           )}
           <select
             id={name}
-            {...field}
+            value={field.value ?? ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              field.onChange(isNumeric ? Number(value) : value);
+            }}
             disabled={disabled}
             className="w-full border p-2 rounded disabled:bg-gray-100"
           >

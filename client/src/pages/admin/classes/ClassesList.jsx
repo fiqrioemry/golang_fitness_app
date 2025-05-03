@@ -9,6 +9,7 @@ import { UpdateClass } from "@/components/admin/classes/UpdateClass";
 
 const ClassesList = () => {
   const navigate = useNavigate();
+
   const { data, isLoading, isError, refetch } = useClassesQuery();
 
   useEffect(() => {
