@@ -85,7 +85,7 @@ func ResetDatabase(db *gorm.DB) {
 	SeedPayments(db)
 	SeedUserPackages(db)
 	SeedClassSchedules(db)
-	SeedScheduleTemplates(db)
+	// SeedScheduleTemplates(db)
 	SeedBookings(db)
 	SeedAttendances(db)
 	SeedReviews(db)

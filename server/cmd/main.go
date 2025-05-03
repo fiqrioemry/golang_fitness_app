@@ -19,8 +19,13 @@ import (
 
 func startCronJobs(service services.ScheduleTemplateService) {
 	c := cron.New()
-	c.AddFunc("0 2 * * *", func() {
-		_ = service.AutoGenerateSchedules()
+	c.AddFunc("@every 1m", func() {
+		log.Println("🕒 [CRON] Auto generating class schedules...")
+		if err := service.AutoGenerateSchedules(); err != nil {
+			log.Printf("❌ [CRON] Error: %v\n", err)
+		} else {
+			log.Println("✅ [CRON] Success generating schedules")
+		}
 	})
 	c.Start()
 }

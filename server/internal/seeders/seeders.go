@@ -1,14 +1,12 @@
 package seeders
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 
 	"server/internal/models"
@@ -840,121 +838,121 @@ func SeedClassSchedules(db *gorm.DB) {
 	}
 }
 
-func SeedScheduleTemplates(db *gorm.DB) {
-	var count int64
-	db.Model(&models.ScheduleTemplate{}).Count(&count)
-	if count > 0 {
-		log.Println("ScheduleTemplates already seeded, skipping...")
-		return
-	}
+// func SeedScheduleTemplates(db *gorm.DB) {
+// 	var count int64
+// 	db.Model(&models.ScheduleTemplate{}).Count(&count)
+// 	if count > 0 {
+// 		log.Println("ScheduleTemplates already seeded, skipping...")
+// 		return
+// 	}
 
-	var classes []models.Class
-	var instructors []models.Instructor
-	if err := db.Find(&classes).Error; err != nil || len(classes) == 0 {
-		log.Println("Failed to fetch classes:", err)
-		return
-	}
-	if err := db.Find(&instructors).Error; err != nil || len(instructors) == 0 {
-		log.Println("Failed to fetch instructors:", err)
-		return
-	}
+// 	var classes []models.Class
+// 	var instructors []models.Instructor
+// 	if err := db.Find(&classes).Error; err != nil || len(classes) == 0 {
+// 		log.Println("Failed to fetch classes:", err)
+// 		return
+// 	}
+// 	if err := db.Find(&instructors).Error; err != nil || len(instructors) == 0 {
+// 		log.Println("Failed to fetch instructors:", err)
+// 		return
+// 	}
 
-	jsonDays := func(days []int) datatypes.JSON {
-		j, _ := json.Marshal(days)
-		return j
-	}
+// 	jsonDays := func(days []int) datatypes.JSON {
+// 		j, _ := json.Marshal(days)
+// 		return j
+// 	}
 
-	templates := []models.ScheduleTemplate{
-		{
-			ID:           uuid.New(),
-			ClassID:      classes[0].ID,
-			InstructorID: instructors[0].ID,
-			DayOfWeeks:   jsonDays([]int{1, 3, 5}),
-			StartHour:    10,
-			StartMinute:  0,
-			Capacity:     10,
-			IsActive:     true,
-		},
-		{
-			ID:           uuid.New(),
-			ClassID:      classes[1%len(classes)].ID,
-			InstructorID: instructors[1%len(instructors)].ID,
-			DayOfWeeks:   jsonDays([]int{2}), // Selasa
-			StartHour:    14,
-			StartMinute:  30,
-			Capacity:     12,
-			IsActive:     true,
-		},
-		{
-			ID:           uuid.New(),
-			ClassID:      classes[2%len(classes)].ID,
-			InstructorID: instructors[2%len(instructors)].ID,
-			DayOfWeeks:   jsonDays([]int{0, 6}), // Minggu, Sabtu
-			StartHour:    18,
-			StartMinute:  0,
-			Capacity:     8,
-			IsActive:     true,
-		},
-		// Tambahan 4 data baru
-		{
-			ID:           uuid.New(),
-			ClassID:      classes[0].ID,
-			InstructorID: instructors[0].ID,
-			DayOfWeeks:   jsonDays([]int{1}),
-			StartHour:    9,
-			StartMinute:  0,
-			Capacity:     15,
-			IsActive:     true,
-		},
-		{
-			ID:           uuid.New(),
-			ClassID:      classes[1].ID,
-			InstructorID: instructors[1].ID,
-			DayOfWeeks:   jsonDays([]int{3}),
-			StartHour:    11,
-			StartMinute:  30,
-			Capacity:     20,
-			IsActive:     true,
-		},
-		{
-			ID:           uuid.New(),
-			ClassID:      classes[2].ID,
-			InstructorID: instructors[2].ID,
-			DayOfWeeks:   jsonDays([]int{5}),
-			StartHour:    15,
-			StartMinute:  0,
-			Capacity:     18,
-			IsActive:     true,
-		},
-		// Bentrok di hari dan jam yang sama
-		{
-			ID:           uuid.New(),
-			ClassID:      classes[0].ID,
-			InstructorID: instructors[0].ID,
-			DayOfWeeks:   jsonDays([]int{4}),
-			StartHour:    13,
-			StartMinute:  0,
-			Capacity:     10,
-			IsActive:     true,
-		},
-		{
-			ID:           uuid.New(),
-			ClassID:      classes[1].ID,
-			InstructorID: instructors[1].ID,
-			DayOfWeeks:   jsonDays([]int{4}),
-			StartHour:    13,
-			StartMinute:  0,
-			Capacity:     10,
-			IsActive:     true,
-		},
-	}
+// 	templates := []models.ScheduleTemplate{
+// 		{
+// 			ID:           uuid.New(),
+// 			ClassID:      classes[0].ID,
+// 			InstructorID: instructors[0].ID,
+// 			DayOfWeeks:   jsonDays([]int{1, 3, 5}),
+// 			StartHour:    10,
+// 			StartMinute:  0,
+// 			Capacity:     10,
+// 			IsActive:     true,
+// 		},
+// 		{
+// 			ID:           uuid.New(),
+// 			ClassID:      classes[1%len(classes)].ID,
+// 			InstructorID: instructors[1%len(instructors)].ID,
+// 			DayOfWeeks:   jsonDays([]int{2}), // Selasa
+// 			StartHour:    14,
+// 			StartMinute:  30,
+// 			Capacity:     12,
+// 			IsActive:     true,
+// 		},
+// 		{
+// 			ID:           uuid.New(),
+// 			ClassID:      classes[2%len(classes)].ID,
+// 			InstructorID: instructors[2%len(instructors)].ID,
+// 			DayOfWeeks:   jsonDays([]int{0, 6}), // Minggu, Sabtu
+// 			StartHour:    18,
+// 			StartMinute:  0,
+// 			Capacity:     8,
+// 			IsActive:     true,
+// 		},
+// 		// Tambahan 4 data baru
+// 		{
+// 			ID:           uuid.New(),
+// 			ClassID:      classes[0].ID,
+// 			InstructorID: instructors[0].ID,
+// 			DayOfWeeks:   jsonDays([]int{1}),
+// 			StartHour:    9,
+// 			StartMinute:  0,
+// 			Capacity:     15,
+// 			IsActive:     true,
+// 		},
+// 		{
+// 			ID:           uuid.New(),
+// 			ClassID:      classes[1].ID,
+// 			InstructorID: instructors[1].ID,
+// 			DayOfWeeks:   jsonDays([]int{3}),
+// 			StartHour:    11,
+// 			StartMinute:  30,
+// 			Capacity:     20,
+// 			IsActive:     true,
+// 		},
+// 		{
+// 			ID:           uuid.New(),
+// 			ClassID:      classes[2].ID,
+// 			InstructorID: instructors[2].ID,
+// 			DayOfWeeks:   jsonDays([]int{5}),
+// 			StartHour:    15,
+// 			StartMinute:  0,
+// 			Capacity:     18,
+// 			IsActive:     true,
+// 		},
+// 		// Bentrok di hari dan jam yang sama
+// 		{
+// 			ID:           uuid.New(),
+// 			ClassID:      classes[0].ID,
+// 			InstructorID: instructors[0].ID,
+// 			DayOfWeeks:   jsonDays([]int{4}),
+// 			StartHour:    13,
+// 			StartMinute:  0,
+// 			Capacity:     10,
+// 			IsActive:     true,
+// 		},
+// 		{
+// 			ID:           uuid.New(),
+// 			ClassID:      classes[1].ID,
+// 			InstructorID: instructors[1].ID,
+// 			DayOfWeeks:   jsonDays([]int{4}),
+// 			StartHour:    13,
+// 			StartMinute:  0,
+// 			Capacity:     10,
+// 			IsActive:     true,
+// 		},
+// 	}
 
-	if err := db.Create(&templates).Error; err != nil {
-		log.Printf("failed seeding schedule templates: %v", err)
-	} else {
-		log.Println("✅ ScheduleTemplates seeding completed!")
-	}
-}
+// 	if err := db.Create(&templates).Error; err != nil {
+// 		log.Printf("failed seeding schedule templates: %v", err)
+// 	} else {
+// 		log.Println("✅ ScheduleTemplates seeding completed!")
+// 	}
+// }
 
 func SeedBookings(db *gorm.DB) {
 	var count int64
