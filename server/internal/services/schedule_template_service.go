@@ -1,9 +1,11 @@
 package services
 
 import (
+	"encoding/json"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
+	"server/internal/utils"
 	"time"
 
 	"github.com/google/uuid"
@@ -36,7 +38,7 @@ func (s *scheduleTemplateService) CreateTemplate(req dto.CreateScheduleTemplateR
 		ID:           uuid.New(),
 		ClassID:      uuid.MustParse(req.ClassID),
 		InstructorID: uuid.MustParse(req.InstructorID),
-		DayOfWeeks:   req.DayOfWeeks,
+		DayOfWeeks:   utils.IntSliceToJSON([]int{req.DayOfWeek}),
 		StartHour:    req.StartHour,
 		StartMinute:  req.StartMinute,
 		Capacity:     req.Capacity,
@@ -52,67 +54,73 @@ func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 		return err
 	}
 
-	today := time.Now()
+	today := time.Now().Truncate(24 * time.Hour)
 
 	for _, template := range templates {
-		// Cek apakah template memiliki recurrence rule
+		// Ambil rule jika recurring
 		rule, err := s.templateRepo.GetRecurrenceRuleByTemplateID(template.ID.String())
-		if err != nil {
+		if err != nil || rule.Frequency != "recurring" {
 			continue
 		}
 
-		// Skip jika rule bukan recurring
-		if rule.Frequency != "recurring" {
+		// Parse DayOfWeeks
+		var days []int
+		if err := json.Unmarshal(template.DayOfWeeks, &days); err != nil {
 			continue
 		}
 
-		// Hitung tanggal untuk jadwal berikutnya
-		dayOffset := (int(template.DayOfWeek) - int(today.Weekday()) + 7) % 7
-		scheduleDate := today.AddDate(0, 0, dayOffset)
-		scheduleDate = time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(), 0, 0, 0, 0, time.UTC)
-
-		// Cek endType dan endDate jika ada
-		if rule.EndType == "until" && rule.EndDate != nil && scheduleDate.After(*rule.EndDate) {
-			continue
-		}
-
-		// Cek apakah sudah ada jadwal yang sama (prevent duplicate)
-		existings, err := s.classScheduleRepo.GetClassSchedules()
-		if err != nil {
-			continue
-		}
-		conflict := false
-		for _, s := range existings {
-			if s.ClassID == template.ClassID && s.Date.Equal(scheduleDate) && s.StartHour == template.StartHour && s.StartMinute == template.StartMinute {
-				conflict = true
-				break
+		// Hitung end date
+		endDate := today.AddDate(0, 1, 0)
+		if rule.EndType == "until" && rule.EndDate != nil {
+			if rule.EndDate.Before(today) {
+				continue
 			}
-		}
-		if conflict {
-			continue
+			endDate = rule.EndDate.Truncate(24 * time.Hour)
 		}
 
-		schedule := models.ClassSchedule{
-			ID:           uuid.New(),
-			ClassID:      template.ClassID,
-			InstructorID: template.InstructorID,
-			Capacity:     template.Capacity,
-			IsActive:     true,
-			Date:         scheduleDate,
-			StartHour:    template.StartHour,
-			StartMinute:  template.StartMinute,
+		// Loop semua hari dari today sampai endDate
+		for d := today; !d.After(endDate); d = d.AddDate(0, 0, 1) {
+			if !utils.IsDayMatched(int(d.Weekday()), days) {
+				continue
+			}
+
+			// Cek duplicate
+			existing, err := s.classScheduleRepo.GetClassSchedulesWithFilter(dto.ClassScheduleQueryParam{
+				StartDate: d.Format("2006-01-02"),
+				EndDate:   d.Format("2006-01-02"),
+			})
+			if err != nil {
+				continue
+			}
+
+			conflict := false
+			for _, e := range existing {
+				if e.ClassID == template.ClassID &&
+					e.StartHour == template.StartHour &&
+					e.StartMinute == template.StartMinute {
+					conflict = true
+					break
+				}
+			}
+			if conflict {
+				continue
+			}
+
+			schedule := models.ClassSchedule{
+				ID:           uuid.New(),
+				ClassID:      template.ClassID,
+				InstructorID: template.InstructorID,
+				Capacity:     template.Capacity,
+				IsActive:     true,
+				Date:         d,
+				StartHour:    template.StartHour,
+				StartMinute:  template.StartMinute,
+			}
+			_ = s.classScheduleRepo.CreateClassSchedule(&schedule)
 		}
-		s.classScheduleRepo.CreateClassSchedule(&schedule)
 	}
 
 	return nil
-}
-func nextWeekday(t time.Time, weekday time.Weekday) time.Time {
-	daysUntil := (int(weekday) - int(t.Weekday()) + 7) % 7
-	if daysUntil == 0 {
-		daysUntil = 7
-	}
-	return t.AddDate(0, 0, daysUntil)
 }
 
 func (s *scheduleTemplateService) CreateRecurringScheduleTemplate(req dto.CreateRecurringScheduleTemplateRequest) error {
@@ -120,7 +128,7 @@ func (s *scheduleTemplateService) CreateRecurringScheduleTemplate(req dto.Create
 		ID:           uuid.New(),
 		ClassID:      uuid.MustParse(req.ClassID),
 		InstructorID: uuid.MustParse(req.InstructorID),
-		DayOfWeek:    req.DayOfWeek,
+		DayOfWeeks:   utils.IntSliceToJSON([]int{req.DayOfWeek}),
 		StartHour:    req.StartHour,
 		StartMinute:  req.StartMinute,
 		Capacity:     req.Capacity,
@@ -151,7 +159,7 @@ func (s *scheduleTemplateService) UpdateTemplate(id string, req dto.CreateSchedu
 		ID:           templateID,
 		ClassID:      uuid.MustParse(req.ClassID),
 		InstructorID: uuid.MustParse(req.InstructorID),
-		DayOfWeek:    req.DayOfWeek,
+		DayOfWeeks:   utils.IntSliceToJSON([]int{req.DayOfWeek}),
 		StartHour:    req.StartHour,
 		StartMinute:  req.StartMinute,
 		Capacity:     req.Capacity,

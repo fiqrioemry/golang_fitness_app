@@ -16,6 +16,7 @@ type ClassScheduleService interface {
 	DeleteClassSchedule(id string) error
 	GetAllClassSchedules() ([]dto.ClassScheduleResponse, error)
 	GetClassScheduleByID(id string) (*dto.ClassScheduleResponse, error)
+	GetSchedulesByFilter(filter dto.ClassScheduleQueryParam) ([]dto.ClassScheduleResponse, error)
 }
 
 type classScheduleService struct {
@@ -148,4 +149,31 @@ func (s *classScheduleService) GetClassScheduleByID(id string) (*dto.ClassSchedu
 		Capacity:     schedule.Capacity,
 		BookedCount:  schedule.BookedCount,
 	}, nil
+}
+
+func (s *classScheduleService) GetSchedulesByFilter(filter dto.ClassScheduleQueryParam) ([]dto.ClassScheduleResponse, error) {
+	schedules, err := s.repo.GetClassSchedulesWithFilter(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.ClassScheduleResponse
+	for _, s := range schedules {
+		result = append(result, dto.ClassScheduleResponse{
+			ID:           s.ID.String(),
+			ClassID:      s.ClassID.String(),
+			ClassTitle:   s.Class.Title,
+			Category:     s.Class.Category.Name,
+			InstructorID: s.InstructorID.String(),
+			Instructor:   s.Instructor.User.Profile.Fullname,
+			Date:         s.Date,
+			Color:        s.Color,
+			StartHour:    s.StartHour,
+			StartMinute:  s.StartMinute,
+			Capacity:     s.Capacity,
+			BookedCount:  s.BookedCount,
+		})
+	}
+
+	return result, nil
 }

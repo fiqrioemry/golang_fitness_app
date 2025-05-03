@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"net/http"
 	"os"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/datatypes"
 )
 
 func MustGetUserID(c *gin.Context) string {
@@ -102,4 +104,17 @@ func ParseDayOfWeek(day string) time.Weekday {
 	default:
 		return -1
 	}
+}
+
+func IntSliceToJSON(data []int) datatypes.JSON {
+	bytes, _ := json.Marshal(data)
+	return datatypes.JSON(bytes)
+}
+func IsDayMatched(currentDay int, allowedDays []int) bool {
+	for _, d := range allowedDays {
+		if d == currentDay {
+			return true
+		}
+	}
+	return false
 }

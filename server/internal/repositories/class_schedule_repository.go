@@ -68,11 +68,15 @@ func (r *classScheduleRepository) GetClassSchedulesWithFilter(filter dto.ClassSc
 		Order("start_minute asc")
 
 	if filter.StartDate != "" {
-		if date, err := time.Parse("2006-01-02", filter.StartDate); err == nil {
-			db = db.Where("start_time >= ?", date)
+		if start, err := time.Parse("2006-01-02", filter.StartDate); err == nil {
+			db = db.Where("date >= ?", start)
 		}
 	}
-
+	if filter.EndDate != "" {
+		if end, err := time.Parse("2006-01-02", filter.EndDate); err == nil {
+			db = db.Where("date <= ?", end)
+		}
+	}
 	if filter.CategoryID != "" {
 		db = db.Joins("JOIN classes ON classes.id = class_schedules.class_id").
 			Where("classes.category_id = ?", filter.CategoryID)

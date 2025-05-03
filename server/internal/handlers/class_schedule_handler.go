@@ -121,11 +121,17 @@ func (h *ClassScheduleHandler) DeleteClassSchedule(c *gin.Context) {
 }
 
 func (h *ClassScheduleHandler) GetAllClassSchedules(c *gin.Context) {
-	schedules, err := h.scheduleService.GetAllClassSchedules()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to get schedules", "error": err.Error()})
+	var filter dto.ClassScheduleQueryParam
+	if err := c.ShouldBindQuery(&filter); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid query parameters", "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, schedules)
+	schedules, err := h.scheduleService.GetSchedulesByFilter(filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch class schedules", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"schedules": schedules})
 }

@@ -386,7 +386,7 @@ type CreateScheduleRequest struct {
 	Date          *time.Time `json:"date,omitempty"`
 	StartHour     int        `json:"startHour" binding:"required"`
 	StartMinute   int        `json:"startMinute" binding:"required"`
-	RecurringDays []string   `json:"recurringDays,omitempty"`
+	RecurringDays []int      `json:"recurringDays,omitempty"`
 	EndType       string     `json:"endType,omitempty"`
 	EndDate       *time.Time `json:"endDate,omitempty"`
 }
