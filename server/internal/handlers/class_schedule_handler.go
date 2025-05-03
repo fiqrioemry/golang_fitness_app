@@ -10,25 +10,88 @@ import (
 )
 
 type ClassScheduleHandler struct {
-	service services.ClassScheduleService
+	scheduleService services.ClassScheduleService
+	templateService services.ScheduleTemplateService // ✅ tambahkan ini
 }
 
-func NewClassScheduleHandler(service services.ClassScheduleService) *ClassScheduleHandler {
-	return &ClassScheduleHandler{service}
+func NewClassScheduleHandler(
+	scheduleService services.ClassScheduleService,
+	templateService services.ScheduleTemplateService,
+) *ClassScheduleHandler {
+	return &ClassScheduleHandler{
+		scheduleService: scheduleService,
+		templateService: templateService,
+	}
 }
 
 func (h *ClassScheduleHandler) CreateClassSchedule(c *gin.Context) {
-	var req dto.CreateClassScheduleRequest
-	if !utils.BindAndValidateJSON(c, &req) {
+	var req dto.CreateScheduleRequest
+	if ok := utils.BindAndValidateJSON(c, &req); !ok {
 		return
 	}
 
-	if err := h.service.CreateClassSchedule(req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create schedule", "error": err.Error()})
+	if !req.IsRecurring {
+		// Non-recurring schedule
+		if req.Date == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "date is required for non-recurring schedule"})
+			return
+		}
+
+		err := h.scheduleService.CreateClassSchedule(dto.CreateClassScheduleRequest{
+			ClassID:      req.ClassID,
+			InstructorID: req.InstructorID,
+			Capacity:     req.Capacity,
+			Color:        req.Color,
+			Date:         *req.Date,
+			StartHour:    req.StartHour,
+			StartMinute:  req.StartMinute,
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create schedule", "error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{"message": "Class schedule created"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Class schedule created successfully"})
+	// Recurring schedule
+	if len(req.RecurringDays) == 0 || req.EndType == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "recurringDays and endType are required for recurring schedule"})
+		return
+	}
+
+	if req.EndType == "until" && req.EndDate == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "endDate is required for 'until' endType"})
+		return
+	}
+
+	for _, day := range req.RecurringDays {
+		dayEnum := utils.ParseDayOfWeek(day)
+		if dayEnum == -1 {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid day in recurringDays: " + day})
+			return
+		}
+
+		err := h.templateService.CreateRecurringScheduleTemplate(dto.CreateRecurringScheduleTemplateRequest{
+			ClassID:      req.ClassID,
+			InstructorID: req.InstructorID,
+			DayOfWeek:    int(dayEnum), // ✅ FIX here
+			StartHour:    req.StartHour,
+			StartMinute:  req.StartMinute,
+			Capacity:     req.Capacity,
+			Frequency:    "recurring",
+			EndType:      req.EndType,
+			EndDate:      req.EndDate,
+		})
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create recurring template", "error": err.Error()})
+			return
+		}
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Recurring schedule templates created"})
 }
 
 func (h *ClassScheduleHandler) UpdateClassSchedule(c *gin.Context) {
@@ -38,7 +101,7 @@ func (h *ClassScheduleHandler) UpdateClassSchedule(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateClassSchedule(id, req); err != nil {
+	if err := h.scheduleService.UpdateClassSchedule(id, req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update schedule", "error": err.Error()})
 		return
 	}
@@ -49,7 +112,7 @@ func (h *ClassScheduleHandler) UpdateClassSchedule(c *gin.Context) {
 func (h *ClassScheduleHandler) DeleteClassSchedule(c *gin.Context) {
 	id := c.Param("id")
 
-	if err := h.service.DeleteClassSchedule(id); err != nil {
+	if err := h.scheduleService.DeleteClassSchedule(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to delete schedule", "error": err.Error()})
 		return
 	}
@@ -58,7 +121,7 @@ func (h *ClassScheduleHandler) DeleteClassSchedule(c *gin.Context) {
 }
 
 func (h *ClassScheduleHandler) GetAllClassSchedules(c *gin.Context) {
-	schedules, err := h.service.GetAllClassSchedules()
+	schedules, err := h.scheduleService.GetAllClassSchedules()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to get schedules", "error": err.Error()})
 		return

@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -79,4 +81,25 @@ func GetTaxRate() float64 {
 		return 0.05
 	}
 	return rate
+}
+
+func ParseDayOfWeek(day string) time.Weekday {
+	switch strings.ToLower(day) {
+	case "sunday":
+		return time.Sunday
+	case "monday":
+		return time.Monday
+	case "tuesday":
+		return time.Tuesday
+	case "wednesday":
+		return time.Wednesday
+	case "thursday":
+		return time.Thursday
+	case "friday":
+		return time.Friday
+	case "saturday":
+		return time.Saturday
+	default:
+		return -1
+	}
 }

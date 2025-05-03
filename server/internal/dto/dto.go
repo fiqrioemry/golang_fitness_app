@@ -377,6 +377,19 @@ type CreateClassScheduleRequest struct {
 	Capacity     int       `json:"capacity" binding:"required"`
 	Color        string    `json:"color"`
 }
+type CreateScheduleRequest struct {
+	IsRecurring   bool       `json:"isRecurring"`
+	ClassID       string     `json:"classId" binding:"required"`
+	InstructorID  string     `json:"instructorId" binding:"required"`
+	Capacity      int        `json:"capacity" binding:"required"`
+	Color         string     `json:"color"`
+	Date          *time.Time `json:"date,omitempty"`
+	StartHour     int        `json:"startHour" binding:"required"`
+	StartMinute   int        `json:"startMinute" binding:"required"`
+	RecurringDays []string   `json:"recurringDays,omitempty"`
+	EndType       string     `json:"endType,omitempty"`
+	EndDate       *time.Time `json:"endDate,omitempty"`
+}
 
 type UpdateClassScheduleRequest struct {
 	Date        time.Time `json:"date"`
@@ -403,6 +416,7 @@ type ClassScheduleResponse struct {
 
 type ClassScheduleQueryParam struct {
 	StartDate  string `form:"startDate"`
+	EndDate    string `form:"endDate"`
 	CategoryID string `form:"categoryId"`
 }
 

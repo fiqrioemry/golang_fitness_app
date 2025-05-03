@@ -105,11 +105,13 @@ func main() {
 	// ClassSchedule
 	classScheduleRepo := repositories.NewClassScheduleRepository(db)
 	classScheduleService := services.NewClassScheduleService(classScheduleRepo, classRepo)
-	classScheduleHandler := handlers.NewClassScheduleHandler(classScheduleService)
 
 	// Schedule template
 	scheduleTemplateRepo := repositories.NewScheduleTemplateRepository(db)
 	scheduleTemplateService := services.NewScheduleTemplateService(scheduleTemplateRepo, classRepo, classScheduleRepo)
+
+	classScheduleHandler := handlers.NewClassScheduleHandler(classScheduleService, scheduleTemplateService)
+
 	scheduleTemplateHandler := handlers.NewScheduleTemplateHandler(scheduleTemplateService)
 
 	// Booking

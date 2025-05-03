@@ -36,7 +36,7 @@ func (s *scheduleTemplateService) CreateTemplate(req dto.CreateScheduleTemplateR
 		ID:           uuid.New(),
 		ClassID:      uuid.MustParse(req.ClassID),
 		InstructorID: uuid.MustParse(req.InstructorID),
-		DayOfWeek:    req.DayOfWeek,
+		DayOfWeeks:   req.DayOfWeeks,
 		StartHour:    req.StartHour,
 		StartMinute:  req.StartMinute,
 		Capacity:     req.Capacity,
