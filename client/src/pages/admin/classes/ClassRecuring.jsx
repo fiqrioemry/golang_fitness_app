@@ -7,6 +7,7 @@ import { CalendarClock, Edit, Trash2 } from "lucide-react";
 import { useRecurringTemplatesQuery } from "@/hooks/useSchedules";
 import { RunTemplate } from "@/components/admin/classes/RunTemplate";
 import { StopTemplate } from "@/components/admin/classes/StopTemplate";
+import { DeleteTemplate } from "../../../components/admin/classes/DeleteTemplate";
 
 const weekdays = [
   "Sunday",
@@ -106,14 +107,7 @@ const ClassRecuring = () => {
                   >
                     <Edit className="w-4 h-4 mr-2" /> Update
                   </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => handleDelete(t.id)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" /> Delete
-                  </Button>
+                  <DeleteTemplate template={t} />
                 </>
               )}
             </div>

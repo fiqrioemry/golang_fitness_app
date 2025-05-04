@@ -1,7 +1,7 @@
 import React from "react";
 import { instructorSchema } from "@/lib/schema";
-import { FormDialog } from "@/components/form/FormDialog";
 import { useInstructorMutation } from "@/hooks/useInstructor";
+import { FormUpdateDialog } from "@/components/form/FormUpdateDialog";
 import { InputTextElement } from "@/components/input/InputTextElement";
 
 const EditInstructor = ({ instructor }) => {
@@ -9,12 +9,11 @@ const EditInstructor = ({ instructor }) => {
   const { isPending, mutateAsync } = updateInstructor;
 
   return (
-    <FormDialog
+    <FormUpdateDialog
       state={instructor}
       loading={isPending}
       action={mutateAsync}
       schema={instructorSchema}
-      resourceId={instructor.id}
       title="Update Instructors"
     >
       <InputTextElement
@@ -22,7 +21,7 @@ const EditInstructor = ({ instructor }) => {
         label="name"
         placeholder="Enter instructor name"
       />
-    </FormDialog>
+    </FormUpdateDialog>
   );
 };
 

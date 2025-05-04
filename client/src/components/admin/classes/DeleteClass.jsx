@@ -12,9 +12,9 @@ const DeleteClass = ({ classes }) => {
 
   return (
     <FormDelete
-      loading={deleteClass.isPending}
       title="Delete Class"
       onDelete={handleDeleteClass}
+      loading={deleteClass.isPending}
       description="Are you sure want to delete this classes ?"
     />
   );

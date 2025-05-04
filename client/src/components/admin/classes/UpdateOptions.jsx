@@ -1,31 +1,22 @@
 // src/components/address/UpdateClass.jsx
 import React from "react";
-import { Pencil } from "lucide-react";
-import { FormDialog } from "@/components/form/FormDialog";
 import { optionSchema, locationSchema } from "@/lib/schema";
 import { useMutationOptions } from "@/hooks/useSelectOptions";
+import { FormUpdateDialog } from "@/components/form/FormUpdateDialog";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
 const UpdateOptions = ({ option, activeTab }) => {
   const { updateOptions } = useMutationOptions(activeTab);
+  const schema = activeTab === "location" ? locationSchema : optionSchema;
 
   return (
-    <FormDialog
+    <FormUpdateDialog
       state={option}
-      schema={activeTab === "location" ? locationSchema : optionSchema}
-      resourceId={option.id}
+      schema={schema}
       title={`Update ${activeTab}`}
       loading={updateOptions.isPending}
       action={updateOptions.mutateAsync}
-      buttonText={
-        <button
-          type="button"
-          className="text-primary hover:text-blue-600 transition"
-        >
-          <Pencil className="w-4 h-4" />
-        </button>
-      }
     >
       <InputTextElement
         name="name"
@@ -33,22 +24,28 @@ const UpdateOptions = ({ option, activeTab }) => {
         placeholder={`Enter the name for ${activeTab}`}
       />
 
-      {activeTab === "location" && (
-        <>
-          <InputTextareaElement
-            name="address"
-            label="Address"
-            placeholder={`Enter the address for ${activeTab}`}
-          />
-          <InputTextElement
-            name="geoLocation"
-            label="Geo Coordinate"
-            placeholder={`Enter the address for ${activeTab}`}
-          />
-        </>
-      )}
-    </FormDialog>
+      {activeTab === "location" && <LocationInputElement />}
+    </FormUpdateDialog>
   );
 };
 
 export { UpdateOptions };
+
+const LocationInputElement = () => {
+  return (
+    <>
+      <div>
+        <InputTextareaElement
+          name="address"
+          label="Address"
+          placeholder="Enter full address"
+        />
+        <InputTextElement
+          name="geoLocation"
+          label="Geo Location"
+          placeholder="Enter geolocation coordinates"
+        />
+      </div>
+    </>
+  );
+};

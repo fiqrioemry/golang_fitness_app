@@ -1,8 +1,8 @@
 import React from "react";
 import { classSchema } from "@/lib/schema";
 import { useClassMutation } from "@/hooks/useClass";
-import { FormDialog } from "@/components/form/FormDialog";
 import { SwitchElement } from "@/components/input/SwitchElement";
+import { FormUpdateDialog } from "@/components/form/FormUpdateDialog";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { InputFileElement } from "@/components/input/InputFileElement";
@@ -16,13 +16,12 @@ const UpdateClass = ({ classes }) => {
   const { isPending, mutateAsync } = updateClass;
 
   return (
-    <FormDialog
+    <FormUpdateDialog
       state={classes}
+      title="Update Class"
       loading={isPending}
       schema={classSchema}
       action={mutateAsync}
-      title="Update Class"
-      resourceId={classes.id}
     >
       <InputTextElement
         name="title"
@@ -85,7 +84,7 @@ const UpdateClass = ({ classes }) => {
       />
       <InputFileElement name="galleries" label="Gallery (Optional)" />
       <SwitchElement name="isActive" label="Set as active class" />
-    </FormDialog>
+    </FormUpdateDialog>
   );
 };
 

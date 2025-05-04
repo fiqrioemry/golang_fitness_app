@@ -28,6 +28,8 @@ export const createClass = async (data) => {
 
 // PUT /api/classes/:id
 export const updateClass = async (id, data) => {
+  console.log(id);
+  console.log(data);
   const formData = buildFormData(data);
   const res = await authInstance.put(`/classes/${id}`, formData);
   return res.data;

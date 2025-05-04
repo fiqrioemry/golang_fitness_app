@@ -27,28 +27,27 @@ export const useScheduleTemplateMutation = () => {
   return {
     createRecurring: useMutation({
       mutationFn: scheduleService.createScheduleTemplates,
-      ...mutationOpts("Recurring template created"),
-    }),
-
-    autoGenerate: useMutation({
-      mutationFn: scheduleService.autoGenerateSchedules,
-      ...mutationOpts("Schedules auto-generated"),
+      ...mutationOpts("Template created Successfully"),
     }),
 
     updateTemplate: useMutation({
       mutationFn: ({ id, data }) =>
         scheduleService.updateScheduleTemplate(id, data),
-      ...mutationOpts("Template updated"),
+      ...mutationOpts("Template updated successfully"),
+    }),
+    deleteTemplate: useMutation({
+      mutationFn: scheduleService.deleteScheduleTemplate,
+      ...mutationOpts("Template deleted Successfully"),
     }),
 
     runTemplate: useMutation({
       mutationFn: scheduleService.runScheduleTemplate,
-      ...mutationOpts("Template activated and schedules generated"),
+      ...mutationOpts("Template activated successfully"),
     }),
 
     stopTemplate: useMutation({
       mutationFn: scheduleService.stopScheduleTemplate,
-      ...mutationOpts("Template deactivated"),
+      ...mutationOpts("Template deactivated successfully"),
     }),
   };
 };

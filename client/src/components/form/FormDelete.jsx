@@ -12,31 +12,22 @@ import { SubmitLoading } from "@/components/ui/SubmitLoading";
 
 const FormDelete = ({
   title,
+  onDelete,
   description,
   icon = true,
-  onDelete,
-  text = "delete",
   loading = false,
 }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
         {icon ? (
-          <button
-            type="button"
-            className="text-red-500 hover:text-red-700 transition"
-          ></button>
+          <Button variant="icon" type="button">
+            <Trash2 className="w-4 h-4" />
+          </Button>
         ) : (
-          <Button
-            variant={text === "delete" ? "destructive" : "primary"}
-            type="button"
-          >
-            {text !== "delete" ? (
-              <Play className="w-4 h-4" />
-            ) : (
-              <Trash2 className="w-4 h-4" />
-            )}
-            <span>{text}</span>
+          <Button className="w-full" variant="destructive" type="button">
+            <Trash2 className="w-4 h-4" />
+            <span>Delete</span>
           </Button>
         )}
       </DialogTrigger>

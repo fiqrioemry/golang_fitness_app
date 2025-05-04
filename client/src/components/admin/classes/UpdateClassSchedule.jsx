@@ -11,7 +11,6 @@ import { SelectCalendarElement } from "@/components/input/SelectCalendarElement"
 
 const UpdateClassSchedule = ({ open, setOpen, schedule }) => {
   const { updateSchedule } = useScheduleMutation();
-
   const { isPending, mutateAsync } = updateSchedule;
 
   return (

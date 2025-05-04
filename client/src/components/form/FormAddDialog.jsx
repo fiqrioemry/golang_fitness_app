@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
@@ -12,18 +13,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { Pencil, PlusCircle } from "lucide-react";
 
-export function FormDialog({
+export function FormAddDialog({
   title,
   state,
   schema,
   action,
   children,
-  icon = true,
-  resourceId = null,
+  buttonText,
   loading = false,
-  update = true,
   shouldReset = true,
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -63,15 +61,11 @@ export function FormDialog({
 
   const handleSave = useCallback(
     async (data) => {
-      if (resourceId !== null && resourceId !== undefined) {
-        await action({ id: resourceId, data });
-      } else {
-        await action(data);
-      }
+      await action(data);
       if (formState.isValid && shouldReset) reset();
       setIsOpen(false);
     },
-    [action, formState.isValid, reset, shouldReset, resourceId]
+    [action, formState.isValid, reset, shouldReset]
   );
 
   return (
@@ -82,26 +76,10 @@ export function FormDialog({
         onOpenChange={(open) => (!open ? handleCancel() : setIsOpen(open))}
       >
         <DialogTrigger asChild>
-          {update ? (
-            icon ? (
-              <button
-                type="button"
-                className="text-primary hover:text-blue-600 transition"
-              >
-                <Pencil className="w-4 h-4" />
-              </button>
-            ) : (
-              <Button variant="destructive" type="button">
-                <Pencil className="w-4 h-4" />
-                <span>Update</span>
-              </Button>
-            )
-          ) : (
-            <Button variant="destructive" type="button">
-              <PlusCircle />
-              <span>{text}</span>
-            </Button>
-          )}
+          <Button type="button">
+            <PlusCircle className="w-4 h-4" />
+            <span>{buttonText || "Add new"}</span>
+          </Button>
         </DialogTrigger>
 
         <DialogContent className="sm:max-w-lg overflow-hidden rounded-xl p-0">
@@ -111,15 +89,15 @@ export function FormDialog({
             <FormProvider {...methods}>
               <form
                 onSubmit={handleSubmit(handleSave)}
-                className="flex flex-col h-[65vh]"
+                className="flex flex-col max-h-[70vh]"
               >
                 {/* Header */}
                 <div className="border-b px-6 py-4">
-                  <DialogTitle className="text-lg font-semibold">
+                  <DialogTitle className="text-lg font-semibold text-center">
                     {title}
                   </DialogTitle>
-                  <DialogDescription className="text-gray-500 text-sm">
-                    Submit button will activate when you make changes.
+                  <DialogDescription className="text-gray-500 text-sm text-center">
+                    Submit button will activate when All required Field Filled
                   </DialogDescription>
                 </div>
 
@@ -160,7 +138,7 @@ export function FormDialog({
               className="w-32"
               onClick={() => handleConfirmation(false)}
             >
-              Keep Editing
+              cancel
             </Button>
             <Button
               variant="destructive"

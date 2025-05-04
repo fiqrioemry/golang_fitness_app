@@ -2,8 +2,8 @@
 import React from "react";
 import { packageSchema } from "@/lib/schema";
 import { usePackageMutation } from "@/hooks/usePackage";
-import { FormDialog } from "@/components/form/FormDialog";
 import { SwitchElement } from "@/components/input/SwitchElement";
+import { FormUpdateDialog } from "@/components/form/FormUpdateDialog";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { InputFileElement } from "@/components/input/InputFileElement";
@@ -15,10 +15,9 @@ const UpdatePackage = ({ pkg }) => {
   const { isPending, mutateAsync } = updatePackage;
 
   return (
-    <FormDialog
+    <FormUpdateDialog
       state={pkg}
       loading={isPending}
-      resourceId={pkg.id}
       action={mutateAsync}
       title="Update Package"
       schema={packageSchema}
@@ -50,10 +49,10 @@ const UpdatePackage = ({ pkg }) => {
         placeholder="Package expiration duration in days"
       />
       <InputNumberElement
-        name="discount"
-        label="Discount"
         min={0}
         max={99}
+        name="discount"
+        label="Discount"
         placeholder="Discount in percent"
       />
       <InputTagsElement
@@ -63,7 +62,7 @@ const UpdatePackage = ({ pkg }) => {
       />
       <InputFileElement name="image" label="Thumbnail Image" isSingle />
       <SwitchElement name="isActive" label="Set as active package" />
-    </FormDialog>
+    </FormUpdateDialog>
   );
 };
 

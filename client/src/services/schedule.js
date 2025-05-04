@@ -10,12 +10,6 @@ export const getAllRecuringSchedule = async () => {
   return res.data.data;
 };
 
-// POST /api/schedule-templates/auto-generate
-export const autoGenerateSchedules = async (data) => {
-  const res = await authInstance.post("/schedule-templates/generate", data);
-  return res.data;
-};
-
 // POST /api/schedule-templates/recurring
 export const createScheduleTemplate = async (data) => {
   const res = await authInstance.post("/schedule-templates", data);
@@ -25,6 +19,12 @@ export const createScheduleTemplate = async (data) => {
 // PUT /api/schedule-templates/:id
 export const updateScheduleTemplate = async (id, data) => {
   const res = await authInstance.put(`/schedule-templates/${id}`, data);
+  return res.data;
+};
+
+// DELETE /api/schedule-templates/:id
+export const deleteScheduleTemplate = async (id) => {
+  const res = await authInstance.delete(`/schedule-templates/${id}`);
   return res.data;
 };
 
