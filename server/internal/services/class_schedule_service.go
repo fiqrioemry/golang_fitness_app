@@ -42,18 +42,22 @@ func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRe
 		return err
 	}
 
-	// Validasi: Instruktur tidak boleh punya kelas lain di waktu sama
+	newStart := time.Date(parsedDate.Year(), parsedDate.Month(), parsedDate.Day(), req.StartHour, req.StartMinute, 0, 0, time.Local)
+	newEnd := newStart.Add(time.Hour)
+
 	existingSchedules, err := s.repo.GetClassSchedules()
 	if err != nil {
 		return err
 	}
 
 	for _, schedule := range existingSchedules {
-		if schedule.InstructorID == uuid.MustParse(req.InstructorID) &&
-			schedule.Date.Equal(parsedDate) &&
-			schedule.StartHour == req.StartHour &&
-			schedule.StartMinute == req.StartMinute {
-			return fmt.Errorf("instructor is already assigned to another class at the same time")
+		if schedule.InstructorID == uuid.MustParse(req.InstructorID) && schedule.Date.Equal(parsedDate) {
+			existStart := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(), schedule.StartHour, schedule.StartMinute, 0, 0, time.Local)
+			existEnd := existStart.Add(time.Hour)
+
+			if newStart.Before(existEnd) && existStart.Before(newEnd) {
+				return fmt.Errorf("instructor already booked at this time")
+			}
 		}
 	}
 

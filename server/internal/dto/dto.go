@@ -255,7 +255,7 @@ type PackageResponse struct {
 	Credit      int                    `json:"credit"`
 	Expired     int                    `json:"expired"`
 	Image       string                 `json:"image"`
-	Discount    float64                `form:"discount"`
+	Discount    float64                `json:"discount"`
 	IsActive    bool                   `json:"isActive"`
 	Additional  []string               `json:"additional"`
 	Classes     []ClassSummaryResponse `json:"classes"`
@@ -377,6 +377,7 @@ type CreateClassScheduleRequest struct {
 	Capacity     int       `json:"capacity" binding:"required"`
 	Color        string    `json:"color"`
 }
+
 type CreateScheduleRequest struct {
 	IsRecurring   bool       `json:"isRecurring"`
 	ClassID       string     `json:"classId" binding:"required"`
@@ -384,13 +385,12 @@ type CreateScheduleRequest struct {
 	Capacity      int        `json:"capacity" binding:"required"`
 	Color         string     `json:"color"`
 	Date          *time.Time `json:"date,omitempty"`
-	StartHour     int        `json:"startHour" binding:"required"`
-	StartMinute   int        `json:"startMinute" binding:"required"`
+	StartHour     *int       `json:"startHour" binding:"required"`
+	StartMinute   *int       `json:"startMinute" binding:"required"`
 	RecurringDays []int      `json:"recurringDays,omitempty"`
 	EndType       string     `json:"endType,omitempty"`
 	EndDate       *time.Time `json:"endDate,omitempty"`
 }
-
 type UpdateClassScheduleRequest struct {
 	Date        time.Time `json:"date"`
 	StartHour   int       `json:"startHour"`
