@@ -8,6 +8,7 @@ import { useRecurringTemplatesQuery } from "@/hooks/useSchedules";
 import { RunTemplate } from "@/components/admin/classes/RunTemplate";
 import { StopTemplate } from "@/components/admin/classes/StopTemplate";
 import { DeleteTemplate } from "../../../components/admin/classes/DeleteTemplate";
+import { UpdateTemplate } from "../../../components/admin/classes/UpdateTemplate";
 
 const weekdays = [
   "Sunday",
@@ -99,14 +100,7 @@ const ClassRecuring = () => {
               ) : (
                 <>
                   <RunTemplate template={t} />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => handleUpdate(t.id)}
-                  >
-                    <Edit className="w-4 h-4 mr-2" /> Update
-                  </Button>
+                  <UpdateTemplate template={t} />
                   <DeleteTemplate template={t} />
                 </>
               )}
@@ -118,10 +112,6 @@ const ClassRecuring = () => {
   );
 };
 
-const handleRun = (id) => console.log("Run", id);
-const handleStop = (id) => console.log("Stop", id);
-const handleGenerate = (id) => console.log("Generate", id);
 const handleUpdate = (id) => console.log("Update", id);
-const handleDelete = (id) => console.log("Delete", id);
 
 export default ClassRecuring;

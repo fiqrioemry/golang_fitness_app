@@ -14,7 +14,7 @@ import { SubmitButton } from "@/components/form/SubmitButton";
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { Pencil, PlusCircle } from "lucide-react";
 
-export function FormDialog({
+export function FormDialoxg({
   title,
   state,
   schema,

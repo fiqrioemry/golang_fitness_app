@@ -39,5 +39,5 @@ export const getUserBookings = async (page = 1, limit = 10) => {
   const res = await authInstance.get("/user/bookings", {
     params: { page, limit },
   });
-  return res.data;
+  return res.data.bookings;
 };

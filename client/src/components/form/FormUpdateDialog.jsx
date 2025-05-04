@@ -80,7 +80,7 @@ export function FormUpdateDialog({
               <Pencil className="w-4 h-4" />
             </Button>
           ) : (
-            <Button variant="primary" type="button">
+            <Button variant="outline" className="w-full" type="button">
               <Pencil className="w-4 h-4" />
               <span>Update</span>
             </Button>

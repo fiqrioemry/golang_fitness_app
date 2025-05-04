@@ -9,15 +9,32 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarIcon, ClockIcon, MapPinIcon, UserIcon } from "lucide-react";
 
+const buildDateTime = (dateStr, hour, minute) => {
+  if (!dateStr || hour === undefined || minute === undefined) return null;
+  const date = new Date(dateStr);
+  date.setHours(hour);
+  date.setMinutes(minute);
+  date.setSeconds(0);
+  return date;
+};
+
 export const BookingCard = ({ booking }) => {
   const [timeLeft, setTimeLeft] = useState("");
 
+  const startTime = buildDateTime(
+    booking.date,
+    booking.startHour,
+    booking.startMinute
+  );
+  const endTime = startTime
+    ? new Date(startTime.getTime() + booking.duration * 60 * 1000)
+    : null;
+
   useEffect(() => {
+    if (!startTime) return;
+
     const updateCountdown = () => {
-      const seconds = differenceInSeconds(
-        new Date(booking.startTime),
-        new Date()
-      );
+      const seconds = differenceInSeconds(startTime, new Date());
       if (seconds > 0) {
         const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
         const formatted = formatDuration(duration, {
@@ -32,7 +49,15 @@ export const BookingCard = ({ booking }) => {
     updateCountdown();
     const timer = setInterval(updateCountdown, 1000);
     return () => clearInterval(timer);
-  }, [booking.startTime]);
+  }, [startTime]);
+
+  if (!startTime || isNaN(startTime.getTime()) || !endTime) {
+    return (
+      <Card className="overflow-hidden shadow-lg transition hover:shadow-xl p-4">
+        <p className="text-red-500">Invalid booking time.</p>
+      </Card>
+    );
+  }
 
   return (
     <Card className="overflow-hidden shadow-lg transition hover:shadow-xl">
@@ -52,36 +77,30 @@ export const BookingCard = ({ booking }) => {
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            {booking.instructorName} • {booking.duration} mins
+            {booking.instructor} • {booking.duration} mins
           </p>
 
-          {/* Countdown */}
           <div className="text-sm text-blue-500 font-medium">
             Starts in: {timeLeft} ⏳🔥
           </div>
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <CalendarIcon className="h-4 w-4" />
-            <span>
-              {format(new Date(booking.startTime), "EEE, dd MMM yyyy")}
-            </span>
+            <span>{format(startTime, "EEE, dd MMM yyyy")}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <ClockIcon className="h-4 w-4" />
             <span>
-              {format(new Date(booking.startTime), "HH:mm")} -{" "}
-              {format(new Date(booking.endTime), "HH:mm")}
+              {format(startTime, "HH:mm")} - {format(endTime, "HH:mm")}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <MapPinIcon className="h-4 w-4" />
-            <span>
-              {booking.locationName} - {booking.locationAddress}
-            </span>
+            <span>{booking.location}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <UserIcon className="h-4 w-4" />
-            <span>{booking.participantCount} Participant</span>
+            <span>{booking.participant} Participant</span>
           </div>
           <div className="text-xs text-muted-foreground text-right mt-2">
             Booked at {format(new Date(booking.bookedAt), "dd MMM yyyy, HH:mm")}

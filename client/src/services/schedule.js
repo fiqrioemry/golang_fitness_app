@@ -4,10 +4,16 @@ import { authInstance } from ".";
 // SCHEDULE TEMPLATE (Admin Only)
 // =====================
 
-// PUT /api/schedule-templates/:id
+// GET /api/schedule-templates
 export const getAllRecuringSchedule = async () => {
   const res = await authInstance.get(`/schedule-templates`);
-  return res.data.data;
+  return res.data;
+};
+
+// GET /api/schedule-templates
+export const getAllRecuringSchedule = async () => {
+  const res = await authInstance.get(`/schedule-templates`);
+  return res.data;
 };
 
 // POST /api/schedule-templates/recurring

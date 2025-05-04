@@ -8,7 +8,7 @@ import { NoBooking } from "@/components/customer/bookings/NoBooking";
 
 const UserBookings = () => {
   const {
-    data: response,
+    data: bookings = [],
     isError,
     refetch,
     isLoading,
@@ -17,8 +17,6 @@ const UserBookings = () => {
   if (isLoading) return <Loading />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
-
-  const bookings = response.bookings || [];
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-8 space-y-6">

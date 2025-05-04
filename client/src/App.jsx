@@ -49,6 +49,7 @@ import PublicLayout from "./components/public/PublicLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
 import ClassRecuring from "./pages/admin/classes/ClassRecuring";
+import ScheduleDetail from "./pages/ScheduleDetail";
 
 function App() {
   const { checkingAuth, authMe } = useAuthStore();
@@ -96,6 +97,7 @@ function App() {
           <Route path="schedules" element={<Schedules />} />
           <Route path="classes/:id" element={<ClassDetail />} />
           <Route path="packages/:id" element={<PackageDetail />} />
+          <Route path="schedules/:id" element={<ScheduleDetail />} />
         </Route>
 
         {/* customer */}
@@ -110,6 +112,7 @@ function App() {
           <Route index element={<Profile />} />
           <Route path="packages" element={<UserPackages />} />
           <Route path="bookings" element={<UserBookings />} />
+
           <Route path="transactions" element={<UserTransactions />} />
           <Route path="notifications" element={<UserNotifications />} />
         </Route>

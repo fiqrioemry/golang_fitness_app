@@ -14,5 +14,5 @@ export const createBooking = async (data) => {
 // GET /api/bookings
 export const getUserBookings = async () => {
   const res = await authInstance.get("/bookings");
-  return res.data;
+  return res.data.bookings;
 };

@@ -79,9 +79,9 @@ const UsersList = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
             <SelectItem value="customer">Customer</SelectItem>
             <SelectItem value="instructor">Instructor</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
           </SelectContent>
         </Select>
       </div>
