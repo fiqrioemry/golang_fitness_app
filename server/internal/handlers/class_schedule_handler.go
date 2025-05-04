@@ -75,7 +75,7 @@ func (h *ClassScheduleHandler) CreateClassSchedule(c *gin.Context) {
 			return
 		}
 
-		err := h.templateService.CreateRecurringScheduleTemplate(dto.CreateRecurringScheduleTemplateRequest{
+		err := h.templateService.CreateScheduleTemplate(dto.CreateScheduleTemplateRequest{
 			ClassID:      req.ClassID,
 			InstructorID: req.InstructorID,
 			DayOfWeek:    day,

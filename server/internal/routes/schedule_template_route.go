@@ -10,10 +10,12 @@ import (
 func ScheduleTemplateRoutes(r *gin.Engine, handler *handlers.ScheduleTemplateHandler) {
 	template := r.Group("/api/schedule-templates")
 	template.Use(middleware.AuthRequired(), middleware.AdminOnly())
-	template.POST("", handler.CreateTemplate)
-	template.POST("/auto-generate", handler.AutoGenerateSchedules)
-	template.POST("/recurring", handler.CreateRecurringScheduleTemplate)
+
+	template.GET("", handler.GetAllTemplates)
 	template.PUT("/:id", handler.UpdateTemplate)
 	template.DELETE("/:id", handler.DeleteTemplate)
-
+	template.POST("/:id/run", handler.RunScheduleTemplate)
+	template.POST("/:id/stop", handler.StopScheduleTemplate)
+	template.PUT("", handler.CreateScheduleTemplate)
+	template.POST("/generate", handler.AutoGenerateSchedules)
 }

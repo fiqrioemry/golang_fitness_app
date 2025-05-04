@@ -17,18 +17,14 @@ func NewScheduleTemplateHandler(service services.ScheduleTemplateService) *Sched
 	return &ScheduleTemplateHandler{service}
 }
 
-func (h *ScheduleTemplateHandler) CreateTemplate(c *gin.Context) {
-	var req dto.CreateScheduleTemplateRequest
-	if !utils.BindAndValidateJSON(c, &req) {
+func (h *ScheduleTemplateHandler) GetAllTemplates(c *gin.Context) {
+	templates, err := h.service.GetAllTemplates()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	if err := h.service.CreateTemplate(req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create schedule template", "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{"message": "Schedule template created successfully"})
+	c.JSON(http.StatusOK, gin.H{"data": templates})
 }
 
 func (h *ScheduleTemplateHandler) AutoGenerateSchedules(c *gin.Context) {
@@ -40,13 +36,13 @@ func (h *ScheduleTemplateHandler) AutoGenerateSchedules(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Schedules generated successfully"})
 }
 
-func (h *ScheduleTemplateHandler) CreateRecurringScheduleTemplate(c *gin.Context) {
-	var req dto.CreateRecurringScheduleTemplateRequest
+func (h *ScheduleTemplateHandler) CreateScheduleTemplate(c *gin.Context) {
+	var req dto.CreateScheduleTemplateRequest
 	if !utils.BindAndValidateJSON(c, &req) {
 		return
 	}
 
-	if err := h.service.CreateRecurringScheduleTemplate(req); err != nil {
+	if err := h.service.CreateScheduleTemplate(req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create recurring schedule", "error": err.Error()})
 		return
 	}
@@ -54,8 +50,8 @@ func (h *ScheduleTemplateHandler) CreateRecurringScheduleTemplate(c *gin.Context
 	c.JSON(http.StatusCreated, gin.H{"message": "Recurring schedule template created successfully"})
 }
 
-// schedule_template_handler.go
 func (h *ScheduleTemplateHandler) UpdateTemplate(c *gin.Context) {
+
 	templateID := c.Param("id")
 	var req dto.CreateScheduleTemplateRequest
 	if !utils.BindAndValidateJSON(c, &req) {
@@ -77,4 +73,22 @@ func (h *ScheduleTemplateHandler) DeleteTemplate(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Template deleted successfully"})
+}
+
+func (h *ScheduleTemplateHandler) RunScheduleTemplate(c *gin.Context) {
+	id := c.Param("id")
+	if err := h.service.RunTemplate(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to run template", "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Template is now active and schedules generated"})
+}
+
+func (h *ScheduleTemplateHandler) StopScheduleTemplate(c *gin.Context) {
+	id := c.Param("id")
+	if err := h.service.StopTemplate(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to stop template", "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Template deactivated successfully"})
 }

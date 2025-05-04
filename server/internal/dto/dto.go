@@ -3,6 +3,8 @@ package dto
 import (
 	"mime/multipart"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // AUTHENTICATION  ==============
@@ -399,6 +401,10 @@ type UpdateClassScheduleRequest struct {
 	Color       string    `json:"color"`
 }
 
+type ScheduleTemplateToggleRequest struct {
+	IsActive bool `json:"isActive" binding:"required"`
+}
+
 type ClassScheduleResponse struct {
 	ID           string    `json:"id"`
 	ClassID      string    `json:"classId"`
@@ -420,16 +426,23 @@ type ClassScheduleQueryParam struct {
 	CategoryID string `form:"categoryId"`
 }
 
-type CreateScheduleTemplateRequest struct {
-	ClassID      string `json:"classId" binding:"required"`
-	InstructorID string `json:"instructorId" binding:"required"`
-	DayOfWeek    int    `json:"dayOfWeek" binding:"required,min=0,max=6"`
-	StartHour    int    `json:"startHour" binding:"required,min=0,max=23"`
-	StartMinute  int    `json:"startMinute" binding:"required,min=0,max=59"`
-	Capacity     int    `json:"capacity" binding:"required,gt=0"`
+type ScheduleTemplateResponse struct {
+	ID           uuid.UUID  `json:"id"`
+	ClassID      uuid.UUID  `json:"classId"`
+	ClassName    string     `json:"className"`
+	InstructorID uuid.UUID  `json:"instructorId"`
+	Instructor   string     `json:"instructor"`
+	DayOfWeeks   []int      `json:"dayOfWeeks"`
+	StartHour    int        `json:"startHour"`
+	StartMinute  int        `json:"startMinute"`
+	Capacity     int        `json:"capacity"`
+	IsActive     bool       `json:"isActive"`
+	Frequency    string     `json:"frequency"`
+	EndType      string     `json:"endType"`
+	EndDate      *time.Time `json:"endDate,omitempty"`
 }
 
-type CreateRecurringScheduleTemplateRequest struct {
+type CreateScheduleTemplateRequest struct {
 	ClassID      string `json:"classId" binding:"required"`
 	InstructorID string `json:"instructorId" binding:"required"`
 	DayOfWeek    int    `json:"dayOfWeek" binding:"required,min=0,max=6"`

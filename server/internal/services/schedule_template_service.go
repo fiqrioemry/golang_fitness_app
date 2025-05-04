@@ -13,10 +13,12 @@ import (
 )
 
 type ScheduleTemplateService interface {
-	CreateRecurringScheduleTemplate(req dto.CreateRecurringScheduleTemplateRequest) error
-	CreateTemplate(req dto.CreateScheduleTemplateRequest) error
 	AutoGenerateSchedules() error
+	RunTemplate(id string) error
+	StopTemplate(id string) error
 	DeleteTemplate(id string) error
+	GetAllTemplates() ([]dto.ScheduleTemplateResponse, error)
+	CreateScheduleTemplate(req dto.CreateScheduleTemplateRequest) error
 	UpdateTemplate(id string, req dto.CreateScheduleTemplateRequest) error
 }
 
@@ -34,7 +36,38 @@ func NewScheduleTemplateService(
 	return &scheduleTemplateService{templateRepo, classRepo, classScheduleRepo}
 }
 
-func (s *scheduleTemplateService) CreateTemplate(req dto.CreateScheduleTemplateRequest) error {
+func (s *scheduleTemplateService) GetAllTemplates() ([]dto.ScheduleTemplateResponse, error) {
+	templates, err := s.templateRepo.FindAll()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.ScheduleTemplateResponse
+	for _, t := range templates {
+		var days []int
+		_ = json.Unmarshal(t.DayOfWeeks, &days)
+		rule, _ := s.templateRepo.GetRecurrenceRuleByTemplateID(t.ID.String())
+		resp := dto.ScheduleTemplateResponse{
+			ID:           t.ID,
+			ClassID:      t.ClassID,
+			ClassName:    t.Class.Title,
+			InstructorID: t.InstructorID,
+			Instructor:   t.Instructor.User.Profile.Fullname,
+			DayOfWeeks:   days,
+			StartHour:    t.StartHour,
+			StartMinute:  t.StartMinute,
+			Capacity:     t.Capacity,
+			IsActive:     t.IsActive,
+			Frequency:    rule.Frequency,
+			EndType:      rule.EndType,
+			EndDate:      rule.EndDate,
+		}
+		result = append(result, resp)
+	}
+	return result, nil
+}
+
+func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleTemplateRequest) error {
 	template := models.ScheduleTemplate{
 		ID:           uuid.New(),
 		ClassID:      uuid.MustParse(req.ClassID),
@@ -43,11 +76,51 @@ func (s *scheduleTemplateService) CreateTemplate(req dto.CreateScheduleTemplateR
 		StartHour:    req.StartHour,
 		StartMinute:  req.StartMinute,
 		Capacity:     req.Capacity,
-		IsActive:     true,
+		IsActive:     false,
 	}
 
-	return s.templateRepo.CreateTemplate(&template)
+	if err := s.templateRepo.CreateTemplate(&template); err != nil {
+		return err
+	}
+
+	if req.Frequency == "recurring" {
+		rule := models.RecurrenceRule{
+			TemplateID: template.ID,
+			Frequency:  req.Frequency,
+			EndType:    req.EndType,
+			EndDate:    req.EndDate,
+		}
+		return s.templateRepo.CreateRecurrenceRule(&rule)
+	}
+
+	return nil
 }
+
+func (s *scheduleTemplateService) UpdateTemplate(id string, req dto.CreateScheduleTemplateRequest) error {
+
+	template, err := s.templateRepo.GetTemplateByID(id)
+	if err != nil {
+		return err
+	}
+
+	if template.IsActive {
+		return fmt.Errorf("cannot update an active template, please stop it first")
+	}
+
+	template.ClassID = uuid.MustParse(req.ClassID)
+	template.InstructorID = uuid.MustParse(req.InstructorID)
+	template.DayOfWeeks = utils.IntSliceToJSON([]int{req.DayOfWeek})
+	template.StartHour = req.StartHour
+	template.StartMinute = req.StartMinute
+	template.Capacity = req.Capacity
+
+	return s.templateRepo.UpdateTemplate(template)
+}
+
+func (s *scheduleTemplateService) DeleteTemplate(id string) error {
+	return s.templateRepo.DeleteTemplate(id)
+}
+
 func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 	templates, err := s.templateRepo.GetActiveTemplates()
 	if err != nil {
@@ -146,51 +219,29 @@ func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 	return nil
 }
 
-func (s *scheduleTemplateService) CreateRecurringScheduleTemplate(req dto.CreateRecurringScheduleTemplateRequest) error {
-	template := models.ScheduleTemplate{
-		ID:           uuid.New(),
-		ClassID:      uuid.MustParse(req.ClassID),
-		InstructorID: uuid.MustParse(req.InstructorID),
-		DayOfWeeks:   utils.IntSliceToJSON([]int{req.DayOfWeek}),
-		StartHour:    req.StartHour,
-		StartMinute:  req.StartMinute,
-		Capacity:     req.Capacity,
-		IsActive:     true,
-	}
-
-	if err := s.templateRepo.CreateTemplate(&template); err != nil {
+func (s *scheduleTemplateService) RunTemplate(id string) error {
+	template, err := s.templateRepo.GetTemplateByID(id)
+	if err != nil {
 		return err
 	}
-
-	if req.Frequency == "recurring" {
-		rule := models.RecurrenceRule{
-			TemplateID: template.ID,
-			Frequency:  req.Frequency,
-			EndType:    req.EndType,
-			EndDate:    req.EndDate,
-		}
-		return s.templateRepo.CreateRecurrenceRule(&rule)
+	if template.IsActive {
+		return fmt.Errorf("template is already active")
 	}
-
-	return nil
+	template.IsActive = true
+	if err := s.templateRepo.UpdateTemplate(template); err != nil {
+		return err
+	}
+	return s.AutoGenerateSchedules()
 }
 
-// schedule_template_service.go
-func (s *scheduleTemplateService) UpdateTemplate(id string, req dto.CreateScheduleTemplateRequest) error {
-	templateID, _ := uuid.Parse(id)
-	template := models.ScheduleTemplate{
-		ID:           templateID,
-		ClassID:      uuid.MustParse(req.ClassID),
-		InstructorID: uuid.MustParse(req.InstructorID),
-		DayOfWeeks:   utils.IntSliceToJSON([]int{req.DayOfWeek}),
-		StartHour:    req.StartHour,
-		StartMinute:  req.StartMinute,
-		Capacity:     req.Capacity,
-		IsActive:     true,
+func (s *scheduleTemplateService) StopTemplate(id string) error {
+	template, err := s.templateRepo.GetTemplateByID(id)
+	if err != nil {
+		return err
 	}
-	return s.templateRepo.UpdateTemplate(&template)
-}
-
-func (s *scheduleTemplateService) DeleteTemplate(id string) error {
-	return s.templateRepo.DeleteTemplate(id)
+	if !template.IsActive {
+		return fmt.Errorf("template is already inactive")
+	}
+	template.IsActive = false
+	return s.templateRepo.UpdateTemplate(template)
 }

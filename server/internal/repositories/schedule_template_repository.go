@@ -8,10 +8,12 @@ import (
 
 type ScheduleTemplateRepository interface {
 	DeleteTemplate(id string) error
+	FindAll() ([]models.ScheduleTemplate, error)
 	CreateTemplate(template *models.ScheduleTemplate) error
 	GetActiveTemplates() ([]models.ScheduleTemplate, error)
 	CreateRecurrenceRule(rule *models.RecurrenceRule) error
 	UpdateTemplate(template *models.ScheduleTemplate) error
+	GetTemplateByID(id string) (*models.ScheduleTemplate, error)
 	GetRecurrenceRuleByTemplateID(templateID string) (*models.RecurrenceRule, error)
 }
 
@@ -51,4 +53,18 @@ func (r *scheduleTemplateRepository) GetRecurrenceRuleByTemplateID(templateID st
 	var rule models.RecurrenceRule
 	err := r.db.Where("template_id = ?", templateID).First(&rule).Error
 	return &rule, err
+}
+
+func (r *scheduleTemplateRepository) FindAll() ([]models.ScheduleTemplate, error) {
+	var templates []models.ScheduleTemplate
+	err := r.db.Preload("Class").Preload("Instructor.User.Profile").Find(&templates).Error
+	return templates, err
+}
+
+func (r *scheduleTemplateRepository) GetTemplateByID(id string) (*models.ScheduleTemplate, error) {
+	var template models.ScheduleTemplate
+	if err := r.db.First(&template, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &template, nil
 }

@@ -265,11 +265,14 @@ type ScheduleTemplate struct {
 	ClassID      uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
 	InstructorID uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
 	DayOfWeeks   datatypes.JSON `gorm:"type:json" json:"dayOfWeeks"`
-	StartHour    int            `gorm:"not null" json:"startHour"`   // 0-23
-	StartMinute  int            `gorm:"not null" json:"startMinute"` // 0-59
+	StartHour    int            `gorm:"not null" json:"startHour"`
+	StartMinute  int            `gorm:"not null" json:"startMinute"`
 	Capacity     int            `gorm:"not null" json:"capacity"`
 	IsActive     bool           `gorm:"default:true" json:"isActive"`
 	CreatedAt    time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+
+	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
+	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`
 }
 
 func (s *ScheduleTemplate) BeforeCreate(tx *gorm.DB) (err error) {
