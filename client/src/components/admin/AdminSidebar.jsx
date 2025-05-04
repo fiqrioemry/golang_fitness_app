@@ -16,6 +16,7 @@ import {
   MessageSquare,
   ClipboardCheck,
   LogOut,
+  Repeat,
 } from "lucide-react";
 import {
   Accordion,
@@ -109,6 +110,11 @@ const accordionMenus = [
       { to: "/admin/classes/add", title: "Add Class", icon: Plus },
       { to: "/admin/classes/options", title: "Class Options", icon: Calendar },
       { to: "/admin/classes/schedules", title: "Class Schedules", icon: Clock },
+      {
+        to: "/admin/classes/recuring",
+        title: "Recuring Schedule",
+        icon: Repeat,
+      },
     ],
   },
   {

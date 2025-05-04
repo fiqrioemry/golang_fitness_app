@@ -92,7 +92,7 @@
   }
 
   h2 {
-    @apply text-xl md:text-2xl font-semibold uppercase;
+    @apply text-xl md:text-2xl font-semibold capitalize;
   }
 
   h3 {

@@ -1,5 +1,4 @@
 // src/store/useAuthStore.jsx
-
 import { toast } from "sonner";
 import { create } from "zustand";
 import auth from "@/services/auth";
@@ -11,6 +10,7 @@ export const useAuthStore = create(
       user: null,
       loading: false,
       checkingAuth: true,
+      rememberMe: false,
       resetStep: () => set({ step: 1 }),
 
       setUser: (user) => set({ user }),
@@ -18,6 +18,8 @@ export const useAuthStore = create(
       clearUser: () => set({ user: null }),
 
       setCheckingAuth: () => set({ checkingAuth: false }),
+
+      setRememberMe: (remember) => set({ rememberMe: remember }),
 
       authMe: async () => {
         try {
@@ -32,13 +34,21 @@ export const useAuthStore = create(
 
       login: async (formData) => {
         set({ loading: true });
+
         try {
           const { message } = await auth.login(formData);
           toast.success(message);
+
+          if (formData.rememberMe) {
+            get().setRememberMe(true);
+          } else {
+            get().setRememberMe(false);
+          }
+
           await get().authMe();
         } catch (error) {
           console.log(error);
-          toast.error(error.response.data.message);
+          toast.error(error.response?.data?.message || "Login failed");
         } finally {
           set({ loading: false });
         }
@@ -64,6 +74,7 @@ export const useAuthStore = create(
           set({ loading: false });
         }
       },
+
       register: async (formData) => {
         set({ loading: true });
         try {
@@ -90,10 +101,12 @@ export const useAuthStore = create(
         }
       },
     }),
-
     {
       name: "auth-storage",
-      partialize: (state) => ({ user: state.user }),
+      partialize: (state) => ({
+        user: state.rememberMe ? state.user : null,
+        rememberMe: state.rememberMe,
+      }),
     }
   )
 );

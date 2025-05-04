@@ -155,7 +155,7 @@ export function FormDialog({
               Keep Editing
             </Button>
             <Button
-              variant="danger"
+              variant="destructive"
               className="w-32"
               onClick={() => handleConfirmation(true)}
             >

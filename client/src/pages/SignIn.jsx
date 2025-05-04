@@ -4,9 +4,8 @@ import { loginState } from "@/lib/constant";
 import { WebLogo } from "@/components/ui/WebLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { FormInput } from "@/components/form/FormInput";
-import { InputTextElement } from "@/components/input/InputTextElement";
 import { SwitchElement } from "@/components/input/SwitchElement";
-import { InputDateElement } from "../components/input/InputDateElement";
+import { InputTextElement } from "@/components/input/InputTextElement";
 
 const SignIn = () => {
   const { login, loading } = useAuthStore();
@@ -17,7 +16,7 @@ const SignIn = () => {
         {/* Left Side (Illustration) */}
         <div className="hidden md:block bg-blue-600 p-8 text-white text-center">
           <h2 className="text-3xl font-bold mb-4">Welcome Back!</h2>
-          <p className="text-sm">Login and explore your dashboard</p>
+          <p className="text-sm">Sign in and access your dashboard</p>
           <img
             src="/signin-wallpaper.webp"
             alt="sign-in-illustration"
@@ -29,12 +28,11 @@ const SignIn = () => {
         <div className="p-8">
           <div className="mb-4">
             <WebLogo />
-            <h2 className="text-center">Login</h2>
           </div>
 
           <FormInput
             action={login}
-            text="login"
+            text="Sign In"
             className="w-full"
             state={loginState}
             isLoading={loading}
@@ -43,7 +41,7 @@ const SignIn = () => {
             <InputTextElement
               name="email"
               label="Email"
-              placeholder="Masukkan email"
+              placeholder="Enter your email"
             />
             <InputTextElement
               name="password"
@@ -55,12 +53,12 @@ const SignIn = () => {
           </FormInput>
 
           <p className="text-sm text-center mt-6 text-gray-600">
-            Belum punya akun?
+            Don't have an account?{" "}
             <Link
               to="/signup"
               className="text-blue-600 hover:underline font-medium"
             >
-              Daftar sekarang
+              Sign up now
             </Link>
           </p>
         </div>

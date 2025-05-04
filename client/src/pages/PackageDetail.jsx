@@ -101,10 +101,10 @@ const PackageDetail = () => {
                   {pkg.credit} Credits •{" "}
                   {pkg.Discount > 0 ? (
                     <>
-                      <span className="line-through text-red-500 ml-1">
+                      <span className="line-through text-black ml-1">
                         Rp {pkg.price.toLocaleString("id-ID")}
                       </span>
-                      <span className="ml-2 text-green-600 font-semibold">
+                      <span className="ml-2 text-red-600 font-semibold">
                         Rp {discountedPrice.toLocaleString("id-ID")}
                       </span>
                     </>
@@ -165,14 +165,14 @@ const PackageDetail = () => {
           <div className="bg-white border shadow-md rounded-2xl p-5 sticky top-24 space-y-4">
             <h3 className="text-xl font-semibold mb-1">Checkout</h3>
 
-            <div className="text-sm text-muted-foreground flex justify-between">
+            <div className="text-sm text-muted-foreground flex justify-between items-center">
               <span>Base Price</span>
               {pkg.Discount > 0 ? (
                 <span>
-                  <span className="line-through text-red-500 mr-1">
+                  <span className="line-through text-black mr-1">
                     Rp {pkg.price.toLocaleString("id-ID")}
                   </span>
-                  <span className="text-green-600 font-semibold">
+                  <span className="text-red-600 text-lg font-semibold">
                     Rp {discountedPrice.toLocaleString("id-ID")}
                   </span>
                 </span>
@@ -182,7 +182,7 @@ const PackageDetail = () => {
             </div>
 
             {pkg.Discount > 0 && (
-              <div className="text-sm text-green-600 flex justify-between">
+              <div className="text-sm text-red-600 flex justify-between">
                 <span> Discount</span>
                 <span>-{pkg.Discount}%</span>
               </div>

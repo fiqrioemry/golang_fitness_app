@@ -6,39 +6,33 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Play, Trash2 } from "lucide-react";
+import { Play, StopCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 
-const FormDelete = ({
+const FormToggle = ({
   title,
   description,
-  icon = true,
-  onDelete,
-  text = "delete",
+  onToggle,
+  text = "start",
+  toggle = true,
   loading = false,
 }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        {icon ? (
-          <button
-            type="button"
-            className="text-red-500 hover:text-red-700 transition"
-          ></button>
-        ) : (
-          <Button
-            variant={text === "delete" ? "destructive" : "primary"}
-            type="button"
-          >
-            {text !== "delete" ? (
-              <Play className="w-4 h-4" />
-            ) : (
-              <Trash2 className="w-4 h-4" />
-            )}
-            <span>{text}</span>
-          </Button>
-        )}
+        <Button
+          className="w-full"
+          variant={toggle ? "default" : "destructive"}
+          type="button"
+        >
+          {toggle ? (
+            <Play className="w-4 h-4" />
+          ) : (
+            <StopCircle className="w-4 h-4" />
+          )}
+          <span>{text}</span>
+        </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md rounded-xl p-6 space-y-6">
@@ -66,9 +60,9 @@ const FormDelete = ({
                 <Button
                   variant="destructive"
                   className="w-32"
-                  onClick={onDelete}
+                  onClick={onToggle}
                 >
-                  Delete
+                  Yes, Execute
                 </Button>
               </DialogClose>
             </div>
@@ -79,4 +73,4 @@ const FormDelete = ({
   );
 };
 
-export { FormDelete };
+export { FormToggle };

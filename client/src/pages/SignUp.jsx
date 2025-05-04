@@ -78,7 +78,6 @@ const SignUp = () => {
         <div className="p-8">
           <div className="mb-4">
             <WebLogo />
-            <h3 className="text-center">Register</h3>
           </div>
 
           {/* Step Indicator */}

@@ -1,34 +1,41 @@
 import React, { useState, useMemo } from "react";
-import { useSchedulesQuery } from "@/hooks/useClass";
-import { Loading } from "@/components/ui/Loading";
-import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { format, isSameDay, addDays } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { Button } from "@/components/ui/button";
+import { Loading } from "@/components/ui/Loading";
+import { useSchedulesQuery } from "@/hooks/useClass";
+import { format, isSameDay, addDays } from "date-fns";
+import { ErrorDialog } from "@/components/ui/ErrorDialog";
 
 const Schedules = () => {
+  const today = new Date();
+  const [selectedDate, setSelectedDate] = useState(today);
   const {
-    data: schedules = [],
+    data: { schedules } = [],
     isLoading,
     isError,
     refetch,
   } = useSchedulesQuery();
-  const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(today);
 
   const dateRange = useMemo(() => {
     return Array.from({ length: 14 }, (_, i) => addDays(today, i));
   }, [today]);
 
-  const filteredSchedules = schedules.filter((item) =>
-    isSameDay(new Date(item.startTime), selectedDate)
-  );
+  const filteredSchedules = useMemo(() => {
+    return schedules
+      ?.map((item) => {
+        const start = new Date(item.date);
+        start.setHours(item.startHour, item.startMinute, 0, 0);
+        const end = new Date(start.getTime() + 60 * 60 * 1000);
+        return { ...item, startTime: start, endTime: end };
+      })
+      .filter((item) => isSameDay(item.startTime, selectedDate));
+  }, [schedules, selectedDate]);
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="min-h-screen px-4 py-10 max-w-7xl mx-auto ">
+    <section className="min-h-screen px-4 py-10 max-w-7xl mx-auto">
       {/* Date Header */}
       <div className="flex items-center justify-between mb-4">
         <button className="text-xl">&#8592;</button>
@@ -76,17 +83,11 @@ const Schedules = () => {
             >
               <div className="space-y-1">
                 <p className="text-sm font-semibold text-[#56684c]">
-                  {format(new Date(s.startTime), "h:mm a", {
-                    locale: localeId,
-                  })}{" "}
-                  •{" "}
-                  {Math.round(
-                    (new Date(s.endTime) - new Date(s.startTime)) / 60000
-                  )}{" "}
-                  mins
+                  {format(s.startTime, "h:mm a", { locale: localeId })} •{" "}
+                  {Math.round((s.endTime - s.startTime) / 60000)} mins
                 </p>
-                <p className="font-medium">{s.classTitle}</p>
-                <p className="text-sm text-gray-500">{s.instructorName}</p>
+                <p className="font-medium">{s.class}</p>
+                <p className="text-sm text-gray-500">{s.instructor}</p>
               </div>
 
               <div className="mt-3 sm:mt-0 sm:text-right">

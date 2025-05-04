@@ -23,7 +23,7 @@ const UpdateClassSchedule = ({ open, setOpen, schedule }) => {
       schema={scheduleSchema}
       action={mutateAsync}
       title="Update Schedule"
-      resourceId={schedule.id}
+      resourceId={schedule?.id}
     >
       <SelectCalendarElement name="date" label="Event Date" />
 

@@ -3,37 +3,37 @@ import React, { useState, useEffect } from "react";
 import { useSchedulesQuery } from "@/hooks/useClass";
 import { AddClassSchedule } from "@/components/admin/classes/AddClassSchedule";
 import { ClassScheduleDetail } from "@/components/admin/classes/ClassScheduleDetail";
+import { UpdateClassSchedule } from "@/components/admin/classes/UpdateClassSchedule";
 import { ClassScheduleCalendar } from "@/components/admin/classes/ClassScheduleCalendar";
-import { UpdateClassSchedule } from "../../../components/admin/classes/UpdateClassSchedule";
 
 const ClassSchedule = () => {
   const [events, setEvents] = useState([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [updateFormOpen, setUpdateFormOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const { data: schedules = [], isLoading } = useSchedulesQuery();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const { data: { schedules } = [], isLoading } = useSchedulesQuery();
 
   const handleEmptySlotClick = (dateTime) => {
     setSelectedDate(dateTime);
-    setIsFormOpen(true);
+    setIsAddDialogOpen(true);
   };
 
   const handleSelectUpdate = (event) => {
     setSelectedEvent(event);
-    setIsDetailOpen(false);
-    setUpdateFormOpen(true);
+    setIsDetailDialogOpen(false);
+    setIsUpdateDialogOpen(true);
   };
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
-    setIsDetailOpen(true);
+    setIsDetailDialogOpen(true);
   };
 
   useEffect(() => {
     if (!schedules || schedules.length === 0) return;
 
-    const mapped = schedules.map((item) => {
+    const mapped = schedules?.map((item) => {
       const start = new Date(item.date);
       start.setHours(item.startHour);
       start.setMinutes(item.startMinute);
@@ -57,21 +57,26 @@ const ClassSchedule = () => {
   }, [schedules]);
 
   if (isLoading) return <Loading />;
-  console.log(selectedEvent);
+
   return (
     <section>
       <div className="space-y-1 text-center mb-4">
         <h2 className="text-2xl font-bold">Class Schedules Event</h2>
       </div>
       <AddClassSchedule
-        open={isFormOpen}
-        setOpen={setIsFormOpen}
+        open={isAddDialogOpen}
+        setOpen={setIsAddDialogOpen}
         defaultDateTime={selectedDate}
       />
+      <UpdateClassSchedule
+        open={isUpdateDialogOpen}
+        setOpen={setIsUpdateDialogOpen}
+        schedule={selectedEvent?.resource}
+      />
       <ClassScheduleDetail
-        open={isDetailOpen}
+        open={isDetailDialogOpen}
         onUpdate={handleSelectUpdate}
-        onClose={() => setIsDetailOpen(false)}
+        onClose={() => setIsDetailDialogOpen(false)}
         event={selectedEvent}
       />
       <div className="w-full">

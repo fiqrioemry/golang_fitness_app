@@ -57,9 +57,8 @@ export const getAllClassSchedules = async () => {
 
 // POST /api/schedules (Admin Only)
 export const createClassSchedule = async (data) => {
-  console.log(data);
-  return "success";
   const res = await authInstance.post("/schedules", data);
+  console.log(res);
   return res.data;
 };
 

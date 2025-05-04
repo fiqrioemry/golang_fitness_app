@@ -75,8 +75,8 @@ export const packageSchema = z.object({
   discount: z
     .number()
     .min(0, "Discount cannot be negative")
-    .max(100, "Discount cannot exceed 100"),
-  isActive: z.boolean(),
+    .max(100, "Discount cannot exceed 100")
+    .optional(),
   expired: z.number().min(1, "Expiry duration is required"),
   additional: z.array(z.string()).optional(),
   image: z.union([z.instanceof(File), z.string().url()]),
@@ -153,11 +153,35 @@ export const bookingSchema = z.object({
 });
 
 export const scheduleSchema = z.object({
+  isRecurring: z.boolean().optional().default(false),
   classId: z.string().min(1, "Class is required"),
-  date: z.string().min(1, "Date is required"),
   instructorId: z.string().min(1, "Instructor is required"),
-  startHour: z.number().min(8).max(17),
-  startMinute: z.number().min(0).max(45),
-  capacity: z.number().min(0, "Capacity must be more than 0"),
-  isActive: z.boolean().optional(),
+  capacity: z.number().positive(),
+  color: z.string().optional(),
+
+  // Non-recurring
+  date: z
+    .string()
+    .optional()
+    .refine((val) => !val || !isNaN(Date.parse(val)), {
+      message: "Date must be a valid date",
+    }),
+
+  // Time
+  startHour: z.number().min(0).max(23),
+  startMinute: z.number().max(59),
+
+  // Recurring
+  recurringDays: z
+    .array(z.number().int().min(0).max(6), {
+      required_error: "Recurring days must be an array of valid weekdays (0-6)",
+    })
+    .optional(),
+  endType: z.enum(["never", "until"]).optional(),
+  endDate: z
+    .string()
+    .optional()
+    .refine((val) => !val || !isNaN(Date.parse(val)), {
+      message: "End Date must be a valid date",
+    }),
 });

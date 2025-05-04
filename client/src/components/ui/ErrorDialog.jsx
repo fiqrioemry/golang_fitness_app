@@ -18,7 +18,7 @@ const ErrorDialog = ({ open = true, onRetry }) => {
     if (!visible && onRetry) {
       setTimeout(() => {
         onRetry();
-      }, 500); // auto refetch setelah close
+      }, 500);
     }
   }, [visible, onRetry]);
 
@@ -30,17 +30,17 @@ const ErrorDialog = ({ open = true, onRetry }) => {
             <AlertTriangle className="w-8 h-8" />
           </div>
           <DialogTitle className="text-xl font-semibold text-red-600">
-            Gagal Memuat Data
+            Failed to Load Data
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-sm max-w-xs">
-            Terjadi kesalahan saat mengambil data produk. Coba periksa koneksi
-            internet kamu, lalu klik tombol di bawah untuk memuat ulang halaman.
+            An error occurred while fetching the data. Please check your
+            internet connection and click the button below to reload the page.
           </DialogDescription>
         </DialogHeader>
 
         <DialogFooter className="mt-4 w-full">
           <Button className="w-full" onClick={() => setVisible(false)}>
-            Coba Lagi
+            Try Again
           </Button>
         </DialogFooter>
       </DialogContent>

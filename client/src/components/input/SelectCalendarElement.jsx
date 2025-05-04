@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { useFormContext, Controller } from "react-hook-form";
+import { useState } from "react";
 
 export const SelectCalendarElement = ({
   name,
@@ -17,6 +18,7 @@ export const SelectCalendarElement = ({
   ageLimit = 80,
 }) => {
   const { control } = useFormContext();
+  const [open, setOpen] = useState(false);
 
   const today = new Date();
   const minDate =
@@ -29,46 +31,56 @@ export const SelectCalendarElement = ({
       name={name}
       control={control}
       rules={rules}
-      render={({ field: { value, onChange }, fieldState }) => (
-        <div className="space-y-1">
-          {label && (
-            <label className="block text-sm font-medium text-gray-700">
-              {label}
-            </label>
-          )}
+      render={({ field: { value, onChange }, fieldState }) => {
+        const selectedDate = value ? new Date(value) : undefined;
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !value && "text-muted-foreground"
-                )}
-              >
-                {value ? format(value, "PPP") : "Pilih tanggal"}
-              </Button>
-            </PopoverTrigger>
+        return (
+          <div className="space-y-1">
+            {label && (
+              <label className="block text-sm font-medium text-gray-700">
+                {label}
+              </label>
+            )}
 
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={value}
-                onSelect={onChange}
-                initialFocus
-                fromDate={minDate}
-                toDate={maxDate}
-              />
-            </PopoverContent>
-          </Popover>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !value && "text-muted-foreground"
+                  )}
+                >
+                  {value ? format(new Date(value), "PPP") : "Pilih tanggal"}
+                </Button>
+              </PopoverTrigger>
 
-          {fieldState.error && (
-            <p className="text-red-500 text-xs mt-1">
-              {fieldState.error.message}
-            </p>
-          )}
-        </div>
-      )}
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      // Simpan sebagai ISO string (RFC3339)
+                      onChange(date.toISOString());
+                      setOpen(false);
+                    }
+                  }}
+                  initialFocus
+                  fromDate={minDate}
+                  toDate={maxDate}
+                />
+              </PopoverContent>
+            </Popover>
+
+            {fieldState.error && (
+              <p className="text-red-500 text-xs mt-1">
+                {fieldState.error.message}
+              </p>
+            )}
+          </div>
+        );
+      }}
     />
   );
 };

@@ -48,6 +48,7 @@ import { AdminRoute, AuthRoute, NonAuthRoute, PublicRoute } from "./middleware";
 import PublicLayout from "./components/public/PublicLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
+import ClassRecuring from "./pages/admin/classes/ClassRecuring";
 
 function App() {
   const { checkingAuth, authMe } = useAuthStore();
@@ -92,6 +93,7 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="classes" element={<Classes />} />
           <Route path="packages" element={<Packages />} />
+          <Route path="schedules" element={<Schedules />} />
           <Route path="classes/:id" element={<ClassDetail />} />
           <Route path="packages/:id" element={<PackageDetail />} />
         </Route>
@@ -129,6 +131,7 @@ function App() {
           <Route path="vouchers" element={<VouchersList />} />
           <Route path="bookings" element={<BookingsList />} />
           <Route path="packages" element={<PackagesList />} />
+
           <Route path="packages/add" element={<AddPackage />} />
           <Route path="instructors" element={<InstructorsList />} />
           <Route path="classes/options" element={<ClassOptions />} />
@@ -136,6 +139,7 @@ function App() {
           <Route path="instructors/add" element={<AddInstructors />} />
           <Route path="notifications" element={<NotificationsList />} />
           <Route path="classes/schedules" element={<ClassSchedules />} />
+          <Route path="classes/recuring" element={<ClassRecuring />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 

@@ -32,6 +32,7 @@ const ClassScheduleCalendar = ({ onEmptySlotClick, onSelectEvent, events }) => {
           }}
           onSelectEvent={onSelectEvent}
           eventPropGetter={(event) => {
+            console.log();
             const bgColor = event?.resource?.color || "#4f46e5";
             return {
               style: {
@@ -49,3 +50,6 @@ const ClassScheduleCalendar = ({ onEmptySlotClick, onSelectEvent, events }) => {
 };
 
 export { ClassScheduleCalendar };
+// onSelect={(date) => {
+//   if (date) onChange(date.toISOString().split("T")[0]);
+// }}

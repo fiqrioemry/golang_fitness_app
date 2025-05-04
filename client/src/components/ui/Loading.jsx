@@ -7,7 +7,7 @@ const Loading = () => {
       <div className="flex flex-col items-center space-y-4">
         <Loader size={48} className="animate-spin text-primary" />
         <p className="text-gray-600 text-sm tracking-wide">
-          Dalam Proses, Tunggu ya...
+          Loading, please wait ...
         </p>
       </div>
     </div>

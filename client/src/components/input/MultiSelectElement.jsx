@@ -20,7 +20,7 @@ const MultiSelectElement = ({ name, label, data = "class", rules = {} }) => {
 
   if (isLoading) return <Skeleton className="h-9 rounded-md" />;
 
-  const optionsRaw = Array.isArray(results?.classes) ? results.classes : [];
+  const optionsRaw = Array.isArray(results) ? results : [];
   const options = optionsRaw.map((item) => ({
     label: item.title,
     value: item.id,

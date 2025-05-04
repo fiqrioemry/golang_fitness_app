@@ -4,7 +4,7 @@ import { useClassMutation } from "@/hooks/useClass";
 import { FormDelete } from "@/components/form/FormDelete";
 
 const DeleteClass = ({ classes }) => {
-  const { deleteClass, isLoading } = useClassMutation();
+  const { deleteClass } = useClassMutation();
 
   const handleDeleteClass = () => {
     deleteClass.mutateAsync(classes.id);
@@ -12,7 +12,7 @@ const DeleteClass = ({ classes }) => {
 
   return (
     <FormDelete
-      loading={isLoading}
+      loading={deleteClass.isPending}
       title="Delete Class"
       onDelete={handleDeleteClass}
       description="Are you sure want to delete this classes ?"
