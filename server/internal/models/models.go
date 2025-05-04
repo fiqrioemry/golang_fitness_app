@@ -270,6 +270,7 @@ type ScheduleTemplate struct {
 	Capacity     int            `gorm:"not null" json:"capacity"`
 	IsActive     bool           `gorm:"default:true" json:"isActive"`
 	CreatedAt    time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
 	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`

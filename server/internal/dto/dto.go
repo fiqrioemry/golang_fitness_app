@@ -456,6 +456,19 @@ type CreateScheduleTemplateRequest struct {
 	EndDate   *time.Time `json:"endDate,omitempty"`
 }
 
+type UpdateScheduleTemplateRequest struct {
+	ClassID      string `json:"classId" binding:"required"`
+	InstructorID string `json:"instructorId" binding:"required"`
+	DayOfWeek    int    `json:"dayOfWeek" binding:"required,min=0,max=6"`
+	StartHour    int    `json:"startHour" binding:"required,min=0,max=23"`
+	StartMinute  int    `json:"startMinute" binding:"required,min=0,max=59"`
+	Capacity     int    `json:"capacity" binding:"required,gt=0"`
+
+	// Recurrence rule
+	EndType string     `json:"endType" binding:"required,oneof=never until"`
+	EndDate *time.Time `json:"endDate,omitempty"`
+}
+
 // CLASS-SCHEDULE =====================
 
 // BOOKINGS ===========================

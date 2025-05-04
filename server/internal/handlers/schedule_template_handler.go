@@ -24,7 +24,7 @@ func (h *ScheduleTemplateHandler) GetAllTemplates(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": templates})
+	c.JSON(http.StatusOK, templates)
 }
 
 func (h *ScheduleTemplateHandler) AutoGenerateSchedules(c *gin.Context) {
@@ -81,7 +81,7 @@ func (h *ScheduleTemplateHandler) RunScheduleTemplate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to run template", "error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Template is now active and schedules generated"})
+	c.JSON(http.StatusOK, gin.H{"message": "Template  Activated successfully"})
 }
 
 func (h *ScheduleTemplateHandler) StopScheduleTemplate(c *gin.Context) {

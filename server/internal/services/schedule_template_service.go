@@ -228,10 +228,7 @@ func (s *scheduleTemplateService) RunTemplate(id string) error {
 		return fmt.Errorf("template is already active")
 	}
 	template.IsActive = true
-	if err := s.templateRepo.UpdateTemplate(template); err != nil {
-		return err
-	}
-	return s.AutoGenerateSchedules()
+	return s.templateRepo.UpdateTemplate(template)
 }
 
 func (s *scheduleTemplateService) StopTemplate(id string) error {
