@@ -11,6 +11,7 @@ type ProfileRepository interface {
 	UpdateUser(user *models.User) error
 	GetUserTransactions(userID string, limit, offset int) ([]models.Payment, int64, error)
 	GetUserPackages(userID string, limit, offset int) ([]models.UserPackage, int64, error)
+	GetUserPackagesByClassID(userID, classID string) ([]models.UserPackage, error)
 	GetUserBookings(userID string, limit, offset int) ([]models.Booking, int64, error)
 }
 
@@ -86,4 +87,16 @@ func (r *profileRepository) GetUserBookings(userID string, limit, offset int) ([
 		return nil, 0, err
 	}
 	return data, count, nil
+}
+
+func (r *profileRepository) GetUserPackagesByClassID(userID, classID string) ([]models.UserPackage, error) {
+	var userPackages []models.UserPackage
+
+	err := r.db.
+		Joins("JOIN package_classes pc ON pc.package_id = user_packages.package_id").
+		Where("user_packages.user_id = ? AND pc.class_id = ?", userID, classID).
+		Preload("Package").
+		Find(&userPackages).Error
+
+	return userPackages, err
 }

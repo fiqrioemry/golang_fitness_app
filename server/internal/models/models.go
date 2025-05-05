@@ -135,6 +135,31 @@ func (c *Class) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+type PackageClass struct {
+	ID        uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	ClassID   uuid.UUID `gorm:"type:char(36);not null" json:"classId"`
+	PackageID uuid.UUID `gorm:"type:char(36);not null" json:"packageId"`
+}
+
+func (pc *PackageClass) BeforeCreate(tx *gorm.DB) (err error) {
+	if pc.ID == uuid.Nil {
+		pc.ID = uuid.New()
+	}
+	return
+}
+
+type UserPackage struct {
+	ID              uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID          uuid.UUID  `gorm:"type:char(36);not null" json:"userId"`
+	PackageID       uuid.UUID  `gorm:"type:char(36);not null" json:"packageId"`
+	RemainingCredit int        `gorm:"not null;default:0" json:"remainingCredit"`
+	ExpiredAt       *time.Time `json:"expiredAt"`
+	PurchasedAt     time.Time  `gorm:"autoCreateTime" json:"purchasedAt"`
+
+	User    User    `gorm:"foreignKey:UserID" json:"user"`
+	Package Package `gorm:"foreignKey:PackageID" json:"package"`
+}
+
 type Package struct {
 	ID             uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	Name           string         `gorm:"type:varchar(255);not null" json:"name"`
@@ -180,31 +205,6 @@ func (p *Package) AfterFind(tx *gorm.DB) error {
 		p.AdditionalList = data
 	}
 	return nil
-}
-
-type PackageClass struct {
-	ID        uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	ClassID   uuid.UUID `gorm:"type:char(36);not null" json:"classId"`
-	PackageID uuid.UUID `gorm:"type:char(36);not null" json:"packageId"`
-}
-
-func (pc *PackageClass) BeforeCreate(tx *gorm.DB) (err error) {
-	if pc.ID == uuid.Nil {
-		pc.ID = uuid.New()
-	}
-	return
-}
-
-type UserPackage struct {
-	ID              uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID          uuid.UUID  `gorm:"type:char(36);not null" json:"userId"`
-	PackageID       uuid.UUID  `gorm:"type:char(36);not null" json:"packageId"`
-	RemainingCredit int        `gorm:"not null;default:0" json:"remainingCredit"`
-	ExpiredAt       *time.Time `json:"expiredAt"`
-	PurchasedAt     time.Time  `gorm:"autoCreateTime" json:"purchasedAt"`
-
-	User    User    `gorm:"foreignKey:UserID" json:"user"`
-	Package Package `gorm:"foreignKey:PackageID" json:"package"`
 }
 
 func (up *UserPackage) BeforeCreate(tx *gorm.DB) (err error) {

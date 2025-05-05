@@ -43,7 +43,7 @@ func SeedUsers(db *gorm.DB) {
 			ID:       uuid.New(),
 			Email:    "customer01@example.com",
 			Password: string(password),
-			Role:     "customer 01",
+			Role:     "customer",
 			Profile: models.Profile{
 				Fullname: "Customer User 01",
 				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Customer",
@@ -54,7 +54,7 @@ func SeedUsers(db *gorm.DB) {
 			ID:       uuid.New(),
 			Email:    "customer02@example.com",
 			Password: string(password),
-			Role:     "customer 02",
+			Role:     "customer",
 			Profile: models.Profile{
 				Fullname: "Customer User 02",
 				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Customer",
@@ -724,7 +724,7 @@ func SeedUserPackages(db *gorm.DB) {
 
 	// Ambil user dengan email customer01 dan customer02
 	var users []models.User
-	if err := db.Where("email IN ?", []string{"customer01@mail.com", "customer02@mail.com"}).Find(&users).Error; err != nil || len(users) < 2 {
+	if err := db.Where("email IN ?", []string{"customer01@example.com", "customer02@example.com"}).Find(&users).Error; err != nil || len(users) < 2 {
 		log.Println("❌ Failed to fetch users with specified emails")
 		return
 	}

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"server/internal/dto"
 	"server/internal/models"
@@ -8,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type PackageService interface {
@@ -16,6 +18,7 @@ type PackageService interface {
 	DeletePackage(id string) error
 	GetAllPackages() ([]dto.PackageResponse, error)
 	GetPackageByID(id string) (*dto.PackageDetailResponse, error)
+	GetRelatedPackages(classID string) ([]dto.PackageResponse, error)
 }
 
 type packageService struct {
@@ -171,4 +174,28 @@ func (s *packageService) GetPackageByID(id string) (*dto.PackageDetailResponse, 
 		Additional:  pkg.AdditionalList,
 		Classes:     classes,
 	}, nil
+}
+
+func (s *packageService) GetRelatedPackages(classID string) ([]dto.PackageResponse, error) {
+	packages, err := s.repo.GetPackagesByClassID(classID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return []dto.PackageResponse{}, nil
+		}
+		return nil, err
+	}
+
+	var res []dto.PackageResponse
+	for _, pkg := range packages {
+		res = append(res, dto.PackageResponse{
+			ID:          pkg.ID.String(),
+			Name:        pkg.Name,
+			Description: pkg.Description,
+			Price:       pkg.Price,
+			Credit:      pkg.Credit,
+			Image:       pkg.Image,
+			IsActive:    pkg.IsActive,
+		})
+	}
+	return res, nil
 }

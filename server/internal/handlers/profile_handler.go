@@ -108,6 +108,19 @@ func (h *ProfileHandler) GetUserPackages(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+func (h *ProfileHandler) GetUserPackagesByClassID(c *gin.Context) {
+	classID := c.Param("id")
+	userID := utils.MustGetUserID(c)
+
+	userPackages, err := h.profileService.GetUserPackagesByClassID(userID, classID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch user packages", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, userPackages)
+}
+
 func (h *ProfileHandler) GetUserBookings(c *gin.Context) {
 	userID := utils.MustGetUserID(c)
 	page := utils.GetQueryInt(c, "page", 1)

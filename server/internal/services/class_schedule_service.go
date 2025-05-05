@@ -144,18 +144,7 @@ func (s *classScheduleService) GetClassScheduleByID(id string) (*dto.ClassSchedu
 		return nil, err
 	}
 
-	// Ambil package berdasarkan class_id
 	packages, err := s.packageRepo.GetPackagesByClassID(schedule.ClassID.String())
-	if err != nil {
-		return nil, err
-	}
-
-	// Ambil user package dari semua package di atas
-	var packageIDs []uuid.UUID
-	for _, p := range packages {
-		packageIDs = append(packageIDs, p.ID)
-	}
-	userPackages, err := s.userPackageRepo.GetUserPackagesByPackageIDs(packageIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -166,18 +155,6 @@ func (s *classScheduleService) GetClassScheduleByID(id string) (*dto.ClassSchedu
 			ID:    p.ID.String(),
 			Name:  p.Name,
 			Price: p.Price,
-		})
-	}
-
-	var userPkgResponses []dto.UserPackageResponse
-	for _, up := range userPackages {
-		userPkgResponses = append(userPkgResponses, dto.UserPackageResponse{
-			ID:              up.ID.String(),
-			PackageID:       up.PackageID.String(),
-			PackageName:     up.Package.Name,
-			RemainingCredit: up.RemainingCredit,
-			ExpiredAt:       up.ExpiredAt.Format("2006-01-02"),
-			PurchasedAt:     up.PurchasedAt.Format("2006-01-02"),
 		})
 	}
 
@@ -196,8 +173,7 @@ func (s *classScheduleService) GetClassScheduleByID(id string) (*dto.ClassSchedu
 			Capacity:     schedule.Capacity,
 			BookedCount:  schedule.BookedCount,
 		},
-		Packages:     pkgResponses,
-		UserPackages: userPkgResponses,
+		Packages: pkgResponses,
 	}, nil
 }
 

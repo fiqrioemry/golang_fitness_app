@@ -422,8 +422,7 @@ type ClassScheduleResponse struct {
 
 type ClassScheduleDetailResponse struct {
 	ClassScheduleResponse
-	Packages     []PackageResponse     `json:"packages"`
-	UserPackages []UserPackageResponse `json:"userPackages"`
+	Packages []PackageResponse `json:"packages"`
 }
 
 type ClassScheduleQueryParam struct {

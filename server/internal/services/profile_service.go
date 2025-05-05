@@ -15,6 +15,7 @@ type ProfileService interface {
 	UpdateAvatar(userID string, file *multipart.FileHeader) (string, error)
 	GetUserTransactions(userID string, page, limit int) (*dto.TransactionListResponse, error)
 	GetUserPackages(userID string, page, limit int) (*dto.UserPackageListResponse, error)
+	GetUserPackagesByClassID(userID, classID string) ([]dto.UserPackageResponse, error)
 	GetUserBookings(userID string, page, limit int) (*dto.BookingListResponse, error)
 }
 
@@ -155,6 +156,38 @@ func (s *profileService) GetUserPackages(userID string, page, limit int) (*dto.U
 		Page:     page,
 		Limit:    limit,
 	}, nil
+}
+
+func (s *profileService) GetUserPackagesByClassID(userID, classID string) ([]dto.UserPackageResponse, error) {
+	userPackages, err := s.repo.GetUserPackagesByClassID(userID, classID)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.UserPackageResponse
+	for _, up := range userPackages {
+		var (
+			expiredAt     string
+			expiredInDays int
+		)
+
+		if up.ExpiredAt != nil {
+			expiredAt = up.ExpiredAt.Format("2006-01-02")
+			expiredInDays = int(max(0, int(time.Until(*up.ExpiredAt).Hours()/24)))
+		}
+
+		result = append(result, dto.UserPackageResponse{
+			ID:              up.ID.String(),
+			PackageID:       up.Package.ID.String(),
+			PackageName:     up.Package.Name,
+			RemainingCredit: up.RemainingCredit,
+			ExpiredAt:       expiredAt,
+			ExpiredInDays:   expiredInDays,
+			PurchasedAt:     up.PurchasedAt.Format("2006-01-02"),
+		})
+	}
+
+	return result, nil
 }
 
 func (s *profileService) GetUserBookings(userID string, page, limit int) (*dto.BookingListResponse, error) {
