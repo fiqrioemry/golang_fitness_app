@@ -17,6 +17,7 @@ type ClassScheduleService interface {
 	GetAllClassSchedules() ([]dto.ClassScheduleResponse, error)
 	GetClassScheduleByID(id string) (*dto.ClassScheduleDetailResponse, error)
 	GetSchedulesByFilter(filter dto.ClassScheduleQueryParam) ([]dto.ClassScheduleResponse, error)
+	GetSchedulesWithBookingStatus(userID string) ([]dto.ClassScheduleWithBookingStatusResponse, error)
 }
 
 type classScheduleService struct {
@@ -24,15 +25,17 @@ type classScheduleService struct {
 	classRepo       repositories.ClassRepository
 	packageRepo     repositories.PackageRepository
 	userPackageRepo repositories.UserPackageRepository
+	bookingRepo     repositories.BookingRepository
 }
 
 func NewClassScheduleService(repo repositories.ClassScheduleRepository, classRepo repositories.ClassRepository, packageRepo repositories.PackageRepository,
-	userPackageRepo repositories.UserPackageRepository) ClassScheduleService {
+	userPackageRepo repositories.UserPackageRepository, bookingRepo repositories.BookingRepository) ClassScheduleService {
 	return &classScheduleService{
 		repo:            repo,
 		classRepo:       classRepo,
 		packageRepo:     packageRepo,
 		userPackageRepo: userPackageRepo,
+		bookingRepo:     bookingRepo,
 	}
 }
 func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRequest) error {
@@ -198,6 +201,43 @@ func (s *classScheduleService) GetSchedulesByFilter(filter dto.ClassScheduleQuer
 			StartMinute:  s.StartMinute,
 			Capacity:     s.Capacity,
 			BookedCount:  s.BookedCount,
+		})
+	}
+
+	return result, nil
+}
+
+func (s *classScheduleService) GetSchedulesWithBookingStatus(userID string) ([]dto.ClassScheduleWithBookingStatusResponse, error) {
+	parsedUserID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user ID")
+	}
+
+	schedules, err := s.repo.GetClassSchedules()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.ClassScheduleWithBookingStatusResponse
+	for _, schedule := range schedules {
+		isBooked, _ := s.bookingRepo.IsUserBookedSchedule(parsedUserID, schedule.ID)
+
+		result = append(result, dto.ClassScheduleWithBookingStatusResponse{
+			ClassScheduleResponse: dto.ClassScheduleResponse{
+				ID:           schedule.ID.String(),
+				ClassID:      schedule.ClassID.String(),
+				ClassTitle:   schedule.Class.Title,
+				Category:     schedule.Class.Category.Name,
+				InstructorID: schedule.InstructorID.String(),
+				Color:        schedule.Color,
+				Instructor:   schedule.Instructor.User.Profile.Fullname,
+				Date:         schedule.Date,
+				StartHour:    schedule.StartHour,
+				StartMinute:  schedule.StartMinute,
+				Capacity:     schedule.Capacity,
+				BookedCount:  schedule.BookedCount,
+			},
+			IsBooked: isBooked,
 		})
 	}
 

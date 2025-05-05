@@ -10,7 +10,6 @@ import (
 func BookingRoutes(r *gin.Engine, handler *handlers.BookingHandler) {
 	booking := r.Group("/api/bookings")
 	booking.Use(middleware.AuthRequired())
-
 	booking.POST("", handler.CreateBooking)
 	booking.GET("", handler.GetUserBookings)
 }

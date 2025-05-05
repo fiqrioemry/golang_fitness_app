@@ -95,7 +95,7 @@ func (r *profileRepository) GetUserPackagesByClassID(userID, classID string) ([]
 	err := r.db.
 		Joins("JOIN package_classes pc ON pc.package_id = user_packages.package_id").
 		Where("user_packages.user_id = ? AND pc.class_id = ?", userID, classID).
-		Preload("Package").
+		Preload("Package.Classes").
 		Find(&userPackages).Error
 
 	return userPackages, err

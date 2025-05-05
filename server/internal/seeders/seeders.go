@@ -3,6 +3,7 @@ package seeders
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/google/uuid"
@@ -515,8 +516,9 @@ func generateGalleryText(title string) string {
 	}
 	return title
 }
-
 func SeedPackages(db *gorm.DB) {
+	rand.Seed(time.Now().UnixNano())
+
 	var count int64
 	db.Model(&models.Package{}).Count(&count)
 
@@ -599,31 +601,55 @@ func SeedPackages(db *gorm.DB) {
 		log.Println("✅ Successfully seeded packages!")
 	}
 
-	var firstPackage models.Package
-
 	var classes []models.Class
-
-	if err := db.First(&firstPackage).Error; err != nil {
-		log.Println("❌ Failed to fetch first package:", err)
-		return
-	}
-	if err := db.Limit(2).Find(&classes).Error; err != nil {
-		log.Println("❌ Failed to fetch 2 classes:", err)
+	if err := db.Find(&classes).Error; err != nil {
+		log.Println("❌ Failed to fetch classes:", err)
 		return
 	}
 
-	if len(classes) < 2 {
-		log.Println("❌ Not enough classes for seeding package_classes")
+	var allPackages []models.Package
+	if err := db.Find(&allPackages).Error; err != nil {
+		log.Println("❌ Failed to fetch packages:", err)
 		return
 	}
 
-	// GORM many2many: cukup assign ID class ke relasi slice
-	if err := db.Model(&firstPackage).Association("Classes").Replace(&classes); err != nil {
-		log.Println("❌ Failed to associate package with classes:", err)
-		return
+	// Pastikan setiap class punya minimal 1 relasi package
+	classHasPackage := map[uuid.UUID]bool{}
+
+	for i, pkg := range allPackages {
+		n := 1 + rand.Intn(3)
+
+		selected := map[uuid.UUID]bool{}
+		var selectedClasses []models.Class
+		for len(selectedClasses) < n {
+			idx := rand.Intn(len(classes))
+			class := classes[idx]
+			if !selected[class.ID] {
+				selected[class.ID] = true
+				selectedClasses = append(selectedClasses, class)
+				classHasPackage[class.ID] = true
+			}
+		}
+
+		if err := db.Model(&allPackages[i]).Association("Classes").Replace(&selectedClasses); err != nil {
+			log.Printf("❌ Failed associating package %s: %v", pkg.Name, err)
+		} else {
+			log.Printf("✅ Associated %d classes to package %s", len(selectedClasses), pkg.Name)
+		}
 	}
 
-	log.Println("✅ Successfully associated 1 package with 2 classes!")
+	for _, class := range classes {
+		if !classHasPackage[class.ID] {
+			randomPkg := allPackages[rand.Intn(len(allPackages))]
+			if err := db.Model(&randomPkg).Association("Classes").Append(&class); err != nil {
+				log.Printf("❌ Failed assigning fallback package to class %s: %v", class.Title, err)
+			} else {
+				log.Printf("Fallback assigned 1 package to class %s", class.Title)
+			}
+		}
+	}
+
+	log.Println("✅ Package-Class association completed!")
 }
 
 func SeedInstructors(db *gorm.DB) {
@@ -796,7 +822,6 @@ func SeedClassSchedules(db *gorm.DB) {
 	date := now.AddDate(0, 0, 2).Truncate(24 * time.Hour)
 
 	schedules := []models.ClassSchedule{
-		// Awal
 		{
 			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
 			Date: date, StartHour: 10, StartMinute: 0, Capacity: 10,
@@ -863,122 +888,6 @@ func SeedClassSchedules(db *gorm.DB) {
 	}
 }
 
-// func SeedScheduleTemplates(db *gorm.DB) {
-// 	var count int64
-// 	db.Model(&models.ScheduleTemplate{}).Count(&count)
-// 	if count > 0 {
-// 		log.Println("ScheduleTemplates already seeded, skipping...")
-// 		return
-// 	}
-
-// 	var classes []models.Class
-// 	var instructors []models.Instructor
-// 	if err := db.Find(&classes).Error; err != nil || len(classes) == 0 {
-// 		log.Println("Failed to fetch classes:", err)
-// 		return
-// 	}
-// 	if err := db.Find(&instructors).Error; err != nil || len(instructors) == 0 {
-// 		log.Println("Failed to fetch instructors:", err)
-// 		return
-// 	}
-
-// 	jsonDays := func(days []int) datatypes.JSON {
-// 		j, _ := json.Marshal(days)
-// 		return j
-// 	}
-
-// 	templates := []models.ScheduleTemplate{
-// 		{
-// 			ID:           uuid.New(),
-// 			ClassID:      classes[0].ID,
-// 			InstructorID: instructors[0].ID,
-// 			DayOfWeeks:   jsonDays([]int{1, 3, 5}),
-// 			StartHour:    10,
-// 			StartMinute:  0,
-// 			Capacity:     10,
-// 			IsActive:     true,
-// 		},
-// 		{
-// 			ID:           uuid.New(),
-// 			ClassID:      classes[1%len(classes)].ID,
-// 			InstructorID: instructors[1%len(instructors)].ID,
-// 			DayOfWeeks:   jsonDays([]int{2}), // Selasa
-// 			StartHour:    14,
-// 			StartMinute:  30,
-// 			Capacity:     12,
-// 			IsActive:     true,
-// 		},
-// 		{
-// 			ID:           uuid.New(),
-// 			ClassID:      classes[2%len(classes)].ID,
-// 			InstructorID: instructors[2%len(instructors)].ID,
-// 			DayOfWeeks:   jsonDays([]int{0, 6}), // Minggu, Sabtu
-// 			StartHour:    18,
-// 			StartMinute:  0,
-// 			Capacity:     8,
-// 			IsActive:     true,
-// 		},
-// 		// Tambahan 4 data baru
-// 		{
-// 			ID:           uuid.New(),
-// 			ClassID:      classes[0].ID,
-// 			InstructorID: instructors[0].ID,
-// 			DayOfWeeks:   jsonDays([]int{1}),
-// 			StartHour:    9,
-// 			StartMinute:  0,
-// 			Capacity:     15,
-// 			IsActive:     true,
-// 		},
-// 		{
-// 			ID:           uuid.New(),
-// 			ClassID:      classes[1].ID,
-// 			InstructorID: instructors[1].ID,
-// 			DayOfWeeks:   jsonDays([]int{3}),
-// 			StartHour:    11,
-// 			StartMinute:  30,
-// 			Capacity:     20,
-// 			IsActive:     true,
-// 		},
-// 		{
-// 			ID:           uuid.New(),
-// 			ClassID:      classes[2].ID,
-// 			InstructorID: instructors[2].ID,
-// 			DayOfWeeks:   jsonDays([]int{5}),
-// 			StartHour:    15,
-// 			StartMinute:  0,
-// 			Capacity:     18,
-// 			IsActive:     true,
-// 		},
-// 		// Bentrok di hari dan jam yang sama
-// 		{
-// 			ID:           uuid.New(),
-// 			ClassID:      classes[0].ID,
-// 			InstructorID: instructors[0].ID,
-// 			DayOfWeeks:   jsonDays([]int{4}),
-// 			StartHour:    13,
-// 			StartMinute:  0,
-// 			Capacity:     10,
-// 			IsActive:     true,
-// 		},
-// 		{
-// 			ID:           uuid.New(),
-// 			ClassID:      classes[1].ID,
-// 			InstructorID: instructors[1].ID,
-// 			DayOfWeeks:   jsonDays([]int{4}),
-// 			StartHour:    13,
-// 			StartMinute:  0,
-// 			Capacity:     10,
-// 			IsActive:     true,
-// 		},
-// 	}
-
-// 	if err := db.Create(&templates).Error; err != nil {
-// 		log.Printf("failed seeding schedule templates: %v", err)
-// 	} else {
-// 		log.Println("✅ ScheduleTemplates seeding completed!")
-// 	}
-// }
-
 func SeedBookings(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Booking{}).Count(&count)
@@ -995,7 +904,6 @@ func SeedBookings(db *gorm.DB) {
 		return
 	}
 
-	// Fetch class schedules
 	var schedules []models.ClassSchedule
 	if err := db.Limit(3).Find(&schedules).Error; err != nil {
 		log.Println("Failed to fetch class schedules:", err)

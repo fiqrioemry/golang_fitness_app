@@ -3,6 +3,7 @@ package repositories
 import (
 	"server/internal/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -11,6 +12,7 @@ type BookingRepository interface {
 	GetBookingsByUserID(userID string) ([]models.Booking, error)
 	CountBookingBySchedule(scheduleID string) (int64, error)
 	GetBookingByID(id string) (*models.Booking, error)
+	IsUserBookedSchedule(userID, scheduleID uuid.UUID) (bool, error)
 }
 
 type bookingRepository struct {
@@ -50,4 +52,15 @@ func (r *bookingRepository) GetBookingByID(id string) (*models.Booking, error) {
 		return nil, err
 	}
 	return &booking, nil
+}
+
+func (r *bookingRepository) IsUserBookedSchedule(userID, scheduleID uuid.UUID) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.Booking{}).
+		Where("user_id = ? AND class_schedule_id = ?", userID, scheduleID).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }

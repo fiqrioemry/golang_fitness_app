@@ -142,6 +142,18 @@ func (h *ClassScheduleHandler) GetAllClassSchedules(c *gin.Context) {
 	c.JSON(http.StatusOK, schedules)
 }
 
+func (h *ClassScheduleHandler) GetSchedulesWithBookingStatus(c *gin.Context) {
+	userID := utils.MustGetUserID(c)
+
+	schedules, err := h.scheduleService.GetSchedulesWithBookingStatus(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, schedules)
+}
+
 func (h *ClassScheduleHandler) GetScheduleByID(c *gin.Context) {
 	scheduleID := c.Param("id")
 

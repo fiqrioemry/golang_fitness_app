@@ -13,6 +13,7 @@ func ClassScheduleRoutes(r *gin.Engine, handler *handlers.ClassScheduleHandler) 
 	// Public
 	schedule.GET("", handler.GetAllClassSchedules)
 	customer := schedule.Use(middleware.AuthRequired())
+	customer.GET("/status", handler.GetSchedulesWithBookingStatus)
 	customer.GET("/:id", handler.GetScheduleByID)
 
 	// Admin Only

@@ -425,6 +425,10 @@ type ClassScheduleDetailResponse struct {
 	Packages []PackageResponse `json:"packages"`
 }
 
+type ClassScheduleWithBookingStatusResponse struct {
+	ClassScheduleResponse
+	IsBooked bool `json:"isBooked"`
+}
 type ClassScheduleQueryParam struct {
 	StartDate  string `form:"startDate"`
 	EndDate    string `form:"endDate"`

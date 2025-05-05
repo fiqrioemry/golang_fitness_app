@@ -82,9 +82,6 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 	}
 
 	snapResp, err := config.SnapClient.CreateTransaction(snapReq)
-	if err != nil {
-		return nil, err
-	}
 
 	return &dto.CreatePaymentResponse{
 		PaymentID: paymentID.String(),
