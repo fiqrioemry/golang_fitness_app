@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"server/internal/dto"
 	"server/internal/repositories"
 	"server/internal/utils"
@@ -95,21 +94,19 @@ func (s *attendanceService) ExportAttendancesToExcel() (*excelize.File, error) {
 func (s *attendanceService) CheckinAttendance(userID string, bookingID string) (string, error) {
 	booking, err := s.bookingRepo.GetBookingByID(bookingID)
 	if err != nil {
-		return "", fmt.Errorf("booking not found")
+		return "", errors.New("booking not found")
 	}
 	if booking.UserID.String() != userID {
-		return "", fmt.Errorf("unauthorized")
+		return "", errors.New("unauthorized")
 	}
 
 	schedule := booking.ClassSchedule
-	start := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(), schedule.StartHour, schedule.StartMinute, 0, 0, time.UTC)
+	startTime := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(), schedule.StartHour, schedule.StartMinute, 0, 0, time.UTC)
 	now := time.Now().UTC()
 
-	diffStart := start.Sub(now).Minutes()
-	diffEnd := now.Sub(start).Minutes()
-
-	if diffStart > 15 || diffEnd > 30 {
-		return "", fmt.Errorf("attendance window closed")
+	// attendance window: 15 menit sebelum sampai 30 menit setelah
+	if now.Before(startTime.Add(-15*time.Minute)) || now.After(startTime.Add(30*time.Minute)) {
+		return "", errors.New("attendance window closed")
 	}
 
 	attendance, err := s.attendanceRepo.MarkAsAttendance(userID, bookingID)
@@ -117,6 +114,10 @@ func (s *attendanceService) CheckinAttendance(userID string, bookingID string) (
 		return "", err
 	}
 
+	// generate QR hanya jika status "attended"
+	if attendance.Status != "attended" {
+		return "", errors.New("attendance not marked properly")
+	}
 	qr := utils.GenerateBase64QR(attendance.ID.String())
 	return qr, nil
 }

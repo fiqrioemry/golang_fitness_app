@@ -55,23 +55,32 @@ func (r *attendanceRepository) MarkAsAttendance(userID string, bookingID string)
 		return nil, err
 	}
 
-	var exist models.Attendance
-	err := r.db.Where("user_id = ? AND class_schedule_id = ?", userID, booking.ClassScheduleID.String()).First(&exist).Error
-	if err == nil {
-		return &exist, nil
-	}
+	var attendance models.Attendance
+	err := r.db.Where("user_id = ? AND class_schedule_id = ?", userID, booking.ClassScheduleID.String()).First(&attendance).Error
 
 	now := time.Now()
-	attendance := models.Attendance{
+	if err == nil {
+		// update jika sudah ada
+		attendance.Status = "attended"
+		attendance.CheckedAt = &now
+		if err := r.db.Save(&attendance).Error; err != nil {
+			return nil, err
+		}
+		return &attendance, nil
+	}
+
+	// buat baru jika belum ada
+	newAttendance := models.Attendance{
 		ID:              uuid.New(),
 		UserID:          uuid.MustParse(userID),
 		ClassScheduleID: booking.ClassScheduleID,
 		Status:          "attended",
 		CheckedAt:       &now,
 	}
-
-	err = r.db.Create(&attendance).Error
-	return &attendance, err
+	if err := r.db.Create(&newAttendance).Error; err != nil {
+		return nil, err
+	}
+	return &newAttendance, nil
 }
 
 func (r *attendanceRepository) FindByUserBooking(userID string, bookingID string) (*models.Attendance, error) {
