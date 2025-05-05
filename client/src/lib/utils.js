@@ -89,14 +89,12 @@ export const getTimeLeft = (startTime) => {
   return "Ongoing or passed";
 };
 
-export const isAttendanceWindow = (start, durationMinutes) => {
+export const isAttendanceWindow = (start) => {
   const now = new Date();
-  const diffStart = differenceInMinutes(start, now);
-  const diffEnd = differenceInMinutes(
-    new Date(start.getTime() + durationMinutes * 60000),
-    now
-  );
-  return diffStart <= 30 && diffEnd >= -30;
+  const diffStart = (start.getTime() - now.getTime()) / 60000;
+  const diffEnd = (now.getTime() - start.getTime()) / 60000;
+
+  return diffStart <= 15 && diffEnd <= 30;
 };
 
 export const buildDateTime = (dateStr, hour, minute) => {

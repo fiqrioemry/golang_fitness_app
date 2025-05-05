@@ -1,7 +1,6 @@
-// src/hooks/useAttendances.js
 import { toast } from "sonner";
 import * as attendance from "@/services/attendance";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 export const useAttendancesQuery = () =>
   useQuery({
@@ -10,41 +9,31 @@ export const useAttendancesQuery = () =>
     keepPreviousData: true,
   });
 
-export const useMarkAttendanceMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: attendance.markAttendance,
+export const useCheckinAttendance = () =>
+  useMutation({
+    mutationFn: attendance.checkinAttendance,
     onSuccess: () => {
-      toast.success("Attendance marked successfully");
-      queryClient.invalidateQueries({ queryKey: ["attendances"] });
+      console.log("MASUK");
+      toast.success("Check-in berhasil, QR Code siap ditampilkan.");
     },
-    onError: (error) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to mark attendance"
-      );
+    onError: (err) => {
+      console.log("MASUK");
+      console.log(err);
+      console.log(err.response);
+      toast.error(err?.response?.data?.error || "Gagal check-in kelas.");
     },
   });
-};
 
-export const useAttendNow = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: attendance.markAttendance,
-    onSuccess: () => {
-      toast.success("Attendance marked successfully");
-      queryClient.invalidateQueries({ queryKey: ["attendances"] });
-    },
-    onError: (error) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to mark attendance"
-      );
-    },
+export const useQRCodeQuery = (bookingId) =>
+  useQuery({
+    queryKey: ["attendances", "qr", bookingId],
+    queryFn: () => attendance.getQRCode(bookingId),
+    enabled: !!bookingId,
   });
-};
 
 export const useExportAttendances = () =>
   useQuery({
     queryKey: ["attendances", "export"],
     queryFn: attendance.exportAttendances,
-    enabled: false, // Only fetch manually
+    enabled: false,
   });

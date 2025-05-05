@@ -1,20 +1,25 @@
-// src/services/attendance.js
 import { authInstance } from ".";
 
-// =====================
-// ATTENDANCE (Auth Required)
-// =====================
-
-// POST /api/attendances
-export const markAttendance = async (data) => {
-  const res = await authInstance.post("/attendances/check-in", data);
-  return res.data;
-};
-
-// GET /api/attendances
+// ✅ GET /api/attendances
 export const getAllAttendances = async () => {
   const res = await authInstance.get("/attendances");
   return res.data;
+};
+
+// ✅ GET /api/attendances/:bookingId/qr
+export const getQRCode = async (bookingId) => {
+  console.log("MASUK");
+  const res = await authInstance.get(`/attendances/${bookingId}/qr`);
+  console.log(res);
+  return res.data.qr;
+};
+
+// ✅ POST /api/attendances/:bookingId/checkin
+export const checkinAttendance = async (bookingId) => {
+  console.log("MASUK");
+  const res = await authInstance.post(`/attendances/${bookingId}/checkin`);
+  console.log(res);
+  return res.data.qr;
 };
 
 // GET /api/attendances/export

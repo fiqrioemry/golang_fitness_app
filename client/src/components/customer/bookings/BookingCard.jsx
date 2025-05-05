@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { useAttendNow } from "@/hooks/useAttendances";
 import { Card, CardContent } from "@/components/ui/card";
 import { buildDateTime, getTimeLeft, isAttendanceWindow } from "@/lib/utils";
 import { CalendarIcon, ClockIcon, MapPinIcon, UserIcon } from "lucide-react";
+import { useQRCodeQuery, useCheckinAttendance } from "@/hooks/useAttendances";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export const BookingCard = ({ booking }) => {
   const [timeLeft, setTimeLeft] = useState("");
   const [canAttend, setCanAttend] = useState(false);
-  const attendNow = useAttendNow();
+  const [showQR, setShowQR] = useState(false);
 
   const startTime = buildDateTime(
     booking.date,
@@ -17,7 +19,7 @@ export const BookingCard = ({ booking }) => {
     booking.startMinute
   );
   const endTime = startTime
-    ? new Date(startTime.getTime() + booking.duration * 60000)
+    ? new Date(startTime.getTime() + Number(booking.duration || 0) * 60000)
     : null;
 
   useEffect(() => {
@@ -25,17 +27,30 @@ export const BookingCard = ({ booking }) => {
 
     const updateStatus = () => {
       setTimeLeft(getTimeLeft(startTime));
-      setCanAttend(isAttendanceWindow(startTime, booking.duration));
+      setCanAttend(
+        isAttendanceWindow(startTime, Number(booking.duration || 0))
+      );
     };
 
     updateStatus();
     const timer = setInterval(updateStatus, 1000);
     return () => clearInterval(timer);
-  }, [startTime, endTime]);
+  }, [startTime, endTime, booking.duration]);
 
-  const handleAttend = () => {
-    console.log("masyukk");
-    // attendNow(booking.id);
+  const checkinMutation = useCheckinAttendance();
+  const qrCodeQuery = useQRCodeQuery(showQR ? booking.id : null);
+
+  const handleAttend = async () => {
+    try {
+      await checkinMutation.mutateAsync(booking.id);
+      setShowQR(true);
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Failed to check in");
+    }
+  };
+
+  const handleShowQR = () => {
+    setShowQR(true);
   };
 
   if (!startTime || !endTime || isNaN(startTime.getTime())) {
@@ -89,12 +104,30 @@ export const BookingCard = ({ booking }) => {
           </div>
 
           {canAttend && (
-            <button
-              onClick={handleAttend}
-              className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-            >
-              Attend Now
-            </button>
+            <Dialog open={showQR} onOpenChange={setShowQR}>
+              <DialogTrigger asChild>
+                <button
+                  onClick={booking.attended ? handleShowQR : handleAttend}
+                  className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                >
+                  {booking.attended ? "Show QR Code" : "Attend Now"}
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <h3 className="text-lg font-semibold mb-2">Scan QR Code</h3>
+                {qrCodeQuery.isLoading ? (
+                  <p>Loading QR Code...</p>
+                ) : qrCodeQuery.isError || !qrCodeQuery.data ? (
+                  <p className="text-red-500">Failed to load QR Code</p>
+                ) : (
+                  <img
+                    src={`data:image/png;base64,${qrCodeQuery.data}`}
+                    alt="QR Code"
+                    className="mx-auto w-64 h-64"
+                  />
+                )}
+              </DialogContent>
+            </Dialog>
           )}
 
           <div className="text-xs text-muted-foreground text-right mt-2">

@@ -22,7 +22,7 @@ const ClassScheduleCalendar = ({ onEmptySlotClick, onSelectEvent, events }) => {
           defaultView={Views.WEEK}
           views={["week"]}
           min={new Date(1970, 1, 1, 1, 0)}
-          max={new Date(1970, 1, 1, 23, 0)}
+          max={new Date(1970, 1, 1, 23, 50)}
           showMultiDayTimes={true}
           allDayAccessor={false}
           showAllDayEvents={false}
@@ -32,7 +32,6 @@ const ClassScheduleCalendar = ({ onEmptySlotClick, onSelectEvent, events }) => {
           }}
           onSelectEvent={onSelectEvent}
           eventPropGetter={(event) => {
-            console.log();
             const bgColor = event?.resource?.color || "#4f46e5";
             return {
               style: {
