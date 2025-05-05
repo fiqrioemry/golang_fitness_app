@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"server/internal/dto"
 	"server/internal/services"
 	"server/internal/utils"
 
@@ -10,31 +9,15 @@ import (
 )
 
 type AttendanceHandler struct {
-	service services.AttendanceService
+	attendanceService services.AttendanceService
 }
 
-func NewAttendanceHandler(service services.AttendanceService) *AttendanceHandler {
-	return &AttendanceHandler{service}
-}
-
-func (h *AttendanceHandler) MarkAttendance(c *gin.Context) {
-	var req dto.MarkAttendanceRequest
-	if !utils.BindAndValidateJSON(c, &req) {
-		return
-	}
-
-	userID := utils.MustGetUserID(c)
-
-	if err := h.service.MarkAttendance(userID, req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Attendance marked successfully"})
+func NewAttendanceHandler(attendanceService services.AttendanceService) *AttendanceHandler {
+	return &AttendanceHandler{attendanceService}
 }
 
 func (h *AttendanceHandler) GetAllAttendances(c *gin.Context) {
-	attendances, err := h.service.GetAllAttendances()
+	attendances, err := h.attendanceService.GetAllAttendances()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch attendances", "error": err.Error()})
 		return
@@ -44,7 +27,7 @@ func (h *AttendanceHandler) GetAllAttendances(c *gin.Context) {
 }
 
 func (h *AttendanceHandler) ExportAttendances(c *gin.Context) {
-	file, err := h.service.ExportAttendancesToExcel()
+	file, err := h.attendanceService.ExportAttendancesToExcel()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to export attendances", "error": err.Error()})
 		return
@@ -59,4 +42,38 @@ func (h *AttendanceHandler) ExportAttendances(c *gin.Context) {
 	if err := file.Write(c.Writer); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to write excel file", "error": err.Error()})
 	}
+}
+
+func (h *AttendanceHandler) CheckinAttendance(c *gin.Context) {
+	bookingID := c.Param("bookingId")
+	userID := utils.MustGetUserID(c)
+
+	qr, err := h.attendanceService.CheckinAttendance(userID, bookingID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"qr": qr})
+}
+
+// khusus buat cron job kelas
+func (h *AttendanceHandler) MarkAbsentAttendances(c *gin.Context) {
+	if err := h.attendanceService.MarkAbsentAttendances(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "absent marked"})
+}
+
+func (h *AttendanceHandler) RegenerateQRCode(c *gin.Context) {
+	bookingID := c.Param("bookingId")
+	userID := utils.MustGetUserID(c)
+
+	qr, err := h.attendanceService.GetQRCode(userID, bookingID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"qr": qr})
 }

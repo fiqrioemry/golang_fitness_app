@@ -134,7 +134,7 @@ func (s *classScheduleService) GetAllClassSchedules() ([]dto.ClassScheduleRespon
 			StartHour:    s.StartHour,
 			StartMinute:  s.StartMinute,
 			Capacity:     s.Capacity,
-			BookedCount:  s.BookedCount,
+			BookedCount:  s.Booked,
 		})
 	}
 
@@ -174,7 +174,7 @@ func (s *classScheduleService) GetClassScheduleByID(id string) (*dto.ClassSchedu
 			StartHour:    schedule.StartHour,
 			StartMinute:  schedule.StartMinute,
 			Capacity:     schedule.Capacity,
-			BookedCount:  schedule.BookedCount,
+			BookedCount:  schedule.Booked,
 		},
 		Packages: pkgResponses,
 	}, nil
@@ -200,7 +200,7 @@ func (s *classScheduleService) GetSchedulesByFilter(filter dto.ClassScheduleQuer
 			StartHour:    s.StartHour,
 			StartMinute:  s.StartMinute,
 			Capacity:     s.Capacity,
-			BookedCount:  s.BookedCount,
+			BookedCount:  s.Booked,
 		})
 	}
 
@@ -235,7 +235,7 @@ func (s *classScheduleService) GetSchedulesWithBookingStatus(userID string) ([]d
 				StartHour:    schedule.StartHour,
 				StartMinute:  schedule.StartMinute,
 				Capacity:     schedule.Capacity,
-				BookedCount:  schedule.BookedCount,
+				BookedCount:  schedule.Booked,
 			},
 			IsBooked: isBooked,
 		})

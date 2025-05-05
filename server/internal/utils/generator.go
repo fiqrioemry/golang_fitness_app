@@ -1,12 +1,15 @@
 package utils
 
 import (
+	"encoding/base64"
 	"fmt"
 	"math/rand"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/skip2/go-qrcode"
 )
 
 func RandomUserAvatar() string {
@@ -54,4 +57,13 @@ func leftPad(s string, pad string, length int) string {
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+}
+
+func GenerateBase64QR(data string) string {
+	var png []byte
+	png, err := qrcode.Encode(data, qrcode.Medium, 256)
+	if err != nil {
+		return ""
+	}
+	return base64.StdEncoding.EncodeToString(png)
 }

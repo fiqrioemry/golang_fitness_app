@@ -516,6 +516,7 @@ func generateGalleryText(title string) string {
 	}
 	return title
 }
+
 func SeedPackages(db *gorm.DB) {
 	rand.Seed(time.Now().UnixNano())
 

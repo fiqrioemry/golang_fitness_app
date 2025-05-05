@@ -249,8 +249,7 @@ type ClassSchedule struct {
 
 	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
 	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`
-
-	BookedCount int `gorm:"-" json:"bookedCount"`
+	Booked     int        `gorm:"not null;default:0" json:"booked"`
 }
 
 func (cs *ClassSchedule) BeforeCreate(tx *gorm.DB) (err error) {
@@ -271,6 +270,7 @@ type ScheduleTemplate struct {
 	IsActive     bool           `gorm:"default:true" json:"isActive"`
 	CreatedAt    time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	Color        string         `gorm:"type:varchar(20)" json:"color"`
 
 	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
 	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`
@@ -446,7 +446,7 @@ type Attendance struct {
 	ID              uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	UserID          uuid.UUID      `gorm:"type:char(36);not null;index" json:"userId"`
 	ClassScheduleID uuid.UUID      `gorm:"type:char(36);not null;index" json:"classScheduleId"`
-	Status          string         `gorm:"type:varchar(20);not null;check:status IN ('attended', 'absent', 'cancelled')" json:"status"`
+	Status          string         `gorm:"type:varchar(20);not null;check:status IN ('attended', 'absent')" json:"status"`
 	CheckedAt       *time.Time     `json:"checkedAt,omitempty"`
 	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`

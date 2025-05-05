@@ -11,7 +11,14 @@ func AttendanceRoutes(r *gin.Engine, handler *handlers.AttendanceHandler) {
 	attendance := r.Group("/api/attendances")
 	attendance.Use(middleware.AuthRequired())
 
-	attendance.POST("", handler.MarkAttendance)
 	attendance.GET("", handler.GetAllAttendances)
-	attendance.GET("/export", handler.ExportAttendances)
+	attendance.GET("/:bookingId/qr", middleware.AuthRequired(), handler.RegenerateQRCode)
+	attendance.POST("/:bookingId/checkin", middleware.AuthRequired(), handler.CheckinAttendance)
 }
+
+
+
+
+
+attendance.GET("/export", handler.ExportAttendances)
+attendance.POST("/cron/mark-absent", handler.MarkAbsentAttendances)

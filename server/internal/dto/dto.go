@@ -458,6 +458,7 @@ type CreateScheduleTemplateRequest struct {
 	StartHour    int    `json:"startHour" binding:"required,min=0,max=23"`
 	StartMinute  int    `json:"startMinute" binding:"required,min=0,max=59"`
 	Capacity     int    `json:"capacity" binding:"required,gt=0"`
+	Color        string `json:"color"`
 
 	// Recurrence rule
 	Frequency string     `json:"frequency" binding:"required,oneof=recurring non-recurring"`
@@ -496,10 +497,10 @@ type BookingResponse struct {
 	ClassImage string `json:"classImage"`
 	Duration   int    `json:"duration"`
 
-	Date        time.Time `gorm:"not null" json:"date"`
-	StartHour   int       `json:"startHour"`
-	StartMinute int       `json:"startMinute"`
-	Location    string    `json:"location"`
+	Date        string `json:"date"`
+	StartHour   int    `json:"startHour"`
+	StartMinute int    `json:"startMinute"`
+	Location    string `json:"location"`
 
 	Instructor  string `json:"instructor"`
 	Participant int    `json:"participant"`

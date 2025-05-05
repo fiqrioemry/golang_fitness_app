@@ -5,11 +5,13 @@ import (
 	"server/internal/models"
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type ClassScheduleRepository interface {
 	DeleteClassSchedule(id string) error
+	IncrementBooked(scheduleID uuid.UUID) error
 	GetClassSchedules() ([]models.ClassSchedule, error)
 	CreateClassSchedule(schedule *models.ClassSchedule) error
 	UpdateClassSchedule(schedule *models.ClassSchedule) error
@@ -86,4 +88,10 @@ func (r *classScheduleRepository) GetClassSchedulesWithFilter(filter dto.ClassSc
 		return nil, err
 	}
 	return schedules, nil
+}
+
+func (r *classScheduleRepository) IncrementBooked(scheduleID uuid.UUID) error {
+	return r.db.Model(&models.ClassSchedule{}).
+		Where("id = ?", scheduleID).
+		Update("booked", gorm.Expr("booked + 1")).Error
 }

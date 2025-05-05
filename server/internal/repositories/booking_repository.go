@@ -29,7 +29,9 @@ func (r *bookingRepository) CreateBooking(booking *models.Booking) error {
 
 func (r *bookingRepository) GetBookingsByUserID(userID string) ([]models.Booking, error) {
 	var bookings []models.Booking
-	err := r.db.Preload("ClassSchedule.Class.Location").
+	err := r.db.
+		Preload("ClassSchedule").
+		Preload("ClassSchedule.Class.Location").
 		Preload("ClassSchedule.Instructor.User.Profile").
 		Where("user_id = ?", userID).
 		Order("created_at desc").

@@ -83,6 +83,7 @@ func (h *ClassScheduleHandler) CreateClassSchedule(c *gin.Context) {
 			StartMinute:  *req.StartMinute,
 			Capacity:     req.Capacity,
 			Frequency:    "recurring",
+			Color:        req.Color,
 			EndType:      req.EndType,
 			EndDate:      req.EndDate,
 		})

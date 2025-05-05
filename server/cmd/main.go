@@ -29,6 +29,14 @@ func startCronJobs(service services.ScheduleTemplateService) {
 	c.Start()
 }
 
+func StartScheduler(attendanceService services.AttendanceService) {
+	c := cron.New()
+	c.AddFunc("@every 15m", func() {
+		_ = attendanceService.MarkAbsentAttendances()
+	})
+	c.Start()
+}
+
 func main() {
 	utils.LoadEnv()
 	config.InitDatabase()
@@ -109,6 +117,7 @@ func main() {
 	classScheduleHandler := handlers.NewClassScheduleHandler(classScheduleService, scheduleTemplateService)
 
 	// ========== Cron Job ==========
+	StartScheduler(attendanceService)
 	startCronJobs(scheduleTemplateService)
 
 	// ========== Route Binding ==========

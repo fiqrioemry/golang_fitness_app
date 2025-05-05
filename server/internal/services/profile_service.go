@@ -214,13 +214,14 @@ func (s *profileService) GetUserBookings(userID string, page, limit int) (*dto.B
 			BookedAt:    b.CreatedAt.Format("2006-01-02 15:04:05"),
 			ClassID:     c.ID.String(),
 			ClassTitle:  c.Title,
+			Date:        cs.Date.Format("2006-01-02"),
 			ClassImage:  c.Image,
 			Duration:    c.Duration,
 			StartHour:   cs.StartHour,
 			StartMinute: cs.StartMinute,
 			Location:    loc.Name,
 			Instructor:  instructor.Fullname,
-			Participant: cs.BookedCount,
+			Participant: cs.Booked,
 		})
 	}
 

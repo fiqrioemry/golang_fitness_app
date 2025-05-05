@@ -31,22 +31,17 @@ func NewBookingService(bookingRepo repositories.BookingRepository, classSchedule
 }
 
 func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) error {
-
 	pkg, err := s.packageRepo.GetPackageByID(packageID)
-	if err != nil {
-		return fmt.Errorf("package not found")
-	}
-	if !pkg.IsActive {
-		return fmt.Errorf("package is not active")
+	if err != nil || !pkg.IsActive {
+		return fmt.Errorf("package is not valid or inactive")
 	}
 
-	// Validasi schedule
 	schedule, err := s.classScheduleRepo.GetClassScheduleByID(scheduleID)
 	if err != nil {
 		return fmt.Errorf("class schedule not found")
 	}
 
-	// Validasi userPackage aktif sesuai package
+	// Validasi userPackage
 	var userPackage models.UserPackage
 	err = s.userPackageRepo.FindActiveByUserAndPackage(userID, packageID, &userPackage)
 	if err != nil {
@@ -65,7 +60,7 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 		return fmt.Errorf("class schedule is full")
 	}
 
-	// Buat booking
+	// Buat booking baru
 	booking := models.Booking{
 		ID:              uuid.New(),
 		UserID:          uuid.MustParse(userID),
@@ -76,9 +71,14 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 		return err
 	}
 
-	// Kurangi kredit
+	// Kurangi kredit dari UserPackage
 	userPackage.RemainingCredit -= 1
 	if err := s.userPackageRepo.UpdateUserPackage(&userPackage); err != nil {
+		return err
+	}
+
+	// Tambah Booked di ClassSchedule
+	if err := s.classScheduleRepo.IncrementBooked(schedule.ID); err != nil {
 		return err
 	}
 
@@ -107,6 +107,7 @@ func (s *bookingService) GetUserBookings(userID string) ([]dto.BookingResponse, 
 		result = append(result, dto.BookingResponse{
 			ID:          b.ID.String(),
 			Status:      b.Status,
+			Date:        schedule.Date.Format("2006-01-02"),
 			BookedAt:    b.CreatedAt.Format("2006-01-02 15:04:05"),
 			ClassID:     class.ID.String(),
 			ClassTitle:  class.Title,

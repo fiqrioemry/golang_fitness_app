@@ -2,19 +2,21 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"server/internal/dto"
-	"server/internal/models"
 	"server/internal/repositories"
+	"server/internal/utils"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/xuri/excelize/v2"
 )
 
 type AttendanceService interface {
-	MarkAttendance(userID string, req dto.MarkAttendanceRequest) error
-	GetAllAttendances() ([]dto.AttendanceResponse, error)
+	MarkAbsentAttendances() error
 	ExportAttendancesToExcel() (*excelize.File, error)
+	GetAllAttendances() ([]dto.AttendanceResponse, error)
+	GetQRCode(userID, bookingID string) (string, error)
+	CheckinAttendance(userID string, bookingID string) (string, error)
 }
 
 type attendanceService struct {
@@ -26,34 +28,6 @@ func NewAttendanceService(attendanceRepo repositories.AttendanceRepository, book
 	return &attendanceService{attendanceRepo, bookingRepo}
 }
 
-func (s *attendanceService) MarkAttendance(userID string, req dto.MarkAttendanceRequest) error {
-	// Fetch Booking
-	booking, err := s.bookingRepo.GetBookingByID(req.BookingID)
-	if err != nil {
-		return errors.New("booking not found")
-	}
-
-	// Check if already marked
-	exist, _ := s.attendanceRepo.GetAttendanceByBooking(userID, booking.ClassScheduleID.String())
-	if exist != nil && exist.ID != uuid.Nil {
-		// If already exist, update
-		exist.Status = req.Status
-		now := time.Now()
-		exist.CheckedAt = &now
-		return s.attendanceRepo.UpdateAttendance(exist)
-	}
-
-	// New Attendance
-	now := time.Now()
-	attendance := models.Attendance{
-		ID:              uuid.New(),
-		UserID:          uuid.MustParse(userID),
-		ClassScheduleID: booking.ClassScheduleID,
-		Status:          req.Status,
-		CheckedAt:       &now,
-	}
-	return s.attendanceRepo.CreateAttendance(&attendance)
-}
 func (s *attendanceService) GetAllAttendances() ([]dto.AttendanceResponse, error) {
 	attendances, err := s.attendanceRepo.GetAllAttendances()
 	if err != nil {
@@ -89,14 +63,12 @@ func (s *attendanceService) ExportAttendancesToExcel() (*excelize.File, error) {
 	sheet := "Attendances"
 	f.SetSheetName("Sheet1", sheet)
 
-	// Header
 	headers := []string{"No", "User Name", "Class Title", "Start Time", "End Time", "Status"}
 	for idx, header := range headers {
 		cell, _ := excelize.CoordinatesToCellName(idx+1, 1)
 		f.SetCellValue(sheet, cell, header)
 	}
 
-	// Isi data
 	for i, a := range attendances {
 		row := i + 2
 		startHour := a.ClassSchedule.StartHour
@@ -118,4 +90,60 @@ func (s *attendanceService) ExportAttendancesToExcel() (*excelize.File, error) {
 	}
 
 	return f, nil
+}
+
+func (s *attendanceService) CheckinAttendance(userID string, bookingID string) (string, error) {
+	booking, err := s.bookingRepo.GetBookingByID(bookingID)
+	if err != nil {
+		return "", fmt.Errorf("booking not found")
+	}
+	if booking.UserID.String() != userID {
+		return "", fmt.Errorf("unauthorized")
+	}
+
+	schedule := booking.ClassSchedule
+	start := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(), schedule.StartHour, schedule.StartMinute, 0, 0, time.UTC)
+	now := time.Now().UTC()
+
+	diffStart := start.Sub(now).Minutes()
+	diffEnd := now.Sub(start).Minutes()
+
+	if diffStart > 15 || diffEnd > 30 {
+		return "", fmt.Errorf("attendance window closed")
+	}
+
+	attendance, err := s.attendanceRepo.MarkAsAttendance(userID, bookingID)
+	if err != nil {
+		return "", err
+	}
+
+	qr := utils.GenerateBase64QR(attendance.ID.String())
+	return qr, nil
+}
+
+func (s *attendanceService) MarkAbsentAttendances() error {
+	now := time.Now()
+	schedules, err := s.attendanceRepo.FindAllSchedulesBefore(now.Add(-30 * time.Minute))
+	if err != nil {
+		return err
+	}
+	for _, sched := range schedules {
+		err := s.attendanceRepo.MarkAbsentIfNotCheckedIn(sched.ID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *attendanceService) GetQRCode(userID, bookingID string) (string, error) {
+	attendance, err := s.attendanceRepo.FindByUserBooking(userID, bookingID)
+	if err != nil {
+		return "", err
+	}
+	if attendance.Status != "attended" {
+		return "", errors.New("attendance not marked yet")
+	}
+	qr := utils.GenerateBase64QR(attendance.ID.String())
+	return qr, nil
 }
