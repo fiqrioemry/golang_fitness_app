@@ -32,6 +32,21 @@ export const useSchedulesQuery = () =>
     queryFn: classService.getAllClassSchedules,
   });
 
+// GET /api/schedules/status
+export const useSchedulesWithStatusQuery = () =>
+  useQuery({
+    queryKey: ["schedules"],
+    queryFn: classService.getAllClassSchedulesWithStatus,
+  });
+
+// GET /api/classes/:id
+export const useScheduleDetailQuery = (id) =>
+  useQuery({
+    queryKey: ["schedule", id],
+    queryFn: () => classService.getClassScheduleDetail(id),
+    enabled: !!id,
+  });
+
 export const useClassMutation = () => {
   const qc = useQueryClient();
 

@@ -19,8 +19,15 @@ export const useProfileQuery = () =>
 
 export const useUserPackagesQuery = () =>
   useQuery({
-    queryKey: ["user", "packages"],
+    queryKey: ["user-packages"],
     queryFn: profileService.getUserPackages,
+  });
+
+export const useUserClassPackagesQuery = (id) =>
+  useQuery({
+    queryKey: ["user-packages", id],
+    queryFn: () => profileService.getUserPackagesByClassID(id),
+    enabled: !!id,
   });
 
 // =====================
@@ -39,6 +46,7 @@ export const useUserBookingsQuery = (page = 1, limit = 10) =>
   useQuery({
     queryKey: ["user", "bookings", page, limit],
     queryFn: () => profileService.getUserBookings(page, limit),
+    staleTime: 0,
   });
 
 // =====================

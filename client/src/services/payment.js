@@ -13,6 +13,7 @@ export const getAllUserPayments = async (params) => {
 
 // POST /api/payments (auth required)
 export const createPayment = async (data) => {
+  console.log(data);
   const res = await authInstance.post("/payments", data);
   return res.data;
 };

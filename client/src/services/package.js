@@ -10,6 +10,11 @@ export const getAllPackages = async () => {
   return res.data;
 };
 
+export const getClassPackages = async (id) => {
+  const res = await publicInstance.get(`/packages/class/${id}`);
+  return res.data;
+};
+
 export const getPackageById = async (id) => {
   const res = await publicInstance.get(`/packages/${id}`);
   return res.data;

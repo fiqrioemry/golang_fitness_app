@@ -28,8 +28,6 @@ export const createClass = async (data) => {
 
 // PUT /api/classes/:id
 export const updateClass = async (id, data) => {
-  console.log(id);
-  console.log(data);
   const formData = buildFormData(data);
   const res = await authInstance.put(`/classes/${id}`, formData);
   return res.data;
@@ -57,10 +55,21 @@ export const getAllClassSchedules = async () => {
   return res.data;
 };
 
+// GET /api/schedules/status
+export const getAllClassSchedulesWithStatus = async () => {
+  const res = await authInstance.get("/schedules/status");
+  return res.data;
+};
+
+// GET /api/schedules/:id
+export const getClassScheduleDetail = async (id) => {
+  const res = await publicInstance.get(`/schedules/${id}`);
+  return res.data;
+};
+
 // POST /api/schedules (Admin Only)
 export const createClassSchedule = async (data) => {
   const res = await authInstance.post("/schedules", data);
-  console.log(res);
   return res.data;
 };
 

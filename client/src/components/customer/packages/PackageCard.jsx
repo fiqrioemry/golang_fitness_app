@@ -1,7 +1,13 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { format, differenceInDays, isBefore } from "date-fns";
-import { CalendarCheck, Clock, AlertTriangle } from "lucide-react";
+import {
+  CalendarCheck,
+  Clock,
+  AlertTriangle,
+  XCircle,
+  CheckCircle,
+} from "lucide-react";
 
 export const PackageCard = ({ pkgs }) => {
   const today = new Date();
@@ -11,13 +17,16 @@ export const PackageCard = ({ pkgs }) => {
       {pkgs.map((item) => {
         const expiredDate = new Date(item.expiredAt);
         const daysLeft = differenceInDays(expiredDate, today);
+
         const isExpired = isBefore(expiredDate, today);
+        const isCreditEmpty = item.remainingCredit === 0;
+        const isActive = !isExpired && item.remainingCredit > 0;
 
         return (
           <div
             key={item.id}
             className={`border rounded-xl p-5 space-y-4 transition-shadow ${
-              isExpired ? "bg-gray-100 opacity-60" : "bg-white"
+              isActive ? "bg-white" : "bg-gray-100 opacity-60"
             } shadow-sm hover:shadow-md`}
           >
             <div className="flex justify-between items-start">
@@ -33,16 +42,27 @@ export const PackageCard = ({ pkgs }) => {
 
               <div className="text-right space-y-1">
                 <Badge
-                  variant={isExpired ? "destructive" : "default"}
+                  variant={isActive ? "default" : "destructive"}
                   className="text-xs"
                 >
-                  {item.remainingCredit} session
+                  {item.remainingCredit} CREDIT
                 </Badge>
-                <div className="text-xs mt-1">
-                  {isExpired ? (
-                    <span className="text-red-500">Expired</span>
+                <div className="text-xs mt-1 flex items-center gap-1">
+                  {isActive ? (
+                    <>
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-green-600">Active</span>
+                    </>
+                  ) : isExpired ? (
+                    <>
+                      <XCircle className="w-4 h-4 text-red-500" />
+                      <span className="text-red-500">Expired</span>
+                    </>
                   ) : (
-                    <span className="text-green-600">Active</span>
+                    <>
+                      <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                      <span className="text-yellow-600">No Credit</span>
+                    </>
                   )}
                 </div>
               </div>
@@ -57,11 +77,10 @@ export const PackageCard = ({ pkgs }) => {
                 <Clock className="w-4 h-4" />
                 {isExpired ? (
                   <>
-                    <AlertTriangle className="w-4 h-4 text-red-500" />
-                    Expired {Math.abs(daysLeft)} day(s) ago
+                    <span>Expired {Math.abs(daysLeft)} day(s) ago</span>
                   </>
                 ) : (
-                  <>Time left: {daysLeft} day(s)</>
+                  <span>Time left: {daysLeft} day(s)</span>
                 )}
               </p>
             </div>

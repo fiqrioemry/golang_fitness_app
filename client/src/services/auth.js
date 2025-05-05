@@ -13,6 +13,7 @@ export const sendOTP = async (data) => {
 
 // POST /api/auth/verify-otp
 export const verifyOTP = async (data) => {
+  console.log(data);
   const res = await publicInstance.post("/auth/verify-otp", data);
   return res.data;
 };

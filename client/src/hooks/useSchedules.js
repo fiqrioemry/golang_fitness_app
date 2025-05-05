@@ -8,15 +8,6 @@ export const useRecurringTemplatesQuery = () =>
     queryFn: scheduleService.getAllRecuringSchedule,
   });
 
-export const useScheduleDetailQuery = (id) =>
-  useQuery({
-    queryKey: ["schedule", id],
-    queryFn: () => scheduleService.getClassById(id),
-    enabled: !!id,
-  });
-
-// hooks/useSchedules.js
-
 export const useScheduleTemplateMutation = () => {
   const qc = useQueryClient();
 

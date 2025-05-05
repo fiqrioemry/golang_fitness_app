@@ -1,19 +1,25 @@
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import React, { useState, useMemo } from "react";
 import { id as localeId } from "date-fns/locale";
 import { Loading } from "@/components/ui/Loading";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useSchedulesQuery } from "@/hooks/useClass";
 import { format, isSameDay, addDays } from "date-fns";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { useSchedulesWithStatusQuery } from "@/hooks/useClass";
 
 const Schedules = () => {
   const today = new Date();
+  const { user } = useAuthStore();
+
   const [selectedDate, setSelectedDate] = useState(today);
-  const {
-    data: { schedules } = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useSchedulesQuery();
+
+  const { data, isLoading, isError, refetch } = user?.id
+    ? useSchedulesWithStatusQuery()
+    : useSchedulesQuery();
+
+  const schedules = data || [];
 
   const dateRange = useMemo(() => {
     return Array.from({ length: 14 }, (_, i) => addDays(today, i));
@@ -31,7 +37,6 @@ const Schedules = () => {
   }, [schedules, selectedDate]);
 
   if (isLoading) return <Loading />;
-
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
@@ -89,17 +94,25 @@ const Schedules = () => {
                 <p className="font-medium">{s.class}</p>
                 <p className="text-sm text-gray-500">{s.instructor}</p>
               </div>
-
               <div className="mt-3 sm:mt-0 sm:text-right">
                 <p className="text-sm text-gray-500">
                   {s.capacity - s.bookedCount > 0
                     ? `${s.capacity - s.bookedCount} left`
                     : "0 in waitlist"}
                 </p>
-                {s.capacity - s.bookedCount > 0 ? (
-                  <button className="btn btn-primary mt-2 rounded-2xl">
-                    Book Now
-                  </button>
+                {s.isBooked ? (
+                  <Link to="/profile/bookings">
+                    <Button
+                      variant="outline"
+                      className="bg-green-100 text-green-700 border-green-500 hover:bg-green-200"
+                    >
+                      Booked
+                    </Button>
+                  </Link>
+                ) : s.capacity - s.bookedCount > 0 ? (
+                  <Link to={`/schedules/${s.id}`}>
+                    <Button>Book Now</Button>
+                  </Link>
                 ) : (
                   <button className="mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium">
                     Join Waitlist

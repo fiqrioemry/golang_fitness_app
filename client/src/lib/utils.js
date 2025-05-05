@@ -1,14 +1,21 @@
+// src/lib/utils.js
+import {
+  format,
+  parse,
+  getDay,
+  formatDuration,
+  intervalToDuration,
+  differenceInMinutes,
+} from "date-fns";
 import { clsx } from "clsx";
 import id from "date-fns/locale/id";
 import { twMerge } from "tailwind-merge";
 import { dateFnsLocalizer } from "react-big-calendar";
-import { format, parse, getDay } from "date-fns";
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-// src/utils/formatPrice.js
 export const formatRupiah = (number) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -16,8 +23,6 @@ export const formatRupiah = (number) => {
     maximumFractionDigits: 0,
   }).format(number);
 };
-
-// src/lib/
 
 export const formatDateTime = (dateStr) => {
   const date = new Date(dateStr);
@@ -68,7 +73,38 @@ export const buildFormData = (data) => {
 export const localizer = dateFnsLocalizer({
   format,
   parse,
-  startOfWeek: () => new Date(), // ✅ Mulai dari Today
+  startOfWeek: () => new Date(),
   getDay,
   locales: { id },
 });
+
+export const getTimeLeft = (startTime) => {
+  const seconds = (startTime - new Date()) / 1000;
+  if (seconds > 0) {
+    const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
+    return formatDuration(duration, {
+      format: ["days", "hours", "minutes", "seconds"],
+    });
+  }
+  return "Ongoing or passed";
+};
+
+export const isAttendanceWindow = (start, durationMinutes) => {
+  const now = new Date();
+  const diffStart = differenceInMinutes(start, now);
+  const diffEnd = differenceInMinutes(
+    new Date(start.getTime() + durationMinutes * 60000),
+    now
+  );
+  return diffStart <= 30 && diffEnd >= -30;
+};
+
+export const buildDateTime = (dateStr, hour, minute) => {
+  if (!dateStr || hour === undefined || minute === undefined) return null;
+
+  const date = new Date(dateStr);
+  date.setHours(hour);
+  date.setMinutes(minute);
+  date.setSeconds(0);
+  return date;
+};

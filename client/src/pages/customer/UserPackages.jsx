@@ -6,18 +6,13 @@ import { NoPackage } from "@/components/customer/packages/NoPackage";
 import { PackageCard } from "@/components/customer/packages/PackageCard";
 
 const UserPackages = () => {
-  const {
-    data: response,
-    isError,
-    refetch,
-    isLoading,
-  } = useUserPackagesQuery();
+  const { data, isError, refetch, isLoading } = useUserPackagesQuery();
 
   if (isLoading) return <Loading />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
-  const pkgs = response.packages || [];
+  const pkgs = data.packages || [];
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-8 space-y-6">

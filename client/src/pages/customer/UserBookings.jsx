@@ -7,16 +7,13 @@ import { BookingCard } from "@/components/customer/bookings/BookingCard";
 import { NoBooking } from "@/components/customer/bookings/NoBooking";
 
 const UserBookings = () => {
-  const {
-    data: bookings = [],
-    isError,
-    refetch,
-    isLoading,
-  } = useUserBookingsQuery();
+  const { data, isError, refetch, isLoading } = useUserBookingsQuery();
 
   if (isLoading) return <Loading />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
+
+  const bookings = data || [];
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-8 space-y-6">

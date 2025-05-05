@@ -1,25 +1,15 @@
-import {
-  format,
-  formatDuration,
-  intervalToDuration,
-  differenceInSeconds,
-} from "date-fns";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { useAttendNow } from "@/hooks/useAttendances";
 import { Card, CardContent } from "@/components/ui/card";
+import { buildDateTime, getTimeLeft, isAttendanceWindow } from "@/lib/utils";
 import { CalendarIcon, ClockIcon, MapPinIcon, UserIcon } from "lucide-react";
-
-const buildDateTime = (dateStr, hour, minute) => {
-  if (!dateStr || hour === undefined || minute === undefined) return null;
-  const date = new Date(dateStr);
-  date.setHours(hour);
-  date.setMinutes(minute);
-  date.setSeconds(0);
-  return date;
-};
 
 export const BookingCard = ({ booking }) => {
   const [timeLeft, setTimeLeft] = useState("");
+  const [canAttend, setCanAttend] = useState(false);
+  const attendNow = useAttendNow();
 
   const startTime = buildDateTime(
     booking.date,
@@ -27,33 +17,30 @@ export const BookingCard = ({ booking }) => {
     booking.startMinute
   );
   const endTime = startTime
-    ? new Date(startTime.getTime() + booking.duration * 60 * 1000)
+    ? new Date(startTime.getTime() + booking.duration * 60000)
     : null;
 
   useEffect(() => {
-    if (!startTime) return;
+    if (!startTime || !endTime) return;
 
-    const updateCountdown = () => {
-      const seconds = differenceInSeconds(startTime, new Date());
-      if (seconds > 0) {
-        const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
-        const formatted = formatDuration(duration, {
-          format: ["days", "hours", "minutes", "seconds"],
-        });
-        setTimeLeft(formatted);
-      } else {
-        setTimeLeft("Ongoing or passed");
-      }
+    const updateStatus = () => {
+      setTimeLeft(getTimeLeft(startTime));
+      setCanAttend(isAttendanceWindow(startTime, booking.duration));
     };
 
-    updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
+    updateStatus();
+    const timer = setInterval(updateStatus, 1000);
     return () => clearInterval(timer);
-  }, [startTime]);
+  }, [startTime, endTime]);
 
-  if (!startTime || isNaN(startTime.getTime()) || !endTime) {
+  const handleAttend = () => {
+    console.log("masyukk");
+    // attendNow(booking.id);
+  };
+
+  if (!startTime || !endTime || isNaN(startTime.getTime())) {
     return (
-      <Card className="overflow-hidden shadow-lg transition hover:shadow-xl p-4">
+      <Card className="p-4 shadow-lg">
         <p className="text-red-500">Invalid booking time.</p>
       </Card>
     );
@@ -69,9 +56,7 @@ export const BookingCard = ({ booking }) => {
         />
         <CardContent className="p-4 space-y-2">
           <div className="flex justify-between items-start">
-            <h2 className="text-xl font-semibold leading-tight">
-              {booking.classTitle}
-            </h2>
+            <h2 className="text-xl font-semibold">{booking.classTitle}</h2>
             <Badge variant="outline" className="capitalize">
               {booking.status}
             </Badge>
@@ -102,6 +87,16 @@ export const BookingCard = ({ booking }) => {
             <UserIcon className="h-4 w-4" />
             <span>{booking.participant} Participant</span>
           </div>
+
+          {canAttend && (
+            <button
+              onClick={handleAttend}
+              className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            >
+              Attend Now
+            </button>
+          )}
+
           <div className="text-xs text-muted-foreground text-right mt-2">
             Booked at {format(new Date(booking.bookedAt), "dd MMM yyyy, HH:mm")}
           </div>

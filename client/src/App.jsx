@@ -10,7 +10,6 @@ import ClassDetail from "./pages/ClassDetail";
 import Profile from "./pages/customer/Profile";
 
 // admin pages
-
 import Dashboard from "./pages/admin/Dashboard";
 import UsersList from "./pages/admin/UsersList";
 import AddClass from "./pages/admin/classes/AddClass";
@@ -23,6 +22,7 @@ import ClassOptions from "./pages/admin/classes/ClassOptions";
 import TransactionsList from "./pages/admin/TransactionsList";
 import PackagesList from "./pages/admin/packages/PackagesList";
 import NotificationsList from "./pages/admin/NotificationsList";
+import ClassRecuring from "./pages/admin/classes/ClassRecuring";
 import ClassSchedules from "./pages/admin/classes/ClassSchedules";
 import AddInstructors from "./pages/admin/instructors/AddInstructors";
 import InstructorsList from "./pages/admin/instructors/InstructorsList";
@@ -48,7 +48,6 @@ import { AdminRoute, AuthRoute, NonAuthRoute, PublicRoute } from "./middleware";
 import PublicLayout from "./components/public/PublicLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
-import ClassRecuring from "./pages/admin/classes/ClassRecuring";
 import ScheduleDetail from "./pages/ScheduleDetail";
 
 function App() {
@@ -95,9 +94,16 @@ function App() {
           <Route path="classes" element={<Classes />} />
           <Route path="packages" element={<Packages />} />
           <Route path="schedules" element={<Schedules />} />
+          <Route
+            path="schedules/:id"
+            element={
+              <AuthRoute>
+                <ScheduleDetail />
+              </AuthRoute>
+            }
+          />
           <Route path="classes/:id" element={<ClassDetail />} />
           <Route path="packages/:id" element={<PackageDetail />} />
-          <Route path="schedules/:id" element={<ScheduleDetail />} />
         </Route>
 
         {/* customer */}

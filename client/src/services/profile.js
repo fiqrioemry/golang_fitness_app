@@ -26,6 +26,12 @@ export const getUserPackages = async () => {
   return res.data;
 };
 
+// GET /api/user/packages
+export const getUserPackagesByClassID = async (id) => {
+  const res = await authInstance.get(`/user/packages/class/${id}`);
+  return res.data;
+};
+
 // GET /api/user/transactions
 export const getUserTransactions = async (page = 1, limit = 10) => {
   const res = await authInstance.get("/user/transactions", {
@@ -39,5 +45,6 @@ export const getUserBookings = async (page = 1, limit = 10) => {
   const res = await authInstance.get("/user/bookings", {
     params: { page, limit },
   });
+  console.log(res.data);
   return res.data.bookings;
 };

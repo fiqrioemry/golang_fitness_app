@@ -7,7 +7,7 @@ import { authInstance } from ".";
 
 // POST /api/attendances
 export const markAttendance = async (data) => {
-  const res = await authInstance.post("/attendances", data);
+  const res = await authInstance.post("/attendances/check-in", data);
   return res.data;
 };
 

@@ -23,6 +23,13 @@ export const usePackageDetailQuery = (id) =>
     enabled: !!id,
   });
 
+export const useClassPackagesQuery = (id) =>
+  useQuery({
+    queryKey: ["class-packages", id],
+    queryFn: () => packageService.getClassPackages(id),
+    enabled: !!id,
+  });
+
 // =====================
 // MUTATIONS (Admin Only)
 // =====================

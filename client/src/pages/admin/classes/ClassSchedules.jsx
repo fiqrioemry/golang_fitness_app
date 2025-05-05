@@ -13,7 +13,7 @@ const ClassSchedule = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
-  const { data: { schedules } = [], isLoading } = useSchedulesQuery();
+  const { data: schedules = [], isLoading } = useSchedulesQuery();
 
   const handleEmptySlotClick = (dateTime) => {
     setSelectedDate(dateTime);

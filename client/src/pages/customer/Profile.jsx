@@ -7,11 +7,13 @@ import { UploadAvatar } from "@/components/customer/profile/UploadAvatar";
 import { UpdateProfile } from "@/components/customer/profile/UpdateProfile";
 
 const Profile = () => {
-  const { data: profile, isError, refetch, isLoading } = useProfileQuery();
+  const { data, isError, refetch, isLoading } = useProfileQuery();
 
   if (isLoading) return <Loading />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
+
+  const profile = data || [];
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-8 space-y-6">

@@ -21,8 +21,8 @@ const ClassScheduleCalendar = ({ onEmptySlotClick, onSelectEvent, events }) => {
           style={{ height: "calc(100vh - 100px)" }}
           defaultView={Views.WEEK}
           views={["week"]}
-          min={new Date(1970, 1, 1, 8, 0)}
-          max={new Date(1970, 1, 1, 17, 0)}
+          min={new Date(1970, 1, 1, 1, 0)}
+          max={new Date(1970, 1, 1, 23, 0)}
           showMultiDayTimes={true}
           allDayAccessor={false}
           showAllDayEvents={false}

@@ -10,12 +10,6 @@ export const getAllRecuringSchedule = async () => {
   return res.data;
 };
 
-// GET /api/schedule-templates
-export const getAllRecuringSchedule = async () => {
-  const res = await authInstance.get(`/schedule-templates`);
-  return res.data;
-};
-
 // POST /api/schedule-templates/recurring
 export const createScheduleTemplate = async (data) => {
   const res = await authInstance.post("/schedule-templates", data);
