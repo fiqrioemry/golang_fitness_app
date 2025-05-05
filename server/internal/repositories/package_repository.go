@@ -12,6 +12,7 @@ type PackageRepository interface {
 	DeletePackage(id string) error
 	GetAllPackages() ([]models.Package, error)
 	GetPackageByID(id string) (*models.Package, error)
+	GetPackagesByClassID(classID string) ([]models.Package, error)
 }
 
 type packageRepository struct {
@@ -48,4 +49,13 @@ func (r *packageRepository) GetPackageByID(id string) (*models.Package, error) {
 		return nil, err
 	}
 	return &pkg, nil
+}
+
+func (r *packageRepository) GetPackagesByClassID(classID string) ([]models.Package, error) {
+	var packages []models.Package
+	err := r.db.Joins("JOIN package_classes ON packages.id = package_classes.package_id").
+		Where("package_classes.class_id = ?", classID).
+		Preload("Classes").
+		Find(&packages).Error
+	return packages, err
 }

@@ -41,6 +41,28 @@ func SeedUsers(db *gorm.DB) {
 		},
 		{
 			ID:       uuid.New(),
+			Email:    "customer01@example.com",
+			Password: string(password),
+			Role:     "customer 01",
+			Profile: models.Profile{
+				Fullname: "Customer User 01",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Customer",
+				Gender:   "female",
+			},
+		},
+		{
+			ID:       uuid.New(),
+			Email:    "customer02@example.com",
+			Password: string(password),
+			Role:     "customer 02",
+			Profile: models.Profile{
+				Fullname: "Customer User 02",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Customer",
+				Gender:   "female",
+			},
+		},
+		{
+			ID:       uuid.New(),
 			Email:    "elena.morris@example.com",
 			Password: string(password),
 			Role:     "customer",
@@ -700,10 +722,10 @@ func SeedUserPackages(db *gorm.DB) {
 		return
 	}
 
-	// Ambil 2 user customer pertama
+	// Ambil user dengan email customer01 dan customer02
 	var users []models.User
-	if err := db.Where("role = ?", "customer").Limit(2).Find(&users).Error; err != nil || len(users) < 2 {
-		log.Println("❌ Failed to fetch at least 2 customer users")
+	if err := db.Where("email IN ?", []string{"customer01@mail.com", "customer02@mail.com"}).Find(&users).Error; err != nil || len(users) < 2 {
+		log.Println("❌ Failed to fetch users with specified emails")
 		return
 	}
 
@@ -717,18 +739,20 @@ func SeedUserPackages(db *gorm.DB) {
 	now := time.Now()
 	var userPackages []models.UserPackage
 
-	for _, user := range users {
-		for _, pkg := range packages {
-			expired := now.AddDate(0, 0, getExpiredDays(pkg))
-			userPackages = append(userPackages, models.UserPackage{
-				ID:              uuid.New(),
-				UserID:          user.ID,
-				PackageID:       pkg.ID,
-				RemainingCredit: pkg.Credit,
-				PurchasedAt:     now,
-				ExpiredAt:       &expired,
-			})
-		}
+	// Assign 1 package untuk setiap user
+	for i := 0; i < 2; i++ {
+		pkg := packages[i]
+		user := users[i]
+		expired := now.AddDate(0, 0, getExpiredDays(pkg))
+
+		userPackages = append(userPackages, models.UserPackage{
+			ID:              uuid.New(),
+			UserID:          user.ID,
+			PackageID:       pkg.ID,
+			RemainingCredit: pkg.Credit,
+			PurchasedAt:     now,
+			ExpiredAt:       &expired,
+		})
 	}
 
 	if err := db.Create(&userPackages).Error; err != nil {
@@ -741,6 +765,7 @@ func SeedUserPackages(db *gorm.DB) {
 func getExpiredDays(pkg models.Package) int {
 	return 30
 }
+
 func SeedClassSchedules(db *gorm.DB) {
 	var count int64
 	db.Model(&models.ClassSchedule{}).Count(&count)

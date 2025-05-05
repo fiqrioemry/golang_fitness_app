@@ -420,6 +420,12 @@ type ClassScheduleResponse struct {
 	Color        string    `json:"color"`
 }
 
+type ClassScheduleDetailResponse struct {
+	ClassScheduleResponse
+	Packages     []PackageResponse     `json:"packages"`
+	UserPackages []UserPackageResponse `json:"userPackages"`
+}
+
 type ClassScheduleQueryParam struct {
 	StartDate  string `form:"startDate"`
 	EndDate    string `form:"endDate"`
@@ -472,9 +478,9 @@ type UpdateScheduleTemplateRequest struct {
 // CLASS-SCHEDULE =====================
 
 // BOOKINGS ===========================
-
 type CreateBookingRequest struct {
-	ClassScheduleID string `json:"classScheduleId" binding:"required"`
+	PackageID       string `json:"packageId" binding:"required,uuid"`
+	ClassScheduleID string `json:"scheduleId" binding:"required,uuid"`
 }
 
 type BookingResponse struct {

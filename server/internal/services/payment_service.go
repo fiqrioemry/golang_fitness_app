@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
+	"gorm.io/gorm"
 )
 
 type PaymentService interface {
@@ -91,6 +92,7 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 		SnapURL:   snapResp.RedirectURL,
 	}, nil
 }
+
 func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationRequest) error {
 	payment, err := s.paymentRepo.GetPaymentByOrderID(req.OrderID)
 	if err != nil {
@@ -102,7 +104,7 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 		return nil
 	}
 
-	// Update method from webhook
+	// Update payment method
 	payment.PaymentMethod = req.PaymentType
 
 	switch req.TransactionStatus {
@@ -120,25 +122,45 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 		return err
 	}
 
-	// On success, create UserPackage
+	// On success, handle UserPackage logic
 	if payment.Status == "success" {
 		pkg, err := s.packageRepo.GetPackageByID(payment.PackageID.String())
 		if err != nil {
 			return err
 		}
 
-		expired := time.Now().AddDate(0, 0, pkg.Expired)
-		userPackage := models.UserPackage{
-			ID:              uuid.New(),
-			UserID:          payment.UserID,
-			PackageID:       payment.PackageID,
-			RemainingCredit: pkg.Credit,
-			ExpiredAt:       &expired,
-			PurchasedAt:     time.Now(),
+		var existing models.UserPackage
+		now := time.Now()
+		err = s.userPackageRepo.
+			FindActiveByUserAndPackage(payment.UserID.String(), payment.PackageID.String(), &existing)
+
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
 		}
 
-		if err := s.userPackageRepo.CreateUserPackage(&userPackage); err != nil {
-			return err
+		if existing.ID == uuid.Nil {
+			// Kondisi 1: belum punya, buat baru
+			expired := now.AddDate(0, 0, pkg.Expired)
+			newUP := models.UserPackage{
+				ID:              uuid.New(),
+				UserID:          payment.UserID,
+				PackageID:       payment.PackageID,
+				RemainingCredit: pkg.Credit,
+				ExpiredAt:       &expired,
+				PurchasedAt:     now,
+			}
+			return s.userPackageRepo.CreateUserPackage(&newUP)
+		} else {
+			// Kondisi 2: sudah punya dan masih aktif
+			existing.RemainingCredit += pkg.Credit
+			if existing.ExpiredAt != nil {
+				*existing.ExpiredAt = existing.ExpiredAt.AddDate(0, 0, pkg.Expired)
+			} else {
+				exp := now.AddDate(0, 0, pkg.Expired)
+				existing.ExpiredAt = &exp
+			}
+			existing.PurchasedAt = now
+			return s.userPackageRepo.UpdateUserPackage(&existing)
 		}
 	}
 

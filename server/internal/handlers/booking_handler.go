@@ -10,11 +10,23 @@ import (
 )
 
 type BookingHandler struct {
-	service services.BookingService
+	bookingService services.BookingService
 }
 
-func NewBookingHandler(service services.BookingService) *BookingHandler {
-	return &BookingHandler{service}
+func NewBookingHandler(bookingService services.BookingService) *BookingHandler {
+	return &BookingHandler{bookingService}
+}
+
+func (h *BookingHandler) GetUserBookings(c *gin.Context) {
+	userID := utils.MustGetUserID(c)
+
+	bookings, err := h.bookingService.GetUserBookings(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch bookings", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, bookings)
 }
 
 func (h *BookingHandler) CreateBooking(c *gin.Context) {
@@ -25,22 +37,11 @@ func (h *BookingHandler) CreateBooking(c *gin.Context) {
 
 	userID := utils.MustGetUserID(c)
 
-	if err := h.service.CreateBooking(userID, req); err != nil {
+	err := h.bookingService.CreateBooking(userID, req.PackageID, req.ClassScheduleID)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Booking successful"})
-}
-
-func (h *BookingHandler) GetUserBookings(c *gin.Context) {
-	userID := utils.MustGetUserID(c)
-
-	bookings, err := h.service.GetUserBookings(userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch bookings", "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, bookings)
 }

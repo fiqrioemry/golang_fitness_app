@@ -15,19 +15,24 @@ type ClassScheduleService interface {
 	UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error
 	DeleteClassSchedule(id string) error
 	GetAllClassSchedules() ([]dto.ClassScheduleResponse, error)
-	GetClassScheduleByID(id string) (*dto.ClassScheduleResponse, error)
+	GetClassScheduleByID(id string) (*dto.ClassScheduleDetailResponse, error)
 	GetSchedulesByFilter(filter dto.ClassScheduleQueryParam) ([]dto.ClassScheduleResponse, error)
 }
 
 type classScheduleService struct {
-	repo      repositories.ClassScheduleRepository
-	classRepo repositories.ClassRepository
+	repo            repositories.ClassScheduleRepository
+	classRepo       repositories.ClassRepository
+	packageRepo     repositories.PackageRepository
+	userPackageRepo repositories.UserPackageRepository
 }
 
-func NewClassScheduleService(repo repositories.ClassScheduleRepository, classRepo repositories.ClassRepository) ClassScheduleService {
+func NewClassScheduleService(repo repositories.ClassScheduleRepository, classRepo repositories.ClassRepository, packageRepo repositories.PackageRepository,
+	userPackageRepo repositories.UserPackageRepository) ClassScheduleService {
 	return &classScheduleService{
-		repo:      repo,
-		classRepo: classRepo,
+		repo:            repo,
+		classRepo:       classRepo,
+		packageRepo:     packageRepo,
+		userPackageRepo: userPackageRepo,
 	}
 }
 func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRequest) error {
@@ -133,25 +138,66 @@ func (s *classScheduleService) GetAllClassSchedules() ([]dto.ClassScheduleRespon
 	return result, nil
 }
 
-func (s *classScheduleService) GetClassScheduleByID(id string) (*dto.ClassScheduleResponse, error) {
+func (s *classScheduleService) GetClassScheduleByID(id string) (*dto.ClassScheduleDetailResponse, error) {
 	schedule, err := s.repo.GetClassScheduleByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.ClassScheduleResponse{
-		ID:           schedule.ID.String(),
-		ClassID:      schedule.ClassID.String(),
-		ClassTitle:   schedule.Class.Title,
-		Category:     schedule.Class.Category.Name,
-		InstructorID: schedule.InstructorID.String(),
-		Instructor:   schedule.Instructor.User.Profile.Fullname,
-		Date:         schedule.Date,
-		Color:        schedule.Color,
-		StartHour:    schedule.StartHour,
-		StartMinute:  schedule.StartMinute,
-		Capacity:     schedule.Capacity,
-		BookedCount:  schedule.BookedCount,
+	// Ambil package berdasarkan class_id
+	packages, err := s.packageRepo.GetPackagesByClassID(schedule.ClassID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	// Ambil user package dari semua package di atas
+	var packageIDs []uuid.UUID
+	for _, p := range packages {
+		packageIDs = append(packageIDs, p.ID)
+	}
+	userPackages, err := s.userPackageRepo.GetUserPackagesByPackageIDs(packageIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	var pkgResponses []dto.PackageResponse
+	for _, p := range packages {
+		pkgResponses = append(pkgResponses, dto.PackageResponse{
+			ID:    p.ID.String(),
+			Name:  p.Name,
+			Price: p.Price,
+		})
+	}
+
+	var userPkgResponses []dto.UserPackageResponse
+	for _, up := range userPackages {
+		userPkgResponses = append(userPkgResponses, dto.UserPackageResponse{
+			ID:              up.ID.String(),
+			PackageID:       up.PackageID.String(),
+			PackageName:     up.Package.Name,
+			RemainingCredit: up.RemainingCredit,
+			ExpiredAt:       up.ExpiredAt.Format("2006-01-02"),
+			PurchasedAt:     up.PurchasedAt.Format("2006-01-02"),
+		})
+	}
+
+	return &dto.ClassScheduleDetailResponse{
+		ClassScheduleResponse: dto.ClassScheduleResponse{
+			ID:           schedule.ID.String(),
+			ClassID:      schedule.ClassID.String(),
+			ClassTitle:   schedule.Class.Title,
+			Category:     schedule.Class.Category.Name,
+			InstructorID: schedule.InstructorID.String(),
+			Instructor:   schedule.Instructor.User.Profile.Fullname,
+			Date:         schedule.Date,
+			Color:        schedule.Color,
+			StartHour:    schedule.StartHour,
+			StartMinute:  schedule.StartMinute,
+			Capacity:     schedule.Capacity,
+			BookedCount:  schedule.BookedCount,
+		},
+		Packages:     pkgResponses,
+		UserPackages: userPkgResponses,
 	}, nil
 }
 

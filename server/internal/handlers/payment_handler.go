@@ -17,7 +17,6 @@ func NewPaymentHandler(paymentService services.PaymentService) *PaymentHandler {
 	return &PaymentHandler{paymentService}
 }
 
-// CreatePayment untuk user beli package
 func (h *PaymentHandler) CreatePayment(c *gin.Context) {
 	var req dto.CreatePaymentRequest
 	if !utils.BindAndValidateJSON(c, &req) {

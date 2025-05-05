@@ -139,5 +139,17 @@ func (h *ClassScheduleHandler) GetAllClassSchedules(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"schedules": schedules})
+	c.JSON(http.StatusOK, schedules)
+}
+
+func (h *ClassScheduleHandler) GetScheduleByID(c *gin.Context) {
+	scheduleID := c.Param("id")
+
+	result, err := h.scheduleService.GetClassScheduleByID(scheduleID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
 }
