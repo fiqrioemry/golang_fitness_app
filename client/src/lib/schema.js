@@ -74,13 +74,15 @@ export const classSchema = z.object({
   locationId: z.string().min(1, "Location is required"),
   categoryId: z.string().min(1, "Category is required"),
   subcategoryId: z.string().min(1, "Subcategory is required"),
-  image: z.union([z.instanceof(File), z.string().url()]),
-  images: z.array(
-    imageItemSchema.refine((val) => !!val, {
-      message: "Image is required",
-    })
-  ),
+  image: imageItemSchema.refine((val) => !!val, {
+    message: "Image is required",
+  }),
+
   isActive: z.boolean().optional(),
+});
+
+export const uploadGallerySchema = z.object({
+  gallery: z.array(imageItemSchema).optional(),
 });
 
 // package

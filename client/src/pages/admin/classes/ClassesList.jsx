@@ -16,6 +16,7 @@ import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { DeleteClass } from "@/components/admin/classes/DeleteClass";
 import { UpdateClass } from "@/components/admin/classes/UpdateClass";
+import { UploadClassGallery } from "@/components/admin/classes/UploadClassGallery";
 
 const ClassesList = () => {
   const navigate = useNavigate();
@@ -100,6 +101,7 @@ const ClassesList = () => {
                       <div className="flex gap-2">
                         <UpdateClass classes={item} />
                         <DeleteClass classes={item} />
+                        <UploadClassGallery classes={item} />
                       </div>
                     </TableCell>
                   </TableRow>

@@ -81,7 +81,6 @@ const UpdateClass = ({ classes }) => {
         label="Additional Information"
         placeholder="Enter info, press enter to add"
       />
-      <InputFileElement name="galleries" label="Gallery (Optional)" />
       <SwitchElement name="isActive" label="Set as active class" />
     </FormUpdateDialog>
   );

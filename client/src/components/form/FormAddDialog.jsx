@@ -20,7 +20,7 @@ export function FormAddDialog({
   schema,
   action,
   children,
-  buttonText = "",
+  icon = false,
   loading = false,
   shouldReset = true,
 }) {
@@ -76,8 +76,10 @@ export function FormAddDialog({
         onOpenChange={(open) => (!open ? handleCancel() : setIsOpen(open))}
       >
         <DialogTrigger asChild>
-          {buttonText !== "" ? (
-            buttonText
+          {icon ? (
+            <Button size="icon" variant="secondary" type="button">
+              <PlusCircle className="w-4 h-4" />
+            </Button>
           ) : (
             <Button type="button">
               <PlusCircle className="w-4 h-4 mr-2" />

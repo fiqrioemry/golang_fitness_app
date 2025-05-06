@@ -82,7 +82,8 @@ export const useClassMutation = () => {
     }),
 
     uploadGallery: useMutation({
-      mutationFn: ({ id, data }) => classService.uploadClassGallery(id, data),
+      mutationFn: ({ id, gallery }) =>
+        classService.uploadClassGallery(id, gallery),
       ...mutationOpts("Gallery uploaded", ({ id }) => {
         qc.invalidateQueries({ queryKey: ["class", id] });
       }),

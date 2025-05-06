@@ -61,7 +61,7 @@ const MultiSelectElement = ({ name, label, data = "class", rules = {} }) => {
               </label>
             )}
 
-            <div className="flex flex-wrap gap-2 min-h-[42px] border border-input rounded-md p-2 bg-background">
+            <div className="flex flex-wrap gap-2 min-h-12 border border-input rounded-md p-2 bg-background">
               {selectedValues.length === 0 && (
                 <span className="text-sm text-muted-foreground">
                   No selection
@@ -86,7 +86,7 @@ const MultiSelectElement = ({ name, label, data = "class", rules = {} }) => {
             </div>
 
             <div className="relative">
-              <Command className="border border-input rounded-md w-full shadow-sm">
+              <Command className="border border-input  rounded-md w-full shadow-sm">
                 <Input
                   placeholder="Search options..."
                   value={query}
@@ -96,7 +96,7 @@ const MultiSelectElement = ({ name, label, data = "class", rules = {} }) => {
                   }}
                   onFocus={() => setIsOpen(true)}
                   onBlur={() => setTimeout(() => setIsOpen(false), 150)}
-                  className="border-none focus:ring-0 px-3 py-2"
+                  className="border-none h-12 focus:ring-0 px-3 py-2"
                 />
                 {isOpen && (
                   <CommandList className="absolute z-10 w-full bg-popover border border-border rounded-md shadow-lg max-h-40 overflow-auto">

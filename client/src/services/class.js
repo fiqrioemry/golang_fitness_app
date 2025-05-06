@@ -39,7 +39,10 @@ export const deleteClass = async (id) => {
   return res.data;
 };
 
-export const uploadClassGallery = async (id, formData) => {
+export const uploadClassGallery = async (id, gallery) => {
+  console.log(id);
+  console.log(gallery);
+  const formData = buildFormData(gallery);
   const res = await authInstance.post(`/classes/${id}/gallery`, formData);
   return res.data;
 };
