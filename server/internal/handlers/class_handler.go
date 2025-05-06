@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"server/internal/dto"
 	"server/internal/models"
@@ -139,41 +140,6 @@ func (h *ClassHandler) GetClassByID(c *gin.Context) {
 	c.JSON(http.StatusOK, classResponse)
 }
 
-func (h *ClassHandler) GetAllClasses(c *gin.Context) {
-	var query dto.ClassQueryParam
-	if err := c.ShouldBindQuery(&query); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid query parameters", "error": err.Error()})
-		return
-	}
-
-	classes, total, err := h.classService.GetAllClasses(query)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch classes", "error": err.Error()})
-		return
-	}
-
-	if classes == nil {
-		classes = []dto.ClassResponse{}
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"classes": classes,
-		"total":   total,
-		"page":    query.Page,
-		"limit":   query.Limit,
-	})
-}
-
-func (h *ClassHandler) GetActiveClasses(c *gin.Context) {
-	classes, err := h.classService.GetActiveClasses()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch active classes", "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, classes)
-}
-
 func (h *ClassHandler) UploadClassGallery(c *gin.Context) {
 	classID := c.Param("id")
 	form, err := c.MultipartForm()
@@ -182,7 +148,8 @@ func (h *ClassHandler) UploadClassGallery(c *gin.Context) {
 		return
 	}
 
-	files := form.File["gallery[]"]
+	files := form.File["gallery"]
+	fmt.Println(files)
 	if len(files) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "no gallery images provided"})
 		return
@@ -216,6 +183,41 @@ func (h *ClassHandler) UploadClassGallery(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "gallery uploaded successfully"})
+}
+
+func (h *ClassHandler) GetAllClasses(c *gin.Context) {
+	var query dto.ClassQueryParam
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid query parameters", "error": err.Error()})
+		return
+	}
+
+	classes, total, err := h.classService.GetAllClasses(query)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch classes", "error": err.Error()})
+		return
+	}
+
+	if classes == nil {
+		classes = []dto.ClassResponse{}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"classes": classes,
+		"total":   total,
+		"page":    query.Page,
+		"limit":   query.Limit,
+	})
+}
+
+func (h *ClassHandler) GetActiveClasses(c *gin.Context) {
+	classes, err := h.classService.GetActiveClasses()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch active classes", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, classes)
 }
 
 func (h *ClassHandler) DeleteClassGallery(c *gin.Context) {

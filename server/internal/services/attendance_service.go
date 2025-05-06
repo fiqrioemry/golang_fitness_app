@@ -123,9 +123,9 @@ func (s *attendanceService) CheckinAttendance(userID string, bookingID string) (
 	fmt.Println("startTime -15m      :", startTime.Add(-15*time.Minute))
 	fmt.Println("startTime +30m      :", startTime.Add(30*time.Minute))
 
-	// if now.Before(startTime.Add(-15*time.Minute)) || now.After(startTime.Add(30*time.Minute)) {
-	// 	return "", errors.New("attendance window closed")
-	// }
+	if now.Before(startTime.Add(-15*time.Minute)) || now.After(startTime.Add(30*time.Minute)) {
+		return "", errors.New("attendance window closed")
+	}
 
 	attendance, err := s.attendanceRepo.MarkAsAttendance(userID, bookingID)
 	if err != nil {
