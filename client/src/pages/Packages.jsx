@@ -1,34 +1,35 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { usePackagesQuery } from "@/hooks/usePackage";
-import { Loading } from "@/components/ui/Loading";
-import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { Button } from "@/components/ui/button";
-import { CheckCircle2 } from "lucide-react";
 import {
   Card,
-  CardContent,
+  CardTitle,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardContent,
   CardDescription,
 } from "@/components/ui/card";
+import { CheckCircle2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Loading } from "@/components/ui/Loading";
+import { usePackagesQuery } from "@/hooks/usePackage";
+import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+
+const packagesTitle =
+  "Packages - Find the right plan that matches your fitness goals and schedule";
 
 const Packages = () => {
-  const {
-    data: packages = [],
-    isLoading,
-    isError,
-    refetch,
-  } = usePackagesQuery();
-
+  useDocumentTitle(packagesTitle);
   const navigate = useNavigate();
+  const { data, isLoading, isError, refetch } = usePackagesQuery();
+  const packages = data || [];
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="section">
+    <section className="section py-24 text-foreground">
       <div className="bg-primary text-primary-foreground rounded-xl shadow px-6 py-10 text-center space-y-2 mb-10">
         <h3 className="text-3xl font-bold">Choose a Package</h3>
         <p className="text-sm opacity-80">

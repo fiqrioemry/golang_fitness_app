@@ -1,19 +1,26 @@
+import {
+  useSchedulesQuery,
+  useSchedulesWithStatusQuery,
+} from "@/hooks/useClass";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import React, { useState, useMemo } from "react";
 import { id as localeId } from "date-fns/locale";
 import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/store/useAuthStore";
-import {
-  useSchedulesQuery,
-  useSchedulesWithStatusQuery,
-} from "@/hooks/useClass";
 import { format, isSameDay, addDays } from "date-fns";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
+const scheduleTitle =
+  "Discover and book fitness classes that fit your lifestyle. Explore real-time schedules with flexible times, expert instructors, and a variety of wellness programs at FitBook Studio.";
 const Schedules = () => {
+  useDocumentTitle(scheduleTitle);
+
   const today = new Date();
+
   const { user } = useAuthStore();
+
   const [selectedDate, setSelectedDate] = useState(today);
 
   const { data, isLoading, isError, refetch } = user?.id
@@ -38,10 +45,11 @@ const Schedules = () => {
   }, [schedules, selectedDate]);
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="min-h-screen px-4 py-10 max-w-7xl mx-auto text-foreground">
+    <section className="section py-24 text-foreground">
       {/* Date Picker */}
       <div className="flex items-center justify-between mb-6">
         <button className="text-xl text-muted-foreground">&#8592;</button>

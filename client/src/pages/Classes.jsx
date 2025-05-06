@@ -1,20 +1,25 @@
 import React from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { useClassesQuery } from "@/hooks/useClass";
-import { Loading } from "@/components/ui/Loading";
-import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import FilterSelection from "@/components/input/FilterSelection";
-import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
+  CardDescription,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useClassesQuery } from "@/hooks/useClass";
+import { Loading } from "@/components/ui/Loading";
+import { Link, useSearchParams } from "react-router-dom";
+import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import FilterSelection from "@/components/input/FilterSelection";
+
+const classesTitle =
+  "Classes - Discover personalized sessions tailored for your needs, from beginner to advanced levels";
 
 const Classes = () => {
+  useDocumentTitle(classesTitle);
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filters = {
@@ -38,7 +43,7 @@ const Classes = () => {
   const { classes = [] } = response;
 
   return (
-    <section className="min-h-screen px-4 py-10 max-w-7xl mx-auto space-y-8">
+    <section className="section py-24 text-foreground">
       {/* Heading */}
       <div className="bg-primary text-primary-foreground rounded-xl shadow-md px-6 py-10 text-center space-y-2 mb-8">
         <h3 className="text-3xl font-bold">Explore Fitness Classes</h3>

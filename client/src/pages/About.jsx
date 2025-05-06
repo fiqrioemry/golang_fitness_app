@@ -1,10 +1,3 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/ui/Loading";
-import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { useInstructorsQuery } from "@/hooks/useInstructor";
-import { HeartPulse, CalendarClock, Users } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -12,8 +5,17 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/card";
+import React from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Loading } from "@/components/ui/Loading";
+import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { useInstructorsQuery } from "@/hooks/useInstructor";
+import { HeartPulse, CalendarClock, Users } from "lucide-react";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const About = () => {
+  useDocumentTitle("About Us – Empowering Your Wellness Journey");
   const {
     data: instructors = [],
     isLoading,
@@ -25,12 +27,12 @@ const About = () => {
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="min-h-screen max-w-7xl mx-auto px-4 py-10 space-y-20 text-foreground">
+    <section className="section py-24 space-y-20 text-foreground">
       {/* Hero Section */}
       <div className="bg-primary text-primary-foreground rounded-xl shadow-md px-6 py-10 text-center space-y-2 mb-8">
         <h3 className="text-3xl font-bold">Empowering Your Wellness Journey</h3>
         <p className="text-sm opacity-80 max-w-xl mx-auto">
-          At FitBook Studio, we believe that fitness is not just a goal — it's a
+          At Sweat Up, we believe that fitness is not just a goal — it's a
           lifestyle. Join our community and book classes tailored to your body
           and mind.
         </p>
