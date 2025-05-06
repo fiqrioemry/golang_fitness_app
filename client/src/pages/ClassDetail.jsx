@@ -1,5 +1,5 @@
 import React from "react";
-import { Star } from "lucide-react";
+import { ArrowLeft, Star } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Loading } from "@/components/ui/Loading";
@@ -16,7 +16,16 @@ const ClassDetail = () => {
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="section">
+    <section className="section py-24 text-foreground">
+      <div className="mb-6">
+        <button
+          onClick={() => history.back()}
+          className="flex items-center text-sm text-muted-foreground hover:text-primary transition"
+        >
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back to Classes
+        </button>
+      </div>
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         <img

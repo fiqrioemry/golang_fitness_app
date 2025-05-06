@@ -1,57 +1,23 @@
 import React from "react";
-import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import { useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
-import { useAuthStore } from "@/store/useAuthStore";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { useParams, useNavigate } from "react-router-dom";
 import { usePackageDetailQuery } from "@/hooks/usePackage";
-import { useCreatePaymentMutation } from "@/hooks/usePayment";
+import { usePackageTransaction } from "@/hooks/usePackageTransaction";
 import { MidtransScriptLoader } from "@/components/midtrans/MidtransScriptLoader";
 
 const PackageDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { user } = useAuthStore();
-  const { mutate: createPayment, isPending } = useCreatePaymentMutation();
+
   const { data: pkg, isLoading, isError, refetch } = usePackageDetailQuery(id);
 
-  const handleBuyNow = () => {
-    if (!user) return navigate("/signin");
-
-    createPayment(
-      { packageId: id },
-      {
-        onSuccess: (res) => {
-          if (res.snapToken && window.snap) {
-            window.snap.pay(res.snapToken, {
-              onSuccess: () => {
-                toast.success("Payment successful!");
-                navigate("/transactions");
-              },
-              onPending: () => {
-                toast("Waiting for payment confirmation...");
-              },
-              onError: () => {
-                toast.error("Payment failed.");
-              },
-              onClose: () => {
-                navigate("/user/trans");
-                toast.info("You closed the payment popup.");
-              },
-            });
-          } else {
-            toast.error("Failed to load Snap UI.");
-          }
-        },
-        onError: () => toast.error("Failed to create transaction."),
-      }
-    );
-  };
+  const { handleBuyNow, isPending } = usePackageTransaction(id);
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const discountedPrice =
@@ -59,12 +25,13 @@ const PackageDetail = () => {
       ? pkg.price * (1 - pkg.Discount / 100)
       : pkg.price;
   const tax = discountedPrice * 0.1;
+
   const totalPrice = discountedPrice + tax;
 
   return (
     <>
       <MidtransScriptLoader />
-      <section className="section">
+      <section className="section py-24 text-foreground">
         <div className="mb-6">
           <button
             onClick={() => history.back()}
@@ -161,14 +128,14 @@ const PackageDetail = () => {
           <div className="bg-card border border-border shadow-md rounded-2xl p-5 sticky top-24 space-y-4">
             <h3 className="text-xl font-semibold mb-1">Checkout</h3>
 
-            <div className="text-sm text-muted-foreground flex justify-between">
+            <div className="text-sm text-muted-foreground items-center flex justify-between">
               <span>Base Price</span>
               {pkg.Discount > 0 ? (
                 <span>
-                  <span className="line-through text-muted mr-1">
+                  <span className="line-through text-muted-foreground mr-1">
                     Rp {pkg.price.toLocaleString("id-ID")}
                   </span>
-                  <span className="text-red-600 font-semibold text-base">
+                  <span className="text-red-600 font-semibold text-lg">
                     Rp {discountedPrice.toLocaleString("id-ID")}
                   </span>
                 </span>
@@ -199,10 +166,10 @@ const PackageDetail = () => {
             </div>
 
             <Button
-              onClick={handleBuyNow}
+              size="lg"
               disabled={isPending}
               className="w-full mt-2"
-              size="lg"
+              onClick={handleBuyNow}
             >
               {isPending ? "Processing..." : "Buy Now"}
             </Button>

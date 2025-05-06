@@ -1,8 +1,9 @@
 // src/components/input/InputTagsElement.jsx
 
-import { Controller, useFormContext } from "react-hook-form";
 import { useState } from "react";
 import { X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Controller, useFormContext } from "react-hook-form";
 
 const InputTagsElement = ({
   name,
@@ -52,20 +53,18 @@ const InputTagsElement = ({
             )}
 
             <div className="flex flex-wrap gap-2 p-2 border border-border bg-background rounded-md transition focus-within:ring-1 focus-within:ring-primary">
-              {(field.value || []).map((tag, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full"
+              {(field.value || []).map((val) => (
+                <Badge
+                  key={val}
+                  variant="secondary"
+                  className="flex items-center gap-1 pr-1"
                 >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    className="hover:text-destructive transition"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
+                  {val}
+                  <X
+                    className="w-3 h-3 cursor-pointer ml-1"
+                    onClick={() => removeTag(val)}
+                  />
+                </Badge>
               ))}
 
               <input
@@ -76,7 +75,7 @@ const InputTagsElement = ({
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
                 disabled={disabled}
-                className="flex-1 min-w-[120px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                className="flex-1 resize-none h-10 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </div>
 

@@ -63,15 +63,11 @@ const Schedules = () => {
                 className={`w-14 min-w-[56px] h-16 flex flex-col items-center justify-center rounded-lg transition font-medium ${
                   isSelected
                     ? "bg-primary text-primary-foreground"
-                    : "bg-muted hover:bg-accent text-muted-foreground"
+                    : "bg-muted hover:bg-accent hover:text-background text-muted-foreground"
                 }`}
               >
-                <span className="text-xs">
-                  {format(date, "EEE", { locale: localeId })}
-                </span>
-                <span className="text-lg font-bold">
-                  {format(date, "dd", { locale: localeId })}
-                </span>
+                <span className="text-xs">{format(date, "EEE")}</span>
+                <span className="text-lg font-bold">{format(date, "dd")}</span>
               </button>
             );
           })}
@@ -82,7 +78,7 @@ const Schedules = () => {
       {/* Summary */}
       <div className="text-sm text-muted-foreground mb-6">
         <strong className="text-foreground">
-          {format(selectedDate, "EEEE, dd MMM", { locale: localeId })}
+          {format(selectedDate, "EEEE, dd MMM")}
         </strong>{" "}
         • {filteredSchedules.length} classes
       </div>
@@ -98,7 +94,7 @@ const Schedules = () => {
               {/* Left section */}
               <div className="flex flex-col space-y-2">
                 <p className="text-sm font-semibold">
-                  {format(s.startTime, "h:mm a", { locale: localeId })} •{" "}
+                  {format(s.startTime, "h:mm a")} •{" "}
                   {Math.round((s.endTime - s.startTime) / 60000)} mins
                 </p>
                 <p className="font-medium text-base">{s.class}</p>
