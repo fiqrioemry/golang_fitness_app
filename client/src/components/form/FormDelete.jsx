@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Play, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 
@@ -21,7 +21,7 @@ const FormDelete = ({
     <Dialog>
       <DialogTrigger asChild>
         {icon ? (
-          <Button variant="icon" type="button">
+          <Button variant="destructive" size="icon" type="button">
             <Trash2 className="w-4 h-4" />
           </Button>
         ) : (
@@ -32,16 +32,16 @@ const FormDelete = ({
         )}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-md rounded-xl p-6 space-y-6">
+      <DialogContent className="sm:max-w-md rounded-xl bg-background border border-border p-6 space-y-6">
         {loading ? (
           <SubmitLoading text="Deleting..." />
         ) : (
           <>
             <div className="text-center space-y-2">
-              <DialogTitle className="text-2xl font-bold text-gray-800">
+              <DialogTitle className="text-2xl font-bold text-foreground">
                 {title}
               </DialogTitle>
-              <DialogDescription className="text-gray-500">
+              <DialogDescription className="text-sm text-muted-foreground">
                 {description}
               </DialogDescription>
             </div>

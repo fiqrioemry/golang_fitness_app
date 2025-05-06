@@ -1,5 +1,3 @@
-// src/components/input/InputTextElement.jsx
-
 import { Controller, useFormContext } from "react-hook-form";
 
 const InputTextElement = ({
@@ -41,11 +39,12 @@ const InputTextElement = ({
             {label && (
               <label
                 htmlFor={name}
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-foreground"
               >
                 {label}
               </label>
             )}
+
             <input
               id={name}
               type={type}
@@ -55,12 +54,11 @@ const InputTextElement = ({
               disabled={disabled}
               maxLength={maxLength}
               inputMode={isNumeric ? "numeric" : undefined}
-              className="w-full border p-2 rounded disabled:bg-gray-100"
+              className={`input ${fieldState.error ? "input-error" : ""}`}
             />
+
             {fieldState.error && (
-              <p className="text-red-500 text-xs mt-1">
-                {fieldState.error.message}
-              </p>
+              <p className="error-message">{fieldState.error.message}</p>
             )}
           </div>
         );

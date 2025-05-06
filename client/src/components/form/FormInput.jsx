@@ -23,7 +23,7 @@ const FormInput = ({
           text={text}
           className={className}
           isLoading={isLoading}
-          disabled={!methods.formState.isValid || isLoading}
+          disabled={!methods.formState.isValid}
         />
       </form>
     </FormProvider>

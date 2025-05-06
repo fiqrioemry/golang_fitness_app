@@ -10,30 +10,31 @@ const Profile = () => {
   const { data, isError, refetch, isLoading } = useProfileQuery();
 
   if (isLoading) return <Loading />;
-
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const profile = data || [];
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">My Profile</h2>
+    <section className="px-4 py-10 space-y-6">
+      {/* Heading */}
+      <div className="text-center space-y-1">
+        <h2 className="text-2xl font-bold text-foreground">My Profile</h2>
         <p className="text-muted-foreground text-sm">
           Your personal account information
         </p>
       </div>
 
-      <div className="bg-white shadow-sm border rounded-xl p-6">
+      {/* Card */}
+      <div className="bg-card text-card-foreground border border-border rounded-xl shadow p-6 space-y-6">
         <div className="flex flex-col md:flex-row items-center gap-6">
-          {/* avatar display */}
+          {/* Avatar */}
           <UploadAvatar profile={profile} />
 
-          {/* profile display  */}
+          {/* Profile Info */}
           <ProfileInfo profile={profile} />
         </div>
 
-        {/* edit profile */}
+        {/* Update Button */}
         <div className="flex justify-end">
           <UpdateProfile profile={profile} />
         </div>

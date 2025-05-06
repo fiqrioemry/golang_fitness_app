@@ -1,15 +1,24 @@
-import { Plus } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableHeader,
+} from "@/components/ui/table";
 import React, { useEffect } from "react";
+import { PlusCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
 import { useClassesQuery } from "@/hooks/useClass";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { Card, CardContent } from "@/components/ui/card";
 import { DeleteClass } from "@/components/admin/classes/DeleteClass";
 import { UpdateClass } from "@/components/admin/classes/UpdateClass";
 
 const ClassesList = () => {
   const navigate = useNavigate();
-
   const { data, isLoading, isError, refetch } = useClassesQuery();
 
   useEffect(() => {
@@ -17,130 +26,143 @@ const ClassesList = () => {
   }, []);
 
   if (isLoading) return <Loading />;
-
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const classes = data?.classes || [];
 
   return (
     <section className="section">
+      {/* Header */}
       <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Class Management</h2>
-        <p className="text-muted-foreground text-sm">
+        <h2 className="text-2xl font-bold text-foreground">Class Management</h2>
+        <p className="text-sm text-muted-foreground">
           View, add, and manage training classes available for users.
         </p>
       </div>
-      <div className="flex justify-end">
-        <button
-          onClick={() => navigate("/admin/classes/add")}
-          className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition"
-        >
-          <Plus className="w-4 h-4" />
+
+      {/* Add Button */}
+      <div className="flex justify-end mt-4">
+        <Button size="nav" onClick={() => navigate("/admin/classes/add")}>
+          <PlusCircle className="w-4 h-4 mr-2" />
           Add Class
-        </button>
+        </Button>
       </div>
-      <div className="overflow-x-auto">
-        <>
-          {/* Desktop Table */}
-          <div className="hidden md:block overflow-x-auto border rounded-xl shadow-sm">
-            <table className="min-w-full bg-white text-sm">
-              <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
-                <tr>
-                  <th className="p-3 text-left">Thumbnail</th>
-                  <th className="p-3 text-left">Title</th>
-                  <th className="p-3 text-left">Duration</th>
-                  <th className="p-3 text-left">Status</th>
-                  <th className="p-3 text-left">Created At</th>
-                  <th className="p-3 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {classes.map((classItem) => (
-                  <tr key={classItem.id} className="border-t hover:bg-gray-50">
-                    <td className="p-3">
+
+      {/* Desktop Table */}
+      <Card className="border shadow-sm mt-6">
+        <CardContent className="overflow-x-auto p-0">
+          <div className="hidden md:block max-w-8xl w-full">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/40">
+                  <TableHead>Thumbnail</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Created At</TableHead>
+                  <TableHead className="text-left">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {classes.map((item) => (
+                  <TableRow
+                    key={item.id}
+                    className="border-t border-border hover:bg-muted transition"
+                  >
+                    <TableCell>
                       <img
-                        src={classItem.image}
-                        alt={classItem.title}
-                        className="w-16 h-16 object-cover rounded-md"
+                        src={item.image}
+                        alt={item.title}
+                        className="w-14 h-14 rounded-md object-cover border"
                       />
-                    </td>
-                    <td className="p-3 font-medium">{classItem.title}</td>
-                    <td className="p-3">{classItem.duration} minutes</td>
-                    <td className="p-3">
+                    </TableCell>
+                    <TableCell className="font-medium text-foreground">
+                      {item.title}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {item.duration} minutes
+                    </TableCell>
+                    <TableCell>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          classItem.isActive
+                          item.isActive
                             ? "bg-green-100 text-green-700"
                             : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {classItem.isActive ? "Active" : "Inactive"}
+                        {item.isActive ? "Active" : "Inactive"}
                       </span>
-                    </td>
-                    <td className="p-3">
-                      {new Date(classItem.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="p-3">
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
                       <div className="flex gap-2">
-                        <UpdateClass classes={classItem} />
-                        <DeleteClass classes={classItem} />
+                        <UpdateClass classes={item} />
+                        <DeleteClass classes={item} />
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
 
-          {/* Mobile Card View */}
-          <div className="md:hidden space-y-4">
-            {classes.map((classItem) => (
+          {/* Mobile View */}
+          <div className="md:hidden w-full space-y-4 p-4">
+            {classes.map((item) => (
               <div
-                key={classItem.id}
-                className="border rounded-lg p-4 shadow-sm space-y-2"
+                key={item.id}
+                className="border border-border rounded-lg p-4 shadow-sm bg-background"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 mb-3">
                   <img
-                    src={classItem.image}
-                    alt={classItem.title}
-                    className="w-16 h-16 object-cover rounded-md"
+                    src={item.image}
+                    alt={item.title}
+                    className="w-16 h-16 rounded-md object-cover border"
                   />
-                  <div>
-                    <h3 className="font-semibold text-base">
-                      {classItem.title}
+                  <div className="flex-1">
+                    <h3 className="text-base font-semibold text-foreground">
+                      {item.title}
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      {classItem.duration} minutes
+                      {item.duration} minutes
                     </p>
                   </div>
                 </div>
-                <div className="text-sm space-y-1">
-                  <p className="text-muted-foreground">
-                    Status:{" "}
+
+                <div className="text-sm text-muted-foreground space-y-1 mb-3">
+                  <p>
+                    <span className="font-medium text-foreground">
+                      Status :
+                    </span>{" "}
                     <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        classItem.isActive
+                      className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                        item.isActive
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {classItem.isActive ? "Active" : "Inactive"}
+                      {item.isActive ? "Active" : "Inactive"}
                     </span>
                   </p>
-                  <p className="text-muted-foreground">
-                    Created:{" "}
-                    {new Date(classItem.createdAt).toLocaleDateString()}
+                  <p>
+                    <span className="font-medium text-foreground">
+                      Created :
+                    </span>{" "}
+                    {new Date(item.createdAt).toLocaleDateString()}
                   </p>
                 </div>
+
                 <div className="flex justify-end gap-2">
-                  <UpdateClass classes={classItem} />
-                  <DeleteClass classes={classItem} />
+                  <UpdateClass classes={item} />
+                  <DeleteClass classes={item} />
                 </div>
               </div>
             ))}
           </div>
-        </>
-      </div>
+        </CardContent>
+      </Card>
     </section>
   );
 };

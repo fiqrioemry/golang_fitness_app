@@ -9,17 +9,19 @@ export const useAttendancesQuery = () =>
     keepPreviousData: true,
   });
 
+export const useValidateQRCode = () => {
+  return useMutation({
+    mutationFn: attendance.validateQRCode,
+  });
+};
+
 export const useCheckinAttendance = () =>
   useMutation({
     mutationFn: attendance.checkinAttendance,
     onSuccess: () => {
-      console.log("MASUK");
       toast.success("Check-in berhasil, QR Code siap ditampilkan.");
     },
     onError: (err) => {
-      console.log("MASUK");
-      console.log(err);
-      console.log(err.response);
       toast.error(err?.response?.data?.error || "Gagal check-in kelas.");
     },
   });

@@ -42,22 +42,22 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { WebLogo } from "../ui/WebLogo";
 
 const NavItem = ({ to, icon: Icon, title, active }) => (
   <Link
     to={to}
     className={cn(
-      "flex items-center justify-between px-4 py-2 text-sm rounded-md transition",
-      active ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-100"
+      "flex items-center gap-3 px-4 py-2 text-sm rounded-md transition",
+      active
+        ? "bg-primary text-primary-foreground font-semibold"
+        : "text-muted-foreground hover:bg-muted"
     )}
   >
-    <span className="flex items-center gap-2">
-      <Icon className="w-4 h-4" />
-      {title}
-    </span>
+    <Icon className="w-4 h-4" />
+    {title}
   </Link>
 );
-
 const directMenus = [
   {
     to: "/admin/users",
@@ -135,9 +135,9 @@ const AdminSidebar = () => {
 
   return (
     <Sidebar>
-      <SidebarContent className="p-4 space-y-4 text-sm text-gray-700">
-        <SidebarHeader className="mb-4">
-          <h2>admin panel</h2>
+      <SidebarContent className="px-4 space-y-4 text-sm text-gray-700">
+        <SidebarHeader className="mb-4 py-2">
+          <img src="/logo.png" />
         </SidebarHeader>
 
         <SidebarMenu className="space-y-1">
@@ -161,11 +161,16 @@ const AdminSidebar = () => {
           <Accordion type="multiple" className="space-y-1">
             {accordionMenus.map((menu) => (
               <AccordionItem key={menu.value} value={menu.value}>
-                <AccordionTrigger className="px-4 py-2 rounded-md hover:bg-gray-100 border-none">
-                  <span className="flex items-center gap-2">
-                    <menu.icon className="w-4 h-4" /> {menu.title}
-                  </span>
+                <AccordionTrigger
+                  className={cn(
+                    "w-full px-4 py-2 text-sm rounded-md transition flex items-center gap-2",
+                    "text-muted-foreground hover:bg-muted [&[data-state=open]]:bg-muted"
+                  )}
+                >
+                  <menu.icon className="w-4 h-4" />
+                  {menu.title}
                 </AccordionTrigger>
+
                 <AccordionContent className="pl-6 space-y-1 mt-1">
                   {menu.children.map((child) => (
                     <NavItem
@@ -182,20 +187,19 @@ const AdminSidebar = () => {
           </Accordion>
         </SidebarMenu>
       </SidebarContent>
-
-      <SidebarFooter className="p-4 text-xs text-gray-500">
+      <SidebarFooter className="p-4 text-xs text-muted-foreground">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 p-2 rounded-md transition">
+            <div className="flex items-center gap-3 cursor-pointer hover:bg-muted px-3 py-2 rounded-md transition">
               <Avatar className="w-9 h-9">
                 <AvatarImage src={user?.avatar} alt={user?.fullname} />
                 <AvatarFallback>{user?.fullname?.[0] || "A"}</AvatarFallback>
               </Avatar>
-              <div className="flex flex-col text-left">
-                <span className="text-sm font-medium text-gray-700">
+              <div className="flex flex-col text-left overflow-hidden">
+                <span className="text-sm font-medium text-foreground truncate">
                   {user?.fullname || "Admin"}
                 </span>
-                <span className="text-xs text-muted-foreground truncate max-w-[140px]">
+                <span className="text-xs text-muted-foreground truncate">
                   {user?.email || "admin@gmail.com"}
                 </span>
               </div>

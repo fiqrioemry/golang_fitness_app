@@ -20,7 +20,7 @@ export function FormAddDialog({
   schema,
   action,
   children,
-  buttonText,
+  buttonText = "",
   loading = false,
   shouldReset = true,
 }) {
@@ -76,13 +76,17 @@ export function FormAddDialog({
         onOpenChange={(open) => (!open ? handleCancel() : setIsOpen(open))}
       >
         <DialogTrigger asChild>
-          <Button type="button">
-            <PlusCircle className="w-4 h-4" />
-            <span>{buttonText || "Add new"}</span>
-          </Button>
+          {buttonText !== "" ? (
+            buttonText
+          ) : (
+            <Button type="button">
+              <PlusCircle className="w-4 h-4 mr-2" />
+              <span>Add new</span>
+            </Button>
+          )}
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-lg overflow-hidden rounded-xl p-0">
+        <DialogContent className="sm:max-w-lg overflow-hidden rounded-xl p-0 bg-card border border-border">
           {loading ? (
             <SubmitLoading />
           ) : (
@@ -92,22 +96,23 @@ export function FormAddDialog({
                 className="flex flex-col max-h-[70vh]"
               >
                 {/* Header */}
-                <div className="border-b px-6 py-4">
-                  <DialogTitle className="text-lg font-semibold text-center">
+                <div className="border-b border-border p-4 ">
+                  <DialogTitle className="text-lg font-semibold text-center text-foreground">
                     {title}
                   </DialogTitle>
-                  <DialogDescription className="text-gray-500 text-sm text-center">
-                    Submit button will activate when All required Field Filled
+                  <DialogDescription className="text-sm text-muted-foreground text-center">
+                    Submit button will activate when all required fields are
+                    filled.
                   </DialogDescription>
                 </div>
 
                 {/* Scrollable Form Content */}
-                <ScrollArea className="flex-1 px-6 py-4">
-                  <div className="space-y-4">{children}</div>
+                <ScrollArea className="flex-1">
+                  <div className="space-y-4 p-4">{children}</div>
                 </ScrollArea>
 
                 {/* Footer */}
-                <div className="border-t px-6 py-4 flex justify-end">
+                <div className="border-t border-border px-6 py-4 flex justify-end ">
                   <SubmitButton
                     text="Save Changes"
                     isLoading={loading}
@@ -122,12 +127,12 @@ export function FormAddDialog({
 
       {/* Confirmation Dialog */}
       <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
-        <DialogContent className="sm:max-w-md p-6 rounded-xl space-y-6">
+        <DialogContent className="sm:max-w-md p-6 rounded-xl space-y-6 bg-card border border-border">
           <div className="text-center">
-            <DialogTitle className="text-xl font-semibold text-gray-800">
+            <DialogTitle className="text-xl font-semibold text-foreground">
               Unsaved Changes
             </DialogTitle>
-            <p className="mt-2 text-gray-500 text-sm">
+            <p className="mt-2 text-sm text-muted-foreground">
               You have made changes. Are you sure you want to discard them?
             </p>
           </div>
@@ -138,7 +143,7 @@ export function FormAddDialog({
               className="w-32"
               onClick={() => handleConfirmation(false)}
             >
-              cancel
+              Cancel
             </Button>
             <Button
               variant="destructive"

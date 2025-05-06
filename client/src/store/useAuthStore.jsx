@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { create } from "zustand";
 import auth from "@/services/auth";
 import { persist } from "zustand/middleware";
+import { queryClient } from "../lib/react-query";
 
 export const useAuthStore = create(
   persist(
@@ -58,6 +59,7 @@ export const useAuthStore = create(
         try {
           await auth.logout();
           get().clearUser();
+          queryClient.clear();
         } catch (error) {
           console.error(error.message);
         }
@@ -94,7 +96,6 @@ export const useAuthStore = create(
             set({ step: 1 });
           }
         } catch (error) {
-          console.log("registering error", error);
           toast.error(error.response.data.message);
         } finally {
           set({ loading: false });
@@ -104,7 +105,7 @@ export const useAuthStore = create(
     {
       name: "auth-storage",
       partialize: (state) => ({
-        user: state.rememberMe ? state.user : null,
+        user: state.user,
         rememberMe: state.rememberMe,
       }),
     }

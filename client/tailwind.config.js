@@ -5,6 +5,10 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Montserrat", "sans-serif"], // Body text
+        heading: ["Orbitron", "sans-serif"], // Title / Heading
+      },
       screens: {
         md: " 768px",
         lg: "1024px",

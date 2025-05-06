@@ -24,14 +24,15 @@ const FilterSelection = ({ paramKey, label, data }) => {
   return (
     <div className="space-y-1">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label htmlFor={paramKey} className="label">
           {label}
         </label>
       )}
       <select
+        id={paramKey}
         value={selected}
         onChange={handleChange}
-        className="w-full border p-2 rounded"
+        className="input bg-background text-foreground border border-input focus:ring focus:ring-ring disabled:bg-muted disabled:text-muted-foreground"
       >
         <option value="">All</option>
         {options.map((opt) => (

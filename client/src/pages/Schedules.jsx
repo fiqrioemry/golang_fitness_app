@@ -4,15 +4,16 @@ import React, { useState, useMemo } from "react";
 import { id as localeId } from "date-fns/locale";
 import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useSchedulesQuery } from "@/hooks/useClass";
+import {
+  useSchedulesQuery,
+  useSchedulesWithStatusQuery,
+} from "@/hooks/useClass";
 import { format, isSameDay, addDays } from "date-fns";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { useSchedulesWithStatusQuery } from "@/hooks/useClass";
 
 const Schedules = () => {
   const today = new Date();
   const { user } = useAuthStore();
-
   const [selectedDate, setSelectedDate] = useState(today);
 
   const { data, isLoading, isError, refetch } = user?.id
@@ -27,7 +28,7 @@ const Schedules = () => {
 
   const filteredSchedules = useMemo(() => {
     return schedules
-      ?.map((item) => {
+      .map((item) => {
         const start = new Date(item.date);
         start.setHours(item.startHour, item.startMinute, 0, 0);
         const end = new Date(start.getTime() + 60 * 60 * 1000);
@@ -40,71 +41,75 @@ const Schedules = () => {
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="min-h-screen px-4 py-10 max-w-7xl mx-auto">
-      {/* Date Header */}
-      <div className="flex items-center justify-between mb-4">
-        <button className="text-xl">&#8592;</button>
+    <section className="min-h-screen px-4 py-10 max-w-7xl mx-auto text-foreground">
+      {/* Date Picker */}
+      <div className="flex items-center justify-between mb-6">
+        <button className="text-xl text-muted-foreground">&#8592;</button>
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
           {dateRange.map((date, i) => {
             const isSelected = isSameDay(date, selectedDate);
             return (
-              <div
+              <button
                 key={i}
                 onClick={() => setSelectedDate(date)}
-                className={`w-14 min-w-[56px] h-16 flex flex-col items-center justify-center rounded-lg cursor-pointer ${
+                className={`w-14 min-w-[56px] h-16 flex flex-col items-center justify-center rounded-lg transition font-medium ${
                   isSelected
-                    ? "bg-primary text-white font-semibold"
-                    : "bg-white text-gray-800 hover:bg-gray-100"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted hover:bg-accent text-muted-foreground"
                 }`}
               >
-                <span className="text-sm">
+                <span className="text-xs">
                   {format(date, "EEE", { locale: localeId })}
                 </span>
                 <span className="text-lg font-bold">
                   {format(date, "dd", { locale: localeId })}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>
-        <button className="text-xl">&#8594;</button>
+        <button className="text-xl text-muted-foreground">&#8594;</button>
       </div>
 
       {/* Summary */}
-      <div className="text-sm text-gray-500 mb-4">
-        <strong className="text-gray-800">
+      <div className="text-sm text-muted-foreground mb-6">
+        <strong className="text-foreground">
           {format(selectedDate, "EEEE, dd MMM", { locale: localeId })}
         </strong>{" "}
         • {filteredSchedules.length} classes
       </div>
 
-      {/* Class Schedule List */}
+      {/* Schedule List */}
       <div className="space-y-4">
         {filteredSchedules.length > 0 ? (
           filteredSchedules.map((s) => (
             <div
               key={s.id}
-              className="bg-secondary rounded-xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between"
+              className="bg-card border border-border rounded-xl px-6 py-8 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between"
             >
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-[#56684c]">
+              {/* Left section */}
+              <div className="flex flex-col space-y-2">
+                <p className="text-sm font-semibold">
                   {format(s.startTime, "h:mm a", { locale: localeId })} •{" "}
                   {Math.round((s.endTime - s.startTime) / 60000)} mins
                 </p>
-                <p className="font-medium">{s.class}</p>
-                <p className="text-sm text-gray-500">{s.instructor}</p>
+                <p className="font-medium text-base">{s.class}</p>
+                <p className="text-sm text-muted-foreground">{s.instructor}</p>
               </div>
-              <div className="mt-3 sm:mt-0 sm:text-right">
-                <p className="text-sm text-gray-500">
+
+              {/* Right section */}
+              <div className="mt-4 md:mt-0 md:text-right flex flex-col items-end gap-2">
+                <p className="text-sm text-muted-foreground">
                   {s.capacity - s.bookedCount > 0
                     ? `${s.capacity - s.bookedCount} left`
                     : "0 in waitlist"}
                 </p>
+
                 {s.isBooked ? (
                   <Link to="/profile/bookings">
                     <Button
                       variant="outline"
-                      className="bg-green-100 text-green-700 border-green-500 hover:bg-green-200"
+                      className="text-green-700 border-green-500 bg-green-100 hover:bg-green-200"
                     >
                       Booked
                     </Button>
@@ -114,16 +119,20 @@ const Schedules = () => {
                     <Button>Book Now</Button>
                   </Link>
                 ) : (
-                  <button className="mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium">
+                  <Button
+                    variant="secondary"
+                    className="cursor-not-allowed"
+                    disabled
+                  >
                     Join Waitlist
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-500 text-lg mt-20">
-            📭 No schedules on this day.
+          <p className="text-center text-muted-foreground text-lg mt-20">
+            📭 No schedules available for this day.
           </p>
         )}
       </div>

@@ -80,7 +80,7 @@ export function FormSheet({
               onSubmit={handleSubmit(handleSave)}
               className="flex flex-col h-full"
             >
-              <div className="border-b px-6 py-4">
+              <div className="border-b p-4">
                 <SheetHeader>
                   <SheetTitle className="text-lg font-semibold">
                     {title}
@@ -91,11 +91,11 @@ export function FormSheet({
                 </SheetHeader>
               </div>
 
-              <ScrollArea className="flex-1 px-6 py-4">
-                <div className="space-y-4">{children}</div>
+              <ScrollArea className="flex-1 py-4">
+                <div className="space-y-4 px-4">{children}</div>
               </ScrollArea>
 
-              <div className="border-t px-6 py-4 gap-4 flex justify-end">
+              <div className="border-t p-4 gap-4 flex justify-end">
                 <SubmitButton
                   text="Save Changes"
                   isLoading={loading}

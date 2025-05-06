@@ -1,26 +1,48 @@
 import { Button } from "@/components/ui/button";
-import { InputDateElement } from "../components/input/InputDateElement";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const heroImages = [
+    "/hero-image1.webp",
+    "/hero-image2.webp",
+    "/hero-image3.webp",
+    "/hero-image4.webp",
+  ];
+
+  const [currentImage, setCurrentImage] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % heroImages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <main className="bg-white text-gray-900">
-      {/* Hero Section */}
+    <main className="bg-background text-foreground">
       <section
-        className="relative w-full h-[800px] bg-cover bg-center"
-        style={{ backgroundImage: "url('https://placehold.co/1920x800')" }}
+        className="relative w-full h-[800px] bg-cover bg-center transition-all duration-1000 ease-in-out"
+        style={{ backgroundImage: `url('${heroImages[currentImage]}')` }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="text-center px-4">
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <div className="text-center px-4 max-w-3xl">
+            <h1 className="text-4xl md:text-6xl font-bold text-primary/90 mb-4 font-heading">
               Train Better. Live Stronger.
             </h1>
-            <p className="text-xl text-white mb-6">
+            <p className="text-lg text-muted-foreground mb-6">
               Discover, schedule, and attend classes that energize your
-              lifestyle — all in one beautifully simple platform.
+              lifestyle — all in one platform.
             </p>
             <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <Button className="text-lg px-6 py-3"> Book a Class</Button>
-              <Button variant="outline" className="text-lg px-6 py-3">
+              <Button size="lg" className="w-60 h-12 rounded-full">
+                Book a Class
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-60 h-12 rounded-full"
+              >
                 See Our Packages
               </Button>
             </div>
@@ -28,54 +50,68 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="py-16 px-4 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-semibold text-center mb-4">
-          Explore Our Classes
+      <section className="py-24 px-4 max-w-7xl mx-auto">
+        <h2 className="text-4xl font-bold text-center mb-4 font-heading">
+          Explore Our Program
         </h2>
-        <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+        <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto text-base">
           From relaxing yoga sessions to high-intensity workouts, choose the
-          class that matches your fitness goals and schedule.
+          class that suits your fitness goals.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-          {["Yoga", "HIIT", "Strength", "Zumba"].map((cat) => (
-            <div
-              key={cat}
-              className="text-center border rounded-xl overflow-hidden shadow hover:shadow-lg transition"
+          {[
+            { name: "Yoga", image: "/class-image1.webp" },
+            { name: "HIIT", image: "/class-image2.webp" },
+            { name: "Strength", image: "/class-image3.webp" },
+            { name: "Zumba", image: "/class-image4.webp" },
+          ].map((cls) => (
+            <Card
+              key={cls.name}
+              className="group overflow-hidden rounded-2xl shadow hover:shadow-xl transition"
             >
-              <img
-                src="https://placehold.co/400x250"
-                alt={cat}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-semibold">{cat}</h3>
+              <div className="relative w-full h-48 overflow-hidden">
+                <img
+                  src={cls.image}
+                  alt={cls.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition" />
               </div>
-            </div>
+              <CardHeader className="bg-background text-center py-4">
+                <CardTitle className="text-lg font-semibold text-foreground">
+                  {cls.name}
+                </CardTitle>
+              </CardHeader>
+            </Card>
           ))}
         </div>
       </section>
 
-      {/* Popular Classes */}
-      <section className="py-16 px-4 bg-gray-100">
-        <h2 className="text-3xl font-semibold text-center mb-12">
+      {/* Popular Classes - desain lama */}
+      <section className="py-20 px-4 bg-muted">
+        <h2 className="text-4xl font-bold text-center mb-4 font-heading">
           Popular Classes
         </h2>
+        <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto text-base">
+          From relaxing yoga sessions to high-intensity workouts, choose the
+          class that suits your fitness goals.
+        </p>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {[1, 2, 3].map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition"
+              className="bg-card text-foreground border border-border rounded-xl shadow hover:shadow-xl transition"
             >
               <img
-                src="https://placehold.co/600x400"
+                src="/class-image1.webp"
                 alt="class"
                 className="w-full h-56 object-cover"
               />
               <div className="p-6">
-                <h4 className="text-xl font-bold mb-2">Zumba Burn</h4>
-                <p className="text-sm text-gray-600 mb-4">
+                <h4 className="text-lg font-bold mb-2">Zumba Burn</h4>
+                <p className="text-sm text-muted-foreground mb-4">
                   Today at 6 PM · Central Studio
                 </p>
                 <div className="flex justify-between items-center">
@@ -88,19 +124,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Packages */}
-      <section className="py-16 px-4 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-semibold text-center mb-12">
+      {/* Membership Packages - desain lama */}
+      <section className="py-20 px-4 max-w-7xl mx-auto">
+        <h2 className="text-4xl font-bold text-center mb-4 font-heading">
           Membership Packages
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-          {["Basic", "Pro", "Unlimited"].map((pkg, i) => (
+        <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto text-base">
+          From relaxing yoga sessions to high-intensity workouts, choose the
+          class that suits your fitness goals.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {["Basic", "Pro", "Unlimited"].map((pkg) => (
             <div
               key={pkg}
-              className="bg-white border rounded-xl p-6 text-center shadow"
+              className="bg-card text-foreground border border-border rounded-xl p-6 text-center shadow"
             >
               <h3 className="text-2xl font-bold mb-4">{pkg}</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 {pkg === "Basic"
                   ? "4 classes/month"
                   : pkg === "Pro"
@@ -120,22 +160,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Visit Our Studio */}
-      <section className="py-20 px-4 bg-white">
+      {/* Visit Studio */}
+      <section className="py-20 px-4 bg-muted border-t border-border">
         <div className="max-w-6xl mx-auto space-y-10">
           <div className="text-center space-y-2">
-            <h3 className="text-3xl font-bold text-gray-800">
+            <h2 className="text-4xl font-bold text-center mb-4 font-heading">
               Visit Our Studio
-            </h3>
+            </h2>
             <p className="text-sm text-muted-foreground max-w-xl mx-auto">
-              Experience the space where wellness begins. Drop by and feel the
-              calm, the energy, and the inspiration.
+              Experience our studio space — drop in, feel the energy, and meet
+              our instructors in person.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            {/* Map section */}
-            <div className="w-full h-80 rounded-xl overflow-hidden shadow-lg ring-1 ring-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="w-full h-80 rounded-xl overflow-hidden shadow ring-1 ring-border">
               <iframe
                 title="Studio Map"
                 width="100%"
@@ -147,23 +186,18 @@ export default function Home() {
                 src="https://www.google.com/maps?q=40.712776,-74.005974&z=15&output=embed"
               ></iframe>
             </div>
-
-            {/* Studio info */}
             <div className="p-6 space-y-4">
-              <h4 className="text-xl font-semibold text-gray-800">
-                Fitness Studio A
-              </h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="text-lg font-semibold">Fitness Studio A</h4>
+              <p className="text-sm text-muted-foreground">
                 <span className="font-medium">Address:</span> 123 Fitness St,
                 New York, NY
               </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">Hours:</span> Open daily from{" "}
-                <strong>6AM – 10PM</strong>
+              <p className="text-sm text-muted-foreground">
+                <span className="font-medium">Hours:</span> 6AM – 10PM daily
               </p>
-              <p className="text-sm text-gray-600">
-                Come join our in-studio classes or simply drop in for a tour and
-                meet our instructors in person!
+              <p className="text-sm text-muted-foreground">
+                Join a class, get a tour, or just stop by to see what we’re all
+                about!
               </p>
             </div>
           </div>

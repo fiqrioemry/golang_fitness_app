@@ -60,8 +60,8 @@ const ClassSchedule = () => {
 
   return (
     <section>
-      <div className="space-y-1 text-center mb-4">
-        <h2 className="text-2xl font-bold">Class Schedules Event</h2>
+      <div className="space-y-1 text-center">
+        <h2 className="text-2xl font-bold py-4">Class Schedules Event</h2>
       </div>
       <AddClassSchedule
         open={isAddDialogOpen}

@@ -27,54 +27,44 @@ const PackageDetail = () => {
         onSuccess: (res) => {
           if (res.snapToken && window.snap) {
             window.snap.pay(res.snapToken, {
-              onSuccess: function (result) {
+              onSuccess: () => {
                 toast.success("Payment successful!");
-                console.log("Success", result);
                 navigate("/transactions");
               },
-              onPending: function (result) {
+              onPending: () => {
                 toast("Waiting for payment confirmation...");
-                console.log("Pending", result);
               },
-              onError: function (result) {
+              onError: () => {
                 toast.error("Payment failed.");
-                console.error("Error", result);
               },
-              onClose: function () {
+              onClose: () => {
                 navigate("/user/trans");
-                toast.info(
-                  "You closed the payment popup before completing the transaction."
-                );
+                toast.info("You closed the payment popup.");
               },
             });
           } else {
             toast.error("Failed to load Snap UI.");
           }
         },
-        onError: () => {
-          toast.error("Failed to create transaction.");
-        },
+        onError: () => toast.error("Failed to create transaction."),
       }
     );
   };
 
   if (isLoading) return <Loading />;
-
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const discountedPrice =
     pkg.Discount && pkg.Discount > 0
       ? pkg.price * (1 - pkg.Discount / 100)
       : pkg.price;
-
   const tax = discountedPrice * 0.1;
-
   const totalPrice = discountedPrice + tax;
 
   return (
     <>
       <MidtransScriptLoader />
-      <section className="px-4 py-10 max-w-7xl mx-auto">
+      <section className="section">
         <div className="mb-6">
           <button
             onClick={() => history.back()}
@@ -86,22 +76,26 @@ const PackageDetail = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
+          {/* Left Content */}
           <div className="md:col-span-2 space-y-5">
             <img
               src={pkg.image}
               alt={pkg.name}
-              className="rounded-xl w-full h-[400px] object-cover border shadow-sm"
+              className="rounded-xl w-full h-[400px] object-cover border border-border shadow"
             />
 
             <div>
-              <h2 className="text-3xl font-bold mb-1">{pkg.name}</h2>
-              <p className="text-muted-foreground text-sm">{pkg.description}</p>
+              <h2 className="text-3xl font-bold">{pkg.name}</h2>
+              <p className="text-muted-foreground text-sm mt-1">
+                {pkg.description}
+              </p>
+
               <div className="mt-2 flex items-center gap-2 flex-wrap">
                 <Badge variant="outline">
                   {pkg.credit} Credits •{" "}
                   {pkg.Discount > 0 ? (
                     <>
-                      <span className="line-through text-black ml-1">
+                      <span className="line-through text-muted ml-1">
                         Rp {pkg.price.toLocaleString("id-ID")}
                       </span>
                       <span className="ml-2 text-red-600 font-semibold">
@@ -133,21 +127,22 @@ const PackageDetail = () => {
                 ))}
               </ul>
             </div>
-            {pkg.classes && pkg.classes.length > 0 && (
+
+            {pkg.classes?.length > 0 && (
               <div className="mt-6">
                 <h3 className="text-lg font-semibold mb-3">
-                  🧘 Classes Included in This Package
+                  🧘 Classes Included
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {pkg.classes.map((cls) => (
                     <div
                       key={cls.id}
-                      className="flex items-center gap-4 bg-gray-50 border rounded-xl p-3 shadow-sm"
+                      className="flex items-center gap-4 bg-muted/50 border border-border rounded-xl p-3"
                     >
                       <img
                         src={cls.image}
                         alt={cls.title}
-                        className="w-16 h-16 rounded object-cover border"
+                        className="w-16 h-16 rounded object-cover border border-border"
                       />
                       <div className="flex-1">
                         <p className="font-medium text-sm">{cls.title}</p>
@@ -162,17 +157,18 @@ const PackageDetail = () => {
             )}
           </div>
 
-          <div className="bg-white border shadow-md rounded-2xl p-5 sticky top-24 space-y-4">
+          {/* Checkout */}
+          <div className="bg-card border border-border shadow-md rounded-2xl p-5 sticky top-24 space-y-4">
             <h3 className="text-xl font-semibold mb-1">Checkout</h3>
 
-            <div className="text-sm text-muted-foreground flex justify-between items-center">
+            <div className="text-sm text-muted-foreground flex justify-between">
               <span>Base Price</span>
               {pkg.Discount > 0 ? (
                 <span>
-                  <span className="line-through text-black mr-1">
+                  <span className="line-through text-muted mr-1">
                     Rp {pkg.price.toLocaleString("id-ID")}
                   </span>
-                  <span className="text-red-600 text-lg font-semibold">
+                  <span className="text-red-600 font-semibold text-base">
                     Rp {discountedPrice.toLocaleString("id-ID")}
                   </span>
                 </span>
@@ -183,7 +179,7 @@ const PackageDetail = () => {
 
             {pkg.Discount > 0 && (
               <div className="text-sm text-red-600 flex justify-between">
-                <span> Discount</span>
+                <span>Discount</span>
                 <span>-{pkg.Discount}%</span>
               </div>
             )}
@@ -205,8 +201,8 @@ const PackageDetail = () => {
             <Button
               onClick={handleBuyNow}
               disabled={isPending}
-              size="lg"
               className="w-full mt-2"
+              size="lg"
             >
               {isPending ? "Processing..." : "Buy Now"}
             </Button>

@@ -5,6 +5,14 @@ import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 const Packages = () => {
   const {
@@ -20,10 +28,10 @@ const Packages = () => {
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
-    <section className="min-h-screen px-4 py-10 max-w-7xl mx-auto">
-      <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-gray-800">Choose a Package</h2>
-        <p className="text-gray-500 mt-2 text-sm">
+    <section className="section">
+      <div className="bg-primary text-primary-foreground rounded-xl shadow px-6 py-10 text-center space-y-2 mb-10">
+        <h3 className="text-3xl font-bold">Choose a Package</h3>
+        <p className="text-sm opacity-80">
           Find the right plan that matches your fitness goals and schedule.
         </p>
       </div>
@@ -34,59 +42,54 @@ const Packages = () => {
           const discountedPrice = pkg.price * (1 - pkg.discount / 100);
 
           return (
-            <div
+            <Card
               key={pkg.id}
-              className={`relative rounded-2xl border shadow-sm overflow-hidden bg-white flex flex-col`}
+              className={`relative overflow-hidden card-hover ${
+                !pkg.isActive ? "opacity-60" : ""
+              }`}
             >
-              {/* Banner Sold Out (tetap terang) */}
+              {/* SOLD OUT Banner */}
               {!pkg.isActive && (
                 <div className="absolute top-4 -left-12 w-40 rotate-[-45deg] bg-red-600 text-white text-center text-xs font-bold py-1 shadow-lg z-10">
                   SOLD OUT
                 </div>
               )}
 
-              {/* Diskon */}
+              {/* Discount Badge */}
               {hasDiscount && (
-                <span className="absolute top-4 right-4 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow z-10">
+                <span className="absolute top-4 right-4 bg-green-600 text-white text-xs px-2 py-1 rounded-full z-10 shadow">
                   {pkg.discount}% OFF
                 </span>
               )}
 
-              {/* Gambar */}
+              {/* Image */}
               <img
                 src={pkg.image}
                 alt={pkg.name}
-                className={`w-full h-44 object-cover ${
-                  !pkg.isActive ? "opacity-60 grayscale" : ""
-                }`}
+                className="w-full h-44 object-cover"
               />
 
-              {/* Konten */}
-              <div
-                className={`p-5 flex flex-col items-center text-center flex-grow ${
-                  !pkg.isActive ? "opacity-60" : ""
-                }`}
-              >
-                <h3 className="text-xl font-semibold line-clamp-1">
+              <CardHeader className="text-center">
+                <CardTitle className="line-clamp-1 text-lg">
                   {pkg.name}
-                </h3>
-                <p className="text-sm text-gray-500 line-clamp-2 mt-1">
+                </CardTitle>
+                <CardDescription className="line-clamp-2">
                   {pkg.description}
-                </p>
+                </CardDescription>
+              </CardHeader>
 
-                <div className="mt-2 flex items-center text-sm text-gray-700">
-                  <p>
-                    <strong>Credit:</strong> {pkg.credit}
-                  </p>
+              <CardContent className="px-5 pb-0">
+                <div className="text-sm text-muted-foreground mb-1">
+                  Credit: <span className="font-medium">{pkg.credit}</span>
                 </div>
 
-                <div className="mt-2 text-lg font-bold">
+                <div className="text-lg font-bold">
                   {hasDiscount ? (
                     <>
                       <span className="text-red-600">
                         Rp {discountedPrice.toLocaleString("id-ID")}
                       </span>
-                      <span className="ml-2 text-sm text-gray-400 line-through">
+                      <span className="ml-2 text-sm line-through text-muted-foreground">
                         Rp {pkg.price.toLocaleString("id-ID")}
                       </span>
                     </>
@@ -95,30 +98,26 @@ const Packages = () => {
                   )}
                 </div>
 
-                {/* Konten tengah diberi flex-grow agar dorong tombol ke bawah */}
-                <div className="flex-grow w-full h-24 mt-4">
-                  {pkg.additional?.length > 0 && (
-                    <ul className="text-left text-sm text-gray-600 space-y-2 w-full">
-                      {pkg.additional.slice(0, 4).map((item, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-green-500 mt-1" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+                <ul className="mt-4 text-sm text-muted-foreground space-y-2 h-20 overflow-y-auto">
+                  {pkg.additional.slice(0, 4).map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-primary mt-1" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
 
-                {/* Tombol tetap di bawah */}
+              <CardFooter className="px-5 pb-5">
                 <Button
                   onClick={() => navigate(`/packages/${pkg.id}`)}
-                  className="mt-auto w-full"
+                  className="w-full"
                   disabled={!pkg.isActive}
                 >
                   {pkg.isActive ? "Buy Now" : "Unavailable"}
                 </Button>
-              </div>
-            </div>
+              </CardFooter>
+            </Card>
           );
         })}
       </div>

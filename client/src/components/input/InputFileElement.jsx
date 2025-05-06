@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
-import { PlusCircle, X } from "lucide-react";
 import { toast } from "sonner";
+import { PlusCircle, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Controller, useFormContext } from "react-hook-form";
 
 const InputFileElement = ({
   name,
@@ -24,9 +25,7 @@ const InputFileElement = ({
           const validFiles = Array.from(files).filter((file) => {
             const isValidSize = file.size / (1024 * 1024) <= maxSizeMB;
             if (!isValidSize) {
-              toast.warning(
-                `${file.name} exceeds maximum size of ${maxSizeMB}MB`
-              );
+              toast.warning(`${file.name} exceeds ${maxSizeMB}MB`);
             }
             return isValidSize;
           });
@@ -65,12 +64,8 @@ const InputFileElement = ({
         };
 
         const getImageURL = (item) => {
-          if (item instanceof File) {
-            return URL.createObjectURL(item);
-          }
-          if (typeof item === "string") {
-            return item;
-          }
+          if (item instanceof File) return URL.createObjectURL(item);
+          if (typeof item === "string") return item;
           return "";
         };
 
@@ -82,15 +77,17 @@ const InputFileElement = ({
               <img
                 src={url}
                 alt="preview"
-                className="object-cover w-full h-full"
+                className="object-cover w-full h-full rounded-md"
               />
-              <button
+              <Button
                 type="button"
+                size="icon"
+                variant="destructive"
                 onClick={() => handleRemoveImage(field.value)}
-                className="absolute top-2 right-2 p-1 rounded-full bg-white shadow hover:bg-red-500 hover:text-white transition"
+                className="absolute top-1 right-1 p-1"
               >
                 <X className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
           );
         };
@@ -99,20 +96,22 @@ const InputFileElement = ({
           return (field.value || []).map((img, idx) => (
             <div
               key={idx}
-              className="relative w-32 h-32 border rounded-md overflow-hidden"
+              className="relative w-32 h-32 border border-border rounded-md overflow-hidden"
             >
               <img
                 src={getImageURL(img)}
                 alt="preview"
                 className="object-cover w-full h-full"
               />
-              <button
+              <Button
+                size="icon"
                 type="button"
+                variant="destructive"
                 onClick={() => handleRemoveImage(img)}
-                className="absolute top-1 right-1 p-1 rounded-full bg-white shadow hover:bg-red-500 hover:text-white transition"
+                className="absolute top-1 right-1 p-1"
               >
-                <X className="w-4 h-4" />
-              </button>
+                <X className="w-2 h-2" />
+              </Button>
             </div>
           ));
         };
@@ -122,7 +121,7 @@ const InputFileElement = ({
             {label && (
               <label
                 htmlFor={name}
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-foreground"
               >
                 {label}
               </label>
@@ -142,9 +141,11 @@ const InputFileElement = ({
                 isSingle
                   ? "relative w-full h-64 flex items-center justify-center overflow-hidden"
                   : "flex flex-wrap gap-4 p-4"
-              } border-2 rounded-md ${
-                isDragging ? "border-primary bg-primary/10" : "border-primary"
-              } transition`}
+              } border-2 rounded-md transition ${
+                isDragging
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-muted/30"
+              }`}
             >
               {isSingle ? (
                 field.value ? (
@@ -152,10 +153,10 @@ const InputFileElement = ({
                 ) : (
                   <label
                     htmlFor={`${name}-upload`}
-                    className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-primary/10"
+                    className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-muted transition rounded-md"
                   >
                     <PlusCircle className="text-primary mb-2" />
-                    <span className="text-primary text-sm">Select Image</span>
+                    <span className="text-sm ">Select Image</span>
                   </label>
                 )
               ) : (
@@ -164,12 +165,10 @@ const InputFileElement = ({
                   {(!field.value || field.value.length < maxImages) && (
                     <label
                       htmlFor={`${name}-upload`}
-                      className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-primary rounded-md cursor-pointer hover:bg-primary/10 transition"
+                      className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-primary rounded-md cursor-pointer hover:bg-muted transition"
                     >
                       <PlusCircle className="text-primary mb-2" />
-                      <span className="text-primary text-sm">
-                        Select Images
-                      </span>
+                      <span className="text-sm">Select Images</span>
                     </label>
                   )}
                 </>
@@ -185,7 +184,7 @@ const InputFileElement = ({
             </div>
 
             {fieldState.error && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-destructive text-xs mt-1">
                 {fieldState.error.message || "This field is required"}
               </p>
             )}

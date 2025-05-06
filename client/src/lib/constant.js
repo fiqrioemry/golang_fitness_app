@@ -13,10 +13,11 @@ export const verifyOTPState = {
   email: "",
   otp: "",
 };
-export const loginState = {
+export const getLoginState = (rememberMe = false) => ({
   email: "",
   password: "",
-};
+  rememberMe,
+});
 
 export const profileState = {
   fullname: "",
@@ -129,3 +130,8 @@ export const packageState = {
   discount: 0,
   classIds: [],
 };
+
+export const genderOptions = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+];

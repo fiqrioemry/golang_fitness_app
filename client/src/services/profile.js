@@ -9,6 +9,7 @@ export const getProfile = async () => {
 
 // PUT /api/user/profile
 export const updateProfile = async (data) => {
+  console.log(data);
   const res = await authInstance.put("/user/profile", data);
   return res.data;
 };
@@ -45,6 +46,5 @@ export const getUserBookings = async (page = 1, limit = 10) => {
   const res = await authInstance.get("/user/bookings", {
     params: { page, limit },
   });
-  console.log(res.data);
   return res.data.bookings;
 };

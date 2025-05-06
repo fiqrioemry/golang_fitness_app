@@ -1,5 +1,3 @@
-// src/components/input/InputTextareaElement.jsx
-
 import { Controller, useFormContext } from "react-hook-form";
 
 const InputTextareaElement = ({
@@ -19,12 +17,9 @@ const InputTextareaElement = ({
       control={control}
       rules={rules}
       render={({ field, fieldState }) => (
-        <div className="space-y-2">
+        <div className="space-y-1">
           {label && (
-            <label
-              htmlFor={name}
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor={name} className="label">
               {label}
             </label>
           )}
@@ -35,12 +30,12 @@ const InputTextareaElement = ({
             disabled={disabled}
             rows={rows}
             maxLength={maxLength}
-            className="w-full border p-2 rounded resize-none disabled:bg-gray-100"
+            className={`input resize-none ${
+              fieldState.error ? "input-error" : ""
+            }`}
           />
           {fieldState.error && (
-            <p className="text-red-500 text-xs mt-1">
-              {fieldState.error.message}
-            </p>
+            <p className="error-message">{fieldState.error.message}</p>
           )}
         </div>
       )}

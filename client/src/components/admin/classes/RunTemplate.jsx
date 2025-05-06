@@ -12,7 +12,7 @@ const RunTemplate = ({ template }) => {
 
   return (
     <FormToggle
-      text="Start"
+      type="start"
       loading={isPending}
       title="Run Recuring Schedule"
       onToggle={handleRunTemplate}

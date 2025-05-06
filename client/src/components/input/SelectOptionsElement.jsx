@@ -24,18 +24,18 @@ const SelectOptionsElement = ({
       render={({ field, fieldState }) => (
         <div className="space-y-1">
           {label && (
-            <label
-              htmlFor={name}
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor={name} className="label">
               {label}
             </label>
           )}
+
           <select
             id={name}
             {...field}
             disabled={disabled}
-            className="w-full border p-2 rounded disabled:bg-gray-100"
+            className={`input bg-background text-foreground border-input focus:ring focus:ring-ring disabled:bg-muted disabled:text-muted-foreground ${
+              fieldState.error ? "input-error" : ""
+            }`}
           >
             <option value="">{placeholder}</option>
             {options.map((option) => (
@@ -47,10 +47,9 @@ const SelectOptionsElement = ({
               </option>
             ))}
           </select>
+
           {fieldState.error && (
-            <p className="text-red-500 text-xs mt-1">
-              {fieldState.error.message}
-            </p>
+            <p className="error-message">{fieldState.error.message}</p>
           )}
         </div>
       )}

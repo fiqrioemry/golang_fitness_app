@@ -61,22 +61,24 @@ const SignUp = () => {
   }, [step, canResend]);
 
   return (
-    <section className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="grid grid-cols-1 md:grid-cols-2 bg-white rounded-xl shadow-lg overflow-hidden max-w-4xl w-full">
-        {/* Left Side */}
-        <div className="hidden md:block bg-blue-600 p-8 text-white text-center">
-          <h2 className="text-3xl font-bold mb-4">Stay Strong With Us!</h2>
-          <p className="text-sm">Stay Fit and Join us now</p>
+    <section className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+        {/* Left Illustration */}
+        <div className="hidden md:flex flex-col justify-center items-center bg-muted text-primary px-6 py-10">
+          <h2 className="text-3xl font-bold mb-2">Stay Strong With Us!</h2>
+          <p className="text-sm text-muted-foreground text-center">
+            Stay fit and join us now
+          </p>
           <img
             src="/signup-wallpaper.webp"
-            alt="sign-up-illustration"
-            className="mt-6 w-full h-auto"
+            alt="sign-up"
+            className="w-full h-auto mt-6 rounded"
           />
         </div>
 
-        {/* Right Side */}
-        <div className="p-8">
-          <div className="mb-4">
+        {/* Right Form */}
+        <div className="px-6 py-10">
+          <div className="mb-6 flex justify-center text-center">
             <WebLogo />
           </div>
 
@@ -87,8 +89,8 @@ const SignUp = () => {
                 key={s}
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                   step === s
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-600"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
                 }`}
               >
                 {s}
@@ -99,7 +101,7 @@ const SignUp = () => {
           <FormInput
             text={
               step === 1
-                ? "Register with email"
+                ? "Register with Email"
                 : step === 2
                 ? "Submit OTP"
                 : "Register"
@@ -125,9 +127,11 @@ const SignUp = () => {
 
             {step === 2 && (
               <>
-                <div className="mb-2 text-sm text-gray-700">
+                <div className="mb-2 text-sm text-muted-foreground">
                   We sent an OTP to:{" "}
-                  <span className="font-medium">{sentEmail}</span>
+                  <span className="font-medium text-foreground">
+                    {sentEmail}
+                  </span>
                 </div>
                 <InputTextElement
                   name="otp"
@@ -141,12 +145,12 @@ const SignUp = () => {
                     <button
                       type="button"
                       onClick={handleResendOTP}
-                      className="text-blue-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       Resend OTP
                     </button>
                   ) : (
-                    <span className="text-gray-500">
+                    <span className="text-muted-foreground">
                       Resend in {countdown}s
                     </span>
                   )}
@@ -155,7 +159,7 @@ const SignUp = () => {
             )}
 
             {step === 3 && (
-              <div>
+              <>
                 <InputTextElement name="email" label="Email" disabled />
                 <InputTextElement
                   name="password"
@@ -168,31 +172,33 @@ const SignUp = () => {
                   label="Fullname"
                   placeholder="Enter your fullname"
                 />
-              </div>
+              </>
             )}
           </FormInput>
 
           {step === 1 && (
-            <div>
-              <div className="text-center py-2 text-sm">Or</div>
+            <>
+              <div className="text-center py-2 text-sm text-muted-foreground">
+                Or
+              </div>
               <Button
                 variant="outline"
                 onClick={handleGoogleAuth}
                 className="w-full"
               >
-                <FcGoogle size={24} />
+                <FcGoogle size={20} className="mr-2" />
                 Continue with Google
               </Button>
-              <p className="text-sm text-center mt-6 text-gray-600">
+              <p className="text-sm text-center mt-6 text-muted-foreground">
                 Already have an account?{" "}
                 <Link
                   to="/signin"
-                  className="text-blue-600 hover:underline font-medium"
+                  className="text-primary font-medium hover:underline"
                 >
                   Login
                 </Link>
               </p>
-            </div>
+            </>
           )}
         </div>
       </div>

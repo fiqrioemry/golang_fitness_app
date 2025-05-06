@@ -66,22 +66,25 @@ const TransactionsList = () => {
           ) : (
             <>
               {/* Desktop Table */}
-              <div className="hidden md:block">
+              <div className="hidden md:block w-full">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-muted/40">
-                      <TableHead>User</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Package</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Method</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Paid At</TableHead>
+                    <TableRow>
+                      <TableHead className="text-center">User</TableHead>
+                      <TableHead className="text-center">Email</TableHead>
+                      <TableHead className="text-center">Package</TableHead>
+                      <TableHead className="text-center">Price</TableHead>
+                      <TableHead className="text-center">Method</TableHead>
+                      <TableHead className="text-center">Status</TableHead>
+                      <TableHead className="text-center">Paid At</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody className="h-12">
                     {transactions.map((tx) => (
-                      <TableRow key={tx.id} className="hover:bg-accent">
+                      <TableRow
+                        key={tx.id}
+                        className="border-t border-border hover:bg-muted transition"
+                      >
                         <TableCell>{tx.fullname}</TableCell>
                         <TableCell>{tx.userEmail}</TableCell>
                         <TableCell>{tx.packageName}</TableCell>

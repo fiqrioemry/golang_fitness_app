@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+
 export const InputDateElement = ({
   name,
   label,
@@ -28,23 +29,49 @@ export const InputDateElement = ({
 
   useEffect(() => {
     if (!day && !month && !year) {
-      setDay(startDay);
-      setMonth(startMonth);
-      setYear(startYearVal);
+      const initialValue = control._formValues?.[name];
+      if (initialValue) {
+        const [y, m, d] = initialValue.split("-").map(Number);
+        setYear(y);
+        setMonth(m);
+        setDay(d);
+      } else {
+        setDay(startDay);
+        setMonth(startMonth);
+        setYear(startYearVal);
+      }
     }
-  }, [startDay, startMonth, startYearVal, day, month, year]);
+  }, [
+    day,
+    month,
+    year,
+    control._formValues,
+    name,
+    startDay,
+    startMonth,
+    startYearVal,
+  ]);
 
   useEffect(() => {
-    const maxDay = getDaysInMonth(month, year);
-    if (day > maxDay) setDay("");
-  }, [month, year]);
+    const isValid =
+      Number(day) >= 1 &&
+      Number(month) >= 1 &&
+      Number(month) <= 12 &&
+      Number(year) > 1900;
 
-  useEffect(() => {
-    if (day && month && year) {
+    if (isValid) {
       const formatted = `${year}-${String(month).padStart(2, "0")}-${String(
         day
       ).padStart(2, "0")}`;
-      setValue(name, formatted);
+      setValue(name, formatted, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    } else {
+      setValue(name, "", {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     }
   }, [day, month, year, name, setValue]);
 
@@ -52,16 +79,12 @@ export const InputDateElement = ({
   const isSameMonthAndYear =
     Number(month) === startMonth && Number(year) === startYearVal;
 
-  const minValidDay = (() => {
-    if (mode === "future" && isSameMonthAndYear) return startDay;
-    return 1;
-  })();
+  const minValidDay = mode === "future" && isSameMonthAndYear ? startDay : 1;
+  const maxValidDay =
+    mode === "past" && isSameMonthAndYear && hasInteracted
+      ? startDay
+      : daysInMonth;
 
-  const maxValidDay = (() => {
-    if (mode === "past" && isSameMonthAndYear && hasInteracted) return startDay;
-    if (mode === "past" && !hasInteracted) return daysInMonth;
-    return daysInMonth;
-  })();
   const days = Array.from(
     { length: maxValidDay - minValidDay + 1 },
     (_, i) => i + minValidDay
@@ -95,17 +118,16 @@ export const InputDateElement = ({
       render={({ fieldState }) => (
         <div className="space-y-1">
           {label && (
-            <label className="block text-sm font-medium text-gray-700">
+            <label htmlFor={name} className="label">
               {label}
             </label>
           )}
-
           <div className="flex gap-2">
             {/* Day */}
             <select
               value={day}
               onChange={(e) => setDay(Number(e.target.value))}
-              className="border p-2 rounded w-1/3"
+              className={`input ${fieldState.error ? "input-error" : ""}`}
             >
               <option value="">Tanggal</option>
               {days.map((d) => (
@@ -122,7 +144,7 @@ export const InputDateElement = ({
                 setMonth(Number(e.target.value));
                 setHasInteracted(true);
               }}
-              className="border p-2 rounded w-1/3"
+              className={`input ${fieldState.error ? "input-error" : ""}`}
             >
               <option value="">Bulan</option>
               {months.map((m, i) => {
@@ -154,7 +176,7 @@ export const InputDateElement = ({
                 setYear(Number(e.target.value));
                 setHasInteracted(true);
               }}
-              className="border p-2 rounded w-1/3"
+              className={`input ${fieldState.error ? "input-error" : ""}`}
             >
               <option value="">Tahun</option>
               {years.map((y) => (
@@ -166,9 +188,7 @@ export const InputDateElement = ({
           </div>
 
           {fieldState.error && (
-            <p className="text-red-500 text-xs mt-1">
-              {fieldState.error.message}
-            </p>
+            <p className="error-message">{fieldState.error.message}</p>
           )}
         </div>
       )}

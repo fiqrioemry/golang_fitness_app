@@ -8,17 +8,13 @@ export const getAllAttendances = async () => {
 
 // ✅ GET /api/attendances/:bookingId/qr
 export const getQRCode = async (bookingId) => {
-  console.log("MASUK");
   const res = await authInstance.get(`/attendances/${bookingId}/qr`);
-  console.log(res);
   return res.data.qr;
 };
 
 // ✅ POST /api/attendances/:bookingId/checkin
 export const checkinAttendance = async (bookingId) => {
-  console.log("MASUK");
   const res = await authInstance.post(`/attendances/${bookingId}/checkin`);
-  console.log(res);
   return res.data.qr;
 };
 
@@ -28,4 +24,9 @@ export const exportAttendances = async () => {
     responseType: "blob", // download as Excel file
   });
   return res;
+};
+
+export const validateQRCode = async (qrCode) => {
+  const res = await authInstance.post("/attendances/validate", { qrCode });
+  return res.data;
 };

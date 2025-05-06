@@ -11,6 +11,7 @@ export const useProfileQuery = () =>
   useQuery({
     queryKey: ["user", "profile"],
     queryFn: profileService.getProfile,
+    staleTime: 0,
   });
 
 // =====================
@@ -21,6 +22,7 @@ export const useUserPackagesQuery = () =>
   useQuery({
     queryKey: ["user-packages"],
     queryFn: profileService.getUserPackages,
+    staleTime: 0,
   });
 
 export const useUserClassPackagesQuery = (id) =>

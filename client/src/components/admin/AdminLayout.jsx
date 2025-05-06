@@ -13,17 +13,19 @@ const AdminLayout = () => {
     <SidebarProvider>
       <AdminSidebar />
       <SidebarInset>
-        <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4 z-50">
+        <header className="sticky top-0 z-50 flex h-16 items-center gap-2 border-b border-border bg-background px-4">
           <SidebarTrigger className="-ml-1">
-            <MenuIcon />
+            <MenuIcon className="w-5 h-5" />
           </SidebarTrigger>
           <Separator orientation="vertical" className="mr-2 h-4" />
+          <h1 className="text-lg font-semibold text-muted-foreground">
+            Admin Dashboard
+          </h1>
         </header>
-        <div className="flex flex-1 flex-col bg-muted">
-          <div className="py-3 md:py-6">
-            <Outlet />
-          </div>
-        </div>
+
+        <main className="flex flex-1 flex-col bg-muted">
+          <Outlet />
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

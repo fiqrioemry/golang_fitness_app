@@ -1,7 +1,9 @@
 import React from "react";
+import { Camera } from "lucide-react";
 import { avatarSchema } from "@/lib/schema";
+import { Button } from "@/components/ui/button";
 import { useProfileMutation } from "@/hooks/useProfile";
-import { FormUpdateDialog } from "@/components/form/FormUpdateDialog";
+import { FormAddDialog } from "@/components/form/FormAddDialog";
 import { InputFileElement } from "@/components/input/InputFileElement";
 
 export const UploadAvatar = ({ profile }) => {
@@ -15,20 +17,26 @@ export const UploadAvatar = ({ profile }) => {
         alt={profile.fullname}
         className="w-32 h-32 rounded-full object-cover border"
       />
-      <FormUpdateDialog
+      <FormAddDialog
         state={profile}
         title="Edit Avatar"
         schema={avatarSchema}
         loading={isPending}
         action={mutateAsync}
+        buttonText={
+          <Button variant="edit" className="w-full" type="button">
+            <Camera className="w-4 h-4" />
+            <span>Change Avatar</span>
+          </Button>
+        }
       >
         <InputFileElement
           isSingle
           name="avatar"
           label="Upload Avatar"
-          note="Rekomendasi: rasio 1:1 (400x400px)"
+          note="Recommend: ratio 1:1 (400x400px)"
         />
-      </FormUpdateDialog>
+      </FormAddDialog>
     </div>
   );
 };

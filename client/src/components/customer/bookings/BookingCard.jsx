@@ -6,6 +6,7 @@ import { buildDateTime, getTimeLeft, isAttendanceWindow } from "@/lib/utils";
 import { CalendarIcon, ClockIcon, MapPinIcon, UserIcon } from "lucide-react";
 import { useQRCodeQuery, useCheckinAttendance } from "@/hooks/useAttendances";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export const BookingCard = ({ booking }) => {
@@ -55,70 +56,90 @@ export const BookingCard = ({ booking }) => {
 
   if (!startTime || !endTime || isNaN(startTime.getTime())) {
     return (
-      <Card className="p-4 shadow-lg">
-        <p className="text-red-500">Invalid booking time.</p>
+      <Card className="p-4 bg-card border text-destructive border-border shadow-sm">
+        <p>Invalid booking time.</p>
       </Card>
     );
   }
-
   return (
-    <Card className="overflow-hidden shadow-lg transition hover:shadow-xl">
-      <div className="grid grid-cols-1 sm:grid-cols-[150px_1fr]">
+    <Card className="overflow-hidden border border-border bg-card shadow-md hover:shadow-xl transition">
+      <div className="grid grid-cols-1 sm:grid-cols-[215px_1fr]">
         <img
           src={booking.classImage}
           alt={booking.classTitle}
-          className="h-full w-full object-cover sm:h-full sm:w-full"
+          className="w-full h-48 sm:h-full object-cover"
         />
-        <CardContent className="p-4 space-y-2">
-          <div className="flex justify-between items-start">
-            <h2 className="text-xl font-semibold">{booking.classTitle}</h2>
-            <Badge variant="outline" className="capitalize">
+
+        <CardContent className="p-5 space-y-4">
+          {/* Header Title & Status */}
+          <div className="flex justify-between items-center space-x-4">
+            <h3 className="text-base font-semibold text-foreground">
+              {booking.classTitle}
+            </h3>
+            <Badge variant="outline" className="capitalize text-xs">
               {booking.status}
             </Badge>
           </div>
+
+          {/* Instructor & Duration */}
           <p className="text-sm text-muted-foreground">
             {booking.instructor} • {booking.duration} mins
           </p>
 
-          <div className="text-sm text-blue-500 font-medium">
+          {/* Countdown */}
+          <p className="text-sm font-medium text-primary">
             Starts in: {timeLeft} ⏳🔥
+          </p>
+
+          {/* Schedule Info */}
+          <div className="grid grid-cols-2 gap-8 text-sm text-muted-foreground ">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4" />
+                <span>{format(startTime, "EEE, dd MMM yyyy")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ClockIcon className="w-4 h-4" />
+                <span>
+                  {format(startTime, "HH:mm")} - {format(endTime, "HH:mm")}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <MapPinIcon className="w-4 h-4" />
+                <span>{booking.location}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <UserIcon className="w-4 h-4" />
+                <span>{booking.participant} Participant</span>
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <CalendarIcon className="h-4 w-4" />
-            <span>{format(startTime, "EEE, dd MMM yyyy")}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <ClockIcon className="h-4 w-4" />
-            <span>
-              {format(startTime, "HH:mm")} - {format(endTime, "HH:mm")}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPinIcon className="h-4 w-4" />
-            <span>{booking.location}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <UserIcon className="h-4 w-4" />
-            <span>{booking.participant} Participant</span>
-          </div>
-
-          {canAttend && (
+          {/* Attend Button & QR Dialog */}
+          {!canAttend && (
             <Dialog open={showQR} onOpenChange={setShowQR}>
               <DialogTrigger asChild>
-                <button
+                <Button
+                  type="button"
+                  className="py-5 w-60"
                   onClick={booking.attended ? handleShowQR : handleAttend}
-                  className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                 >
                   {booking.attended ? "Show QR Code" : "Attend Now"}
-                </button>
+                </Button>
               </DialogTrigger>
-              <DialogContent>
-                <h3 className="text-lg font-semibold mb-2">Scan QR Code</h3>
+
+              <DialogContent className="text-center space-y-4">
+                <h4 className="text-lg font-semibold">Scan QR Code</h4>
                 {qrCodeQuery.isLoading ? (
-                  <p>Loading QR Code...</p>
+                  <p className="text-sm text-muted-foreground">
+                    Loading QR Code...
+                  </p>
                 ) : qrCodeQuery.isError || !qrCodeQuery.data ? (
-                  <p className="text-red-500">Failed to load QR Code</p>
+                  <p className="text-destructive text-sm">
+                    Failed to load QR Code
+                  </p>
                 ) : (
                   <img
                     src={`data:image/png;base64,${qrCodeQuery.data}`}
@@ -130,9 +151,10 @@ export const BookingCard = ({ booking }) => {
             </Dialog>
           )}
 
-          <div className="text-xs text-muted-foreground text-right mt-2">
+          {/* Footer */}
+          <p className="text-xs text-muted-foreground text-right">
             Booked at {format(new Date(booking.bookedAt), "dd MMM yyyy, HH:mm")}
-          </div>
+          </p>
         </CardContent>
       </div>
     </Card>

@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Play, StopCircle, Trash2 } from "lucide-react";
+import { Play, StopCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 
@@ -14,37 +14,35 @@ const FormToggle = ({
   title,
   description,
   onToggle,
-  text = "start",
-  toggle = true,
+  type = "start",
   loading = false,
 }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          className="w-full"
-          variant={toggle ? "default" : "destructive"}
-          type="button"
-        >
-          {toggle ? (
+        {type === "start" ? (
+          <Button className="w-full" type="button">
             <Play className="w-4 h-4" />
-          ) : (
+            <span className="capitalize">start</span>
+          </Button>
+        ) : (
+          <Button variant="destructive" className="w-full" type="button">
             <StopCircle className="w-4 h-4" />
-          )}
-          <span>{text}</span>
-        </Button>
+            <span className="capitalize">Stop</span>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md rounded-xl p-6 space-y-6">
         {loading ? (
-          <SubmitLoading text="Deleting..." />
+          <SubmitLoading text="Processing..." />
         ) : (
           <>
             <div className="text-center space-y-2">
-              <DialogTitle className="text-2xl font-bold text-gray-800">
+              <DialogTitle className="text-2xl font-bold text-foreground">
                 {title}
               </DialogTitle>
-              <DialogDescription className="text-gray-500">
+              <DialogDescription className="text-muted-foreground">
                 {description}
               </DialogDescription>
             </div>

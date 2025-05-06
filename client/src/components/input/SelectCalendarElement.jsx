@@ -36,18 +36,15 @@ export const SelectCalendarElement = ({
 
         return (
           <div className="space-y-1">
-            {label && (
-              <label className="block text-sm font-medium text-gray-700">
-                {label}
-              </label>
-            )}
+            {label && <label className="label">{label}</label>}
 
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
+                  type="button"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "input text-left font-normal px-3 py-2",
                     !value && "text-muted-foreground"
                   )}
                 >
@@ -55,13 +52,12 @@ export const SelectCalendarElement = ({
                 </Button>
               </PopoverTrigger>
 
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0 bg-popover text-popover-foreground border border-border rounded-xl shadow-lg">
                 <Calendar
                   mode="single"
                   selected={selectedDate}
                   onSelect={(date) => {
                     if (date) {
-                      // Simpan sebagai ISO string (RFC3339)
                       onChange(date.toISOString());
                       setOpen(false);
                     }
@@ -74,9 +70,7 @@ export const SelectCalendarElement = ({
             </Popover>
 
             {fieldState.error && (
-              <p className="text-red-500 text-xs mt-1">
-                {fieldState.error.message}
-              </p>
+              <p className="error-message">{fieldState.error.message}</p>
             )}
           </div>
         );

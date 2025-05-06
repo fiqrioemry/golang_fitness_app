@@ -45,27 +45,29 @@ const InputTagsElement = ({
             {label && (
               <label
                 htmlFor={name}
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-foreground"
               >
                 {label}
               </label>
             )}
-            <div className="flex flex-wrap gap-2 p-2 border rounded">
+
+            <div className="flex flex-wrap gap-2 p-2 border border-border bg-background rounded-md transition focus-within:ring-1 focus-within:ring-primary">
               {(field.value || []).map((tag, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-1 px-2 py-1 bg-primary/10 rounded-full text-sm"
+                  className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full"
                 >
                   {tag}
                   <button
                     type="button"
                     onClick={() => removeTag(tag)}
-                    className="hover:text-red-500"
+                    className="hover:text-destructive transition"
                   >
                     <X className="w-3 h-3" />
                   </button>
                 </div>
               ))}
+
               <input
                 id={name}
                 type="text"
@@ -74,11 +76,12 @@ const InputTagsElement = ({
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
                 disabled={disabled}
-                className="flex-1 min-w-[120px] border-none outline-none bg-transparent"
+                className="flex-1 min-w-[120px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </div>
+
             {fieldState.error && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-destructive text-xs mt-1">
                 {fieldState.error.message}
               </p>
             )}

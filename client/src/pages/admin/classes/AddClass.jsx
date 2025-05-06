@@ -22,7 +22,7 @@ const AddClass = () => {
         </p>
       </div>
 
-      <div className="bg-white border shadow-sm rounded-xl p-6">
+      <div className="bg-background border shadow-sm rounded-xl p-6">
         <FormInput
           text="Add New Class"
           className="w-72"

@@ -1,16 +1,24 @@
 import { z } from "zod";
 
-const imageItemSchema = z.union([
-  z
-    .instanceof(File)
-    .refine((file) => file.type.startsWith("image/"), {
-      message: "File must be an image",
-    })
-    .refine((file) => file.size <= 2 * 1024 * 1024, {
-      message: "Image size must be less than or equal to 2MB",
-    }),
-  z.string().url(),
-]);
+const imageItemSchema = z
+  .any()
+  .optional()
+  .refine(
+    (file) =>
+      !file || // kosong = lolos
+      file instanceof File ||
+      typeof file === "string",
+    { message: "Input must be a file or a valid URL" }
+  )
+  .refine(
+    (file) =>
+      !file || typeof file === "string" || file.type?.startsWith("image/"),
+    { message: "File must be an image" }
+  )
+  .refine(
+    (file) => !file || typeof file === "string" || file.size <= 2 * 1024 * 1024,
+    { message: "Image size must be <= 2MB" }
+  );
 
 // Register
 export const sendOTPSchema = z.object({
@@ -32,19 +40,24 @@ export const registerSchema = z.object({
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  rememberMe: z.boolean().optional(),
 });
 
 // profiles
 export const profileSchema = z.object({
-  fullname: z.string().min(6, "Full name must be at least 6 characters"),
-  birthday: z.string(),
-  gender: z.string(),
-  phone: z.string(),
-  bio: z.string(),
+  fullname: z.string().min(6, "Fullname must be at least 6 characters"),
+  birthday: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Tanggal tidak valid",
+  }),
+  gender: z.string().optional(),
+  phone: z.string().optional(),
+  bio: z.string().optional(),
 });
 
 export const avatarSchema = z.object({
-  avatar: z.union([z.instanceof(File), z.string().url()]),
+  avatar: imageItemSchema.refine((val) => !!val, {
+    message: "Image is required",
+  }),
 });
 
 // classes
@@ -62,7 +75,11 @@ export const classSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   subcategoryId: z.string().min(1, "Subcategory is required"),
   image: z.union([z.instanceof(File), z.string().url()]),
-  images: z.array(imageItemSchema).optional(),
+  images: z.array(
+    imageItemSchema.refine((val) => !!val, {
+      message: "Image is required",
+    })
+  ),
   isActive: z.boolean().optional(),
 });
 
@@ -79,7 +96,9 @@ export const packageSchema = z.object({
     .optional(),
   expired: z.number().min(1, "Expiry duration is required"),
   additional: z.array(z.string()).optional(),
-  image: z.union([z.instanceof(File), z.string().url()]),
+  image: imageItemSchema.refine((val) => !!val, {
+    message: "Image is required",
+  }),
   isActive: z.boolean().optional(),
 });
 

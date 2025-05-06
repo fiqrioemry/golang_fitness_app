@@ -24,14 +24,13 @@ const ClassOptions = () => {
   } = useSelectOptions(activeTab);
 
   if (isLoading) return <Loading />;
-
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const renderMap = (geoLocation) => {
     const [lat, lng] = geoLocation.split(",");
     const mapUrl = `https://maps.google.com/maps?q=${lat},${lng}&hl=es&z=14&output=embed`;
     return (
-      <div className="rounded overflow-hidden border">
+      <div className="rounded overflow-hidden border border-border">
         <iframe
           src={mapUrl}
           width="100%"
@@ -49,24 +48,24 @@ const ClassOptions = () => {
     <section className="section">
       {/* Header */}
       <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Class Options</h2>
-        <p className="text-muted-foreground text-sm">
+        <h2 className="text-2xl font-bold text-foreground">Class Options</h2>
+        <p className="text-sm text-muted-foreground">
           Manage all static data such as class types, categories, levels, and
           locations.
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b overflow-x-auto">
+      <div className="flex gap-2 border-b border-border overflow-x-auto mt-4">
         {tabs.map((tab) => (
           <button
             key={tab.type}
             onClick={() => setActiveTab(tab.type)}
-            className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${
+            className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition rounded-t-md ${
               activeTab === tab.type
-                ? "border-b-2 border-primary text-primary"
-                : "text-gray-500 hover:text-primary"
-            } transition`}
+                ? "bg-muted text-primary border border-border border-b-transparent"
+                : "text-muted-foreground hover:text-primary"
+            }`}
           >
             {tab.label}
           </button>
@@ -74,9 +73,11 @@ const ClassOptions = () => {
       </div>
 
       {/* Content */}
-      <div className="space-y-4">
+      <div className="space-y-4 mt-6">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold capitalize">{activeTab} List</h3>
+          <h3 className="text-lg font-semibold capitalize text-foreground">
+            {activeTab} List
+          </h3>
           <AddOptions activeTab={activeTab} />
         </div>
 
@@ -84,22 +85,22 @@ const ClassOptions = () => {
           {options.map((item) => (
             <div
               key={item.id}
-              className="flex flex-col justify-between gap-2 border rounded-md px-4 py-3 shadow-sm bg-white hover:shadow transition"
+              className="flex flex-col justify-between gap-2 border border-border bg-background rounded-xl px-4 py-3 shadow-sm hover:shadow-md transition"
             >
               <div className="flex-1 space-y-1">
-                <span className="font-medium text-gray-800 block truncate">
+                <span className="font-medium text-foreground block truncate">
                   {item.name}
                 </span>
                 {activeTab === "location" && (
                   <>
-                    <p className="text-gray-600 text-sm truncate">
+                    <p className="text-sm text-muted-foreground truncate">
                       {item.address}
                     </p>
                     {item.geoLocation && renderMap(item.geoLocation)}
                   </>
                 )}
               </div>
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 pt-2">
                 <DeleteOptions option={item} activeTab={activeTab} />
                 <UpdateOptions option={item} activeTab={activeTab} />
               </div>
@@ -107,7 +108,7 @@ const ClassOptions = () => {
           ))}
 
           {options.length === 0 && (
-            <p className="text-sm text-gray-500 col-span-full">
+            <p className="text-sm text-muted-foreground col-span-full">
               No data found.
             </p>
           )}

@@ -26,7 +26,7 @@ const ClassScheduleDetail = ({ open, onClose, event, onUpdate }) => {
         </p>
         <div className="mt-4 flex gap-4 justify-end">
           <DeleteClassSchedule onUpdate={onUpdate} schedule={resource} />
-          <Button onClick={onUpdate} variant="outline">
+          <Button className="w-full" onClick={onUpdate} variant="secondary">
             <Pencil />
             <span>Update</span>
           </Button>

@@ -18,7 +18,7 @@ const MultiSelectElement = ({ name, label, data = "class", rules = {} }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: results, isLoading } = useSelectOptions(data);
 
-  if (isLoading) return <Skeleton className="h-9 rounded-md" />;
+  if (isLoading) return <Skeleton className="h-10 w-full rounded-md" />;
 
   const optionsRaw = Array.isArray(results) ? results : [];
   const options = optionsRaw.map((item) => ({
@@ -42,26 +42,30 @@ const MultiSelectElement = ({ name, label, data = "class", rules = {} }) => {
         );
 
         const removeTag = (val) => {
-          const newVal = selectedValues.filter((v) => v !== val);
-          field.onChange(newVal);
+          field.onChange(selectedValues.filter((v) => v !== val));
         };
 
         const addTag = (val) => {
-          field.onChange([...(selectedValues || []), val]);
+          field.onChange([...selectedValues, val]);
           setQuery("");
         };
 
         return (
           <div className="space-y-2">
             {label && (
-              <label className="text-sm font-medium text-gray-700">
+              <label
+                htmlFor={name}
+                className="block text-sm font-medium text-foreground"
+              >
                 {label}
               </label>
             )}
 
-            <div className="flex flex-wrap gap-2 min-h-[36px] border p-2 rounded-md w-full">
+            <div className="flex flex-wrap gap-2 min-h-[42px] border border-input rounded-md p-2 bg-background">
               {selectedValues.length === 0 && (
-                <span className="text-sm text-gray-400">No selection</span>
+                <span className="text-sm text-muted-foreground">
+                  No selection
+                </span>
               )}
               {selectedValues.map((val) => {
                 const matched = options.find((opt) => opt.value === val);
@@ -82,9 +86,9 @@ const MultiSelectElement = ({ name, label, data = "class", rules = {} }) => {
             </div>
 
             <div className="relative">
-              <Command className="border rounded-md w-full">
+              <Command className="border border-input rounded-md w-full shadow-sm">
                 <Input
-                  placeholder="Search classes..."
+                  placeholder="Search options..."
                   value={query}
                   onChange={(e) => {
                     setQuery(e.target.value);
@@ -95,7 +99,7 @@ const MultiSelectElement = ({ name, label, data = "class", rules = {} }) => {
                   className="border-none focus:ring-0 px-3 py-2"
                 />
                 {isOpen && (
-                  <CommandList className="absolute z-10 w-full bg-white border rounded-md shadow-md max-h-40 overflow-auto">
+                  <CommandList className="absolute z-10 w-full bg-popover border border-border rounded-md shadow-lg max-h-40 overflow-auto">
                     <CommandGroup>
                       {filteredOptions.map((opt) => (
                         <CommandItem

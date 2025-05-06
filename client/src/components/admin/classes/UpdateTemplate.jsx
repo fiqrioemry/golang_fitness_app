@@ -3,7 +3,6 @@ import { classSchema } from "@/lib/schema";
 import { SelectElement } from "@/components/input/SelectElement";
 import { useScheduleTemplateMutation } from "@/hooks/useSchedules";
 import { FormUpdateDialog } from "@/components/form/FormUpdateDialog";
-import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { DaySelectorElement } from "@/components/input/DaySelectorElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";

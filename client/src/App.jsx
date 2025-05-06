@@ -49,6 +49,7 @@ import PublicLayout from "./components/public/PublicLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
 import ScheduleDetail from "./pages/ScheduleDetail";
+import ValidateAttendancePage from "./pages/admin/ValidateAttendancePage";
 
 function App() {
   const { checkingAuth, authMe } = useAuthStore();
@@ -140,6 +141,7 @@ function App() {
           <Route path="vouchers" element={<VouchersList />} />
           <Route path="bookings" element={<BookingsList />} />
           <Route path="packages" element={<PackagesList />} />
+          <Route path="validate" element={<ValidateAttendancePage />} />
 
           <Route path="packages/add" element={<AddPackage />} />
           <Route path="instructors" element={<InstructorsList />} />

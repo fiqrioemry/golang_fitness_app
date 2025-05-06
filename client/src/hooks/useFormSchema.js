@@ -10,9 +10,7 @@ export function useFormSchema({ state, schema, action }) {
   });
 
   const handleSubmit = methods.handleSubmit(async (data) => {
-    const res = await action(data);
-
-    if (res !== false) methods.reset();
+    await action(data);
   });
 
   return { methods, handleSubmit };

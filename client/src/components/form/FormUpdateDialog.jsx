@@ -76,11 +76,11 @@ export function FormUpdateDialog({
       >
         <DialogTrigger asChild>
           {icon ? (
-            <Button variant="icon" type="button">
+            <Button variant="edit" size="icon" type="button">
               <Pencil className="w-4 h-4" />
             </Button>
           ) : (
-            <Button variant="outline" className="w-full" type="button">
+            <Button variant="secondary" className="w-full" type="button">
               <Pencil className="w-4 h-4" />
               <span>Update</span>
             </Button>
@@ -97,22 +97,22 @@ export function FormUpdateDialog({
                 className="flex flex-col max-h-[70vh]"
               >
                 {/* Header */}
-                <div className="border-b px-6 py-4">
-                  <DialogTitle className="text-lg font-semibold text-center">
+                <div className="border-b border-border p-4 ">
+                  <DialogTitle className="text-lg font-semibold text-center text-foreground">
                     {title}
                   </DialogTitle>
-                  <DialogDescription className="text-gray-500 text-sm text-center">
+                  <DialogDescription className="text-sm text-muted-foreground text-center">
                     Submit button will activate when you make changes.
                   </DialogDescription>
                 </div>
 
                 {/* Scrollable Form Content */}
-                <ScrollArea className="flex-1 px-6 py-4">
-                  <div className="space-y-4">{children}</div>
+                <ScrollArea className="flex-1">
+                  <div className="space-y-4 p-4">{children}</div>
                 </ScrollArea>
 
                 {/* Footer */}
-                <div className="border-t px-6 py-4 flex justify-end">
+                <div className="border-t p-4 flex justify-end">
                   <SubmitButton
                     text="Save Changes"
                     isLoading={loading}
@@ -127,19 +127,19 @@ export function FormUpdateDialog({
 
       {/* Confirmation Dialog */}
       <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
-        <DialogContent className="sm:max-w-md p-6 rounded-xl space-y-6">
+        <DialogContent className="sm:max-w-md p-6 rounded-xl space-y-6 bg-card border border-border">
           <div className="text-center">
-            <DialogTitle className="text-xl font-semibold text-gray-800">
+            <DialogTitle className="text-xl font-semibold text-foreground">
               Unsaved Changes
             </DialogTitle>
-            <p className="mt-2 text-gray-500 text-sm">
+            <p className="mt-2 text-sm text-muted-foreground">
               You have made changes. Are you sure you want to discard them?
             </p>
           </div>
 
           <div className="flex justify-center gap-4">
             <Button
-              variant="secondary"
+              variant="outline"
               className="w-32"
               onClick={() => handleConfirmation(false)}
             >

@@ -15,14 +15,16 @@ const CustomerLayout = () => {
       <SidebarInset>
         <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4 z-50">
           <SidebarTrigger className="-ml-1">
-            <MenuIcon />
+            <MenuIcon className="text-muted-foreground" />
           </SidebarTrigger>
           <Separator orientation="vertical" className="mr-2 h-4" />
+          <h1 className="text-lg font-semibold text-muted-foreground hidden sm:block">
+            Dashboard
+          </h1>
         </header>
+
         <div className="flex flex-1 flex-col bg-muted">
-          <div className="container mx-auto py-3 md:py-6 px-2">
-            <Outlet />
-          </div>
+          <Outlet />
         </div>
       </SidebarInset>
     </SidebarProvider>

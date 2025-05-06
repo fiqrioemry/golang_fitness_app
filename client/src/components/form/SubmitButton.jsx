@@ -1,5 +1,6 @@
 // src/components/form/SubmitButton.jsx
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const SubmitButton = ({
   text = "Submit",
@@ -8,18 +9,15 @@ const SubmitButton = ({
   isLoading = false,
   ...props
 }) => {
-  const baseClass =
-    "inline-flex items-center h-9 justify-center px-4 py-2 text-sm font-medium rounded-md bg-primary text-white hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed";
-
   return (
-    <button
+    <Button
       type="submit"
+      className="w-full"
       disabled={disabled || isLoading}
-      className={`${baseClass} ${className}`}
       {...props}
     >
       {isLoading ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : text}
-    </button>
+    </Button>
   );
 };
 

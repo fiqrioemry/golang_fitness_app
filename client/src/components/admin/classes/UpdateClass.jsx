@@ -12,7 +12,6 @@ import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
 
 const UpdateClass = ({ classes }) => {
   const { updateClass } = useClassMutation();
-
   const { isPending, mutateAsync } = updateClass;
 
   return (

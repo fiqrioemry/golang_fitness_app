@@ -22,7 +22,7 @@ const AddPackage = () => {
         </p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border p-6">
+      <div className="bg-background rounded-xl shadow-sm border p-6">
         <FormInput
           className="w-full md:w-72"
           state={packageState}

@@ -94,7 +94,7 @@ export const isAttendanceWindow = (start) => {
   const diffStart = (start.getTime() - now.getTime()) / 60000;
   const diffEnd = (now.getTime() - start.getTime()) / 60000;
 
-  return diffStart <= 15 && diffEnd <= 30;
+  return diffStart <= 1360 && diffEnd <= 30;
 };
 
 export const buildDateTime = (dateStr, hour, minute) => {

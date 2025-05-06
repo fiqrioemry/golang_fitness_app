@@ -5,7 +5,6 @@ import {
   SidebarFooter,
   SidebarContent,
 } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -24,13 +23,16 @@ import {
   LogOut,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 const NavItem = ({ to, icon: Icon, title, active }) => (
   <Link
     to={to}
     className={cn(
-      "flex items-center gap-2 px-4 py-2 text-sm rounded-md transition",
-      active ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-100"
+      "flex items-center gap-3 px-4 py-2 text-sm rounded-md transition",
+      active
+        ? "bg-primary text-primary-foreground font-semibold"
+        : "text-muted-foreground hover:bg-muted"
     )}
   >
     <Icon className="w-4 h-4" />
@@ -45,7 +47,7 @@ const CustomerSidebar = () => {
 
   return (
     <Sidebar>
-      <SidebarContent className="p-4 space-y-4 text-sm text-gray-700">
+      <SidebarContent className="p-4 space-y-4 text-sm">
         <SidebarHeader className="mb-4">
           <WebLogo />
         </SidebarHeader>
@@ -84,19 +86,19 @@ const CustomerSidebar = () => {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 text-xs text-gray-500">
+      <SidebarFooter className="p-4 text-xs text-muted-foreground">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 p-2 rounded-md transition">
+            <div className="flex items-center gap-3 cursor-pointer hover:bg-muted px-3 py-2 rounded-md transition">
               <Avatar className="w-9 h-9">
                 <AvatarImage src={user?.avatar} alt={user?.fullname} />
                 <AvatarFallback>{user?.fullname?.[0] || "A"}</AvatarFallback>
               </Avatar>
-              <div className="flex flex-col text-left">
-                <span className="text-sm font-medium text-gray-700">
+              <div className="flex flex-col text-left overflow-hidden">
+                <span className="text-sm font-medium text-foreground truncate">
                   {user?.fullname || "Admin"}
                 </span>
-                <span className="text-xs text-muted-foreground truncate max-w-[140px]">
+                <span className="text-xs text-muted-foreground truncate">
                   {user?.email || "admin@gmail.com"}
                 </span>
               </div>
