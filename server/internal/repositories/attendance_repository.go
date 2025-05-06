@@ -11,8 +11,9 @@ import (
 type AttendanceRepository interface {
 	GetAllAttendances() ([]models.Attendance, error)
 	MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) error
-	UpdateAttendance(attendance *models.Attendance) error
 	CreateAttendance(attendance *models.Attendance) error
+	UpdateAttendance(att *models.Attendance) error
+	GetByID(id string) (*models.Attendance, error)
 	FindAllSchedulesBefore(t time.Time) ([]models.ClassSchedule, error)
 	MarkAsAttendance(userID string, bookingID string) (*models.Attendance, error)
 	FindByUserBooking(userID string, bookingID string) (*models.Attendance, error)
@@ -126,4 +127,12 @@ func (r *attendanceRepository) MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) er
 		}
 	}
 	return nil
+}
+
+func (r *attendanceRepository) GetByID(id string) (*models.Attendance, error) {
+	var att models.Attendance
+	if err := r.db.First(&att, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &att, nil
 }

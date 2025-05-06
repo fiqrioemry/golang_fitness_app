@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"server/internal/dto"
 	"server/internal/repositories"
 	"server/internal/utils"
@@ -14,6 +15,9 @@ type AttendanceService interface {
 	MarkAbsentAttendances() error
 	ExportAttendancesToExcel() (*excelize.File, error)
 	GetAllAttendances() ([]dto.AttendanceResponse, error)
+	// ValidateQRCode(attendanceID string) error
+	ValidateQRCodeData(qr string) (*dto.AttendanceInfoResponse, error)
+
 	GetQRCode(userID, bookingID string) (string, error)
 	CheckinAttendance(userID string, bookingID string) (string, error)
 }
@@ -101,23 +105,36 @@ func (s *attendanceService) CheckinAttendance(userID string, bookingID string) (
 	}
 
 	schedule := booking.ClassSchedule
-	startTime := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(), schedule.StartHour, schedule.StartMinute, 0, 0, time.UTC)
-	now := time.Now().UTC()
 
-	// attendance window: 15 menit sebelum sampai 30 menit setelah
-	if now.Before(startTime.Add(-15*time.Minute)) || now.After(startTime.Add(30*time.Minute)) {
-		return "", errors.New("attendance window closed")
-	}
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+	now := time.Now().In(loc)
+
+	startTime := time.Date(
+		schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
+		schedule.StartHour, schedule.StartMinute, 0, 0, loc,
+	)
+
+	fmt.Println("=== Debug Waktu Check-in ===")
+	fmt.Println("schedule.Date       :", schedule.Date)
+	fmt.Println("schedule.StartHour  :", schedule.StartHour)
+	fmt.Println("schedule.StartMinute:", schedule.StartMinute)
+	fmt.Println("startTime           :", startTime)
+	fmt.Println("now                 :", now)
+	fmt.Println("startTime -15m      :", startTime.Add(-15*time.Minute))
+	fmt.Println("startTime +30m      :", startTime.Add(30*time.Minute))
+
+	// if now.Before(startTime.Add(-15*time.Minute)) || now.After(startTime.Add(30*time.Minute)) {
+	// 	return "", errors.New("attendance window closed")
+	// }
 
 	attendance, err := s.attendanceRepo.MarkAsAttendance(userID, bookingID)
 	if err != nil {
 		return "", err
 	}
-
-	// generate QR hanya jika status "attended"
 	if attendance.Status != "attended" {
 		return "", errors.New("attendance not marked properly")
 	}
+
 	qr := utils.GenerateBase64QR(attendance.ID.String())
 	return qr, nil
 }
@@ -147,4 +164,95 @@ func (s *attendanceService) GetQRCode(userID, bookingID string) (string, error) 
 	}
 	qr := utils.GenerateBase64QR(attendance.ID.String())
 	return qr, nil
+}
+
+// func (s *attendanceService) ValidateQRCode(attendanceID string) error {
+// 	attendance, err := s.attendanceRepo.GetByID(attendanceID)
+// 	if err != nil {
+// 		return errors.New("attendance not found")
+// 	}
+
+// 	if attendance.Verified {
+// 		return errors.New("already verified")
+// 	}
+
+// 	now := time.Now()
+// 	attendance.Verified = true
+// 	attendance.VerifiedAt = &now
+
+// 	err = s.attendanceRepo.UpdateAttendance(attendance)
+// 	if err != nil {
+// 		return errors.New("failed to verify attendance")
+// 	}
+
+// 	return nil
+// }
+
+// func (s *attendanceService) ValidateQRCodeAttendance(payload string) (*dto.AttendanceValidationResponse, error) {
+// 	var data struct {
+// 		UserID     string `json:"userId"`
+// 		BookingID  string `json:"bookingId"`
+// 		ScheduleID string `json:"scheduleId"`
+// 	}
+
+// 	err := json.Unmarshal([]byte(payload), &data)
+// 	if err != nil {
+// 		return nil, errors.New("invalid QR payload")
+// 	}
+
+// 	attendance, err := s.attendanceRepo.FindByUserBooking(data.UserID, data.BookingID)
+// 	if err != nil {
+// 		return nil, errors.New("attendance not found")
+// 	}
+
+// 	if !attendance.Verified {
+// 		now := time.Now()
+// 		attendance.Verified = true
+// 		attendance.VerifiedAt = &now
+// 		s.attendanceRepo.UpdateAttendance(attendance)
+// 	}
+
+// 	// response
+// 	response := &dto.AttendanceValidationResponse{
+// 		Fullname:   attendance.User.Profile.Fullname,
+// 		ClassName:  attendance.ClassSchedule.Class.Title,
+// 		StartTime:  fmt.Sprintf("%02d:%02d", attendance.ClassSchedule.StartHour, attendance.ClassSchedule.StartMinute),
+// 		Status:     attendance.Status,
+// 		Verified:   attendance.Verified,
+// 		VerifiedAt: attendance.VerifiedAt,
+// 	}
+// 	return response, nil
+// }
+
+func (s *attendanceService) ValidateQRCodeData(qr string) (*dto.AttendanceInfoResponse, error) {
+	data, err := utils.ParseQRPayload(qr)
+	if err != nil {
+		return nil, errors.New("invalid QR format")
+	}
+
+	attendance, err := s.attendanceRepo.FindByUserBooking(data.UserID, data.BookingID)
+	if err != nil {
+		return nil, errors.New("attendance record not found")
+	}
+
+	// Optional: verifikasi dan update attendance jika belum verified
+	if !attendance.Verified {
+		now := time.Now()
+		attendance.Verified = true
+		attendance.VerifiedAt = &now
+		if err := s.attendanceRepo.UpdateAttendance(attendance); err != nil {
+			return nil, errors.New("failed to mark as verified")
+		}
+	}
+
+	return &dto.AttendanceInfoResponse{
+		ID:          attendance.ID.String(),
+		ClassName:   attendance.ClassSchedule.Class.Title,
+		Date:        attendance.ClassSchedule.Date.Format("2006-01-02"),
+		StartHour:   attendance.ClassSchedule.StartHour,
+		StartMinute: attendance.ClassSchedule.StartMinute,
+		Fullname:    attendance.User.Profile.Fullname,
+		Status:      attendance.Status,
+		Verified:    attendance.Verified,
+	}, nil
 }

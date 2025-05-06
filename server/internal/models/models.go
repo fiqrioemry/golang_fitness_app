@@ -451,6 +451,9 @@ type Attendance struct {
 	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 
+	Verified   bool       `gorm:"default:false" json:"verified"`
+	VerifiedAt *time.Time `json:"verifiedAt"`
+
 	ClassSchedule ClassSchedule `gorm:"foreignKey:ClassScheduleID" json:"classSchedule"`
 	User          User          `gorm:"foreignKey:UserID"`
 }

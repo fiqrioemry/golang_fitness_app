@@ -507,6 +507,21 @@ type BookingResponse struct {
 }
 
 // ATTENDANCE ==========================
+// dto.go
+type ValidateQRRequest struct {
+	QRCode string `json:"qrCode"`
+}
+type AttendanceInfoResponse struct {
+	ID          string `json:"id"`
+	ClassName   string `json:"className"`
+	Date        string `json:"date"`
+	StartHour   int    `json:"startHour"`
+	StartMinute int    `json:"startMinute"`
+	Fullname    string `json:"fullname"`
+	Status      string `json:"status"`
+	Verified    bool   `json:"verified"`
+}
+
 type MarkAttendanceRequest struct {
 	BookingID string `json:"bookingId" binding:"required"`
 	Status    string `json:"status" binding:"required,oneof=attended absent cancelled"`

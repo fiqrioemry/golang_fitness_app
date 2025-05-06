@@ -77,3 +77,33 @@ func (h *AttendanceHandler) RegenerateQRCode(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"qr": qr})
 }
+
+// func (h *AttendanceHandler) ValidateQRCode(c *gin.Context) {
+// 	id := c.Param("attendanceId")
+
+// 	err := h.attendanceService.ValidateQRCode(id)
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{"message": "Attendance validated successfully"})
+// }
+
+func (h *AttendanceHandler) ValidateQRCodeScan(c *gin.Context) {
+	var req struct {
+		QR string `json:"qr" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid QR payload"})
+		return
+	}
+
+	info, err := h.attendanceService.ValidateQRCodeData(req.QR)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": info})
+}

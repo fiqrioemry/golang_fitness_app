@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"regexp"
@@ -66,4 +67,24 @@ func GenerateBase64QR(data string) string {
 		return ""
 	}
 	return base64.StdEncoding.EncodeToString(png)
+}
+
+type QRPayload struct {
+	UserID     string `json:"userId"`
+	BookingID  string `json:"bookingId"`
+	ScheduleID string `json:"scheduleId"`
+}
+
+func ParseQRPayload(base64QR string) (*QRPayload, error) {
+	decoded, err := base64.StdEncoding.DecodeString(base64QR)
+	if err != nil {
+		return nil, err
+	}
+
+	var payload QRPayload
+	if err := json.Unmarshal(decoded, &payload); err != nil {
+		return nil, err
+	}
+
+	return &payload, nil
 }
