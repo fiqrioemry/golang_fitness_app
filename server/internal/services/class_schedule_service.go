@@ -96,6 +96,11 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 		return err
 	}
 
+	today := time.Now().Truncate(24 * time.Hour)
+	if parsedDate.Before(today) {
+		return fmt.Errorf("cannot update schedule to a past date")
+	}
+
 	newStart := time.Date(parsedDate.Year(), parsedDate.Month(), parsedDate.Day(), req.StartHour, req.StartMinute, 0, 0, time.Local)
 	newEnd := newStart.Add(time.Hour)
 
@@ -118,19 +123,17 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 		}
 	}
 
-	// update fields
+	if req.Capacity < schedule.Booked {
+		return fmt.Errorf("capacity cannot be less than the number of booked participants (%d)", schedule.Booked)
+	}
+
 	schedule.Date = parsedDate
 	schedule.StartHour = req.StartHour
 	schedule.StartMinute = req.StartMinute
 	schedule.ClassID = uuid.MustParse(req.ClassID)
 	schedule.InstructorID = uuid.MustParse(req.InstructorID)
-
-	if req.Capacity > 0 {
-		schedule.Capacity = req.Capacity
-	}
-	if req.Color != "" {
-		schedule.Color = req.Color
-	}
+	schedule.Capacity = req.Capacity
+	schedule.Color = req.Color
 
 	return s.repo.UpdateClassSchedule(schedule)
 }

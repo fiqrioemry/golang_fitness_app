@@ -109,7 +109,7 @@ func (h *ClassScheduleHandler) UpdateClassSchedule(c *gin.Context) {
 	}
 
 	if err := h.scheduleService.UpdateClassSchedule(id, req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update schedule", "error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
