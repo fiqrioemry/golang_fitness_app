@@ -374,9 +374,19 @@ type CreateClassScheduleRequest struct {
 	ClassID      string    `json:"classId" binding:"required"`
 	InstructorID string    `json:"instructorId" binding:"required"`
 	Date         time.Time `json:"date" binding:"required"`
-	StartHour    int       `json:"startHour" binding:"required"`
-	StartMinute  int       `json:"startMinute" binding:"required"`
-	Capacity     int       `json:"capacity" binding:"required"`
+	StartHour    int       `json:"startHour" validate:"required,min=8,max=17"`
+	StartMinute  int       `json:"startMinute" validate:"required,oneof=0 15 30 45"`
+	Capacity     int       `json:"capacity" validate:"required,min=1"`
+	Color        string    `json:"color"`
+}
+
+type UpdateClassScheduleRequest struct {
+	ClassID      string    `json:"classId" binding:"required"`
+	InstructorID string    `json:"instructorId" binding:"required"`
+	Date         time.Time `json:"date" binding:"required"`
+	StartHour    int       `json:"startHour" validate:"required,min=8,max=17"`
+	StartMinute  int       `json:"startMinute" validate:"required,oneof=0 15 30 45"`
+	Capacity     int       `json:"capacity" validate:"required,min=1"`
 	Color        string    `json:"color"`
 }
 

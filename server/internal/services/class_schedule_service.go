@@ -12,7 +12,7 @@ import (
 
 type ClassScheduleService interface {
 	CreateClassSchedule(req dto.CreateClassScheduleRequest) error
-	UpdateClassSchedule(id string, req dto.CreateClassScheduleRequest) error
+	UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error
 	DeleteClassSchedule(id string) error
 	GetAllClassSchedules() ([]dto.ClassScheduleResponse, error)
 	GetClassScheduleByID(id string) (*dto.ClassScheduleDetailResponse, error)
@@ -84,7 +84,7 @@ func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRe
 	return s.repo.CreateClassSchedule(&schedule)
 }
 
-func (s *classScheduleService) UpdateClassSchedule(id string, req dto.CreateClassScheduleRequest) error {
+func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error {
 	schedule, err := s.repo.GetClassScheduleByID(id)
 	if err != nil {
 		return err
