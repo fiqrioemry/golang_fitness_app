@@ -393,13 +393,6 @@ type CreateScheduleRequest struct {
 	EndType       string     `json:"endType,omitempty"`
 	EndDate       *time.Time `json:"endDate,omitempty"`
 }
-type UpdateClassScheduleRequest struct {
-	Date        time.Time `json:"date"`
-	StartHour   int       `json:"startHour"`
-	StartMinute int       `json:"startMinute"`
-	Capacity    int       `json:"capacity"`
-	Color       string    `json:"color"`
-}
 
 type ScheduleTemplateToggleRequest struct {
 	IsActive bool `json:"isActive" binding:"required"`

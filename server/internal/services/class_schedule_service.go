@@ -12,7 +12,7 @@ import (
 
 type ClassScheduleService interface {
 	CreateClassSchedule(req dto.CreateClassScheduleRequest) error
-	UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error
+	UpdateClassSchedule(id string, req dto.CreateClassScheduleRequest) error
 	DeleteClassSchedule(id string) error
 	GetAllClassSchedules() ([]dto.ClassScheduleResponse, error)
 	GetClassScheduleByID(id string) (*dto.ClassScheduleDetailResponse, error)
@@ -84,25 +84,50 @@ func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRe
 	return s.repo.CreateClassSchedule(&schedule)
 }
 
-func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error {
+func (s *classScheduleService) UpdateClassSchedule(id string, req dto.CreateClassScheduleRequest) error {
 	schedule, err := s.repo.GetClassScheduleByID(id)
 	if err != nil {
 		return err
 	}
 
 	dateOnly := req.Date.Format("2006-01-02")
-	parsedDate, err := time.Parse("2006-01-02", dateOnly)
+	parsedDate, err := time.ParseInLocation("2006-01-02", dateOnly, time.Local)
 	if err != nil {
 		return err
 	}
 
+	newStart := time.Date(parsedDate.Year(), parsedDate.Month(), parsedDate.Day(), req.StartHour, req.StartMinute, 0, 0, time.Local)
+	newEnd := newStart.Add(time.Hour)
+
+	existingSchedules, err := s.repo.GetClassSchedules()
+	if err != nil {
+		return err
+	}
+
+	for _, other := range existingSchedules {
+		if other.ID == schedule.ID {
+			continue
+		}
+		if other.InstructorID == uuid.MustParse(req.InstructorID) && other.Date.Equal(parsedDate) {
+			existStart := time.Date(other.Date.Year(), other.Date.Month(), other.Date.Day(), other.StartHour, other.StartMinute, 0, 0, time.Local)
+			existEnd := existStart.Add(time.Hour)
+
+			if newStart.Before(existEnd) && existStart.Before(newEnd) {
+				return fmt.Errorf("instructor already booked at this time")
+			}
+		}
+	}
+
+	// update fields
 	schedule.Date = parsedDate
 	schedule.StartHour = req.StartHour
 	schedule.StartMinute = req.StartMinute
+	schedule.ClassID = uuid.MustParse(req.ClassID)
+	schedule.InstructorID = uuid.MustParse(req.InstructorID)
+
 	if req.Capacity > 0 {
 		schedule.Capacity = req.Capacity
 	}
-
 	if req.Color != "" {
 		schedule.Color = req.Color
 	}
