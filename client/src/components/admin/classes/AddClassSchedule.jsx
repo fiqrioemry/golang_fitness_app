@@ -58,7 +58,7 @@ const AddClassSchedule = ({ open, setOpen, defaultDateTime }) => {
           label="Start Hour"
           isNumeric={true}
           placeholder="Hour"
-          options={[...Array(23)].map((_, i) => 1 + i)} // 8–17
+          options={[...Array(9)].map((_, i) => 8 + i)} // 8–17
         />
         <SelectElement
           isNumeric={true}
@@ -68,6 +68,7 @@ const AddClassSchedule = ({ open, setOpen, defaultDateTime }) => {
           options={[0, 15, 30, 45]}
         />
       </div>
+
       <InputNumberElement name="capacity" label="Capacity" />
     </FormSheet>
   );

@@ -13,11 +13,11 @@ const UploadClassGallery = ({ classes }) => {
       icon
       loading={isPending}
       schema={uploadGallerySchema}
-      state={{ gallery: classes.galleries }}
-      action={(data) => mutateAsync({ id: classes.id, gallery: data.gallery })}
+      state={{ images: classes.galleries }}
+      action={(data) => mutateAsync({ id: classes.id, images: data.images })}
       title="Upload Gallery"
     >
-      <InputFileElement name="gallery" label="Gallery (Required)" />
+      <InputFileElement name="images" label="Gallery (Required)" />
     </FormAddDialog>
   );
 };

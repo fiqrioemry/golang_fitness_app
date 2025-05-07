@@ -12,8 +12,14 @@ const FormInput = ({
   className,
   isLoading,
   children,
+  shouldReset,
 }) => {
-  const { methods, handleSubmit } = useFormSchema({ state, schema, action });
+  const { methods, handleSubmit } = useFormSchema({
+    state,
+    schema,
+    action,
+    shouldReset,
+  });
 
   return (
     <FormProvider {...methods}>

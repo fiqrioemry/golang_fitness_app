@@ -20,7 +20,6 @@ export function FormSheet({
   children,
   open,
   setOpen,
-  resourceId = null,
   loading = false,
   shouldReset = true,
 }) {
@@ -52,22 +51,15 @@ export function FormSheet({
         date: data.date ? new Date(data.date).toISOString() : null,
         endDate: data.endDate ? new Date(data.endDate).toISOString() : null,
       };
-
-      if (resourceId) {
-        await action({ id: resourceId, data: payload });
-      } else {
-        await action(payload);
-      }
-
+      await action(payload);
       if (formState.isValid && shouldReset) reset();
       setOpen(false);
     },
-    [action, formState.isValid, reset, shouldReset, resourceId, setOpen]
+    [action, formState.isValid, reset, shouldReset, setOpen]
   );
 
   return (
     <Sheet
-      modal={false}
       open={open}
       onOpenChange={(val) => (!val ? handleCancel() : setOpen(val))}
     >
@@ -99,7 +91,7 @@ export function FormSheet({
                 <SubmitButton
                   text="Save Changes"
                   isLoading={loading}
-                  disabled={!formState.isValid || !formState.isDirty}
+                  disabled={!formState.isValid}
                 />
               </div>
             </form>

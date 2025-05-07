@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-// src/pages/classes/DeleteClass.jsx
 import { FormToggle } from "@/components/form/FormToggle";
 import { useScheduleTemplateMutation } from "@/hooks/useSchedules";
 

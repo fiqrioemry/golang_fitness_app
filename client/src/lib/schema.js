@@ -20,6 +20,31 @@ const imageItemSchema = z
     { message: "Image size must be <= 2MB" }
   );
 
+const requiredNumberField = (label, { min, max } = {}) =>
+  z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z
+      .number({
+        required_error: `${label} is required`,
+        invalid_type_error: `${label} must be a number`,
+      })
+      .refine(
+        (val) =>
+          (min === undefined || val >= min) &&
+          (max === undefined || val <= max),
+        {
+          message:
+            min !== undefined && max !== undefined
+              ? `${label} must be between ${min} and ${max}`
+              : min !== undefined
+              ? `${label} must be at least ${min}`
+              : max !== undefined
+              ? `${label} must be at most ${max}`
+              : `${label} must be valid`,
+        }
+      )
+  );
+
 // Register
 export const sendOTPSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -58,31 +83,6 @@ export const avatarSchema = z.object({
   avatar: imageItemSchema.refine((val) => !!val, {
     message: "Image is required",
   }),
-});
-
-// classes
-export const classSchema = z.object({
-  title: z.string().min(6, "Title must be at least 6 characters"),
-  duration: z
-    .number()
-    .min(15, "Minimum duration is 15 minutes")
-    .max(180, "Maximum duration is 180 minutes"),
-  description: z.string().min(1, "Description is required"),
-  additional: z.array(z.string()).optional(),
-  typeId: z.string().min(1, "Type is required"),
-  levelId: z.string().min(1, "Level is required"),
-  locationId: z.string().min(1, "Location is required"),
-  categoryId: z.string().min(1, "Category is required"),
-  subcategoryId: z.string().min(1, "Subcategory is required"),
-  image: imageItemSchema.refine((val) => !!val, {
-    message: "Image is required",
-  }),
-
-  isActive: z.boolean().optional(),
-});
-
-export const uploadGallerySchema = z.object({
-  gallery: z.array(imageItemSchema).optional(),
 });
 
 // package
@@ -138,27 +138,6 @@ export const createPaymentSchema = z.object({
   packageId: z.string().min(1, "Package is required"),
 });
 
-export const createScheduleTemplateSchema = z.object({
-  classId: z.string().min(1, "Class is required"),
-  instructorId: z.string().min(1, "Instructor is required"),
-  dayOfWeek: z.number().min(0).max(6),
-  startHour: z.number().min(0).max(23),
-  startMinute: z.number().min(0).max(59),
-  capacity: z.number().positive(),
-});
-
-export const updateClassScheduleSchema = z.object({
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-  capacity: z.number().optional(),
-});
-
-export const createClassScheduleSchema = z.object({
-  classId: z.string().min(1, "Class is required"),
-  instructorId: z.string().min(1, "Instructor is required"),
-  startTime: z.string().min(1, "Start time is required"),
-  capacity: z.number().positive(),
-});
 export const markAttendanceSchema = z.object({
   bookingId: z.string().min(1, "Booking ID is required"),
   status: z.enum(["attended", "absent", "cancelled"]),
@@ -205,4 +184,26 @@ export const scheduleSchema = z.object({
     .refine((val) => !val || !isNaN(Date.parse(val)), {
       message: "End Date must be a valid date",
     }),
+  capacity: requiredNumberField("Capacity", { min: 1 }),
+});
+
+// classes
+export const classSchema = z.object({
+  title: z.string().min(6, "Title must be at least 6 characters"),
+  duration: requiredNumberField("Duration", { min: 15, max: 180 }),
+  description: z.string().min(1, "Description is required"),
+  additional: z.array(z.string()).optional(),
+  typeId: z.string().min(1, "Type is required"),
+  levelId: z.string().min(1, "Level is required"),
+  locationId: z.string().min(1, "Location is required"),
+  categoryId: z.string().min(1, "Category is required"),
+  subcategoryId: z.string().min(1, "Subcategory is required"),
+  image: imageItemSchema.refine((val) => !!val, {
+    message: "Image is required",
+  }),
+  isActive: z.boolean().optional(),
+});
+
+export const uploadGallerySchema = z.object({
+  images: z.array(imageItemSchema).min(1, "Image is required"),
 });

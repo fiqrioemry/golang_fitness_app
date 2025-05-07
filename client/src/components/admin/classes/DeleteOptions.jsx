@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { FormDelete } from "@/components/form/FormDelete";
 import { useMutationOptions } from "@/hooks/useSelectOptions";
 

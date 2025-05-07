@@ -41,7 +41,7 @@ const AddClass = () => {
               <InputTextareaElement
                 name="description"
                 label="Description"
-                placeholder="Minimum 20 characters"
+                placeholder="Write description for your class"
                 maxLength={200}
               />
             </div>

@@ -1,12 +1,12 @@
 import { useScheduleMutation } from "@/hooks/useClass";
 import { FormDelete } from "@/components/form/FormDelete";
 
-const DeleteClassSchedule = ({ schedule, onUpdate }) => {
+const DeleteClassSchedule = ({ schedule, onClose }) => {
   const { deleteSchedule, isPending } = useScheduleMutation();
 
   const handleDeleteSchedule = async () => {
     await deleteSchedule.mutateAsync(schedule.id);
-    onUpdate();
+    onClose();
   };
 
   return (

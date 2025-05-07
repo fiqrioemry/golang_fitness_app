@@ -1,28 +1,30 @@
 import React from "react";
 import { scheduleSchema } from "@/lib/schema";
 import { useScheduleMutation } from "@/hooks/useClass";
-import { FormSheet } from "@/components/form/FormSheet";
 import { SelectElement } from "@/components/input/SelectElement";
-import { SwitchElement } from "@/components/input/SwitchElement";
 import { ColorPickerElement } from "@/components/input/ColorPickerElement";
+import { FormUpdateSheet } from "@/components/form/FormUpdateSheet";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
 import { SelectCalendarElement } from "@/components/input/SelectCalendarElement";
 
-const UpdateClassSchedule = ({ open, setOpen, schedule }) => {
+const UpdateClassSchedule = ({ schedule, onClose }) => {
   const { updateSchedule } = useScheduleMutation();
   const { isPending, mutateAsync } = updateSchedule;
 
+  const handleUpdateSchedule = async (data) => {
+    await mutateAsync({ id: schedule.id, ...data });
+    onClose();
+  };
+
   return (
-    <FormSheet
-      open={open}
-      setOpen={setOpen}
+    <FormUpdateSheet
+      icon={false}
       state={schedule}
       loading={isPending}
       schema={scheduleSchema}
-      action={mutateAsync}
+      action={handleUpdateSchedule}
       title="Update Schedule"
-      resourceId={schedule?.id}
     >
       <SelectCalendarElement name="date" label="Event Date" />
 
@@ -57,8 +59,7 @@ const UpdateClassSchedule = ({ open, setOpen, schedule }) => {
         />
       </div>
       <InputNumberElement name="capacity" label="Capacity" min={1} />
-      <SwitchElement name="isActive" label="Set as active" />
-    </FormSheet>
+    </FormUpdateSheet>
   );
 };
 

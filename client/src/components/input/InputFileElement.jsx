@@ -177,7 +177,10 @@ const InputFileElement = ({
                 id={`${name}-upload`}
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleFiles(e.target.files)}
+                onChange={(e) => {
+                  handleFiles(e.target.files);
+                  e.target.value = "";
+                }}
                 multiple={!isSingle}
                 hidden
               />

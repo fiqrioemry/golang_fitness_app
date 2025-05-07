@@ -31,6 +31,13 @@ const InputNumberElement = ({
           }
         };
 
+        const handleChange = (e) => {
+          const value = e.target.value;
+          if (/^\d{0,15}$/.test(value)) {
+            field.onChange(value === "" ? null : Number(value));
+          }
+        };
+
         return (
           <div className="space-y-1">
             {label && (
@@ -41,17 +48,14 @@ const InputNumberElement = ({
             <input
               id={name}
               type="text"
-              value={field.value ?? ""}
-              onChange={(e) => {
-                const value = e.target.value;
-                field.onChange(value === "" ? null : Number(value));
-              }}
-              onKeyDown={handleKeyDown}
               inputMode="numeric"
               placeholder={placeholder}
               disabled={disabled}
               min={min}
               max={max}
+              onKeyDown={handleKeyDown}
+              onChange={handleChange}
+              value={field.value ?? ""}
               className={`input ${fieldState.error ? "input-error" : ""}`}
             />
             {fieldState.error && (

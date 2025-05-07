@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useSchedulesQuery } from "@/hooks/useClass";
 import { AddClassSchedule } from "@/components/admin/classes/AddClassSchedule";
 import { ClassScheduleDetail } from "@/components/admin/classes/ClassScheduleDetail";
-import { UpdateClassSchedule } from "@/components/admin/classes/UpdateClassSchedule";
 import { ClassScheduleCalendar } from "@/components/admin/classes/ClassScheduleCalendar";
 
 const ClassSchedule = () => {
@@ -12,7 +11,6 @@ const ClassSchedule = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const { data: schedules = [], isLoading } = useSchedulesQuery();
 
   const handleEmptySlotClick = (dateTime) => {
@@ -20,11 +18,6 @@ const ClassSchedule = () => {
     setIsAddDialogOpen(true);
   };
 
-  const handleSelectUpdate = (event) => {
-    setSelectedEvent(event);
-    setIsDetailDialogOpen(false);
-    setIsUpdateDialogOpen(true);
-  };
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
     setIsDetailDialogOpen(true);
@@ -68,14 +61,9 @@ const ClassSchedule = () => {
         setOpen={setIsAddDialogOpen}
         defaultDateTime={selectedDate}
       />
-      <UpdateClassSchedule
-        open={isUpdateDialogOpen}
-        setOpen={setIsUpdateDialogOpen}
-        schedule={selectedEvent?.resource}
-      />
+
       <ClassScheduleDetail
         open={isDetailDialogOpen}
-        onUpdate={handleSelectUpdate}
         onClose={() => setIsDetailDialogOpen(false)}
         event={selectedEvent}
       />

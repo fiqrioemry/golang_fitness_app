@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-// src/pages/classes/DeleteClass.jsx
 import { FormDelete } from "@/components/form/FormDelete";
 import { useScheduleTemplateMutation } from "@/hooks/useSchedules";
 

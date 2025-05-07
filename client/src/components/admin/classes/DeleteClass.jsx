@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-// src/pages/classes/DeleteClass.jsx
 import { useClassMutation } from "@/hooks/useClass";
 import { FormDelete } from "@/components/form/FormDelete";
 

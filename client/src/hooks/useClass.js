@@ -82,18 +82,11 @@ export const useClassMutation = () => {
     }),
 
     uploadGallery: useMutation({
-      mutationFn: ({ id, gallery }) =>
-        classService.uploadClassGallery(id, gallery),
+      mutationFn: ({ id, images }) =>
+        classService.uploadClassGallery(id, images),
       ...mutationOpts("Gallery uploaded", ({ id }) => {
         qc.invalidateQueries({ queryKey: ["class", id] });
-      }),
-    }),
-
-    deleteGallery: useMutation({
-      mutationFn: ({ id, galleryId }) =>
-        classService.deleteClassGallery(id, galleryId),
-      ...mutationOpts("Gallery deleted", ({ id }) => {
-        qc.invalidateQueries({ queryKey: ["class", id] });
+        qc.invalidateQueries({ queryKey: ["classes"] });
       }),
     }),
   };

@@ -57,7 +57,7 @@ export const buildFormData = (data) => {
         });
       } else {
         value.forEach((item) => {
-          formData.append(`${key}[]`, item);
+          formData.append(`${key}`, item);
         });
       }
     } else if (value instanceof File) {
