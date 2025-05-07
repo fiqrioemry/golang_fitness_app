@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"server/internal/dto"
-	"server/internal/models"
 	"server/internal/services"
 	"server/internal/utils"
 
@@ -22,6 +20,7 @@ func NewClassHandler(classService services.ClassService) *ClassHandler {
 
 func (h *ClassHandler) CreateClass(c *gin.Context) {
 	var req dto.CreateClassRequest
+
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input", "error": err.Error()})
 		return
@@ -36,7 +35,7 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 
 	form, err := c.MultipartForm()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid multipart form"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid multipart form"})
 		return
 	}
 
@@ -50,19 +49,25 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 		req.ImageURLs = uploadedImageURLs
 	}
 
-	singleImageURL, err := utils.UploadImageWithValidation(req.Image)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Image upload failed", "error": err.Error()})
+	if req.Image != nil {
+		singleImageURL, err := utils.UploadImageWithValidation(req.Image)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Image upload failed", "error": err.Error()})
+			return
+		}
+		req.ImageURL = singleImageURL
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Image is required"})
 		return
 	}
-	req.ImageURL = singleImageURL
 
 	if err := h.classService.CreateClass(req); err != nil {
-		utils.CleanupImageOnError(singleImageURL)
+		utils.CleanupImageOnError(req.ImageURL)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create class", "error": err.Error()})
 		return
 	}
 
+	// Respond with success
 	c.JSON(http.StatusCreated, gin.H{"message": "Class created successfully"})
 }
 
@@ -140,51 +145,6 @@ func (h *ClassHandler) GetClassByID(c *gin.Context) {
 	c.JSON(http.StatusOK, classResponse)
 }
 
-func (h *ClassHandler) UploadClassGallery(c *gin.Context) {
-	classID := c.Param("id")
-	form, err := c.MultipartForm()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid multipart form"})
-		return
-	}
-
-	files := form.File["gallery"]
-	fmt.Println(files)
-	if len(files) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "no gallery images provided"})
-		return
-	}
-
-	var galleries []models.ClassGallery
-	for _, fileHeader := range files {
-		file, err := fileHeader.Open()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to open file", "error": err.Error()})
-			return
-		}
-		defer file.Close()
-
-		imageURL, err := utils.UploadToCloudinary(file)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to upload image", "error": err.Error()})
-			return
-		}
-
-		galleries = append(galleries, models.ClassGallery{
-			ID:      uuid.New(),
-			ClassID: uuid.MustParse(classID),
-			URL:     imageURL,
-		})
-	}
-
-	if err := h.classService.AddClassGallery(galleries); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to save gallery", "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{"message": "gallery uploaded successfully"})
-}
-
 func (h *ClassHandler) GetAllClasses(c *gin.Context) {
 	var query dto.ClassQueryParam
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -220,13 +180,45 @@ func (h *ClassHandler) GetActiveClasses(c *gin.Context) {
 	c.JSON(http.StatusOK, classes)
 }
 
-func (h *ClassHandler) DeleteClassGallery(c *gin.Context) {
-	galleryID := c.Param("galleryId")
-
-	if err := h.classService.DeleteClassGallery(galleryID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to delete gallery", "error": err.Error()})
+func (h *ClassHandler) UploadClassGallery(c *gin.Context) {
+	classID := c.Param("id")
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid multipart form"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "gallery deleted successfully"})
+	// Ambil URL gambar lama yang dipertahankan
+	keepImages := form.Value["images"]
+
+	// Ambil file gambar baru yang diupload
+	files := form.File["images"]
+	var uploadedURLs []string
+
+	if len(files) > 0 {
+		for _, fileHeader := range files {
+			file, err := fileHeader.Open()
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to open file", "error": err.Error()})
+				return
+			}
+			defer file.Close()
+
+			imageURL, err := utils.UploadToCloudinary(file)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to upload image", "error": err.Error()})
+				return
+			}
+			uploadedURLs = append(uploadedURLs, imageURL)
+		}
+	}
+
+	// Update data galeri
+	if err := h.classService.UpdateClassGallery(uuid.MustParse(classID), keepImages, uploadedURLs); err != nil {
+		utils.CleanupImagesOnError(uploadedURLs)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to update gallery", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "gallery updated successfully"})
 }

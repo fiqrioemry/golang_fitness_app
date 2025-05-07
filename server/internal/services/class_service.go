@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
@@ -19,7 +18,7 @@ type ClassService interface {
 	GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassResponse, int64, error)
 	GetActiveClasses() ([]dto.ClassResponse, error)
 	AddClassGallery(galleries []models.ClassGallery) error
-	DeleteClassGallery(galleryID string) error
+	UpdateClassGallery(classID uuid.UUID, keepImages []string, newImageURLs []string) error
 }
 
 type classService struct {
@@ -71,7 +70,6 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("imageURLs", req.ImageURLs)
 
 	if len(req.ImageURLs) > 0 {
 		var galleries []models.ClassGallery
@@ -148,8 +146,16 @@ func (s *classService) DeleteClass(id string) error {
 		return err
 	}
 
+	// Hapus image utama dari Cloudinary
 	if class.Image != "" {
 		_ = utils.DeleteFromCloudinary(class.Image)
+	}
+
+	// Hapus semua gallery dari cloudinary
+	for _, gallery := range class.Galleries {
+		if gallery.URL != "" {
+			_ = utils.DeleteFromCloudinary(gallery.URL)
+		}
 	}
 
 	return s.repo.DeleteClass(id)
@@ -284,10 +290,45 @@ func (s *classService) GetActiveClasses() ([]dto.ClassResponse, error) {
 	return result, nil
 }
 
-func (s *classService) AddClassGallery(galleries []models.ClassGallery) error {
-	return s.repo.SaveClassGalleries(galleries)
+func (s *classService) UpdateClassGallery(classID uuid.UUID, keepImages []string, newImageURLs []string) error {
+	oldGalleries, err := s.repo.FindGalleriesByClassID(classID)
+	if err != nil {
+		return err
+	}
+
+	// Step 1: Hapus gambar lama yang tidak termasuk dalam keepImages
+	for _, gallery := range oldGalleries {
+		isKept := false
+		for _, keep := range keepImages {
+			if gallery.URL == keep {
+				isKept = true
+				break
+			}
+		}
+		if !isKept {
+			_ = utils.DeleteFromCloudinary(gallery.URL)
+			_ = s.repo.DeleteClassGalleryByID(gallery.ID.String())
+		}
+	}
+
+	// Step 2: Simpan gambar baru jika ada
+	if len(newImageURLs) > 0 {
+		var newGalleries []models.ClassGallery
+		for _, url := range newImageURLs {
+			newGalleries = append(newGalleries, models.ClassGallery{
+				ID:      uuid.New(),
+				ClassID: classID,
+				URL:     url,
+			})
+		}
+		if err := s.repo.SaveClassGalleries(newGalleries); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
-func (s *classService) DeleteClassGallery(galleryID string) error {
-	return s.repo.DeleteClassGalleryByID(galleryID)
+func (s *classService) AddClassGallery(galleries []models.ClassGallery) error {
+	return s.repo.SaveClassGalleries(galleries)
 }

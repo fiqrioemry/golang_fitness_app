@@ -52,7 +52,7 @@ func main() {
 		middleware.Recovery(),
 		middleware.CORS(),
 		middleware.RateLimiter(5, 10),
-		middleware.LimitFileSize(5<<20),
+		middleware.LimitFileSize(12<<20), // batas maksimal 12mb (total 6 gambar jadi pergambar 2mb)
 	)
 
 	// ========== Seeder ==========

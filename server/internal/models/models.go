@@ -50,17 +50,16 @@ func (t *Token) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Profile struct {
-	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID    uuid.UUID      `gorm:"type:char(36);uniqueIndex;not null" json:"userId"`
-	Fullname  string         `gorm:"type:varchar(255);not null" json:"fullname"`
-	Birthday  *time.Time     `json:"birthday,omitempty"`
-	Phone     string         `gorm:"type:varchar(20)" json:"phone"`
-	Gender    string         `gorm:"type:varchar(10)" json:"gender"`
-	Avatar    string         `gorm:"type:varchar(255)" json:"avatar"`
-	Bio       string         `gorm:"type:text" json:"bio"`
-	CreatedAt time.Time      `json:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	ID        uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID    uuid.UUID  `gorm:"type:char(36);uniqueIndex;not null" json:"userId"`
+	Fullname  string     `gorm:"type:varchar(255);not null" json:"fullname"`
+	Birthday  *time.Time `json:"birthday,omitempty"`
+	Phone     string     `gorm:"type:varchar(20)" json:"phone"`
+	Gender    string     `gorm:"type:varchar(10)" json:"gender"`
+	Avatar    string     `gorm:"type:varchar(255)" json:"avatar"`
+	Bio       string     `gorm:"type:text" json:"bio"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
 }
 
 func (p *Profile) BeforeCreate(tx *gorm.DB) (err error) {
@@ -71,20 +70,21 @@ func (p *Profile) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type Class struct {
-	ID             uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	Title          string    `gorm:"type:varchar(255);not null" json:"title"`
-	Image          string    `gorm:"type:varchar(255);not null" json:"image"`
-	IsActive       bool      `gorm:"not null;default:true" json:"isActive"`
-	Duration       int       `gorm:"not null" json:"duration"`
-	Description    string    `gorm:"type:text" json:"description"`
-	Additional     string    `gorm:"type:longtext" json:"-"`
-	AdditionalList []string  `gorm:"-" json:"additional"`
-	TypeID         uuid.UUID `json:"typeId"`
-	LevelID        uuid.UUID `json:"levelId"`
-	LocationID     uuid.UUID `json:"locationId"`
-	CategoryID     uuid.UUID `json:"categoryId"`
-	SubcategoryID  uuid.UUID `json:"subcategoryId"`
-	CreatedAt      time.Time `gorm:"autoCreateTime" json:"createdAt"`
+	ID             uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	Title          string         `gorm:"type:varchar(255);not null" json:"title"`
+	Image          string         `gorm:"type:varchar(255);not null" json:"image"`
+	IsActive       bool           `gorm:"not null;default:true" json:"isActive"`
+	Duration       int            `gorm:"not null" json:"duration"`
+	Description    string         `gorm:"type:text" json:"description"`
+	Additional     string         `gorm:"type:longtext" json:"-"`
+	AdditionalList []string       `gorm:"-" json:"additional"`
+	TypeID         uuid.UUID      `json:"typeId"`
+	LevelID        uuid.UUID      `json:"levelId"`
+	LocationID     uuid.UUID      `json:"locationId"`
+	CategoryID     uuid.UUID      `json:"categoryId"`
+	SubcategoryID  uuid.UUID      `json:"subcategoryId"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// relationship
 	Type        Type        `gorm:"foreignKey:TypeID"`
@@ -95,8 +95,8 @@ type Class struct {
 	Packages    []Package   `gorm:"many2many:package_classes;" json:"packages,omitempty"`
 
 	// optional
-	Galleries []*ClassGallery `gorm:"foreignKey:ClassID" json:"galleries,omitempty"`
-	Reviews   []Review        `gorm:"foreignKey:ClassID" json:"reviews,omitempty"`
+	Galleries []*ClassGallery `gorm:"foreignKey:ClassID;constraint:OnDelete:CASCADE;" json:"galleries,omitempty"`
+	Reviews   []Review        `gorm:"foreignKey:ClassID;constraint:OnDelete:CASCADE;" json:"reviews,omitempty"`
 }
 
 type ClassGallery struct {
@@ -149,12 +149,13 @@ func (pc *PackageClass) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type UserPackage struct {
-	ID              uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID          uuid.UUID  `gorm:"type:char(36);not null" json:"userId"`
-	PackageID       uuid.UUID  `gorm:"type:char(36);not null" json:"packageId"`
-	RemainingCredit int        `gorm:"not null;default:0" json:"remainingCredit"`
-	ExpiredAt       *time.Time `json:"expiredAt"`
-	PurchasedAt     time.Time  `gorm:"autoCreateTime" json:"purchasedAt"`
+	ID              uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID          uuid.UUID      `gorm:"type:char(36);not null" json:"userId"`
+	PackageID       uuid.UUID      `gorm:"type:char(36);not null" json:"packageId"`
+	RemainingCredit int            `gorm:"not null;default:0" json:"remainingCredit"`
+	ExpiredAt       *time.Time     `json:"expiredAt"`
+	PurchasedAt     time.Time      `gorm:"autoCreateTime" json:"purchasedAt"`
+	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 
 	User    User    `gorm:"foreignKey:UserID" json:"user"`
 	Package Package `gorm:"foreignKey:PackageID" json:"package"`
@@ -214,6 +215,7 @@ func (up *UserPackage) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+// ===================================================================
 type Payment struct {
 	ID            uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	PackageID     uuid.UUID `gorm:"type:char(36);not null" json:"packageId"`
@@ -237,15 +239,16 @@ func (p *Payment) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type ClassSchedule struct {
-	ID           uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	ClassID      uuid.UUID `gorm:"type:char(36);not null" json:"classId"`
-	InstructorID uuid.UUID `gorm:"type:char(36);not null" json:"instructorId"`
-	Capacity     int       `gorm:"not null" json:"capacity"`
-	IsActive     bool      `gorm:"default:true" json:"isActive"`
-	Color        string    `gorm:"type:varchar(20)" json:"color"`
-	Date         time.Time `gorm:"not null" json:"date"`
-	StartHour    int       `json:"startHour"`
-	StartMinute  int       `json:"startMinute"`
+	ID           uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	ClassID      uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
+	InstructorID uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
+	Capacity     int            `gorm:"not null" json:"capacity"`
+	IsActive     bool           `gorm:"default:true" json:"isActive"`
+	Color        string         `gorm:"type:varchar(20)" json:"color"`
+	Date         time.Time      `gorm:"not null" json:"date"`
+	StartHour    int            `json:"startHour"`
+	StartMinute  int            `json:"startMinute"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
 	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`

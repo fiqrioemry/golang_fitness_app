@@ -51,7 +51,9 @@ func (r *paymentRepository) GetAllUserPayments(query string, limit, offset int) 
 	var count int64
 
 	db := r.db.Model(&models.Payment{}).
-		Preload("Package").
+		Preload("Package", func(db *gorm.DB) *gorm.DB {
+			return db.Unscoped()
+		}).
 		Preload("User.Profile")
 
 	if query != "" {

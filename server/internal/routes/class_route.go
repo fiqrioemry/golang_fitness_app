@@ -21,6 +21,4 @@ func ClassRoutes(r *gin.Engine, handler *handlers.ClassHandler) {
 	admin.PUT("/:id", handler.UpdateClass)
 	admin.DELETE("/:id", handler.DeleteClass)
 	admin.POST("/:id/gallery", handler.UploadClassGallery)
-	class.DELETE("/:id/gallery/:galleryId", handler.DeleteClassGallery)
-
 }

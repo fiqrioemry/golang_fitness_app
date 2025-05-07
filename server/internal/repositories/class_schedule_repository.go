@@ -41,7 +41,12 @@ func (r *classScheduleRepository) DeleteClassSchedule(id string) error {
 
 func (r *classScheduleRepository) GetClassScheduleByID(id string) (*models.ClassSchedule, error) {
 	var schedule models.ClassSchedule
-	if err := r.db.Preload("Class").Preload("Instructor.User.Profile").First(&schedule, "id = ?", id).Error; err != nil {
+	if err := r.db.Preload("Class", func(db *gorm.DB) *gorm.DB {
+		return db.Unscoped()
+	}).
+		Preload("Instructor.User.Profile", func(db *gorm.DB) *gorm.DB {
+			return db.Unscoped()
+		}).First(&schedule, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &schedule, nil
@@ -50,8 +55,12 @@ func (r *classScheduleRepository) GetClassScheduleByID(id string) (*models.Class
 func (r *classScheduleRepository) GetClassSchedules() ([]models.ClassSchedule, error) {
 	var schedules []models.ClassSchedule
 	if err := r.db.
-		Preload("Class").
-		Preload("Instructor.User.Profile").
+		Preload("Class", func(db *gorm.DB) *gorm.DB {
+			return db.Unscoped()
+		}).
+		Preload("Instructor.User.Profile", func(db *gorm.DB) *gorm.DB {
+			return db.Unscoped()
+		}).
 		Order("date asc").
 		Order("start_hour asc").
 		Order("start_minute asc").
@@ -64,8 +73,12 @@ func (r *classScheduleRepository) GetClassSchedules() ([]models.ClassSchedule, e
 func (r *classScheduleRepository) GetClassSchedulesWithFilter(filter dto.ClassScheduleQueryParam) ([]models.ClassSchedule, error) {
 	var schedules []models.ClassSchedule
 	db := r.db.
-		Preload("Class.Category").
-		Preload("Instructor.User.Profile").
+		Preload("Class", func(db *gorm.DB) *gorm.DB {
+			return db.Unscoped()
+		}).
+		Preload("Instructor.User.Profile", func(db *gorm.DB) *gorm.DB {
+			return db.Unscoped()
+		}).
 		Order("start_hour asc").
 		Order("start_minute asc")
 

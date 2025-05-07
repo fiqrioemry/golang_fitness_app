@@ -3,6 +3,7 @@ package repositories
 import (
 	"server/internal/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +16,7 @@ type ClassRepository interface {
 	GetActiveClasses() ([]models.Class, error)
 	SaveClassGalleries(galleries []models.ClassGallery) error
 	DeleteClassGalleryByID(id string) error
+	FindGalleriesByClassID(classID uuid.UUID) ([]models.ClassGallery, error)
 }
 
 type classRepository struct {
@@ -100,4 +102,12 @@ func (r *classRepository) SaveClassGalleries(galleries []models.ClassGallery) er
 
 func (r *classRepository) DeleteClassGalleryByID(id string) error {
 	return r.db.Delete(&models.ClassGallery{}, "id = ?", id).Error
+}
+
+func (r *classRepository) FindGalleriesByClassID(classID uuid.UUID) ([]models.ClassGallery, error) {
+	var galleries []models.ClassGallery
+	if err := r.db.Where("class_id = ?", classID).Find(&galleries).Error; err != nil {
+		return nil, err
+	}
+	return galleries, nil
 }
