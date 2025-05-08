@@ -152,38 +152,16 @@ export const bookingSchema = z.object({
   classScheduleId: z.string().min(1, "Class Schedule is required"),
 });
 
-export const scheduleSchema = z.object({
-  isRecurring: z.boolean().optional().default(false),
+export const updateRecuringScheduleSchema = z.object({
   classId: z.string().min(1, "Class is required"),
   instructorId: z.string().min(1, "Instructor is required"),
-  capacity: z.number().positive(),
-  color: z.string().optional(),
-
-  // Non-recurring
-  date: z
-    .string()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), {
-      message: "Date must be a valid date",
-    }),
-
-  // Time
+  dayOfWeeks: z.array(z.number().int().min(0).max(6), {
+    required_error: "Days must be an array of valid weekdays (0-6)",
+  }),
   startHour: z.number().min(0).max(23),
   startMinute: z.number().max(59),
-
-  // Recurring
-  recurringDays: z
-    .array(z.number().int().min(0).max(6), {
-      required_error: "Recurring days must be an array of valid weekdays (0-6)",
-    })
-    .optional(),
-  endType: z.enum(["never", "until"]).optional(),
-  endDate: z
-    .string()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), {
-      message: "End Date must be a valid date",
-    }),
+  capacity: z.number().positive(),
+  color: z.string().optional(),
   capacity: requiredNumberField("Capacity", { min: 1 }),
 });
 
@@ -206,4 +184,69 @@ export const classSchema = z.object({
 
 export const uploadGallerySchema = z.object({
   images: z.array(imageItemSchema).min(1, "Image is required"),
+});
+
+export const scheduleSchema = z
+  .object({
+    isRecurring: z.boolean().optional().default(false),
+    classId: z.string().min(1, "Class is required"),
+    instructorId: z.string().min(1, "Instructor is required"),
+    capacity: requiredNumberField("Capacity", { min: 1 }),
+    color: z.string().optional(),
+    date: z
+      .string()
+      .optional()
+      .refine((val) => !val || !isNaN(Date.parse(val)), {
+        message: "Date must be a valid date",
+      }),
+
+    startHour: z.number().min(0).max(23),
+    startMinute: z.number().max(59),
+    dayOfWeeks: z.array(z.number().int().min(0).max(6)).optional().default([]),
+    endDate: z
+      .string()
+      .optional()
+      .refine((val) => !val || !isNaN(Date.parse(val)), {
+        message: "End Date must be a valid date",
+      }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.isRecurring) {
+      if (!data.dayOfWeeks || data.dayOfWeeks.length === 0) {
+        ctx.addIssue({
+          path: ["dayOfWeeks"],
+          code: "custom",
+          message: "At least one day must be selected for recurring schedule",
+        });
+      }
+
+      if (!data.endDate) {
+        ctx.addIssue({
+          path: ["endDate"],
+          code: "custom",
+          message: "End date is required for recurring schedule",
+        });
+      }
+    } else {
+      if (!data.date) {
+        ctx.addIssue({
+          path: ["date"],
+          code: "custom",
+          message: "Date is required for one-time schedule",
+        });
+      }
+    }
+  });
+
+export const updateScheduleSchema = z.object({
+  classId: z.string().min(1, "Class is required"),
+  instructorId: z.string().min(1, "Instructor is required"),
+
+  endDate: z.string().refine((val) => !val || !isNaN(Date.parse(val)), {
+    message: "Date must be a valid date",
+  }),
+  dayOfWeeks: z.array(z.number().int().min(0).max(6)).optional().default([]),
+  startHour: z.number().min(0).max(23),
+  startMinute: z.number().max(59),
+  capacity: requiredNumberField("Capacity", { min: 1 }),
 });

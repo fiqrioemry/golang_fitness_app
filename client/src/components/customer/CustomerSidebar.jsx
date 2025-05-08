@@ -72,6 +72,12 @@ const CustomerSidebar = () => {
             active={currentPath === "/profile/bookings"}
           />
           <NavItem
+            icon={Calendar}
+            title="My Attendance"
+            to="/profile/attendances"
+            active={currentPath === "/profile/attendances"}
+          />
+          <NavItem
             to="/profile/transactions"
             title="Transaction History"
             icon={ShoppingCart}

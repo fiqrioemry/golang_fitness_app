@@ -1,16 +1,16 @@
-import { format } from "date-fns";
 import React, { useEffect } from "react";
-import { CalendarClock, PlusCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
+import { CalendarClock, PlusCircle } from "lucide-react";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useRecurringTemplatesQuery } from "@/hooks/useSchedules";
 import { RunTemplate } from "@/components/admin/classes/RunTemplate";
 import { StopTemplate } from "@/components/admin/classes/StopTemplate";
+import { format, addMonths, parseISO, isValid, isBefore } from "date-fns";
 import { DeleteTemplate } from "@/components/admin/classes/DeleteTemplate";
 import { UpdateTemplate } from "@/components/admin/classes/UpdateTemplate";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 const weekdays = [
   "Sunday",
@@ -36,7 +36,7 @@ const ClassRecuring = () => {
   const templates = data || [];
 
   return (
-    <section className="section max-w-7xl mx-auto px-4 py-10 space-y-6 text-foreground">
+    <section className="section max-w-7xl mx-auto px-4 py-10 text-foreground space-y-6">
       <div className="text-center space-y-1">
         <h2 className="text-2xl font-bold">Recurring Schedule Templates</h2>
         <p className="text-muted-foreground text-sm">
@@ -64,61 +64,76 @@ const ClassRecuring = () => {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates.map((t) => (
-            <div
-              key={t.id}
-              className="border rounded-xl p-5 bg-background shadow-sm hover:shadow transition"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <CalendarClock className="w-4 h-4 text-primary" />
-                  <h3 className="font-semibold text-base truncate max-w-[200px]">
-                    {t.className}
-                  </h3>
+        <div className="flex flex-col gap-4">
+          {templates.map((t) => {
+            const createdAt = isValid(parseISO(t.createdAt))
+              ? parseISO(t.createdAt)
+              : new Date();
+            const endDate = isValid(parseISO(t.endDate))
+              ? parseISO(t.endDate)
+              : null;
+            const nextGen = addMonths(createdAt, 1);
+
+            const showNextGen = endDate && isBefore(nextGen, endDate);
+            const createdAtStr = format(createdAt, "yyyy-MM-dd");
+            const endDateStr = endDate ? format(endDate, "yyyy-MM-dd") : "-";
+
+            return (
+              <div
+                key={t.id}
+                className="border rounded-xl p-5 bg-background shadow-sm hover:shadow transition flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+              >
+                <div className="space-y-1 md:max-w-2xl">
+                  <div className="flex items-center gap-2">
+                    <CalendarClock className="w-4 h-4 text-primary" />
+                    <h3 className="font-semibold text-base truncate">
+                      {t.className}
+                    </h3>
+                    <Badge variant={t.isActive ? "success" : "outline"}>
+                      {t.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-0.5 mt-1">
+                    <li>
+                      <strong>Instructor:</strong> {t.instructor}
+                    </li>
+                    <li>
+                      <strong>Capacity:</strong> {t.capacity}
+                    </li>
+                    <li>
+                      <strong>Time:</strong> {t.startHour}:
+                      {t.startMinute.toString().padStart(2, "0")}
+                    </li>
+                    <li>
+                      <strong>Days:</strong>{" "}
+                      {t.dayOfWeeks.map((d) => weekdays[d]).join(", ")}
+                    </li>
+                    <li>
+                      <strong>End Date:</strong> {endDateStr}
+                    </li>
+                    {showNextGen && (
+                      <li>
+                        <strong>Next Generation:</strong>{" "}
+                        {format(nextGen, "yyyy-MM-dd")}
+                      </li>
+                    )}
+                  </ul>
                 </div>
-                <Badge variant={t.isActive ? "success" : "outline"}>
-                  {t.isActive ? "Active" : "Inactive"}
-                </Badge>
-              </div>
 
-              <ul className="text-sm text-muted-foreground space-y-1 mb-4">
-                <li>
-                  <strong>Instructor:</strong> {t.instructor}
-                </li>
-                <li>
-                  <strong>Capacity:</strong> {t.capacity}
-                </li>
-                <li>
-                  <strong>Time:</strong> {t.startHour}:
-                  {t.startMinute.toString().padStart(2, "0")}
-                </li>
-                <li>
-                  <strong>Days:</strong>{" "}
-                  {t.dayOfWeeks.map((d) => weekdays[d]).join(", ")}
-                </li>
-                <li>
-                  <strong>End Date:</strong>{" "}
-                  {format(new Date(t.endDate), "yyyy-MM-dd")}
-                </li>
-                <li>
-                  <strong>Frequency:</strong> {t.frequency}
-                </li>
-              </ul>
-
-              <div className="flex flex-wrap gap-2">
-                {t.isActive ? (
-                  <StopTemplate template={t} />
-                ) : (
-                  <>
-                    <RunTemplate template={t} />
-                    <UpdateTemplate template={t} />
-                    <DeleteTemplate template={t} />
-                  </>
-                )}
+                <div className="flex flex-wrap gap-2 md:justify-end">
+                  {t.isActive ? (
+                    <StopTemplate template={t} />
+                  ) : (
+                    <>
+                      <RunTemplate template={t} />
+                      <UpdateTemplate template={t} />
+                      <DeleteTemplate template={t} />
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>

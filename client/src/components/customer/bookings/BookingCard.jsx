@@ -1,18 +1,29 @@
+import {
+  CalendarIcon,
+  ClockIcon,
+  MapPinIcon,
+  UserIcon,
+  QrCodeIcon,
+  InfoIcon,
+  AlertCircleIcon,
+} from "lucide-react";
+import {
+  useRegenerateQRCode,
+  useAttendanceMutation,
+} from "@/hooks/useAttendance";
+import { toast } from "sonner";
+import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { buildDateTime, getTimeLeft, isAttendanceWindow } from "@/lib/utils";
-import { CalendarIcon, ClockIcon, MapPinIcon, UserIcon } from "lucide-react";
-import { useQRCodeQuery, useCheckinAttendance } from "@/hooks/useAttendances";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 export const BookingCard = ({ booking }) => {
   const [timeLeft, setTimeLeft] = useState("");
-  const [canAttend, setCanAttend] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  const [canAttend, setCanAttend] = useState(false);
 
   const startTime = buildDateTime(
     booking.date,
@@ -38,21 +49,19 @@ export const BookingCard = ({ booking }) => {
     return () => clearInterval(timer);
   }, [startTime, endTime, booking.duration]);
 
-  const checkinMutation = useCheckinAttendance();
-  const qrCodeQuery = useQRCodeQuery(showQR ? booking.id : null);
+  const { checkin } = useAttendanceMutation();
+  const qrCodeQuery = useRegenerateQRCode(showQR ? booking.id : null);
 
   const handleAttend = async () => {
     try {
-      await checkinMutation.mutateAsync(booking.id);
+      await checkin.mutateAsync(booking.id);
       setShowQR(true);
     } catch (error) {
       toast.error(error?.response?.data?.error || "Failed to check in");
     }
   };
 
-  const handleShowQR = () => {
-    setShowQR(true);
-  };
+  const handleShowQR = () => setShowQR(true);
 
   if (!startTime || !endTime || isNaN(startTime.getTime())) {
     return (
@@ -61,6 +70,8 @@ export const BookingCard = ({ booking }) => {
       </Card>
     );
   }
+
+  console.log();
   return (
     <Card className="overflow-hidden border border-border bg-card shadow-md hover:shadow-xl transition">
       <div className="grid grid-cols-1 sm:grid-cols-[215px_1fr]">
@@ -70,33 +81,28 @@ export const BookingCard = ({ booking }) => {
           className="w-full h-48 sm:h-full object-cover"
         />
 
-        <CardContent className="p-5 space-y-4">
-          {/* Header Title & Status */}
-          <div className="flex justify-between items-center space-x-4">
-            <h3 className="text-base font-semibold text-foreground">
-              {booking.classTitle}
-            </h3>
-            <Badge variant="outline" className="capitalize text-xs">
+        <CardContent className="p-5 space-y-5">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-foreground">
+                {booking.classTitle}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {booking.instructor} • {booking.duration} mins
+              </p>
+            </div>
+            <Badge className="text-xs" variant="outline">
               {booking.status}
             </Badge>
           </div>
 
-          {/* Instructor & Duration */}
-          <p className="text-sm text-muted-foreground">
-            {booking.instructor} • {booking.duration} mins
-          </p>
-
-          {/* Countdown */}
-          <p className="text-sm font-medium text-primary">
-            Starts in: {timeLeft} ⏳🔥
-          </p>
-
-          {/* Schedule Info */}
-          <div className="grid grid-cols-2 gap-8 text-sm text-muted-foreground ">
-            <div className="space-y-4">
+          {/* Timing */}
+          <div className="grid grid-cols-2 gap-6 text-sm">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <CalendarIcon className="w-4 h-4" />
-                <span>{format(startTime, "EEE, dd MMM yyyy")}</span>
+                <span>{format(startTime, "EEEE, dd MMM yyyy")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <ClockIcon className="w-4 h-4" />
@@ -105,7 +111,7 @@ export const BookingCard = ({ booking }) => {
                 </span>
               </div>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <MapPinIcon className="w-4 h-4" />
                 <span>{booking.location}</span>
@@ -117,16 +123,38 @@ export const BookingCard = ({ booking }) => {
             </div>
           </div>
 
-          {/* Attend Button & QR Dialog */}
+          {/* Countdown */}
+          <div className="text-sm font-medium text-primary">
+            Starts in: {timeLeft} ⏳
+          </div>
+
+          {/* Attend Info Notice */}
           {!canAttend && (
+            <div className="flex items-center text-sm text-muted-foreground gap-2">
+              <AlertCircleIcon className="w-4 h-4 text-yellow-500" />
+              Attend button will be enabled 15 minutes before class.
+            </div>
+          )}
+
+          {/* Button */}
+          <div className="pt-2">
             <Dialog open={showQR} onOpenChange={setShowQR}>
               <DialogTrigger asChild>
                 <Button
                   type="button"
-                  className="py-5 w-60"
+                  className="w-full py-4"
                   onClick={booking.attended ? handleShowQR : handleAttend}
+                  disabled={canAttend}
                 >
-                  {booking.attended ? "Show QR Code" : "Attend Now"}
+                  {booking.status === "checked_in" ? (
+                    <>
+                      <QrCodeIcon className="w-4 h-4 mr-2" /> Show QR Code
+                    </>
+                  ) : (
+                    <>
+                      <InfoIcon className="w-4 h-4 mr-2" /> Attend Now
+                    </>
+                  )}
                 </Button>
               </DialogTrigger>
 
@@ -141,15 +169,17 @@ export const BookingCard = ({ booking }) => {
                     Failed to load QR Code
                   </p>
                 ) : (
-                  <img
-                    src={`data:image/png;base64,${qrCodeQuery.data}`}
-                    alt="QR Code"
-                    className="mx-auto w-64 h-64"
-                  />
+                  <div>
+                    <img
+                      alt="QR Code"
+                      src={`data:image/png;base64,${qrCodeQuery.data}`}
+                      className="mx-auto w-60 h-60"
+                    />
+                  </div>
                 )}
               </DialogContent>
             </Dialog>
-          )}
+          </div>
 
           {/* Footer */}
           <p className="text-xs text-muted-foreground text-right">

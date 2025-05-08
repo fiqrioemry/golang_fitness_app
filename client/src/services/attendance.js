@@ -1,32 +1,26 @@
 import { authInstance } from ".";
 
-// ✅ GET /api/attendances
 export const getAllAttendances = async () => {
   const res = await authInstance.get("/attendances");
   return res.data;
 };
 
-// ✅ GET /api/attendances/:bookingId/qr
-export const getQRCode = async (bookingId) => {
-  const res = await authInstance.get(`/attendances/${bookingId}/qr`);
-  return res.data.qr;
+export const getAttendanceDetail = async (id) => {
+  const res = await authInstance.get(`/attendances/${id}`);
+  return res.data;
 };
 
-// ✅ POST /api/attendances/:bookingId/checkin
 export const checkinAttendance = async (bookingId) => {
-  const res = await authInstance.post(`/attendances/${bookingId}/checkin`);
+  const res = await authInstance.post(`/attendances/${bookingId}`);
   return res.data.qr;
 };
 
-// GET /api/attendances/export
-export const exportAttendances = async () => {
-  const res = await authInstance.get("/attendances/export", {
-    responseType: "blob", // download as Excel file
-  });
-  return res;
+export const regenerateQRCode = async (bookingId) => {
+  const res = await authInstance.get(`/attendances/${bookingId}/qr-code`);
+  return res.data.qr;
 };
 
-export const validateQRCode = async (qrCode) => {
-  const res = await authInstance.post("/attendances/validate", { qrCode });
+export const validateQRCodeScan = async ({ qr }) => {
+  const res = await authInstance.post("/attendances/validate", { qr });
   return res.data;
 };

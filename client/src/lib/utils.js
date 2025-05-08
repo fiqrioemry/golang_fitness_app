@@ -5,7 +5,6 @@ import {
   getDay,
   formatDuration,
   intervalToDuration,
-  differenceInMinutes,
 } from "date-fns";
 import { clsx } from "clsx";
 import id from "date-fns/locale/id";
@@ -89,12 +88,11 @@ export const getTimeLeft = (startTime) => {
   return "Ongoing or passed";
 };
 
-export const isAttendanceWindow = (start) => {
+export const isAttendanceWindow = (startTime) => {
   const now = new Date();
-  const diffStart = (start.getTime() - now.getTime()) / 60000;
-  const diffEnd = (now.getTime() - start.getTime()) / 60000;
-
-  return diffStart <= 1360 && diffEnd <= 30;
+  const startWindow = new Date(startTime.getTime() - 15 * 60000);
+  const endWindow = new Date(startTime.getTime() + 30 * 60000);
+  return now >= startWindow && now <= endWindow;
 };
 
 export const buildDateTime = (dateStr, hour, minute) => {

@@ -2,6 +2,61 @@ import { toast } from "sonner";
 import * as scheduleService from "@/services/schedule";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+// GET /api/schedules
+export const useSchedulesQuery = () =>
+  useQuery({
+    queryKey: ["schedules"],
+    queryFn: scheduleService.getAllClassSchedules,
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: false,
+  });
+
+// GET /api/schedules/status
+export const useSchedulesWithStatusQuery = () => {
+  return useQuery({
+    queryKey: ["schedules", "with-status"],
+    queryFn: scheduleService.getAllClassSchedulesWithStatus,
+  });
+};
+
+export const useScheduleDetailQuery = (id) =>
+  useQuery({
+    queryKey: ["schedule", id],
+    queryFn: () => scheduleService.getClassScheduleDetail(id),
+    enabled: !!id,
+  });
+
+export const useScheduleMutation = () => {
+  const qc = useQueryClient();
+
+  const baseOpts = (msg) => ({
+    onSuccess: () => {
+      toast.success(msg);
+      qc.invalidateQueries({ queryKey: ["schedules"] });
+    },
+    onError: (err) => {
+      console.log(err);
+      toast.error(err?.response?.data?.message || "Something went wrong");
+    },
+  });
+
+  return {
+    createSchedule: useMutation({
+      mutationFn: scheduleService.createClassSchedule,
+      ...baseOpts("Schedule created"),
+    }),
+    updateSchedule: useMutation({
+      mutationFn: ({ id, data }) =>
+        scheduleService.updateClassSchedule(id, data),
+      ...baseOpts("Schedule updated"),
+    }),
+    deleteSchedule: useMutation({
+      mutationFn: scheduleService.deleteClassSchedule,
+      ...baseOpts("Schedule deleted"),
+    }),
+  };
+};
+
 export const useRecurringTemplatesQuery = () =>
   useQuery({
     queryKey: ["schedule-templates"],
@@ -23,11 +78,6 @@ export const useScheduleTemplateMutation = () => {
   });
 
   return {
-    createRecurring: useMutation({
-      mutationFn: scheduleService.createScheduleTemplates,
-      ...mutationOpts("Template created Successfully"),
-    }),
-
     updateTemplate: useMutation({
       mutationFn: ({ id, data }) =>
         scheduleService.updateScheduleTemplate(id, data),
@@ -49,3 +99,8 @@ export const useScheduleTemplateMutation = () => {
     }),
   };
 };
+
+// createRecurring: useMutation({
+//   mutationFn: scheduleService.createScheduleTemplates,
+//   ...mutationOpts("Template created Successfully"),
+// }),

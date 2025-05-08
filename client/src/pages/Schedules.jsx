@@ -1,40 +1,37 @@
 import {
   useSchedulesQuery,
   useSchedulesWithStatusQuery,
-} from "@/hooks/useClass";
+} from "@/hooks/useSchedules";
 import { Link } from "react-router-dom";
+import { scheduleTitle } from "@/lib/constant";
 import { Button } from "@/components/ui/button";
-import React, { useState, useMemo } from "react";
-import { id as localeId } from "date-fns/locale";
 import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/store/useAuthStore";
 import { format, isSameDay, addDays } from "date-fns";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import React, { useState, useMemo, useRef } from "react";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
-const scheduleTitle =
-  "Discover and book fitness classes that fit your lifestyle. Explore real-time schedules with flexible times, expert instructors, and a variety of wellness programs at FitBook Studio.";
 const Schedules = () => {
-  useDocumentTitle(scheduleTitle);
-
-  const today = new Date();
-
   const { user } = useAuthStore();
-
+  useDocumentTitle(scheduleTitle);
+  const todayRef = useRef(new Date());
+  const today = todayRef.current;
   const [selectedDate, setSelectedDate] = useState(today);
 
-  const { data, isLoading, isError, refetch } = user?.id
-    ? useSchedulesWithStatusQuery()
-    : useSchedulesQuery();
-
-  const schedules = data || [];
+  const {
+    data = [],
+    isLoading,
+    isError,
+    refetch,
+  } = user === null ? useSchedulesQuery() : useSchedulesWithStatusQuery();
 
   const dateRange = useMemo(() => {
     return Array.from({ length: 14 }, (_, i) => addDays(today, i));
   }, [today]);
 
   const filteredSchedules = useMemo(() => {
-    return schedules
+    return data
       .map((item) => {
         const start = new Date(item.date);
         start.setHours(item.startHour, item.startMinute, 0, 0);
@@ -42,7 +39,7 @@ const Schedules = () => {
         return { ...item, startTime: start, endTime: end };
       })
       .filter((item) => isSameDay(item.startTime, selectedDate));
-  }, [schedules, selectedDate]);
+  }, [data, selectedDate]);
 
   if (isLoading) return <Loading />;
 
@@ -50,29 +47,25 @@ const Schedules = () => {
 
   return (
     <section className="section py-24 text-foreground">
-      {/* Date Picker */}
-      <div className="flex items-center justify-between mb-6">
-        <button className="text-xl text-muted-foreground">&#8592;</button>
-        <div className="flex gap-2 overflow-x-auto no-scrollbar">
-          {dateRange.map((date, i) => {
-            const isSelected = isSameDay(date, selectedDate);
-            return (
-              <button
-                key={i}
-                onClick={() => setSelectedDate(date)}
-                className={`w-14 min-w-[56px] h-16 flex flex-col items-center justify-center rounded-lg transition font-medium ${
-                  isSelected
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted hover:bg-accent hover:text-background text-muted-foreground"
-                }`}
-              >
-                <span className="text-xs">{format(date, "EEE")}</span>
-                <span className="text-lg font-bold">{format(date, "dd")}</span>
-              </button>
-            );
-          })}
-        </div>
-        <button className="text-xl text-muted-foreground">&#8594;</button>
+      <div className="flex items-center justify-center gap-4">
+        {dateRange.map((date) => {
+          const isSelected = isSameDay(date, selectedDate);
+          return (
+            <button
+              key={format(date, "yyyy-MM-dd")}
+              onClick={() => setSelectedDate(date)}
+              aria-label={`Select ${format(date, "EEEE, dd MMMM")}`}
+              className={`w-14 min-w-14 h-16 flex flex-col items-center justify-center rounded-lg transition font-medium ${
+                isSelected
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted hover:bg-accent hover:text-background text-muted-foreground"
+              }`}
+            >
+              <span className="text-xs">{format(date, "EEE")}</span>
+              <span className="text-lg font-bold">{format(date, "dd")}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Summary */}
@@ -91,24 +84,23 @@ const Schedules = () => {
               key={s.id}
               className="bg-card border border-border rounded-xl px-6 py-8 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between"
             >
-              {/* Left section */}
+              {/* Left */}
               <div className="flex flex-col space-y-2">
                 <p className="text-sm font-semibold">
                   {format(s.startTime, "h:mm a")} •{" "}
                   {Math.round((s.endTime - s.startTime) / 60000)} mins
                 </p>
-                <p className="font-medium text-base">{s.class}</p>
-                <p className="text-sm text-muted-foreground">{s.instructor}</p>
+                <p className="font-medium text-base">{s.class.title}</p>
+                <p className="text-sm text-muted-foreground">
+                  {s.instructor.fullname}
+                </p>
               </div>
 
-              {/* Right section */}
+              {/* Right */}
               <div className="mt-4 md:mt-0 md:text-right flex flex-col items-end gap-2">
                 <p className="text-sm text-muted-foreground">
-                  {s.capacity - s.bookedCount > 0
-                    ? `${s.capacity - s.bookedCount} left`
-                    : "0 in waitlist"}
+                  {s.bookedCount} / {s.capacity} Slot
                 </p>
-
                 {s.isBooked ? (
                   <Link to="/profile/bookings">
                     <Button
@@ -118,18 +110,10 @@ const Schedules = () => {
                       Booked
                     </Button>
                   </Link>
-                ) : s.capacity - s.bookedCount > 0 ? (
+                ) : (
                   <Link to={`/schedules/${s.id}`}>
                     <Button>Book Now</Button>
                   </Link>
-                ) : (
-                  <Button
-                    variant="secondary"
-                    className="cursor-not-allowed"
-                    disabled
-                  >
-                    Join Waitlist
-                  </Button>
                 )}
               </div>
             </div>

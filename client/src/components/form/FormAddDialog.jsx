@@ -21,6 +21,7 @@ export function FormAddDialog({
   action,
   children,
   icon = false,
+  buttonText = "",
   loading = false,
   shouldReset = true,
 }) {
@@ -77,9 +78,7 @@ export function FormAddDialog({
       >
         <DialogTrigger asChild>
           {icon ? (
-            <Button size="icon" variant="secondary" type="button">
-              <PlusCircle className="w-4 h-4" />
-            </Button>
+            buttonText
           ) : (
             <Button type="button">
               <PlusCircle className="w-4 h-4 mr-2" />

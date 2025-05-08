@@ -15,16 +15,16 @@ export const UpdateProfile = ({ profile }) => {
   const { mutateAsync, isPending } = updateProfile;
   return (
     <FormAddDialog
-      icon={false}
+      icon={true}
       state={profile}
       title="Edit Profile"
       loading={isPending}
       action={mutateAsync}
       schema={profileSchema}
       buttonText={
-        <Button type="button">
+        <Button variant="secondary" type="button">
           <PencilIcon className="w-4 h-4" />
-          <span>Update Profile</span>
+          <span>Edit Profile</span>
         </Button>
       }
     >

@@ -25,28 +25,6 @@ export const useClassDetailQuery = (id) =>
     enabled: !!id,
   });
 
-// GET /api/schedules
-export const useSchedulesQuery = () =>
-  useQuery({
-    queryKey: ["schedules"],
-    queryFn: classService.getAllClassSchedules,
-  });
-
-// GET /api/schedules/status
-export const useSchedulesWithStatusQuery = () =>
-  useQuery({
-    queryKey: ["schedules"],
-    queryFn: classService.getAllClassSchedulesWithStatus,
-  });
-
-// GET /api/classes/:id
-export const useScheduleDetailQuery = (id) =>
-  useQuery({
-    queryKey: ["schedule", id],
-    queryFn: () => classService.getClassScheduleDetail(id),
-    enabled: !!id,
-  });
-
 export const useClassMutation = () => {
   const qc = useQueryClient();
 
@@ -88,55 +66,6 @@ export const useClassMutation = () => {
         qc.invalidateQueries({ queryKey: ["class", id] });
         qc.invalidateQueries({ queryKey: ["classes"] });
       }),
-    }),
-  };
-};
-
-export const useScheduleMutation = () => {
-  const qc = useQueryClient();
-
-  const baseOpts = (msg) => ({
-    onSuccess: () => {
-      toast.success(msg);
-      qc.invalidateQueries({ queryKey: ["schedules"] });
-    },
-    onError: (err) => {
-      console.log(err);
-      toast.error(err?.response?.data?.message || "Something went wrong");
-    },
-  });
-
-  return {
-    createSchedule: useMutation({
-      mutationFn: classService.createClassSchedule,
-      ...baseOpts("Schedule created"),
-    }),
-    updateSchedule: useMutation({
-      mutationFn: ({ id, data }) => classService.updateClassSchedule(id, data),
-      ...baseOpts("Schedule updated"),
-    }),
-    deleteSchedule: useMutation({
-      mutationFn: classService.deleteClassSchedule,
-      ...baseOpts("Schedule deleted"),
-    }),
-  };
-};
-
-export const useScheduleTemplateMutation = () => {
-  const baseOpts = (msg) => ({
-    onSuccess: () => toast.success(msg),
-    onError: (err) =>
-      toast.error(err?.response?.data?.message || "Something went wrong"),
-  });
-
-  return {
-    createTemplate: useMutation({
-      mutationFn: classService.createTemplate,
-      ...baseOpts("Template created"),
-    }),
-    autoGenerateSchedules: useMutation({
-      mutationFn: classService.autoGenerateSchedules,
-      ...baseOpts("Schedule auto-generated"),
     }),
   };
 };

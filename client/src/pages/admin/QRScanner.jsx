@@ -1,11 +1,11 @@
 // components/QRScanner.jsx
 import React, { useEffect, useRef } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
-import { useValidateQRCode } from "@/hooks/useAttendances";
+import { useAttendanceMutation } from "@/hooks/useAttendance";
 
 const QRScanner = () => {
   const scannerRef = useRef(null);
-  const { mutate } = useValidateQRCode();
+  const { validateQR } = useAttendanceMutation();
 
   useEffect(() => {
     const scanner = new Html5QrcodeScanner("qr-scanner", {
@@ -15,8 +15,8 @@ const QRScanner = () => {
 
     scanner.render(
       (decodedText) => {
-        mutate(decodedText); // validasi otomatis saat berhasil scan
-        scanner.clear(); // stop scanning setelah berhasil
+        validateQR.mutate(decodedText);
+        scanner.clear();
       },
       (err) => {
         console.warn("QR Scan Error:", err);

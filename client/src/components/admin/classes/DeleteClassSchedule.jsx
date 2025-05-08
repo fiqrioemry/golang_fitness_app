@@ -1,4 +1,4 @@
-import { useScheduleMutation } from "@/hooks/useClass";
+import { useScheduleMutation } from "@/hooks/useSchedules";
 import { FormDelete } from "@/components/form/FormDelete";
 
 const DeleteClassSchedule = ({ schedule, onClose }) => {

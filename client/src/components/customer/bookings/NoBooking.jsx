@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export const NoBooking = () => {
   return (
@@ -19,10 +20,9 @@ export const NoBooking = () => {
       <p className="text-sm text-muted-foreground">
         Find a class that suits your fitness goals and start sweating 🔥
       </p>
-
-      <Button asChild>
-        <a href="/classes">Explore Classes</a>
-      </Button>
+      <Link to="/classes">
+        <Button>Explore Classes</Button>
+      </Link>
     </div>
   );
 };

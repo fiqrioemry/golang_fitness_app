@@ -1,6 +1,6 @@
 import { Loading } from "@/components/ui/Loading";
 import React, { useState, useEffect } from "react";
-import { useSchedulesQuery } from "@/hooks/useClass";
+import { useSchedulesQuery } from "@/hooks/useSchedules";
 import { AddClassSchedule } from "@/components/admin/classes/AddClassSchedule";
 import { ClassScheduleDetail } from "@/components/admin/classes/ClassScheduleDetail";
 import { ClassScheduleCalendar } from "@/components/admin/classes/ClassScheduleCalendar";
@@ -36,7 +36,7 @@ const ClassSchedule = () => {
 
       return {
         id: item.id,
-        title: `${item.class} - ${item.instructor} (${item.bookedCount}/${item.capacity})`,
+        title: `${item.class.title} - ${item.instructor.fullname} (${item.bookedCount}/${item.capacity})`,
         start,
         end,
         allDay: false,

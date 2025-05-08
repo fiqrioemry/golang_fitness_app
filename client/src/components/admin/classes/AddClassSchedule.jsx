@@ -1,5 +1,5 @@
 import { scheduleSchema } from "@/lib/schema";
-import { useScheduleMutation } from "@/hooks/useClass";
+import { useScheduleMutation } from "@/hooks/useSchedules";
 import { FormSheet } from "@/components/form/FormSheet";
 import { useFormContext, useWatch } from "react-hook-form";
 import { SelectElement } from "@/components/input/SelectElement";
@@ -23,8 +23,7 @@ const AddClassSchedule = ({ open, setOpen, defaultDateTime }) => {
     date: defaultDateTime ? defaultDateTime.toISOString().split("T")[0] : "",
     startHour: defaultDateTime?.getHours(),
     startMinute: defaultDateTime?.getMinutes(),
-    recurringDays: [],
-    endType: "never",
+    dayOfWeeks: [],
     endDate: "",
   };
 
@@ -58,7 +57,7 @@ const AddClassSchedule = ({ open, setOpen, defaultDateTime }) => {
           label="Start Hour"
           isNumeric={true}
           placeholder="Hour"
-          options={[...Array(9)].map((_, i) => 8 + i)} // 8–17
+          options={[...Array(9)].map((_, i) => 8 + i)}
         />
         <SelectElement
           isNumeric={true}
@@ -81,22 +80,11 @@ const RecurringSection = () => {
   return (
     <>
       <SwitchElement name="isRecurring" label="Repeat weekly?" />
-
       {!isRecurring && <SelectCalendarElement name="date" label="Event Date" />}
-
       {isRecurring && (
         <>
-          <DaySelectorElement name="recurringDays" label="Recurring Days" />
-          <SelectElement
-            name="endType"
-            label="End Type"
-            options={[
-              { value: "never", label: "Never" },
-              { value: "until", label: "Until date" },
-            ]}
-            placeholder="Select end type"
-          />
-          <SelectCalendarElement name="endDate" label="End Date (optional)" />
+          <DaySelectorElement name="dayOfWeeks" label="Recurring Days" />
+          <SelectCalendarElement name="endDate" label="End Date" />
         </>
       )}
     </>

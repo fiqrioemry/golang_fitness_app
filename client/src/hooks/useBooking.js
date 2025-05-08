@@ -14,6 +14,7 @@ export const useCreateBookingMutation = () => {
     onSuccess: () => {
       toast.success("Booking created successfully");
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["schedules", "with-status"] });
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Failed to create booking");

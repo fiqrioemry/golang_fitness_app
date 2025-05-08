@@ -1,9 +1,9 @@
 import React from "react";
-import { scheduleSchema } from "@/lib/schema";
-import { useScheduleMutation } from "@/hooks/useClass";
+import { updateScheduleSchema } from "@/lib/schema";
+import { useScheduleMutation } from "@/hooks/useSchedules";
 import { SelectElement } from "@/components/input/SelectElement";
-import { ColorPickerElement } from "@/components/input/ColorPickerElement";
 import { FormUpdateSheet } from "@/components/form/FormUpdateSheet";
+import { ColorPickerElement } from "@/components/input/ColorPickerElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
 import { SelectCalendarElement } from "@/components/input/SelectCalendarElement";
@@ -22,12 +22,11 @@ const UpdateClassSchedule = ({ schedule, onClose }) => {
       icon={false}
       state={schedule}
       loading={isPending}
-      schema={scheduleSchema}
+      schema={updateScheduleSchema}
       action={handleUpdateSchedule}
       title="Update Schedule"
     >
-      <SelectCalendarElement name="date" label="Event Date" />
-
+      <SelectCalendarElement name="date" label="End Date" />
       <ColorPickerElement name="colorCode" label="Cardboard Color" />
       <SelectOptionsElement
         data="class"

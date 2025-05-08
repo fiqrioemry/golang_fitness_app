@@ -4,10 +4,12 @@ import About from "./pages/About";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Classes from "./pages/Classes";
+import Packages from "./pages/Packages";
 import NotFound from "./pages/NotFound";
 import Schedules from "./pages/Schedules";
 import ClassDetail from "./pages/ClassDetail";
-import Profile from "./pages/customer/Profile";
+import PackageDetail from "./pages/PackageDetail";
+import ScheduleDetail from "./pages/ScheduleDetail";
 
 // admin pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -26,12 +28,13 @@ import ClassRecuring from "./pages/admin/classes/ClassRecuring";
 import ClassSchedules from "./pages/admin/classes/ClassSchedules";
 import AddInstructors from "./pages/admin/instructors/AddInstructors";
 import InstructorsList from "./pages/admin/instructors/InstructorsList";
+import ValidateAttendancePage from "./pages/admin/ValidateAttendancePage";
 
 // customer pages
-import Packages from "./pages/Packages";
-import PackageDetail from "./pages/PackageDetail";
+import Profile from "./pages/customer/Profile";
 import UserBookings from "./pages/customer/UserBookings";
 import UserPackages from "./pages/customer/UserPackages";
+import UserAttendances from "./pages/customer/UserAttendances";
 import UserTransactions from "./pages/customer/UserTransactions";
 import UserNotifications from "./pages/customer/UserNotifications";
 
@@ -45,11 +48,9 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AdminRoute, AuthRoute, NonAuthRoute, PublicRoute } from "./middleware";
 
 // pages layout
-import PublicLayout from "./components/public/PublicLayout";
 import AdminLayout from "./components/admin/AdminLayout";
+import PublicLayout from "./components/public/PublicLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
-import ScheduleDetail from "./pages/ScheduleDetail";
-import ValidateAttendancePage from "./pages/admin/ValidateAttendancePage";
 
 function App() {
   const { checkingAuth, authMe } = useAuthStore();
@@ -119,6 +120,7 @@ function App() {
           <Route index element={<Profile />} />
           <Route path="packages" element={<UserPackages />} />
           <Route path="bookings" element={<UserBookings />} />
+          <Route path="attendances" element={<UserAttendances />} />
 
           <Route path="transactions" element={<UserTransactions />} />
           <Route path="notifications" element={<UserNotifications />} />
