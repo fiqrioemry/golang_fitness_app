@@ -814,71 +814,19 @@ func SeedClassSchedules(db *gorm.DB) {
 		return
 	}
 
-	colors := []string{
-		"#f87171", "#fb923c", "#60a5fa", "#a78bfa", "#4ade80",
-		"#f472b6", "#34d399", "#fbbf24", "#c084fc", "#10b981",
-	}
-
 	now := time.Now()
 	date := now.AddDate(0, 0, 2).Truncate(24 * time.Hour)
 
 	schedules := []models.ClassSchedule{
 		{
 			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date, StartHour: 10, StartMinute: 0, Capacity: 10,
-			IsActive: true, Color: colors[0],
-		},
-		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date.AddDate(0, 0, 2), StartHour: 9, StartMinute: 30, Capacity: 12,
-			IsActive: true, Color: colors[1],
-		},
-		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date.AddDate(0, 0, 2), StartHour: 11, StartMinute: 30, Capacity: 8,
-			IsActive: true, Color: colors[2],
-		},
-		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date.AddDate(0, 0, 2), StartHour: 14, StartMinute: 30, Capacity: 10,
-			IsActive: true, Color: colors[3],
-		},
-		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date.AddDate(0, 0, 2), StartHour: 12, StartMinute: 30, Capacity: 6,
-			IsActive: true, Color: colors[4],
-		},
-
-		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date.AddDate(0, 0, 3), StartHour: 9, StartMinute: 45, Capacity: 15,
-			IsActive: true, Color: colors[5],
-		},
-		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date.AddDate(0, 0, 3), StartHour: 11, StartMinute: 0, Capacity: 10,
-			IsActive: true, Color: colors[6],
-		},
-		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date.AddDate(0, 0, 3), StartHour: 13, StartMinute: 30, Capacity: 12,
-			IsActive: true, Color: colors[7],
-		},
-		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date.AddDate(0, 0, 3), StartHour: 15, StartMinute: 15, Capacity: 8,
-			IsActive: true, Color: colors[8],
-		},
-
-		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date.AddDate(0, 0, 4), StartHour: 10, StartMinute: 0, Capacity: 20,
-			IsActive: true, Color: colors[9],
+			Date: date, StartHour: 9, StartMinute: 0, Capacity: 10,
+			IsActive: true, Color: "#60a5fa",
 		},
 		{
 			ID: uuid.New(), ClassID: classes[1].ID, InstructorID: instructor.ID,
-			Date: date.AddDate(0, 0, 4), StartHour: 10, StartMinute: 0, Capacity: 20,
-			IsActive: true, Color: colors[0],
+			Date: date.AddDate(0, 0, 1), StartHour: 10, StartMinute: 30, Capacity: 12,
+			IsActive: true, Color: "#a78bfa",
 		},
 	}
 
@@ -1023,4 +971,22 @@ func SeedReviews(db *gorm.DB) {
 	} else {
 		log.Println("✅ Reviews seeding completed!")
 	}
+}
+
+func SeedScheduleTemplate(db *gorm.DB) {
+	// Hapus semua recurrence rules
+	if err := db.Exec("DELETE FROM recurrence_rules").Error; err != nil {
+		log.Println("❌ Failed to clear recurrence_rules:", err)
+	} else {
+		log.Println("🧹 RecurrenceRules cleared")
+	}
+
+	// Hapus semua schedule templates
+	if err := db.Exec("DELETE FROM schedule_templates").Error; err != nil {
+		log.Println("❌ Failed to clear schedule_templates:", err)
+	} else {
+		log.Println("🧹 ScheduleTemplates cleared")
+	}
+
+	log.Println("✅ ScheduleTemplate reset completed!")
 }

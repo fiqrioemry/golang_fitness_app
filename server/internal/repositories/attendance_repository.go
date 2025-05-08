@@ -9,15 +9,12 @@ import (
 )
 
 type AttendanceRepository interface {
-	GetAllAttendances() ([]models.Attendance, error)
-	MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) error
-	CreateAttendance(attendance *models.Attendance) error
 	UpdateAttendance(att *models.Attendance) error
-	GetByID(id string) (*models.Attendance, error)
+	MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) error
+	GetAllAttendancesByUser(userID string) ([]models.Attendance, error)
 	FindAllSchedulesBefore(t time.Time) ([]models.ClassSchedule, error)
 	MarkAsAttendance(userID string, bookingID string) (*models.Attendance, error)
 	FindByUserBooking(userID string, bookingID string) (*models.Attendance, error)
-	GetAttendanceByBooking(userID, scheduleID string) (*models.Attendance, error)
 }
 type attendanceRepository struct {
 	db *gorm.DB
@@ -27,27 +24,38 @@ func NewAttendanceRepository(db *gorm.DB) AttendanceRepository {
 	return &attendanceRepository{db}
 }
 
-func (r *attendanceRepository) CreateAttendance(attendance *models.Attendance) error {
-	return r.db.Create(attendance).Error
+func (r *attendanceRepository) GetAllAttendancesByUser(userID string) ([]models.Attendance, error) {
+	var attendances []models.Attendance
+	err := r.db.
+		Preload("ClassSchedule.Class").
+		Preload("ClassSchedule.Instructor").
+		Preload("User.Profile").
+		Where("user_id = ?", userID).
+		Find(&attendances).Error
+	return attendances, err
 }
 
-func (r *attendanceRepository) GetAttendanceByBooking(userID, scheduleID string) (*models.Attendance, error) {
+func (r *attendanceRepository) FindByUserBooking(userID string, bookingID string) (*models.Attendance, error) {
+	var booking models.Booking
+	if err := r.db.Where("id = ? AND user_id = ?", bookingID, userID).First(&booking).Error; err != nil {
+		return nil, err
+	}
+
 	var attendance models.Attendance
-	err := r.db.Where("user_id = ? AND class_schedule_id = ?", userID, scheduleID).First(&attendance).Error
+	err := r.db.Where("user_id = ? AND class_schedule_id = ?", userID, booking.ClassScheduleID).First(&attendance).Error
 	return &attendance, err
+}
+
+func (r *attendanceRepository) FindAllSchedulesBefore(t time.Time) ([]models.ClassSchedule, error) {
+	var schedules []models.ClassSchedule
+	err := r.db.
+		Where("date + INTERVAL start_hour HOUR + INTERVAL start_minute MINUTE <= ?", t).
+		Find(&schedules).Error
+	return schedules, err
 }
 
 func (r *attendanceRepository) UpdateAttendance(attendance *models.Attendance) error {
 	return r.db.Save(attendance).Error
-}
-
-func (r *attendanceRepository) GetAllAttendances() ([]models.Attendance, error) {
-	var attendances []models.Attendance
-	err := r.db.
-		Preload("User.Profile").
-		Preload("ClassSchedule.Class").
-		Find(&attendances).Error
-	return attendances, err
 }
 
 func (r *attendanceRepository) MarkAsAttendance(userID string, bookingID string) (*models.Attendance, error) {
@@ -70,7 +78,6 @@ func (r *attendanceRepository) MarkAsAttendance(userID string, bookingID string)
 		return &attendance, nil
 	}
 
-	// buat baru jika belum ada
 	newAttendance := models.Attendance{
 		ID:              uuid.New(),
 		UserID:          uuid.MustParse(userID),
@@ -82,25 +89,6 @@ func (r *attendanceRepository) MarkAsAttendance(userID string, bookingID string)
 		return nil, err
 	}
 	return &newAttendance, nil
-}
-
-func (r *attendanceRepository) FindByUserBooking(userID string, bookingID string) (*models.Attendance, error) {
-	var booking models.Booking
-	if err := r.db.Where("id = ? AND user_id = ?", bookingID, userID).First(&booking).Error; err != nil {
-		return nil, err
-	}
-
-	var attendance models.Attendance
-	err := r.db.Where("user_id = ? AND class_schedule_id = ?", userID, booking.ClassScheduleID).First(&attendance).Error
-	return &attendance, err
-}
-
-func (r *attendanceRepository) FindAllSchedulesBefore(t time.Time) ([]models.ClassSchedule, error) {
-	var schedules []models.ClassSchedule
-	err := r.db.
-		Where("date + INTERVAL start_hour HOUR + INTERVAL start_minute MINUTE <= ?", t).
-		Find(&schedules).Error
-	return schedules, err
 }
 
 func (r *attendanceRepository) MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) error {
@@ -127,12 +115,4 @@ func (r *attendanceRepository) MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) er
 		}
 	}
 	return nil
-}
-
-func (r *attendanceRepository) GetByID(id string) (*models.Attendance, error) {
-	var att models.Attendance
-	if err := r.db.First(&att, "id = ?", id).Error; err != nil {
-		return nil, err
-	}
-	return &att, nil
 }

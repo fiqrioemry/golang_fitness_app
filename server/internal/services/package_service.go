@@ -107,9 +107,6 @@ func (s *packageService) UpdatePackage(id string, req dto.UpdatePackageRequest) 
 	return s.repo.UpdatePackage(pkg)
 }
 
-func (s *packageService) DeletePackage(id string) error {
-	return s.repo.DeletePackage(id)
-}
 func (s *packageService) GetAllPackages() ([]dto.PackageResponse, error) {
 	packages, err := s.repo.GetAllPackages()
 	if err != nil {
@@ -198,4 +195,17 @@ func (s *packageService) GetRelatedPackages(classID string) ([]dto.PackageRespon
 		})
 	}
 	return res, nil
+}
+
+func (s *packageService) DeletePackage(id string) error {
+	userPackages, err := s.repo.GetUserPackagesWithRemainingCredit(id)
+	if err != nil {
+		return err
+	}
+
+	if len(userPackages) > 0 {
+		return fmt.Errorf("package cannot be deleted, still in use by %d user(s) with remaining credit", len(userPackages))
+	}
+
+	return s.repo.DeletePackage(id)
 }

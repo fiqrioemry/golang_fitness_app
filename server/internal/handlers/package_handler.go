@@ -81,17 +81,6 @@ func (h *PackageHandler) UpdatePackage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Package updated successfully"})
 }
 
-func (h *PackageHandler) DeletePackage(c *gin.Context) {
-	id := c.Param("id")
-
-	if err := h.packageService.DeletePackage(id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to delete package", "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Package deleted successfully"})
-}
-
 func (h *PackageHandler) GetAllPackages(c *gin.Context) {
 	packages, err := h.packageService.GetAllPackages()
 	if err != nil {
@@ -128,4 +117,16 @@ func (h *PackageHandler) GetPackageByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, classPackage)
+}
+
+// DELETE  : /api/packages/:id
+func (h *PackageHandler) DeletePackage(c *gin.Context) {
+	id := c.Param("id")
+
+	if err := h.packageService.DeletePackage(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Package deleted successfully"})
 }

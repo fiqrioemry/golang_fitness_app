@@ -134,10 +134,10 @@ func main() {
 	routes.CategoryRoutes(r, categoryHandler)
 	routes.LocationRoutes(r, locationHandler)
 	routes.InstructorRoutes(r, instructorHandler)
-	routes.AttendanceRoutes(r, attendanceHandler)
 	routes.SubcategoryRoutes(r, subcategoryHandler)
-	routes.ClassScheduleRoutes(r, classScheduleHandler)
 	routes.ScheduleTemplateRoutes(r, scheduleTemplateHandler)
+	routes.AttendanceRoutes(r, attendanceHandler)
+	routes.ClassScheduleRoutes(r, classScheduleHandler)
 
 	// ========== Start Server ==========
 	port := os.Getenv("PORT")

@@ -29,76 +29,48 @@ func (h *ClassScheduleHandler) CreateClassSchedule(c *gin.Context) {
 	if ok := utils.BindAndValidateJSON(c, &req); !ok {
 		return
 	}
-
-	if req.StartHour == nil || req.StartMinute == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "startHour & startMinute required"})
-		return
-	}
-
 	if !req.IsRecurring {
-
-		if req.Date == nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "date required for non-recurring schedule"})
-			return
-		}
-
 		err := h.scheduleService.CreateClassSchedule(dto.CreateClassScheduleRequest{
 			ClassID:      req.ClassID,
 			InstructorID: req.InstructorID,
 			Capacity:     req.Capacity,
 			Color:        req.Color,
 			Date:         *req.Date,
-			StartHour:    *req.StartHour,
-			StartMinute:  *req.StartMinute,
+			StartHour:    req.StartHour,
+			StartMinute:  req.StartMinute,
 		})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create class schedule", "error": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}
-
 		c.JSON(http.StatusCreated, gin.H{"message": "Class schedule created successfully"})
 		return
 	}
 
-	if len(req.RecurringDays) == 0 || req.EndType == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "recurringDays & endType required"})
-		return
-	}
-	if req.EndType == "until" && req.EndDate == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "endDate required for type 'until'"})
-		return
-	}
-
-	for _, day := range req.RecurringDays {
-		if day < 0 || day > 6 {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "invalid day in recurringDays (0 = Sunday, ..., 6 = Saturday)"})
-			return
-		}
-
+	if req.IsRecurring {
 		err := h.templateService.CreateScheduleTemplate(dto.CreateScheduleTemplateRequest{
 			ClassID:      req.ClassID,
 			InstructorID: req.InstructorID,
-			DayOfWeek:    day,
-			StartHour:    *req.StartHour,
-			StartMinute:  *req.StartMinute,
+			DayOfWeeks:   req.DayOfWeeks,
+			StartHour:    req.StartHour,
+			StartMinute:  req.StartMinute,
 			Capacity:     req.Capacity,
-			Frequency:    "recurring",
 			Color:        req.Color,
-			EndType:      req.EndType,
 			EndDate:      req.EndDate,
 		})
+
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create recurring schedule template", "error": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}
-	}
 
-	if err := h.templateService.AutoGenerateSchedules(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to auto-generate schedules", "error": err.Error()})
-		return
-	}
+		if err := h.templateService.AutoGenerateSchedules(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			return
+		}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Recurring schedules created successfully"})
+		c.JSON(http.StatusCreated, gin.H{"message": "Recurring schedules created successfully"})
+	}
 }
 
 func (h *ClassScheduleHandler) UpdateClassSchedule(c *gin.Context) {
@@ -157,8 +129,9 @@ func (h *ClassScheduleHandler) GetSchedulesWithBookingStatus(c *gin.Context) {
 
 func (h *ClassScheduleHandler) GetScheduleByID(c *gin.Context) {
 	scheduleID := c.Param("id")
+	userID := utils.MustGetUserID(c)
 
-	result, err := h.scheduleService.GetClassScheduleByID(scheduleID)
+	result, err := h.scheduleService.GetClassScheduleByID(scheduleID, userID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return

@@ -13,6 +13,7 @@ type PackageRepository interface {
 	GetAllPackages() ([]models.Package, error)
 	GetPackageByID(id string) (*models.Package, error)
 	GetPackagesByClassID(classID string) ([]models.Package, error)
+	GetUserPackagesWithRemainingCredit(packageID string) ([]models.UserPackage, error)
 }
 
 type packageRepository struct {
@@ -58,4 +59,10 @@ func (r *packageRepository) GetPackagesByClassID(classID string) ([]models.Packa
 		Preload("Classes").
 		Find(&packages).Error
 	return packages, err
+}
+
+func (r *packageRepository) GetUserPackagesWithRemainingCredit(packageID string) ([]models.UserPackage, error) {
+	var userPackages []models.UserPackage
+	err := r.db.Where("package_id = ? AND remaining_credit > 0", packageID).Find(&userPackages).Error
+	return userPackages, err
 }

@@ -11,11 +11,11 @@ func AttendanceRoutes(r *gin.Engine, h *handlers.AttendanceHandler) {
 	attendance := r.Group("/api/attendances")
 	attendance.Use(middleware.AuthRequired())
 
+	// customer attendance
 	attendance.GET("", h.GetAllAttendances)
-	attendance.GET("/:bookingId/qr", middleware.AuthRequired(), h.RegenerateQRCode)
-	attendance.POST("/:bookingId/checkin", middleware.AuthRequired(), h.CheckinAttendance)
+	attendance.POST("/:id", h.CheckinAttendance)
+	attendance.GET("/:id/qr-code", h.RegenerateQRCode)
 
-	adminGroup := attendance.Use(middleware.AuthRequired(), middleware.AdminOnly())
-	adminGroup.POST("/validate", h.ValidateQRCodeScan)
-
+	admin := attendance.Use(middleware.AuthRequired(), middleware.AdminOnly())
+	admin.POST("/validate", h.ValidateQRCodeScan)
 }

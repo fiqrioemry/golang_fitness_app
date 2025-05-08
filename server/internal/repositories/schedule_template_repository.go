@@ -9,12 +9,11 @@ import (
 type ScheduleTemplateRepository interface {
 	DeleteTemplate(id string) error
 	FindAll() ([]models.ScheduleTemplate, error)
+	GetAllTemplates() ([]models.ScheduleTemplate, error)
 	CreateTemplate(template *models.ScheduleTemplate) error
 	GetActiveTemplates() ([]models.ScheduleTemplate, error)
-	CreateRecurrenceRule(rule *models.RecurrenceRule) error
 	UpdateTemplate(template *models.ScheduleTemplate) error
 	GetTemplateByID(id string) (*models.ScheduleTemplate, error)
-	GetRecurrenceRuleByTemplateID(templateID string) (*models.RecurrenceRule, error)
 }
 
 type scheduleTemplateRepository struct {
@@ -36,9 +35,14 @@ func (r *scheduleTemplateRepository) GetActiveTemplates() ([]models.ScheduleTemp
 	}
 	return templates, nil
 }
+func (r *scheduleTemplateRepository) GetAllTemplates() ([]models.ScheduleTemplate, error) {
+	var templates []models.ScheduleTemplate
+	err := r.db.
+		Where("deleted_at IS NULL").
+		Order("created_at DESC").
+		Find(&templates).Error
 
-func (r *scheduleTemplateRepository) CreateRecurrenceRule(rule *models.RecurrenceRule) error {
-	return r.db.Create(rule).Error
+	return templates, err
 }
 
 func (r *scheduleTemplateRepository) UpdateTemplate(template *models.ScheduleTemplate) error {
@@ -47,12 +51,6 @@ func (r *scheduleTemplateRepository) UpdateTemplate(template *models.ScheduleTem
 
 func (r *scheduleTemplateRepository) DeleteTemplate(id string) error {
 	return r.db.Delete(&models.ScheduleTemplate{}, "id = ?", id).Error
-}
-
-func (r *scheduleTemplateRepository) GetRecurrenceRuleByTemplateID(templateID string) (*models.RecurrenceRule, error) {
-	var rule models.RecurrenceRule
-	err := r.db.Where("template_id = ?", templateID).First(&rule).Error
-	return &rule, err
 }
 
 func (r *scheduleTemplateRepository) FindAll() ([]models.ScheduleTemplate, error) {

@@ -3,16 +3,16 @@ package repositories
 import (
 	"server/internal/models"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type BookingRepository interface {
 	CreateBooking(booking *models.Booking) error
-	GetBookingsByUserID(userID string) ([]models.Booking, error)
 	CountBookingBySchedule(scheduleID string) (int64, error)
 	GetBookingByID(id string) (*models.Booking, error)
-	IsUserBookedSchedule(userID, scheduleID uuid.UUID) (bool, error)
+	IsUserBookedSchedule(userID, scheduleID string) (bool, error)
+	GetBookingsByUserID(userID string) ([]models.Booking, error)
+	FindByUserAndSchedule(userID, scheduleID string) (*models.Booking, error)
 }
 
 type bookingRepository struct {
@@ -21,10 +21,6 @@ type bookingRepository struct {
 
 func NewBookingRepository(db *gorm.DB) BookingRepository {
 	return &bookingRepository{db}
-}
-
-func (r *bookingRepository) CreateBooking(booking *models.Booking) error {
-	return r.db.Create(booking).Error
 }
 
 func (r *bookingRepository) GetBookingsByUserID(userID string) ([]models.Booking, error) {
@@ -42,10 +38,8 @@ func (r *bookingRepository) GetBookingsByUserID(userID string) ([]models.Booking
 	}
 	return bookings, nil
 }
-func (r *bookingRepository) CountBookingBySchedule(scheduleID string) (int64, error) {
-	var count int64
-	err := r.db.Model(&models.Booking{}).Where("class_schedule_id = ?", scheduleID).Count(&count).Error
-	return count, err
+func (r *bookingRepository) CreateBooking(booking *models.Booking) error {
+	return r.db.Create(booking).Error
 }
 
 func (r *bookingRepository) GetBookingByID(id string) (*models.Booking, error) {
@@ -56,7 +50,13 @@ func (r *bookingRepository) GetBookingByID(id string) (*models.Booking, error) {
 	return &booking, nil
 }
 
-func (r *bookingRepository) IsUserBookedSchedule(userID, scheduleID uuid.UUID) (bool, error) {
+func (r *bookingRepository) CountBookingBySchedule(scheduleID string) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Booking{}).Where("class_schedule_id = ?", scheduleID).Count(&count).Error
+	return count, err
+}
+
+func (r *bookingRepository) IsUserBookedSchedule(userID, scheduleID string) (bool, error) {
 	var count int64
 	err := r.db.Model(&models.Booking{}).
 		Where("user_id = ? AND class_schedule_id = ?", userID, scheduleID).
@@ -65,4 +65,13 @@ func (r *bookingRepository) IsUserBookedSchedule(userID, scheduleID uuid.UUID) (
 		return false, err
 	}
 	return count > 0, nil
+}
+
+func (r *bookingRepository) FindByUserAndSchedule(userID, scheduleID string) (*models.Booking, error) {
+	var booking models.Booking
+	err := r.db.
+		Preload("ClassSchedule").
+		Where("user_id = ? AND class_schedule_id = ?", userID, scheduleID).
+		First(&booking).Error
+	return &booking, err
 }

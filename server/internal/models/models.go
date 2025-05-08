@@ -25,13 +25,6 @@ type User struct {
 	Bookings     []Booking     `gorm:"foreignKey:UserID" json:"bookings,omitempty"`
 }
 
-func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
-	if u.ID == uuid.Nil {
-		u.ID = uuid.New()
-	}
-	return
-}
-
 type Token struct {
 	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	UserID    uuid.UUID      `gorm:"type:char(36);index;not null" json:"userId"`
@@ -40,13 +33,6 @@ type Token struct {
 	CreatedAt time.Time      `json:"createdAt"`
 	UpdatedAt time.Time      `json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-}
-
-func (t *Token) BeforeCreate(tx *gorm.DB) (err error) {
-	if t.ID == uuid.Nil {
-		t.ID = uuid.New()
-	}
-	return
 }
 
 type Profile struct {
@@ -60,13 +46,6 @@ type Profile struct {
 	Bio       string     `gorm:"type:text" json:"bio"`
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt time.Time  `json:"updatedAt"`
-}
-
-func (p *Profile) BeforeCreate(tx *gorm.DB) (err error) {
-	if p.ID == uuid.Nil {
-		p.ID = uuid.New()
-	}
-	return
 }
 
 type Class struct {
@@ -94,7 +73,6 @@ type Class struct {
 	Location    Location    `gorm:"foreignKey:LocationID"`
 	Packages    []Package   `gorm:"many2many:package_classes;" json:"packages,omitempty"`
 
-	// optional
 	Galleries []*ClassGallery `gorm:"foreignKey:ClassID;constraint:OnDelete:CASCADE;" json:"galleries,omitempty"`
 	Reviews   []Review        `gorm:"foreignKey:ClassID;constraint:OnDelete:CASCADE;" json:"reviews,omitempty"`
 }
@@ -106,46 +84,10 @@ type ClassGallery struct {
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
 }
 
-func (c *Class) BeforeSave(tx *gorm.DB) (err error) {
-	if c.AdditionalList != nil {
-		jsonBytes, err := json.Marshal(c.AdditionalList)
-		if err != nil {
-			return err
-		}
-		c.Additional = string(jsonBytes)
-	}
-	return nil
-}
-
-func (c *Class) AfterFind(tx *gorm.DB) (err error) {
-	if c.Additional != "" {
-		var tags []string
-		if err := json.Unmarshal([]byte(c.Additional), &tags); err != nil {
-			return err
-		}
-		c.AdditionalList = tags
-	}
-	return nil
-}
-
-func (c *Class) BeforeCreate(tx *gorm.DB) (err error) {
-	if c.ID == uuid.Nil {
-		c.ID = uuid.New()
-	}
-	return
-}
-
 type PackageClass struct {
 	ID        uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	ClassID   uuid.UUID `gorm:"type:char(36);not null" json:"classId"`
 	PackageID uuid.UUID `gorm:"type:char(36);not null" json:"packageId"`
-}
-
-func (pc *PackageClass) BeforeCreate(tx *gorm.DB) (err error) {
-	if pc.ID == uuid.Nil {
-		pc.ID = uuid.New()
-	}
-	return
 }
 
 type UserPackage struct {
@@ -180,42 +122,6 @@ type Package struct {
 	Classes []Class `gorm:"many2many:package_classes;" json:"classes,omitempty"`
 }
 
-func (p *Package) BeforeCreate(tx *gorm.DB) (err error) {
-	if p.ID == uuid.Nil {
-		p.ID = uuid.New()
-	}
-	return
-}
-func (p *Package) BeforeSave(tx *gorm.DB) error {
-	if p.AdditionalList != nil {
-		data, err := json.Marshal(p.AdditionalList)
-		if err != nil {
-			return err
-		}
-		p.Additional = string(data)
-	}
-	return nil
-}
-
-func (p *Package) AfterFind(tx *gorm.DB) error {
-	if p.Additional != "" {
-		var data []string
-		if err := json.Unmarshal([]byte(p.Additional), &data); err != nil {
-			return err
-		}
-		p.AdditionalList = data
-	}
-	return nil
-}
-
-func (up *UserPackage) BeforeCreate(tx *gorm.DB) (err error) {
-	if up.ID == uuid.Nil {
-		up.ID = uuid.New()
-	}
-	return
-}
-
-// ===================================================================
 type Payment struct {
 	ID            uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	PackageID     uuid.UUID `gorm:"type:char(36);not null" json:"packageId"`
@@ -231,13 +137,6 @@ type Payment struct {
 	User    User    `gorm:"foreignKey:UserID" json:"user"`
 }
 
-func (p *Payment) BeforeCreate(tx *gorm.DB) (err error) {
-	if p.ID == uuid.Nil {
-		p.ID = uuid.New()
-	}
-	return
-}
-
 type ClassSchedule struct {
 	ID           uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	ClassID      uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
@@ -246,20 +145,14 @@ type ClassSchedule struct {
 	IsActive     bool           `gorm:"default:true" json:"isActive"`
 	Color        string         `gorm:"type:varchar(20)" json:"color"`
 	Date         time.Time      `gorm:"not null" json:"date"`
+	Booked       int            `gorm:"not null;default:0" json:"booked"`
 	StartHour    int            `json:"startHour"`
 	StartMinute  int            `json:"startMinute"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
-	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`
-	Booked     int        `gorm:"not null;default:0" json:"booked"`
-}
-
-func (cs *ClassSchedule) BeforeCreate(tx *gorm.DB) (err error) {
-	if cs.ID == uuid.Nil {
-		cs.ID = uuid.New()
-	}
-	return
+	Class       Class        `gorm:"foreignKey:ClassID" json:"class"`
+	Instructor  Instructor   `gorm:"foreignKey:InstructorID" json:"instructor"`
+	Attendances []Attendance `gorm:"foreignKey:ClassScheduleID;constraint:OnDelete:CASCADE" json:"attendances,omitempty"`
 }
 
 type ScheduleTemplate struct {
@@ -271,38 +164,13 @@ type ScheduleTemplate struct {
 	StartMinute  int            `gorm:"not null" json:"startMinute"`
 	Capacity     int            `gorm:"not null" json:"capacity"`
 	IsActive     bool           `gorm:"default:true" json:"isActive"`
+	Color        string         `gorm:"type:varchar(20)" json:"color"`
+	EndDate      *time.Time     `gorm:"default:null" json:"endDate"`
 	CreatedAt    time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
-	Color        string         `gorm:"type:varchar(20)" json:"color"`
 
 	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
 	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`
-}
-
-func (s *ScheduleTemplate) BeforeCreate(tx *gorm.DB) (err error) {
-	if s.ID == uuid.Nil {
-		s.ID = uuid.New()
-	}
-	return
-}
-
-type RecurrenceRule struct {
-	ID         uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
-	TemplateID uuid.UUID      `gorm:"type:char(36);not null;index" json:"templateId"`
-	Frequency  string         `gorm:"type:enum('recurring','non-recurring');not null" json:"frequency"`
-	EndType    string         `gorm:"type:enum('never','until');not null" json:"endType"` // never or until
-	EndDate    *time.Time     `json:"endDate,omitempty"`
-	CreatedAt  time.Time      `gorm:"autoCreateTime" json:"createdAt"`
-	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
-
-	Template ScheduleTemplate `gorm:"foreignKey:TemplateID"`
-}
-
-func (r *RecurrenceRule) BeforeCreate(tx *gorm.DB) (err error) {
-	if r.ID == uuid.Nil {
-		r.ID = uuid.New()
-	}
-	return
 }
 
 type Booking struct {
@@ -317,41 +185,18 @@ type Booking struct {
 	User          User          `gorm:"foreignKey:UserID" json:"user"`
 }
 
-func (b *Booking) BeforeCreate(tx *gorm.DB) (err error) {
-	if b.ID == uuid.Nil {
-		b.ID = uuid.New()
-	}
-	return
-}
-
 type Location struct {
-	ID          uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	Name        string    `gorm:"type:varchar(255);not null" json:"name"`
-	Address     string    `gorm:"type:varchar(255);not null" json:"address"`
-	GeoLocation string    `gorm:"type:varchar(255);not null" json:"geoLocation"`
-
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-}
-
-func (l *Location) BeforeCreate(tx *gorm.DB) (err error) {
-	if l.ID == uuid.Nil {
-		l.ID = uuid.New()
-	}
-	return
+	ID          uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	Name        string         `gorm:"type:varchar(255);not null" json:"name"`
+	Address     string         `gorm:"type:varchar(255);not null" json:"address"`
+	GeoLocation string         `gorm:"type:varchar(255);not null" json:"geoLocation"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 type Category struct {
-	ID   uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	Name string    `gorm:"type:varchar(255);not null" json:"name"`
-
+	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	Name      string         `gorm:"type:varchar(255);not null" json:"name"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-}
-
-func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
-	if c.ID == uuid.Nil {
-		c.ID = uuid.New()
-	}
-	return
 }
 
 type Subcategory struct {
@@ -360,14 +205,8 @@ type Subcategory struct {
 	CategoryID uuid.UUID      `gorm:"type:char(36);not null" json:"categoryId"`
 	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
 
+	// relasi
 	Category Category `gorm:"foreignKey:CategoryID"`
-}
-
-func (s *Subcategory) BeforeCreate(tx *gorm.DB) (err error) {
-	if s.ID == uuid.Nil {
-		s.ID = uuid.New()
-	}
-	return
 }
 
 type Type struct {
@@ -376,24 +215,10 @@ type Type struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
-func (t *Type) BeforeCreate(tx *gorm.DB) (err error) {
-	if t.ID == uuid.Nil {
-		t.ID = uuid.New()
-	}
-	return
-}
-
 type Level struct {
 	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	Name      string         `gorm:"type:varchar(255);not null" json:"name"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-}
-
-func (l *Level) BeforeCreate(tx *gorm.DB) (err error) {
-	if l.ID == uuid.Nil {
-		l.ID = uuid.New()
-	}
-	return
 }
 
 type Notification struct {
@@ -404,13 +229,6 @@ type Notification struct {
 	IsRead    bool           `gorm:"default:false" json:"isRead"`
 	CreatedAt time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-}
-
-func (n *Notification) BeforeCreate(tx *gorm.DB) (err error) {
-	if n.ID == uuid.Nil {
-		n.ID = uuid.New()
-	}
-	return
 }
 
 type Voucher struct {
@@ -427,22 +245,16 @@ type Voucher struct {
 }
 
 type Review struct {
-	ID        uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID    uuid.UUID `gorm:"type:char(36);not null" json:"userId"`
-	ClassID   uuid.UUID `gorm:"type:char(36);not null" json:"classId"`
-	Rating    int       `gorm:"not null" json:"rating"`
-	Comment   string    `gorm:"type:text" json:"comment"`
-	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
+	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID    uuid.UUID      `gorm:"type:char(36);not null" json:"userId"`
+	ClassID   uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
+	Rating    int            `gorm:"not null" json:"rating"`
+	Comment   string         `gorm:"type:text" json:"comment"`
+	CreatedAt time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
 	User  User  `gorm:"foreignKey:UserID" json:"user"`
 	Class Class `gorm:"foreignKey:ClassID" json:"class"`
-}
-
-func (r *Review) BeforeCreate(tx *gorm.DB) (err error) {
-	if r.ID == uuid.Nil {
-		r.ID = uuid.New()
-	}
-	return
 }
 
 type Attendance struct {
@@ -452,10 +264,9 @@ type Attendance struct {
 	Status          string         `gorm:"type:varchar(20);not null;check:status IN ('attended', 'absent')" json:"status"`
 	CheckedAt       *time.Time     `json:"checkedAt,omitempty"`
 	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	Verified        bool           `gorm:"default:false" json:"verified"`
+	VerifiedAt      *time.Time     `json:"verifiedAt"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
-
-	Verified   bool       `gorm:"default:false" json:"verified"`
-	VerifiedAt *time.Time `json:"verifiedAt"`
 
 	ClassSchedule ClassSchedule `gorm:"foreignKey:ClassScheduleID" json:"classSchedule"`
 	User          User          `gorm:"foreignKey:UserID"`
@@ -476,9 +287,174 @@ type Instructor struct {
 	User User `gorm:"foreignKey:UserID"`
 }
 
+func (up *UserPackage) BeforeCreate(tx *gorm.DB) (err error) {
+	if up.ID == uuid.Nil {
+		up.ID = uuid.New()
+	}
+	return
+}
+func (p *Payment) BeforeCreate(tx *gorm.DB) (err error) {
+	if p.ID == uuid.Nil {
+		p.ID = uuid.New()
+	}
+	return
+}
+func (cs *ClassSchedule) BeforeCreate(tx *gorm.DB) (err error) {
+	if cs.ID == uuid.Nil {
+		cs.ID = uuid.New()
+	}
+	return
+}
+
+func (s *ScheduleTemplate) BeforeCreate(tx *gorm.DB) (err error) {
+	if s.ID == uuid.Nil {
+		s.ID = uuid.New()
+	}
+	return
+}
+
+func (b *Booking) BeforeCreate(tx *gorm.DB) (err error) {
+	if b.ID == uuid.Nil {
+		b.ID = uuid.New()
+	}
+	return
+}
+func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
+	if c.ID == uuid.Nil {
+		c.ID = uuid.New()
+	}
+	return
+}
+func (s *Subcategory) BeforeCreate(tx *gorm.DB) (err error) {
+	if s.ID == uuid.Nil {
+		s.ID = uuid.New()
+	}
+	return
+}
 func (i *Instructor) BeforeCreate(tx *gorm.DB) (err error) {
 	if i.ID == uuid.Nil {
 		i.ID = uuid.New()
 	}
 	return
+}
+
+func (l *Location) BeforeCreate(tx *gorm.DB) (err error) {
+	if l.ID == uuid.Nil {
+		l.ID = uuid.New()
+	}
+	return
+}
+
+func (r *Review) BeforeCreate(tx *gorm.DB) (err error) {
+	if r.ID == uuid.Nil {
+		r.ID = uuid.New()
+	}
+	return
+}
+
+func (n *Notification) BeforeCreate(tx *gorm.DB) (err error) {
+	if n.ID == uuid.Nil {
+		n.ID = uuid.New()
+	}
+	return
+}
+
+func (l *Level) BeforeCreate(tx *gorm.DB) (err error) {
+	if l.ID == uuid.Nil {
+		l.ID = uuid.New()
+	}
+	return
+}
+
+func (t *Type) BeforeCreate(tx *gorm.DB) (err error) {
+	if t.ID == uuid.Nil {
+		t.ID = uuid.New()
+	}
+	return
+}
+
+func (p *Package) BeforeCreate(tx *gorm.DB) (err error) {
+	if p.ID == uuid.Nil {
+		p.ID = uuid.New()
+	}
+	return
+}
+
+func (p *Profile) BeforeCreate(tx *gorm.DB) (err error) {
+	if p.ID == uuid.Nil {
+		p.ID = uuid.New()
+	}
+	return
+}
+
+func (t *Token) BeforeCreate(tx *gorm.DB) (err error) {
+	if t.ID == uuid.Nil {
+		t.ID = uuid.New()
+	}
+	return
+}
+
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	if u.ID == uuid.Nil {
+		u.ID = uuid.New()
+	}
+	return
+}
+
+func (c *Class) BeforeCreate(tx *gorm.DB) (err error) {
+	if c.ID == uuid.Nil {
+		c.ID = uuid.New()
+	}
+	return
+}
+
+func (pc *PackageClass) BeforeCreate(tx *gorm.DB) (err error) {
+	if pc.ID == uuid.Nil {
+		pc.ID = uuid.New()
+	}
+	return
+}
+
+func (p *Package) BeforeSave(tx *gorm.DB) error {
+	if p.AdditionalList != nil {
+		data, err := json.Marshal(p.AdditionalList)
+		if err != nil {
+			return err
+		}
+		p.Additional = string(data)
+	}
+	return nil
+}
+
+func (c *Class) BeforeSave(tx *gorm.DB) (err error) {
+	if c.AdditionalList != nil {
+		jsonBytes, err := json.Marshal(c.AdditionalList)
+		if err != nil {
+			return err
+		}
+		c.Additional = string(jsonBytes)
+	}
+	return nil
+}
+
+func (c *Class) AfterFind(tx *gorm.DB) (err error) {
+	if c.Additional != "" {
+		var tags []string
+		if err := json.Unmarshal([]byte(c.Additional), &tags); err != nil {
+			return err
+		}
+		c.AdditionalList = tags
+	}
+	return nil
+}
+
+func (p *Package) AfterFind(tx *gorm.DB) error {
+	if p.Additional != "" {
+		var data []string
+		if err := json.Unmarshal([]byte(p.Additional), &data); err != nil {
+			return err
+		}
+		p.AdditionalList = data
+	}
+	return nil
 }

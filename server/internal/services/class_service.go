@@ -311,7 +311,6 @@ func (s *classService) UpdateClassGallery(classID uuid.UUID, keepImages []string
 		}
 	}
 
-	// Step 2: Simpan gambar baru jika ada
 	if len(newImageURLs) > 0 {
 		var newGalleries []models.ClassGallery
 		for _, url := range newImageURLs {

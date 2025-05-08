@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -117,4 +118,15 @@ func IsDayMatched(currentDay int, allowedDays []int) bool {
 		}
 	}
 	return false
+}
+
+// Mengubah string JSON ke []int: "[1,2,3]" -> []int{1, 2, 3}
+func ParseJSONToIntSlice(jsonStr string) []int {
+	var result []int
+	err := json.Unmarshal([]byte(jsonStr), &result)
+	if err != nil {
+		fmt.Printf("Failed to parse JSON string to []int: %v\n", err)
+		return []int{}
+	}
+	return result
 }
