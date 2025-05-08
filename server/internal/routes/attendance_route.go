@@ -13,6 +13,7 @@ func AttendanceRoutes(r *gin.Engine, h *handlers.AttendanceHandler) {
 
 	// customer attendance
 	attendance.GET("", h.GetAllAttendances)
+	attendance.GET("/:id", h.GetAttendanceDetail)
 	attendance.POST("/:id", h.CheckinAttendance)
 	attendance.GET("/:id/qr-code", h.RegenerateQRCode)
 

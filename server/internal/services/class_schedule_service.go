@@ -153,13 +153,13 @@ func (s *classScheduleService) GetAllClassSchedules() ([]dto.ClassScheduleRespon
 	for _, schedule := range schedules {
 		result = append(result, dto.ClassScheduleResponse{
 			ID: schedule.ID.String(),
-			Class: dto.ClassResponse{
+			Class: dto.ClassBrief{
 				ID:       schedule.Class.ID.String(),
 				Title:    schedule.Class.Title,
 				Image:    schedule.Class.Image,
 				Duration: schedule.Class.Duration,
 			},
-			Instructor: dto.InstructorResponse{
+			Instructor: dto.InstructorBrief{
 				ID:       schedule.Instructor.ID.String(),
 				Fullname: schedule.Instructor.User.Profile.Fullname,
 				Rating:   schedule.Instructor.Rating,
@@ -204,13 +204,13 @@ func (s *classScheduleService) GetClassScheduleByID(scheduleID, userID string) (
 	return &dto.ClassScheduleDetailResponse{
 		ClassScheduleResponse: dto.ClassScheduleResponse{
 			ID: schedule.ID.String(),
-			Class: dto.ClassResponse{
+			Class: dto.ClassBrief{
 				ID:       schedule.Class.ID.String(),
 				Title:    schedule.Class.Title,
 				Image:    schedule.Class.Image,
 				Duration: schedule.Class.Duration,
 			},
-			Instructor: dto.InstructorResponse{
+			Instructor: dto.InstructorBrief{
 				ID:       schedule.Instructor.ID.String(),
 				Fullname: schedule.Instructor.User.Profile.Fullname,
 				Rating:   schedule.Instructor.Rating,
@@ -238,13 +238,13 @@ func (s *classScheduleService) GetSchedulesByFilter(filter dto.ClassScheduleQuer
 	for _, schedule := range schedules {
 		result = append(result, dto.ClassScheduleResponse{
 			ID: schedule.ID.String(),
-			Class: dto.ClassResponse{
+			Class: dto.ClassBrief{
 				ID:       schedule.Class.ID.String(),
 				Title:    schedule.Class.Title,
 				Image:    schedule.Class.Image,
 				Duration: schedule.Class.Duration,
 			},
-			Instructor: dto.InstructorResponse{
+			Instructor: dto.InstructorBrief{
 				ID:       schedule.Instructor.ID.String(),
 				Fullname: schedule.Instructor.User.Profile.Fullname,
 				Rating:   schedule.Instructor.Rating,
@@ -275,13 +275,13 @@ func (s *classScheduleService) GetSchedulesWithBookingStatus(userID string) ([]d
 
 		result = append(result, dto.ClassScheduleResponse{
 			ID: schedule.ID.String(),
-			Class: dto.ClassResponse{
+			Class: dto.ClassBrief{
 				ID:       schedule.Class.ID.String(),
 				Title:    schedule.Class.Title,
 				Image:    schedule.Class.Image,
 				Duration: schedule.Class.Duration,
 			},
-			Instructor: dto.InstructorResponse{
+			Instructor: dto.InstructorBrief{
 				ID:       schedule.Instructor.ID.String(),
 				Fullname: schedule.Instructor.User.Profile.Fullname,
 				Rating:   schedule.Instructor.Rating,

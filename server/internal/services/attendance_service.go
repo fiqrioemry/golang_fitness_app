@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"server/internal/dto"
+	"server/internal/models"
 	"server/internal/repositories"
 	"server/internal/utils"
 	"time"
@@ -10,10 +11,12 @@ import (
 
 type AttendanceService interface {
 	MarkAbsentAttendances() error
-	GetQRCode(userID, bookingID string) (string, error)
-	GetAllAttendances(userID string) ([]dto.AttendanceResponse, error)
-	CheckinAttendance(userID string, bookingID string) (string, error)
+	GetBookingInfo(bookingID string) (*models.Booking, error)
 	ValidateQRCodeData(qr string) (*dto.AttendanceResponse, error)
+	CheckinAttendance(userID string, bookingID string) (string, error)
+	GetAllAttendances(userID string) ([]dto.AttendanceResponse, error)
+	GetQRCode(userID, bookingID string) (string, *models.Booking, error)
+	GetAttendanceDetail(scheduleID string) ([]dto.AttendanceDetailResponse, error)
 }
 
 type attendanceService struct {
@@ -23,6 +26,10 @@ type attendanceService struct {
 
 func NewAttendanceService(attendanceRepo repositories.AttendanceRepository, bookingRepo repositories.BookingRepository) AttendanceService {
 	return &attendanceService{attendanceRepo, bookingRepo}
+}
+
+func (s *attendanceService) GetBookingInfo(bookingID string) (*models.Booking, error) {
+	return s.bookingRepo.GetBookingByID(bookingID)
 }
 
 func (s *attendanceService) GetAllAttendances(userID string) ([]dto.AttendanceResponse, error) {
@@ -38,13 +45,13 @@ func (s *attendanceService) GetAllAttendances(userID string) ([]dto.AttendanceRe
 		}
 		result = append(result, dto.AttendanceResponse{
 			ID: a.ID.String(),
-			Class: dto.ClassResponse{
+			Class: dto.ClassBrief{
 				ID:       a.ClassSchedule.Class.ID.String(),
 				Title:    a.ClassSchedule.Class.Title,
 				Image:    a.ClassSchedule.Class.Image,
 				Duration: a.ClassSchedule.Class.Duration,
 			},
-			Instructor: dto.InstructorResponse{
+			Instructor: dto.InstructorBrief{
 				ID:       a.ClassSchedule.Instructor.ID.String(),
 				Fullname: a.ClassSchedule.Instructor.User.Profile.Fullname,
 				Rating:   a.ClassSchedule.Instructor.Rating,
@@ -91,6 +98,10 @@ func (s *attendanceService) CheckinAttendance(userID, bookingID string) (string,
 	if attendance.Status != "attended" {
 		return "", errors.New("attendance not marked properly")
 	}
+	booking.Status = "checked_in"
+	if err := s.bookingRepo.UpdateBookingStatus(booking.ID, booking.Status); err != nil {
+		return "", errors.New("failed to update booking status")
+	}
 
 	qr := utils.GenerateBase64QR(attendance.ID.String())
 	return qr, nil
@@ -111,18 +122,46 @@ func (s *attendanceService) MarkAbsentAttendances() error {
 	return nil
 }
 
-func (s *attendanceService) GetQRCode(userID, bookingID string) (string, error) {
-	attendance, err := s.attendanceRepo.FindByUserBooking(userID, bookingID)
+func (s *attendanceService) GetAttendanceDetail(scheduleID string) ([]dto.AttendanceDetailResponse, error) {
+	attendances, err := s.attendanceRepo.GetClassAttendance(scheduleID)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	if attendance.Status != "attended" {
-		return "", errors.New("attendance not marked yet")
+
+	var result []dto.AttendanceDetailResponse
+	for _, a := range attendances {
+		checkedAt := ""
+		if a.CheckedAt != nil {
+			checkedAt = a.CheckedAt.Format(time.RFC3339)
+		}
+		result = append(result, dto.AttendanceDetailResponse{
+			ID:        a.ID.String(),
+			Fullname:  a.User.Profile.Fullname,
+			Avatar:    a.User.Profile.Avatar,
+			CheckedAt: checkedAt,
+		})
 	}
-	qr := utils.GenerateBase64QR(attendance.ID.String())
-	return qr, nil
+
+	return result, nil
 }
 
+func (s *attendanceService) GetQRCode(userID, bookingID string) (string, *models.Booking, error) {
+	attendance, err := s.attendanceRepo.FindByUserBooking(userID, bookingID)
+	if err != nil {
+		return "", nil, err
+	}
+	if attendance.Status != "attended" {
+		return "", nil, errors.New("attendance not marked yet")
+	}
+	qr := utils.GenerateBase64QR(attendance.ID.String())
+
+	booking, err := s.bookingRepo.GetBookingByID(bookingID)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return qr, booking, nil
+}
 func (s *attendanceService) ValidateQRCodeData(qr string) (*dto.AttendanceResponse, error) {
 	data, err := utils.ParseQRPayload(qr)
 	if err != nil {
@@ -145,13 +184,13 @@ func (s *attendanceService) ValidateQRCodeData(qr string) (*dto.AttendanceRespon
 
 	return &dto.AttendanceResponse{
 		ID: attendance.ID.String(),
-		Class: dto.ClassResponse{
+		Class: dto.ClassBrief{
 			ID:       attendance.ClassSchedule.Class.ID.String(),
 			Title:    attendance.ClassSchedule.Class.Title,
 			Image:    attendance.ClassSchedule.Class.Image,
 			Duration: attendance.ClassSchedule.Class.Duration,
 		},
-		Instructor: dto.InstructorResponse{
+		Instructor: dto.InstructorBrief{
 			ID:       attendance.ClassSchedule.Instructor.ID.String(),
 			Fullname: attendance.ClassSchedule.Instructor.User.Profile.Fullname,
 			Rating:   attendance.ClassSchedule.Instructor.Rating,

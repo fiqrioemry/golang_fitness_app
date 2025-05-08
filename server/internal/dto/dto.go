@@ -408,17 +408,17 @@ type ScheduleTemplateToggleRequest struct {
 }
 
 type ClassScheduleResponse struct {
-	ID          string             `json:"id"`
-	Class       ClassResponse      `json:"class"`
-	Instructor  InstructorResponse `json:"instructor"`
-	Category    string             `json:"category"`
-	Date        time.Time          `json:"date"`
-	StartHour   int                `json:"startHour"`
-	StartMinute int                `json:"startMinute"`
-	Capacity    int                `json:"capacity"`
-	BookedCount int                `json:"bookedCount"`
-	Color       string             `json:"color"`
-	IsBooked    bool               `json:"isBooked"`
+	ID          string          `json:"id"`
+	Class       ClassBrief      `json:"class"`
+	Instructor  InstructorBrief `json:"instructor"`
+	Category    string          `json:"category"`
+	Date        time.Time       `json:"date"`
+	StartHour   int             `json:"startHour"`
+	StartMinute int             `json:"startMinute"`
+	Capacity    int             `json:"capacity"`
+	BookedCount int             `json:"bookedCount"`
+	Color       string          `json:"color"`
+	IsBooked    bool            `json:"isBooked"`
 }
 
 type ClassScheduleDetailResponse struct {
@@ -495,9 +495,16 @@ type BookingResponse struct {
 	Instructor  string `json:"instructor"`
 	Participant int    `json:"participant"`
 }
+type QRCodeAttendanceResponse struct {
+	QR         string `json:"qr"`
+	ClassTitle string `json:"classTitle"`
+	Date       string `json:"date"`
+	Instructor string `json:"instructor"`
+	StartTime  string `json:"startTime"`
+}
 
 // ATTENDANCE ==========================
-// dto.go
+
 type ValidateQRRequest struct {
 	QRCode string `json:"qrCode"`
 }
@@ -508,16 +515,36 @@ type MarkAttendanceRequest struct {
 }
 
 type AttendanceResponse struct {
-	ID          string             `json:"id"`
-	Class       ClassResponse      `json:"class"`
-	Instructor  InstructorResponse `json:"instructor"`
-	Fullname    string             `json:"fullname"`
-	Date        string             `json:"date"`
-	StartHour   int                `json:"startHour"`
-	StartMinute int                `json:"startMinute"`
-	Status      string             `json:"status"`
-	CheckedAt   string             `json:"checkedAt"`
-	Verified    bool               `json:"verified"`
+	ID          string          `json:"id"`
+	Class       ClassBrief      `json:"class"`
+	Instructor  InstructorBrief `json:"instructor"`
+	Fullname    string          `json:"fullname"`
+	Date        string          `json:"date"`
+	StartHour   int             `json:"startHour"`
+	StartMinute int             `json:"startMinute"`
+	Status      string          `json:"status"`
+	CheckedAt   string          `json:"checkedAt"`
+	Verified    bool            `json:"verified"`
+}
+
+type ClassBrief struct {
+	ID       string `json:"id"`
+	Title    string `json:"title"`
+	Image    string `json:"image"`
+	Duration int    `json:"duration"`
+}
+
+type InstructorBrief struct {
+	ID       string  `json:"id"`
+	Fullname string  `json:"fullname"`
+	Rating   float64 `json:"rating"`
+}
+
+type AttendanceDetailResponse struct {
+	ID        string `json:"id"`
+	Fullname  string `json:"fullname"`
+	Avatar    string `json:"avatar"`
+	CheckedAt string `json:"checkedAt"`
 }
 
 // ATTENDANCE ==========================

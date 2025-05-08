@@ -177,7 +177,7 @@ type Booking struct {
 	ID              uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	UserID          uuid.UUID      `gorm:"type:char(36);not null" json:"userId"`
 	ClassScheduleID uuid.UUID      `gorm:"type:char(36);not null" json:"classScheduleId"`
-	Status          string         `gorm:"type:varchar(50);not null;default:'booked'" json:"status"`
+	Status          string         `gorm:"type:varchar(50);not null;default:'booked';check:status IN ('booked','checked_in','canceled')" json:"status"`
 	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 

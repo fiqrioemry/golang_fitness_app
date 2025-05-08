@@ -11,6 +11,7 @@ import (
 type AttendanceRepository interface {
 	UpdateAttendance(att *models.Attendance) error
 	MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) error
+	GetClassAttendance(scheduleID string) ([]models.Attendance, error)
 	GetAllAttendancesByUser(userID string) ([]models.Attendance, error)
 	FindAllSchedulesBefore(t time.Time) ([]models.ClassSchedule, error)
 	MarkAsAttendance(userID string, bookingID string) (*models.Attendance, error)
@@ -28,7 +29,7 @@ func (r *attendanceRepository) GetAllAttendancesByUser(userID string) ([]models.
 	var attendances []models.Attendance
 	err := r.db.
 		Preload("ClassSchedule.Class").
-		Preload("ClassSchedule.Instructor").
+		Preload("ClassSchedule.Instructor.User.Profile").
 		Preload("User.Profile").
 		Where("user_id = ?", userID).
 		Find(&attendances).Error
@@ -44,6 +45,14 @@ func (r *attendanceRepository) FindByUserBooking(userID string, bookingID string
 	var attendance models.Attendance
 	err := r.db.Where("user_id = ? AND class_schedule_id = ?", userID, booking.ClassScheduleID).First(&attendance).Error
 	return &attendance, err
+}
+
+func (r *attendanceRepository) GetClassAttendance(scheduleID string) ([]models.Attendance, error) {
+	var attendances []models.Attendance
+	err := r.db.Preload("User.Profile").
+		Where("class_schedule_id = ?", scheduleID).
+		Find(&attendances).Error
+	return attendances, err
 }
 
 func (r *attendanceRepository) FindAllSchedulesBefore(t time.Time) ([]models.ClassSchedule, error) {
@@ -69,7 +78,6 @@ func (r *attendanceRepository) MarkAsAttendance(userID string, bookingID string)
 
 	now := time.Now()
 	if err == nil {
-		// update jika sudah ada
 		attendance.Status = "attended"
 		attendance.CheckedAt = &now
 		if err := r.db.Save(&attendance).Error; err != nil {
@@ -93,7 +101,9 @@ func (r *attendanceRepository) MarkAsAttendance(userID string, bookingID string)
 
 func (r *attendanceRepository) MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) error {
 	var bookings []models.Booking
-	err := r.db.Where("class_schedule_id = ?", scheduleID).Find(&bookings).Error
+	err := r.db.Where("class_schedule_id = ?", scheduleID).
+		Where("status != ?", "checked_in").
+		Find(&bookings).Error
 	if err != nil {
 		return err
 	}
