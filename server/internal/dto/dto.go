@@ -696,6 +696,16 @@ type CreateNotificationRequest struct {
 	Channel  string `json:"channel"` // "email" / "browser"
 }
 
+type NotificationResponse struct {
+	ID        string `json:"id"`
+	TypeCode  string `json:"typeCode"`
+	Title     string `json:"title"`
+	Message   string `json:"message"`
+	Channel   string `json:"channel"`
+	IsRead    bool   `json:"isRead"`
+	CreatedAt string `json:"createdAt"`
+}
+
 // VOUCHER
 type CreateVoucherRequest struct {
 	Code         string   `json:"code" binding:"required"`

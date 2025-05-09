@@ -17,6 +17,18 @@ func NewNotificationHandler(service services.NotificationService) *NotificationH
 	return &NotificationHandler{service}
 }
 
+func (h *NotificationHandler) GetAllNotifications(c *gin.Context) {
+	userID := utils.MustGetUserID(c)
+
+	notifications, err := h.service.GetAllNotifications(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to get notifications"})
+		return
+	}
+
+	c.JSON(http.StatusOK, notifications)
+}
+
 func (h *NotificationHandler) GetNotificationSettings(c *gin.Context) {
 	userID := utils.MustGetUserID(c)
 
@@ -44,18 +56,6 @@ func (h *NotificationHandler) UpdateNotificationSetting(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "updated"})
-}
-
-func (h *NotificationHandler) GetUnreadNotifications(c *gin.Context) {
-	userID := utils.MustGetUserID(c)
-
-	notifs, err := h.service.GetUnreadNotifications(userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch notifications"})
-		return
-	}
-
-	c.JSON(http.StatusOK, notifs)
 }
 
 func (h *NotificationHandler) MarkNotificationRead(c *gin.Context) {

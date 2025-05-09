@@ -982,14 +982,12 @@ func SeedReviews(db *gorm.DB) {
 }
 
 func SeedScheduleTemplate(db *gorm.DB) {
-	// Hapus semua recurrence rules
 	if err := db.Exec("DELETE FROM recurrence_rules").Error; err != nil {
 		log.Println("❌ Failed to clear recurrence_rules:", err)
 	} else {
 		log.Println("🧹 RecurrenceRules cleared")
 	}
 
-	// Hapus semua schedule templates
 	if err := db.Exec("DELETE FROM schedule_templates").Error; err != nil {
 		log.Println("❌ Failed to clear schedule_templates:", err)
 	} else {

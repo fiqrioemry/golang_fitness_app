@@ -8,15 +8,15 @@ import (
 )
 
 type NotificationRepository interface {
-	GetAllNotificationTypes() ([]models.NotificationType, error)
-	GetNotificationSettingsByUser(userID uuid.UUID) ([]models.NotificationSetting, error)
-	UpdateNotificationSetting(setting *models.NotificationSetting) error
-	FindSetting(userID, typeID uuid.UUID, channel string) (*models.NotificationSetting, error)
+	MarkNotificationRead(userID, notifID uuid.UUID) error
 	InsertNotifications(notifs []models.Notification) error
 	CreateNotification(notification *models.Notification) error
-	GetUserUnreadNotifications(userID uuid.UUID) ([]models.Notification, error)
-	MarkNotificationRead(userID, notifID uuid.UUID) error
+	GetAllNotificationTypes() ([]models.NotificationType, error)
+	UpdateNotificationSetting(setting *models.NotificationSetting) error
 	CreateNotificationSetting(setting *models.NotificationSetting) error
+	GetUserNotifications(userID uuid.UUID) ([]models.Notification, error)
+	GetNotificationSettingsByUser(userID uuid.UUID) ([]models.NotificationSetting, error)
+	FindSetting(userID, typeID uuid.UUID, channel string) (*models.NotificationSetting, error)
 }
 
 type notificationRepository struct {
@@ -25,6 +25,15 @@ type notificationRepository struct {
 
 func NewNotificationRepository(db *gorm.DB) NotificationRepository {
 	return &notificationRepository{db}
+}
+
+func (r *notificationRepository) GetUserNotifications(userID uuid.UUID) ([]models.Notification, error) {
+	var notifs []models.Notification
+	err := r.db.
+		Where("user_id = ?", userID).
+		Order("created_at DESC").
+		Find(&notifs).Error
+	return notifs, err
 }
 
 func (r *notificationRepository) GetAllNotificationTypes() ([]models.NotificationType, error) {
@@ -60,12 +69,6 @@ func (r *notificationRepository) InsertNotifications(notifs []models.Notificatio
 
 func (r *notificationRepository) CreateNotification(notification *models.Notification) error {
 	return r.db.Create(notification).Error
-}
-
-func (r *notificationRepository) GetUserUnreadNotifications(userID uuid.UUID) ([]models.Notification, error) {
-	var result []models.Notification
-	err := r.db.Where("user_id = ? AND is_read = false", userID).Order("created_at desc").Find(&result).Error
-	return result, err
 }
 
 func (r *notificationRepository) MarkNotificationRead(userID, notifID uuid.UUID) error {

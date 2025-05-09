@@ -4,6 +4,7 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -12,7 +13,7 @@ type NotificationService interface {
 	GetSettingsByUser(userID string) ([]dto.NotificationSettingResponse, error)
 	UpdateSetting(userID string, req dto.UpdateNotificationSettingRequest) error
 	CreateNotification(input dto.CreateNotificationRequest) error
-	GetUnreadNotifications(userID string) ([]models.Notification, error)
+	GetAllNotifications(userID string) ([]dto.NotificationResponse, error)
 	MarkAsRead(userID, notifID string) error
 }
 
@@ -72,10 +73,28 @@ func (s *notificationService) CreateNotification(input dto.CreateNotificationReq
 	return s.repo.CreateNotification(&notif)
 }
 
-func (s *notificationService) GetUnreadNotifications(userID string) ([]models.Notification, error) {
-	return s.repo.GetUserUnreadNotifications(uuid.MustParse(userID))
-}
-
 func (s *notificationService) MarkAsRead(userID, notifID string) error {
 	return s.repo.MarkNotificationRead(uuid.MustParse(userID), uuid.MustParse(userID))
+}
+
+func (s *notificationService) GetAllNotifications(userID string) ([]dto.NotificationResponse, error) {
+	notifs, err := s.repo.GetUserNotifications(uuid.MustParse(userID))
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.NotificationResponse
+	for _, n := range notifs {
+		result = append(result, dto.NotificationResponse{
+			ID:        n.ID.String(),
+			TypeCode:  n.TypeCode,
+			Title:     n.Title,
+			Message:   n.Message,
+			Channel:   n.Channel,
+			IsRead:    n.IsRead,
+			CreatedAt: n.CreatedAt.Format(time.RFC3339),
+		})
+	}
+
+	return result, nil
 }
