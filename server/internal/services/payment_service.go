@@ -20,20 +20,27 @@ type PaymentService interface {
 	GetAllUserPayments(query string, page, limit int) (*dto.AdminPaymentListResponse, error)
 	CreatePayment(userID string, req dto.CreatePaymentRequest) (*dto.CreatePaymentResponse, error)
 }
-
 type paymentService struct {
 	paymentRepo     repositories.PaymentRepository
 	packageRepo     repositories.PackageRepository
 	userPackageRepo repositories.UserPackageRepository
 	authRepo        repositories.AuthRepository
+	voucherService  VoucherService
 }
 
-func NewPaymentService(paymentRepo repositories.PaymentRepository, packageRepo repositories.PackageRepository, userPackageRepo repositories.UserPackageRepository, authRepo repositories.AuthRepository) PaymentService {
+func NewPaymentService(
+	paymentRepo repositories.PaymentRepository,
+	packageRepo repositories.PackageRepository,
+	userPackageRepo repositories.UserPackageRepository,
+	authRepo repositories.AuthRepository,
+	voucherService VoucherService,
+) PaymentService {
 	return &paymentService{
 		paymentRepo:     paymentRepo,
 		packageRepo:     packageRepo,
 		userPackageRepo: userPackageRepo,
 		authRepo:        authRepo,
+		voucherService:  voucherService,
 	}
 }
 
@@ -51,20 +58,36 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 	taxRate := utils.GetTaxRate()
 	discounted := pkg.Price * (1 - pkg.Discount/100)
 	base := discounted
+	var voucherCode *string
+	var voucherDiscount float64
+
+	if req.VoucherCode != nil {
+		apply, err := s.voucherService.ApplyVoucher(dto.ApplyVoucherRequest{
+			Code:  *req.VoucherCode,
+			Total: base,
+		})
+		if err == nil {
+			base = apply.FinalTotal
+			voucherCode = &apply.Code
+			voucherDiscount = apply.DiscountValue
+		}
+	}
 	tax := base * taxRate
 	total := base + tax
 
 	paymentID := uuid.New()
 	payment := models.Payment{
-		ID:            paymentID,
-		PackageID:     pkg.ID,
-		UserID:        uuid.MustParse(userID),
-		PaymentMethod: "-",
-		Status:        "pending",
-		PaidAt:        time.Now(),
-		BasePrice:     base,
-		Tax:           tax,
-		Total:         total,
+		ID:              paymentID,
+		PackageID:       pkg.ID,
+		UserID:          uuid.MustParse(userID),
+		PaymentMethod:   "-",
+		Status:          "pending",
+		PaidAt:          time.Now(),
+		BasePrice:       base,
+		Tax:             tax,
+		Total:           total,
+		VoucherCode:     voucherCode,
+		VoucherDiscount: voucherDiscount,
 	}
 
 	if err := s.paymentRepo.CreatePayment(&payment); err != nil {

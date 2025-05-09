@@ -118,30 +118,11 @@ func (h *ClassHandler) DeleteClass(c *gin.Context) {
 func (h *ClassHandler) GetClassByID(c *gin.Context) {
 	id := c.Param("id")
 
-	class, err := h.classService.GetClassByID(id)
+	classResponse, err := h.classService.GetClassByID(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Class not found"})
 		return
 	}
-
-	classResponse := dto.ClassDetailResponse{
-		ID:          class.ID,
-		Title:       class.Title,
-		Image:       class.Image,
-		IsActive:    class.IsActive,
-		Duration:    class.Duration,
-		Description: class.Description,
-		Additional:  class.Additional,
-		Type:        class.Type,
-		Level:       class.Level,
-		Location:    class.Location,
-		Category:    class.Category,
-		Subcategory: class.Subcategory,
-		CreatedAt:   class.CreatedAt,
-		Galleries:   class.Galleries,
-		Reviews:     class.Reviews,
-	}
-
 	c.JSON(http.StatusOK, classResponse)
 }
 

@@ -89,21 +89,20 @@ type ClassQueryParam struct {
 }
 
 type ClassDetailResponse struct {
-	ID          string           `json:"id"`
-	Title       string           `json:"title"`
-	Image       string           `json:"image"`
-	IsActive    bool             `json:"isActive"`
-	Duration    int              `json:"duration"`
-	Description string           `json:"description"`
-	Additional  []string         `json:"additional"`
-	Type        string           `json:"type"`
-	Level       string           `json:"level"`
-	Location    string           `json:"location"`
-	Category    string           `json:"category"`
-	Subcategory string           `json:"subcategory"`
-	Galleries   []string         `json:"galleries"`
-	Reviews     []ReviewResponse `json:"reviews"`
-	CreatedAt   string           `json:"createdAt"`
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	Image       string   `json:"image"`
+	IsActive    bool     `json:"isActive"`
+	Duration    int      `json:"duration"`
+	Description string   `json:"description"`
+	Additional  []string `json:"additional"`
+	Type        string   `json:"type"`
+	Level       string   `json:"level"`
+	Location    string   `json:"location"`
+	Category    string   `json:"category"`
+	Subcategory string   `json:"subcategory"`
+	Galleries   []string `json:"galleries"`
+	CreatedAt   string   `json:"createdAt"`
 }
 
 type GalleryResponse struct {
@@ -316,7 +315,8 @@ type InstructorResponse struct {
 
 // PAYMENT ================================
 type CreatePaymentRequest struct {
-	PackageID string `json:"packageId" binding:"required"`
+	PackageID   string  `json:"packageId" binding:"required"`
+	VoucherCode *string `json:"voucherCode"` // Optional
 }
 
 type CreatePaymentResponse struct {
@@ -707,6 +707,11 @@ type NotificationResponse struct {
 	CreatedAt string `json:"createdAt"`
 }
 
+type SendPromoNotificationRequest struct {
+	Title   string `json:"title" binding:"required"`
+	Message string `json:"message" binding:"required"`
+}
+
 // VOUCHER
 type CreateVoucherRequest struct {
 	Code         string   `json:"code" binding:"required"`
@@ -728,4 +733,18 @@ type VoucherResponse struct {
 	Quota        int      `json:"quota"`
 	ExpiredAt    string   `json:"expiredAt"`
 	CreatedAt    string   `json:"createdAt"`
+}
+
+type ApplyVoucherRequest struct {
+	Code  string  `json:"code" binding:"required"`
+	Total float64 `json:"total" binding:"required"`
+}
+
+type ApplyVoucherResponse struct {
+	Code          string   `json:"code"`
+	DiscountType  string   `json:"discountType"`
+	Discount      float64  `json:"discount"`
+	MaxDiscount   *float64 `json:"maxDiscount,omitempty"`
+	DiscountValue float64  `json:"discountValue"`
+	FinalTotal    float64  `json:"finalTotal"`
 }

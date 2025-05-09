@@ -48,7 +48,6 @@ func (r *classRepository) GetClassByID(id string) (*models.Class, error) {
 		Preload("Subcategory").
 		Preload("Location").
 		Preload("Galleries").
-		Preload("Reviews.User.Profile").
 		First(&class, "id = ?", id).Error; err != nil {
 		return nil, err
 	}

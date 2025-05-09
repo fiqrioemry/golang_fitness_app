@@ -10,6 +10,7 @@ type VoucherRepository interface {
 	Create(v *models.Voucher) error
 	GetAll() ([]models.Voucher, error)
 	GetByCode(code string) (*models.Voucher, error)
+	GetValidVoucherByCode(code string) (*models.Voucher, error)
 }
 
 type voucherRepository struct {
@@ -34,4 +35,15 @@ func (r *voucherRepository) GetByCode(code string) (*models.Voucher, error) {
 	var v models.Voucher
 	err := r.db.Where("code = ?", code).First(&v).Error
 	return &v, err
+}
+
+func (r *voucherRepository) GetValidVoucherByCode(code string) (*models.Voucher, error) {
+	var v models.Voucher
+	err := r.db.
+		Where("code = ? AND expired_at > NOW() AND quota > 0", code).
+		First(&v).Error
+	if err != nil {
+		return nil, err
+	}
+	return &v, nil
 }

@@ -8,14 +8,15 @@ import (
 )
 
 type NotificationRepository interface {
-	MarkNotificationRead(userID, notifID uuid.UUID) error
+	MarkAllNotificationsRead(userID uuid.UUID) error
 	InsertNotifications(notifs []models.Notification) error
 	CreateNotification(notification *models.Notification) error
 	GetAllNotificationTypes() ([]models.NotificationType, error)
 	UpdateNotificationSetting(setting *models.NotificationSetting) error
 	CreateNotificationSetting(setting *models.NotificationSetting) error
-	GetUserNotifications(userID uuid.UUID) ([]models.Notification, error)
+	GetAllBrowserNotifications(userID uuid.UUID) ([]models.Notification, error)
 	GetNotificationSettingsByUser(userID uuid.UUID) ([]models.NotificationSetting, error)
+	GetUsersWithEnabledPromoNotifications() ([]models.NotificationSetting, error)
 	FindSetting(userID, typeID uuid.UUID, channel string) (*models.NotificationSetting, error)
 }
 
@@ -27,19 +28,15 @@ func NewNotificationRepository(db *gorm.DB) NotificationRepository {
 	return &notificationRepository{db}
 }
 
-func (r *notificationRepository) GetUserNotifications(userID uuid.UUID) ([]models.Notification, error) {
-	var notifs []models.Notification
-	err := r.db.
-		Where("user_id = ?", userID).
-		Order("created_at DESC").
-		Find(&notifs).Error
-	return notifs, err
-}
-
 func (r *notificationRepository) GetAllNotificationTypes() ([]models.NotificationType, error) {
 	var types []models.NotificationType
 	err := r.db.Find(&types).Error
 	return types, err
+}
+func (r *notificationRepository) MarkAllNotificationsRead(userID uuid.UUID) error {
+	return r.db.Model(&models.Notification{}).
+		Where("user_id = ? AND is_read = ?", userID, false).
+		Update("is_read", true).Error
 }
 
 func (r *notificationRepository) GetNotificationSettingsByUser(userID uuid.UUID) ([]models.NotificationSetting, error) {
@@ -71,12 +68,26 @@ func (r *notificationRepository) CreateNotification(notification *models.Notific
 	return r.db.Create(notification).Error
 }
 
-func (r *notificationRepository) MarkNotificationRead(userID, notifID uuid.UUID) error {
-	return r.db.Model(&models.Notification{}).
-		Where("user_id = ? AND id = ?", userID, notifID).
-		Update("is_read", true).Error
-}
-
 func (r *notificationRepository) CreateNotificationSetting(setting *models.NotificationSetting) error {
 	return r.db.Create(setting).Error
+}
+
+func (r *notificationRepository) GetAllBrowserNotifications(userID uuid.UUID) ([]models.Notification, error) {
+	var notifs []models.Notification
+	err := r.db.
+		Where("user_id = ? AND channel = ?", userID, "browser").
+		Order("created_at DESC").
+		Find(&notifs).Error
+	return notifs, err
+}
+
+func (r *notificationRepository) GetUsersWithEnabledPromoNotifications() ([]models.NotificationSetting, error) {
+	var settings []models.NotificationSetting
+	err := r.db.
+		Preload("NotificationType").
+		Where("channel IN ?", []string{"browser", "email"}).
+		Where("enabled = ? AND notification_type_id IN (SELECT id FROM notification_types WHERE code = ?)", true, "promo_offer").
+		Find(&settings).Error
+
+	return settings, err
 }

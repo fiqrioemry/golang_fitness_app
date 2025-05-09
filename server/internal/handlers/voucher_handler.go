@@ -39,3 +39,18 @@ func (h *VoucherHandler) GetAllVouchers(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, vouchers)
 }
+func (h *VoucherHandler) ApplyVoucher(c *gin.Context) {
+	var req dto.ApplyVoucherRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload"})
+		return
+	}
+
+	res, err := h.service.ApplyVoucher(req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}

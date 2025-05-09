@@ -48,7 +48,7 @@ func (s *attendanceService) GetAllAttendances(userID string) ([]dto.AttendanceRe
 			return nil, err
 		}
 
-		reviewed := reviews == nil
+		reviewed := reviews != nil
 
 		checkedAt := ""
 		if a.CheckedAt != nil {

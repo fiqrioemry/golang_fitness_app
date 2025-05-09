@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
@@ -12,6 +13,7 @@ import (
 type VoucherService interface {
 	CreateVoucher(dto.CreateVoucherRequest) error
 	GetAllVouchers() ([]dto.VoucherResponse, error)
+	ApplyVoucher(req dto.ApplyVoucherRequest) (*dto.ApplyVoucherResponse, error)
 }
 
 type voucherService struct {
@@ -67,4 +69,35 @@ func (s *voucherService) GetAllVouchers() ([]dto.VoucherResponse, error) {
 	}
 
 	return result, nil
+}
+
+func (s *voucherService) ApplyVoucher(req dto.ApplyVoucherRequest) (*dto.ApplyVoucherResponse, error) {
+	voucher, err := s.repo.GetValidVoucherByCode(req.Code)
+	if err != nil {
+		return nil, errors.New("invalid or expired voucher")
+	}
+
+	var discountValue float64
+	if voucher.DiscountType == "percentage" {
+		discountValue = req.Total * (voucher.Discount / 100)
+		if voucher.MaxDiscount != nil && discountValue > *voucher.MaxDiscount {
+			discountValue = *voucher.MaxDiscount
+		}
+	} else if voucher.DiscountType == "fixed" {
+		discountValue = voucher.Discount
+		if discountValue > req.Total {
+			discountValue = req.Total
+		}
+	}
+
+	final := req.Total - discountValue
+
+	return &dto.ApplyVoucherResponse{
+		Code:          voucher.Code,
+		DiscountType:  voucher.DiscountType,
+		Discount:      voucher.Discount,
+		MaxDiscount:   voucher.MaxDiscount,
+		DiscountValue: discountValue,
+		FinalTotal:    final,
+	}, nil
 }

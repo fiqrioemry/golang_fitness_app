@@ -14,5 +14,6 @@ func NotificationRoutes(r *gin.Engine, h *handlers.NotificationHandler) {
 
 	route.GET("/settings", h.GetNotificationSettings)
 	route.PUT("/settings", h.UpdateNotificationSetting)
-	route.PATCH("/:id/read", h.MarkNotificationRead)
+	route.POST("/promo", h.SendPromoNotification)
+	route.PATCH("/read", h.MarkAllNotificationsAsRead)
 }

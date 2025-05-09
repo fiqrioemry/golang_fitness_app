@@ -171,19 +171,6 @@ func (s *classService) GetClassByID(id string) (*dto.ClassDetailResponse, error)
 	for _, g := range class.Galleries {
 		galleries = append(galleries, g.URL)
 	}
-
-	reviews := make([]dto.ReviewResponse, len(class.Reviews))
-	for i, r := range class.Reviews {
-		reviews[i] = dto.ReviewResponse{
-			ID:         r.ID.String(),
-			UserName:   r.User.Profile.Fullname,
-			ClassTitle: class.Title,
-			Rating:     r.Rating,
-			Comment:    r.Comment,
-			CreatedAt:  r.CreatedAt.Format(time.RFC3339),
-		}
-	}
-
 	return &dto.ClassDetailResponse{
 		ID:          class.ID.String(),
 		Title:       class.Title,
@@ -198,7 +185,6 @@ func (s *classService) GetClassByID(id string) (*dto.ClassDetailResponse, error)
 		Category:    class.Category.Name,
 		Subcategory: class.Subcategory.Name,
 		Galleries:   galleries,
-		Reviews:     reviews,
 		CreatedAt:   class.CreatedAt.Format(time.RFC3339),
 	}, nil
 

@@ -999,11 +999,10 @@ func SeedScheduleTemplate(db *gorm.DB) {
 
 func SeedNotificationTypes(db *gorm.DB) {
 	defaultTypes := []models.NotificationType{
-		{ID: uuid.New(), Code: "class_reminder", Title: "Class Reminder", Category: "reminder"},
-		{ID: uuid.New(), Code: "booking_success", Title: "Booking Successful", Category: "transaction"},
-		{ID: uuid.New(), Code: "daily_reminder", Title: "Daily Class Reminder", Category: "reminder"},
+		{ID: uuid.New(), Code: "system_message", Title: "System Announcement", Category: "announcement", DefaultEnabled: true}, // for login info, payment notification, booking success, and other
+		{ID: uuid.New(), Code: "class_reminder", Title: "Class Reminder", Category: "reminder", DefaultEnabled: false},
+		{ID: uuid.New(), Code: "daily_reminder", Title: "Daily Class Reminder", Category: "reminder", DefaultEnabled: false},
 		{ID: uuid.New(), Code: "promo_offer", Title: "New Promotion Available", Category: "promotion", DefaultEnabled: false},
-		{ID: uuid.New(), Code: "payment_success", Title: "Payment Successful", Category: "transaction"},
 	}
 	for _, t := range defaultTypes {
 		db.FirstOrCreate(&t, "code = ?", t.Code)
@@ -1030,5 +1029,40 @@ func generateNotificationSettingsForUser(db *gorm.DB, user models.User) {
 				log.Printf("❌ Failed to create notification setting for user %s: %v", user.Email, err)
 			}
 		}
+	}
+}
+
+func SeedDummyNotifications(db *gorm.DB) {
+	var user models.User
+	if err := db.Where("email = ?", "customer01@example.com").First(&user).Error; err != nil {
+		log.Println("❌ customer01@example.com not found")
+		return
+	}
+
+	notifications := []models.Notification{
+		{
+			ID:       uuid.New(),
+			UserID:   user.ID,
+			TypeCode: "class_reminder",
+			Title:    "Upcoming Class Reminder",
+			Message:  "Don't forget your class starts in 1 hour!",
+			Channel:  "browser",
+			IsRead:   false,
+		},
+		{
+			ID:       uuid.New(),
+			UserID:   user.ID,
+			TypeCode: "promo_offer",
+			Title:    "Special Promo Just for You",
+			Message:  "Get 20% off your next class using code: FIT20",
+			Channel:  "browser",
+			IsRead:   false,
+		},
+	}
+
+	if err := db.Create(&notifications).Error; err != nil {
+		log.Printf("❌ Failed to seed dummy notifications: %v", err)
+	} else {
+		log.Println("✅ Dummy notifications for customer01@example.com seeded!")
 	}
 }

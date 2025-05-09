@@ -99,7 +99,7 @@ func main() {
 	notificationService := services.NewNotificationService(notificationRepo)
 	instructorService := services.NewInstructorService(instructorRepo, authRepo)
 	attendanceService := services.NewAttendanceService(attendanceRepo, bookingRepo, reviewRepo)
-	paymentService := services.NewPaymentService(paymentRepo, packageRepo, userPackageRepo, authRepo)
+	paymentService := services.NewPaymentService(paymentRepo, packageRepo, userPackageRepo, authRepo, voucherService)
 	bookingService := services.NewBookingService(bookingRepo, classScheduleRepo, userPackageRepo, packageRepo)
 	scheduleTemplateService := services.NewScheduleTemplateService(scheduleTemplateRepo, classRepo, classScheduleRepo)
 	classScheduleService := services.NewClassScheduleService(classScheduleRepo, classRepo, packageRepo, userPackageRepo, bookingRepo)

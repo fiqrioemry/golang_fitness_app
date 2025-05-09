@@ -10,11 +10,12 @@ import (
 )
 
 type NotificationService interface {
-	GetSettingsByUser(userID string) ([]dto.NotificationSettingResponse, error)
-	UpdateSetting(userID string, req dto.UpdateNotificationSettingRequest) error
+	MarkAllAsRead(userID string) error
 	CreateNotification(input dto.CreateNotificationRequest) error
+	SendPromoNotification(req dto.SendPromoNotificationRequest) error
 	GetAllNotifications(userID string) ([]dto.NotificationResponse, error)
-	MarkAsRead(userID, notifID string) error
+	UpdateSetting(userID string, req dto.UpdateNotificationSettingRequest) error
+	GetSettingsByUser(userID string) ([]dto.NotificationSettingResponse, error)
 }
 
 type notificationService struct {
@@ -73,12 +74,8 @@ func (s *notificationService) CreateNotification(input dto.CreateNotificationReq
 	return s.repo.CreateNotification(&notif)
 }
 
-func (s *notificationService) MarkAsRead(userID, notifID string) error {
-	return s.repo.MarkNotificationRead(uuid.MustParse(userID), uuid.MustParse(userID))
-}
-
 func (s *notificationService) GetAllNotifications(userID string) ([]dto.NotificationResponse, error) {
-	notifs, err := s.repo.GetUserNotifications(uuid.MustParse(userID))
+	notifs, err := s.repo.GetAllBrowserNotifications(uuid.MustParse(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -97,4 +94,29 @@ func (s *notificationService) GetAllNotifications(userID string) ([]dto.Notifica
 	}
 
 	return result, nil
+}
+
+func (s *notificationService) MarkAllAsRead(userID string) error {
+	return s.repo.MarkAllNotificationsRead(uuid.MustParse(userID))
+}
+
+func (s *notificationService) SendPromoNotification(req dto.SendPromoNotificationRequest) error {
+	settings, err := s.repo.GetUsersWithEnabledPromoNotifications()
+	if err != nil {
+		return err
+	}
+
+	var notifs []models.Notification
+	for _, setting := range settings {
+		notifs = append(notifs, models.Notification{
+			ID:       uuid.New(),
+			UserID:   setting.UserID,
+			TypeCode: "promo_offer",
+			Title:    req.Title,
+			Message:  req.Message,
+			Channel:  setting.Channel,
+		})
+	}
+
+	return s.repo.InsertNotifications(notifs)
 }
