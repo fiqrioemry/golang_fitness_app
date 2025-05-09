@@ -24,11 +24,12 @@ func NewReviewService(repo repositories.ReviewRepository) ReviewService {
 
 func (s *reviewService) CreateReview(userID string, req dto.CreateReviewRequest) error {
 	review := models.Review{
-		ID:      uuid.New(),
-		UserID:  uuid.MustParse(userID),
-		ClassID: uuid.MustParse(req.ClassID),
-		Rating:  req.Rating,
-		Comment: req.Comment,
+		ID:        uuid.New(),
+		UserID:    uuid.MustParse(userID),
+		ClassID:   uuid.MustParse(req.ClassID),
+		Rating:    req.Rating,
+		Comment:   req.Comment,
+		CreatedAt: time.Now(),
 	}
 	return s.repo.CreateReview(&review)
 }

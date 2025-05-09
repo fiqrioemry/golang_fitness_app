@@ -62,6 +62,8 @@ func main() {
 	authRepo := repositories.NewAuthRepository(db)
 	userRepo := repositories.NewUserRepository(db)
 	typeRepo := repositories.NewTypeRepository(db)
+	voucherRepo := repositories.NewVoucherRepository(db)
+
 	classRepo := repositories.NewClassRepository(db)
 	levelRepo := repositories.NewLevelRepository(db)
 	reviewRepo := repositories.NewReviewRepository(db)
@@ -75,11 +77,13 @@ func main() {
 	attendanceRepo := repositories.NewAttendanceRepository(db)
 	subcategoryRepo := repositories.NewSubcategoryRepository(db)
 	userPackageRepo := repositories.NewUserPackageRepository(db)
+	notificationRepo := repositories.NewNotificationRepository(db)
 	classScheduleRepo := repositories.NewClassScheduleRepository(db)
 	scheduleTemplateRepo := repositories.NewScheduleTemplateRepository(db)
 
 	// ========== Service Layer ==========
-	authService := services.NewAuthService(authRepo)
+
+	authService := services.NewAuthService(authRepo, notificationRepo)
 	typeService := services.NewTypeService(typeRepo)
 	userService := services.NewUserService(userRepo)
 	classService := services.NewClassService(classRepo)
@@ -89,7 +93,10 @@ func main() {
 	packageService := services.NewPackageService(packageRepo)
 	locationService := services.NewLocationService(locationRepo)
 	categoryService := services.NewCategoryService(categoryRepo)
+	voucherService := services.NewVoucherService(voucherRepo)
+
 	subcategoryService := services.NewSubcategoryService(subcategoryRepo)
+	notificationService := services.NewNotificationService(notificationRepo)
 	instructorService := services.NewInstructorService(instructorRepo, authRepo)
 	attendanceService := services.NewAttendanceService(attendanceRepo, bookingRepo)
 	paymentService := services.NewPaymentService(paymentRepo, packageRepo, userPackageRepo, authRepo)
@@ -100,6 +107,7 @@ func main() {
 	// ========== Handler Layer ==========
 	authHandler := handlers.NewAuthHandler(authService)
 	userHandler := handlers.NewUserHandler(userService)
+	voucherHandler := handlers.NewVoucherHandler(voucherService)
 	typeHandler := handlers.NewTypeHandler(typeService)
 	levelHandler := handlers.NewLevelHandler(levelService)
 	classHandler := handlers.NewClassHandler(classService)
@@ -110,6 +118,7 @@ func main() {
 	packageHandler := handlers.NewPackageHandler(packageService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	locationHandler := handlers.NewLocationHandler(locationService)
+	notificationHandler := handlers.NewNotificationHandler(notificationService)
 	instructorHandler := handlers.NewInstructorHandler(instructorService)
 	attendanceHandler := handlers.NewAttendanceHandler(attendanceService)
 	subcategoryHandler := handlers.NewSubcategoryHandler(subcategoryService)
@@ -127,6 +136,7 @@ func main() {
 	routes.ClassRoutes(r, classHandler)
 	routes.LevelRoutes(r, levelHandler)
 	routes.ReviewRoutes(r, reviewHandler)
+	routes.VoucherRoutes(r, voucherHandler)
 	routes.PackageRoutes(r, packageHandler)
 	routes.ProfileRoutes(r, profileHandler)
 	routes.PaymentRoutes(r, paymentHandler)
@@ -135,9 +145,10 @@ func main() {
 	routes.LocationRoutes(r, locationHandler)
 	routes.InstructorRoutes(r, instructorHandler)
 	routes.SubcategoryRoutes(r, subcategoryHandler)
-	routes.ScheduleTemplateRoutes(r, scheduleTemplateHandler)
 	routes.AttendanceRoutes(r, attendanceHandler)
+	routes.NotificationRoutes(r, notificationHandler)
 	routes.ClassScheduleRoutes(r, classScheduleHandler)
+	routes.ScheduleTemplateRoutes(r, scheduleTemplateHandler)
 
 	// ========== Start Server ==========
 	port := os.Getenv("PORT")

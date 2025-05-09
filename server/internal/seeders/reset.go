@@ -89,6 +89,7 @@ func ResetDatabase(db *gorm.DB) {
 	SeedBookings(db)
 	SeedAttendances(db)
 	SeedReviews(db)
+	SeedNotificationTypes(db)
 
 	log.Println("✅ Seeding completed successfully.")
 }

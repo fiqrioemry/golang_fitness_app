@@ -9,11 +9,10 @@ import (
 	gomail "gopkg.in/gomail.v2"
 )
 
-func SendEmail(email, otpcode, body string) error {
+func SendEmail(subject, email, otpcode, body string) error {
 	m := gomail.NewMessage()
 
 	from := os.Getenv("USER_EMAIL")
-	subject := "One-Time Password (OTP) xxxxx"
 
 	m.SetHeader("From", fmt.Sprintf("fitness_app <%s>", from))
 	m.SetHeader("To", email)

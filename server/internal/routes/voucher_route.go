@@ -1,0 +1,17 @@
+package routes
+
+import (
+	"server/internal/handlers"
+	"server/internal/middleware"
+
+	"github.com/gin-gonic/gin"
+)
+
+func VoucherRoutes(r *gin.Engine, h *handlers.VoucherHandler) {
+	v := r.Group("/api/vouchers")
+	v.Use(middleware.AuthRequired())
+	{
+		v.GET("", h.GetAllVouchers)
+		v.POST("", middleware.AdminOnly(), h.CreateVoucher)
+	}
+}

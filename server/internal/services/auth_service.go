@@ -9,6 +9,8 @@ import (
 	"server/internal/repositories"
 	"server/internal/utils"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type AuthService interface {
@@ -22,11 +24,12 @@ type AuthService interface {
 }
 
 type authService struct {
-	repo repositories.AuthRepository
+	repo             repositories.AuthRepository
+	notificationRepo repositories.NotificationRepository
 }
 
-func NewAuthService(repo repositories.AuthRepository) AuthService {
-	return &authService{repo}
+func NewAuthService(repo repositories.AuthRepository, notificationRepo repositories.NotificationRepository) AuthService {
+	return &authService{repo: repo, notificationRepo: notificationRepo}
 }
 
 func (s *authService) SendOTP(email string) error {
@@ -35,10 +38,11 @@ func (s *authService) SendOTP(email string) error {
 		return errors.New("email already registered")
 	}
 
+	subject := "One-Time Password (OTP) xxxxx"
 	otp := utils.GenerateOTP(6)
 	body := fmt.Sprintf("Your OTP code is %s", otp)
 
-	err = utils.SendEmail(email, otp, body)
+	err = utils.SendEmail(subject, email, otp, body)
 	if err != nil {
 		return errors.New("failed to send email")
 	}
@@ -112,6 +116,8 @@ func (s *authService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, err
 	if err := s.repo.StoreRefreshToken(tokenModel); err != nil {
 		return nil, err
 	}
+
+	s.generateDefaultSettingsForUser(user.ID)
 
 	return &dto.AuthResponse{
 		AccessToken:  accessToken,
@@ -206,4 +212,21 @@ func (s *authService) RefreshToken(refreshToken string) (*dto.AuthResponse, erro
 		AccessToken:  accessToken,
 		RefreshToken: newRefreshToken,
 	}, nil
+}
+
+func (s *authService) generateDefaultSettingsForUser(userID uuid.UUID) {
+	notifTypes, _ := s.notificationRepo.GetAllNotificationTypes()
+
+	for _, nt := range notifTypes {
+		for _, channel := range []string{"email", "browser"} {
+			setting := models.NotificationSetting{
+				ID:                 uuid.New(),
+				UserID:             userID,
+				NotificationTypeID: nt.ID,
+				Channel:            channel,
+				Enabled:            nt.DefaultEnabled,
+			}
+			_ = s.notificationRepo.CreateNotificationSetting(&setting)
+		}
+	}
 }

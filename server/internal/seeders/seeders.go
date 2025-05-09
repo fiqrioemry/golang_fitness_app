@@ -183,7 +183,15 @@ func SeedUsers(db *gorm.DB) {
 		log.Println("Failed to seed instructors:", err)
 	}
 
-	log.Println("✅ User seeding completed!")
+	allUsers := []models.User{adminUser}
+	allUsers = append(allUsers, customerUsers...)
+	allUsers = append(allUsers, instructorUsers...)
+
+	for _, user := range allUsers {
+		generateNotificationSettingsForUser(db, user)
+	}
+
+	log.Println("✅ User seeding completed with notification settings!")
 }
 
 func SeedCategories(db *gorm.DB) {
@@ -989,4 +997,40 @@ func SeedScheduleTemplate(db *gorm.DB) {
 	}
 
 	log.Println("✅ ScheduleTemplate reset completed!")
+}
+
+func SeedNotificationTypes(db *gorm.DB) {
+	defaultTypes := []models.NotificationType{
+		{ID: uuid.New(), Code: "class_reminder", Title: "Class Reminder", Category: "reminder"},
+		{ID: uuid.New(), Code: "booking_success", Title: "Booking Successful", Category: "transaction"},
+		{ID: uuid.New(), Code: "daily_reminder", Title: "Daily Class Reminder", Category: "reminder"},
+		{ID: uuid.New(), Code: "promo_offer", Title: "New Promotion Available", Category: "promotion", DefaultEnabled: false},
+		{ID: uuid.New(), Code: "payment_success", Title: "Payment Successful", Category: "transaction"},
+	}
+	for _, t := range defaultTypes {
+		db.FirstOrCreate(&t, "code = ?", t.Code)
+	}
+}
+
+func generateNotificationSettingsForUser(db *gorm.DB, user models.User) {
+	var notifTypes []models.NotificationType
+	if err := db.Find(&notifTypes).Error; err != nil {
+		log.Printf("❌ Failed to get notification types for user %s: %v", user.Email, err)
+		return
+	}
+
+	for _, nt := range notifTypes {
+		for _, channel := range []string{"email", "browser"} {
+			setting := models.NotificationSetting{
+				ID:                 uuid.New(),
+				UserID:             user.ID,
+				NotificationTypeID: nt.ID,
+				Channel:            channel,
+				Enabled:            nt.DefaultEnabled,
+			}
+			if err := db.Create(&setting).Error; err != nil {
+				log.Printf("❌ Failed to create notification setting for user %s: %v", user.Email, err)
+			}
+		}
+	}
 }

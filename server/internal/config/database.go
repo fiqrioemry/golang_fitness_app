@@ -67,6 +67,8 @@ func InitDatabase() {
 		&models.Booking{},
 		&models.Payment{},
 		&models.Notification{},
+		&models.NotificationType{},
+		&models.NotificationSetting{},
 		&models.Voucher{},
 		&models.Review{},
 		&models.Attendance{},

@@ -672,3 +672,49 @@ type BookingListResponse struct {
 	Page     int               `json:"page"`
 	Limit    int               `json:"limit"`
 }
+
+// NOTIFICATIONS
+type NotificationSettingResponse struct {
+	TypeID  string `json:"typeId"`
+	Code    string `json:"code"`
+	Title   string `json:"title"`
+	Channel string `json:"channel"`
+	Enabled bool   `json:"enabled"`
+}
+
+type UpdateNotificationSettingRequest struct {
+	TypeID  string `json:"typeId" binding:"required"`
+	Channel string `json:"channel" binding:"required,oneof=email browser"`
+	Enabled bool   `json:"enabled"`
+}
+
+type CreateNotificationRequest struct {
+	UserID   string `json:"userId"`
+	TypeCode string `json:"typeCode"`
+	Title    string `json:"title"`
+	Message  string `json:"message"`
+	Channel  string `json:"channel"` // "email" / "browser"
+}
+
+// VOUCHER
+type CreateVoucherRequest struct {
+	Code         string   `json:"code" binding:"required"`
+	Description  string   `json:"description" binding:"required"`
+	DiscountType string   `json:"discountType" binding:"required,oneof=fixed percentage"`
+	Discount     float64  `json:"discount" binding:"required,gt=0"`
+	MaxDiscount  *float64 `json:"maxDiscount,omitempty"`
+	Quota        int      `json:"quota" binding:"required,gt=0"`
+	ExpiredAt    string   `json:"expiredAt" binding:"required,datetime=2006-01-02"`
+}
+
+type VoucherResponse struct {
+	ID           string   `json:"id"`
+	Code         string   `json:"code"`
+	Description  string   `json:"description"`
+	DiscountType string   `json:"discountType"`
+	Discount     float64  `json:"discount"`
+	MaxDiscount  *float64 `json:"maxDiscount,omitempty"`
+	Quota        int      `json:"quota"`
+	ExpiredAt    string   `json:"expiredAt"`
+	CreatedAt    string   `json:"createdAt"`
+}

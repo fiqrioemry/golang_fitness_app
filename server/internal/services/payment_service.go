@@ -96,12 +96,10 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 		return err
 	}
 
-	// Skip if already success
 	if payment.Status == "success" {
 		return nil
 	}
 
-	// Update payment method
 	payment.PaymentMethod = req.PaymentType
 
 	switch req.TransactionStatus {

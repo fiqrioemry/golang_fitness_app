@@ -221,16 +221,6 @@ type Level struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
-type Notification struct {
-	ID        uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID    uuid.UUID      `gorm:"type:char(36);not null;index" json:"userId"`
-	Title     string         `gorm:"type:varchar(255);not null" json:"title"`
-	Message   string         `gorm:"type:text;not null" json:"message"`
-	IsRead    bool           `gorm:"default:false" json:"isRead"`
-	CreatedAt time.Time      `gorm:"autoCreateTime" json:"createdAt"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-}
-
 type Voucher struct {
 	ID           uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	Code         string         `gorm:"type:varchar(100);uniqueIndex;not null" json:"code"`
@@ -285,6 +275,42 @@ type Instructor struct {
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 
 	User User `gorm:"foreignKey:UserID"`
+}
+
+type NotificationType struct {
+	ID             uuid.UUID      `gorm:"type:char(36);primaryKey"`
+	Code           string         `gorm:"unique;not null"`
+	Title          string         `gorm:"type:varchar(255);not null"`
+	Category       string         `gorm:"type:varchar(100)"`
+	DefaultEnabled bool           `gorm:"default:true"`
+	IsRequired     bool           `gorm:"default:false"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
+}
+
+type NotificationSetting struct {
+	ID                 uuid.UUID      `gorm:"type:char(36);primaryKey"`
+	UserID             uuid.UUID      `gorm:"type:char(36);index;not null"`
+	NotificationTypeID uuid.UUID      `gorm:"type:char(36);index;not null"`
+	Channel            string         `gorm:"type:varchar(20);not null;check:channel IN ('email','browser')"`
+	Enabled            bool           `gorm:"default:true"`
+	CreatedAt          time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt          time.Time      `gorm:"autoUpdateTime"`
+	DeletedAt          gorm.DeletedAt `gorm:"index"`
+
+	NotificationType NotificationType `gorm:"foreignKey:NotificationTypeID"`
+}
+
+type Notification struct {
+	ID        uuid.UUID      `gorm:"type:char(36);primaryKey"`
+	UserID    uuid.UUID      `gorm:"type:char(36);not null;index"`
+	TypeCode  string         `gorm:"type:varchar(100);not null"`
+	Title     string         `gorm:"type:varchar(255);not null"`
+	Message   string         `gorm:"type:text;not null"`
+	Channel   string         `gorm:"type:varchar(50);not null"`
+	IsRead    bool           `gorm:"default:false"`
+	CreatedAt time.Time      `gorm:"autoCreateTime"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 func (up *UserPackage) BeforeCreate(tx *gorm.DB) (err error) {

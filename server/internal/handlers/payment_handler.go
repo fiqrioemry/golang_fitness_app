@@ -45,7 +45,7 @@ func (h *PaymentHandler) HandlePaymentNotification(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Notification processed successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Payment succesfully"})
 }
 
 func (h *PaymentHandler) GetAllUserPayments(c *gin.Context) {
