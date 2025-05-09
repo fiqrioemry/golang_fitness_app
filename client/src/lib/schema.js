@@ -142,11 +142,6 @@ export const markAttendanceSchema = z.object({
   bookingId: z.string().min(1, "Booking ID is required"),
   status: z.enum(["attended", "absent", "cancelled"]),
 });
-export const reviewSchema = z.object({
-  classId: z.string().min(1, "Class is required"),
-  rating: z.number().min(1).max(5),
-  comment: z.string().optional(),
-});
 
 export const bookingSchema = z.object({
   classScheduleId: z.string().min(1, "Class Schedule is required"),
@@ -250,3 +245,47 @@ export const updateScheduleSchema = z.object({
   startMinute: z.number().max(59),
   capacity: requiredNumberField("Capacity", { min: 1 }),
 });
+
+export const createReviewSchema = z.object({
+  classId: z.string().min(1, "Class is required"),
+  rating: z
+    .number({
+      required_error: "Rating is required",
+      invalid_type_error: "Rating must be a number",
+    })
+    .min(1, "Minimum rating is 1")
+    .max(5, "Maximum rating is 5"),
+  comment: z.string().min(8, "Comment must be at least 8 characters"),
+});
+
+export const createVoucherSchema = z
+  .object({
+    code: z.string().min(1, "Code is required"),
+    description: z.string().min(1, "Description is required"),
+    discountType: z.enum(["fixed", "percentage"], {
+      required_error: "Discount type is required",
+      invalid_type_error: "Please select a valid discount type",
+    }),
+    discount: z
+      .number({ invalid_type_error: "Discount must be a number" })
+      .gt(0, "Discount must be greater than 0"),
+    maxDiscount: z
+      .number({ invalid_type_error: "Max discount must be a number" })
+      .optional()
+      .nullable(),
+    quota: z
+      .number({ invalid_type_error: "Quota must be a number" })
+      .gt(0, "Quota must be greater than 0"),
+    expiredAt: z.string().refine((val) => !isNaN(Date.parse(val)), {
+      message: "Expired date must be valid (YYYY-MM-DD)",
+    }),
+  })
+  .superRefine((val, ctx) => {
+    if (val.discountType === "percentage" && val.discount > 100) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["discount"],
+        message: "Percentage discount cannot exceed 100",
+      });
+    }
+  });

@@ -15,7 +15,7 @@ const UserTransactions = () => {
   const transactions = data.transactions || [];
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+    <section className="section p-8 space-y-6">
       <div className="space-y-1 text-center">
         <h2 className="text-2xl font-bold">Transaction History</h2>
         <p className="text-muted-foreground text-sm">

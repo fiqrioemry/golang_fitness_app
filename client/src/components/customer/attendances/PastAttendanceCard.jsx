@@ -1,16 +1,10 @@
-import {
-  ClockIcon,
-  UserIcon,
-  XCircleIcon,
-  CalendarIcon,
-  CheckCircleIcon,
-} from "lucide-react";
+import { CalendarIcon, ClockIcon, UserIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { format, parseISO, isBefore } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ReviewClass } from "./ReviewClass";
 
-export const AttendanceCard = ({ attendance }) => {
+export const PastAttendanceCard = ({ attendance }) => {
   const {
     class: classData,
     instructor,
@@ -19,7 +13,6 @@ export const AttendanceCard = ({ attendance }) => {
     startMinute,
     status,
     checkedAt,
-    verified,
     reviewed,
   } = attendance;
 
@@ -29,21 +22,14 @@ export const AttendanceCard = ({ attendance }) => {
   ).padStart(2, "0")}`;
   const checkedTime = checkedAt ? format(parseISO(checkedAt), "HH:mm") : "-";
 
-  const classEndTime = new Date(parseISO(date));
-  classEndTime.setHours(startHour + 1, startMinute);
-
-  const showReviewButton = isBefore(classEndTime, new Date()) && !reviewed;
-
   return (
-    <Card className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 shadow-sm border border-border bg-card">
-      {/* Kiri: Gambar */}
+    <Card className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 shadow-sm border border-border bg-muted/20">
       <img
         src={classData.image}
         alt={classData.title}
         className="w-full sm:w-48 h-32 object-cover rounded-xl"
       />
 
-      {/* Tengah: Info kelas */}
       <div className="flex-1 space-y-1">
         <CardTitle className="text-lg font-semibold">
           {classData.title}
@@ -63,9 +49,10 @@ export const AttendanceCard = ({ attendance }) => {
           <UserIcon className="w-4 h-4" />
           <span>{instructor.fullname}</span>
         </div>
+
+        {!reviewed && <ReviewClass cls={classData} />}
       </div>
 
-      {/* Kanan: Status */}
       <div className="flex flex-col gap-1 items-end w-full sm:w-48">
         <Badge
           variant={status === "attended" ? "success" : "destructive"}
@@ -76,18 +63,6 @@ export const AttendanceCard = ({ attendance }) => {
         <div className="text-xs text-muted-foreground">
           Checked at: <span className="font-medium">{checkedTime}</span>
         </div>
-        <div className="flex items-center gap-1 text-xs">
-          {verified ? (
-            <CheckCircleIcon className="text-green-600 w-4 h-4" />
-          ) : (
-            <XCircleIcon className="text-red-600 w-4 h-4" />
-          )}
-          <span className={verified ? "text-green-600" : "text-red-600"}>
-            {verified ? "Verified" : "Not Verified"}
-          </span>
-        </div>{" "}
-        {/* Tombol Review */}
-        {showReviewButton && <ReviewClass cls={classData} />}
       </div>
     </Card>
   );

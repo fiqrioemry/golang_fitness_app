@@ -1,32 +1,42 @@
-import React from "react";
-import { ArrowLeft, Star } from "lucide-react";
-import { useParams } from "react-router-dom";
+import React, { useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Star } from "lucide-react";
 import { Loading } from "@/components/ui/Loading";
 import { useClassDetailQuery } from "@/hooks/useClass";
 import { Card, CardContent } from "@/components/ui/card";
-import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { useClassReviewsQuery } from "@/hooks/useReview";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ClassDetail = () => {
   const { id } = useParams();
-  const { data: cls, isLoading, isError, refetch } = useClassDetailQuery(id);
 
-  if (isLoading) return <Loading />;
+  const navigate = useNavigate();
 
-  if (isError) return <ErrorDialog onRetry={refetch} />;
+  const { data: cls, isLoading, isError } = useClassDetailQuery(id);
+
+  const { data: reviews } = useClassReviewsQuery(cls?.id);
+
+  useEffect(() => {
+    if (!isLoading && (isError || !cls?.id)) {
+      navigate("/not-found", { replace: true });
+    }
+  }, [isLoading, isError, cls, navigate]);
+
+  if (isLoading || !cls?.id) return <Loading />;
 
   return (
     <section className="section py-24 text-foreground">
       <div className="mb-6">
         <button
-          onClick={() => history.back()}
+          onClick={() => navigate(-1)}
           className="flex items-center text-sm text-muted-foreground hover:text-primary transition"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
           Back to Classes
         </button>
       </div>
-      {/* Header Section */}
+
+      {/* Header */}
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         <img
           src={cls.image}
@@ -34,9 +44,8 @@ const ClassDetail = () => {
           className="w-full lg:w-1/2 h-64 object-cover rounded-2xl border"
         />
         <div className="space-y-4 w-full">
-          <h2 className="text-3xl font-bold text-foreground">{cls.title}</h2>
+          <h2 className="text-3xl font-bold">{cls.title}</h2>
           <p className="text-subtitle leading-relaxed">{cls.description}</p>
-
           <div className="flex flex-wrap gap-2">
             {cls.additional?.map((item, idx) => (
               <Badge key={idx} variant="outline">
@@ -44,7 +53,6 @@ const ClassDetail = () => {
               </Badge>
             ))}
           </div>
-
           <div className="text-sm text-muted-foreground space-y-1">
             <p>⏱ Duration: {cls.duration} minutes</p>
             <p>📍 Location: {cls.location}</p>
@@ -58,12 +66,10 @@ const ClassDetail = () => {
         </div>
       </div>
 
-      {/* Gallery Section */}
+      {/* Gallery */}
       {cls.galleries?.length > 0 && (
-        <div>
-          <h2 className="text-xl font-semibold text-foreground mb-4">
-            Gallery
-          </h2>
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold mb-4">Gallery</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {cls.galleries.map((url, idx) => (
               <img
@@ -77,28 +83,24 @@ const ClassDetail = () => {
         </div>
       )}
 
-      {/* Review Section */}
-      {cls.reviews?.length > 0 && (
-        <div>
-          <h2 className="text-xl font-semibold text-foreground mb-4">
-            Reviews
-          </h2>
+      {/* Reviews */}
+      {reviews?.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold mb-4">Reviews</h3>
           <div className="space-y-4">
-            {cls.reviews.map((review) => (
-              <Card key={review.id} className="card justify-start">
-                <CardContent className="p-4 flex items-start">
+            {reviews.map((review) => (
+              <Card key={review.id}>
+                <CardContent className="p-4">
                   <div className="flex justify-between items-center mb-1">
-                    <p className="font-medium text-foreground">
-                      {review.userName}
-                    </p>
-                    <div className="flex items-center text-yellow-500 gap-1">
+                    <p className="font-medium">{review.userName}</p>
+                    <div className="flex gap-1 text-yellow-500">
                       {[...Array(review.rating)].map((_, i) => (
                         <Star key={i} size={16} fill="currentColor" />
                       ))}
                     </div>
                   </div>
-                  <p className="text-sm text-subtitle">{review.comment}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-sm">{review.comment}</p>
+                  <p className="text-xs text-muted-foreground mt-1 italic">
                     {new Date(review.createdAt).toLocaleDateString()}
                   </p>
                 </CardContent>

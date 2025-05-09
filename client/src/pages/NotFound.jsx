@@ -15,7 +15,7 @@ const NotFound = () => {
         </p>
 
         <Link to="/">
-          <Button variant="primary">← Back to Homepage</Button>
+          <Button>← Back to Homepage</Button>
         </Link>
       </div>
     </section>

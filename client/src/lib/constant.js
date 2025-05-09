@@ -136,6 +136,16 @@ export const genderOptions = [
   { value: "female", label: "Female" },
 ];
 
+export const createVoucherState = {
+  code: "",
+  description: "",
+  discountType: "fixed",
+  discount: 0,
+  maxDiscount: null,
+  quota: 1,
+  expiredAt: "",
+};
+
 // seo setup
 export const scheduleTitle =
   "Discover and book fitness classes that fit your lifestyle. Explore real-time schedules with flexible times, expert instructors, and a variety of wellness programs at FitBook Studio.";

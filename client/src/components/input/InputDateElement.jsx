@@ -19,8 +19,8 @@ export const InputDateElement = ({
   const startMonth = today.getMonth() + 1;
   const startYearVal = today.getFullYear();
 
-  const startYear = mode === "future" ? startYearVal : startYearVal - ageLimit;
   const endYear = mode === "future" ? startYearVal + 5 : startYearVal;
+  const startYear = mode === "future" ? startYearVal : startYearVal - ageLimit;
 
   const getDaysInMonth = (month, year) => {
     if (!month || !year) return 31;

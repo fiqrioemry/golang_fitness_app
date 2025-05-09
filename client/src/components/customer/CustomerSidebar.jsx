@@ -21,6 +21,7 @@ import {
   Bell,
   User,
   LogOut,
+  Settings2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -88,6 +89,12 @@ const CustomerSidebar = () => {
             title="Notifications"
             icon={Bell}
             active={currentPath === "/profile/notifications"}
+          />
+          <NavItem
+            to="/profile/settings"
+            title="Settings"
+            icon={Settings2}
+            active={currentPath === "/profile/settings"}
           />
         </SidebarMenu>
       </SidebarContent>

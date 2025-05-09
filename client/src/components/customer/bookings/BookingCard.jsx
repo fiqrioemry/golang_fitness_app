@@ -71,7 +71,6 @@ export const BookingCard = ({ booking }) => {
     );
   }
 
-  console.log();
   return (
     <Card className="overflow-hidden border border-border bg-card shadow-md hover:shadow-xl transition">
       <div className="grid grid-cols-1 sm:grid-cols-[215px_1fr]">
@@ -82,8 +81,7 @@ export const BookingCard = ({ booking }) => {
         />
 
         <CardContent className="p-5 space-y-5">
-          {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="space-y-4">
             <div>
               <h3 className="text-lg font-bold text-foreground">
                 {booking.classTitle}
@@ -97,7 +95,6 @@ export const BookingCard = ({ booking }) => {
             </Badge>
           </div>
 
-          {/* Timing */}
           <div className="grid grid-cols-2 gap-6 text-sm">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -123,28 +120,31 @@ export const BookingCard = ({ booking }) => {
             </div>
           </div>
 
-          {/* Countdown */}
-          <div className="text-sm font-medium text-primary">
-            Starts in: {timeLeft} ⏳
-          </div>
+          {booking.status !== "checked_in" && (
+            <div className="text-sm font-medium text-primary">
+              Starts in: {timeLeft} ⏳
+            </div>
+          )}
 
-          {/* Attend Info Notice */}
-          {!canAttend && (
+          {booking.status !== "checked_in" && !canAttend && (
             <div className="flex items-center text-sm text-muted-foreground gap-2">
               <AlertCircleIcon className="w-4 h-4 text-yellow-500" />
               Attend button will be enabled 15 minutes before class.
             </div>
           )}
 
-          {/* Button */}
           <div className="pt-2">
             <Dialog open={showQR} onOpenChange={setShowQR}>
               <DialogTrigger asChild>
                 <Button
                   type="button"
                   className="w-full py-4"
-                  onClick={booking.attended ? handleShowQR : handleAttend}
-                  disabled={canAttend}
+                  onClick={
+                    booking.status === "checked_in"
+                      ? handleShowQR
+                      : handleAttend
+                  }
+                  disabled={booking.status !== "checked_in" && !canAttend}
                 >
                   {booking.status === "checked_in" ? (
                     <>
@@ -181,7 +181,6 @@ export const BookingCard = ({ booking }) => {
             </Dialog>
           </div>
 
-          {/* Footer */}
           <p className="text-xs text-muted-foreground text-right">
             Booked at {format(new Date(booking.bookedAt), "dd MMM yyyy, HH:mm")}
           </p>

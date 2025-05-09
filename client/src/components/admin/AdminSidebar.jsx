@@ -14,9 +14,9 @@ import {
   ShoppingCart,
   TicketPercent,
   MessageSquare,
-  ClipboardCheck,
   LogOut,
   Repeat,
+  PlusSquareIcon,
 } from "lucide-react";
 import {
   Accordion,
@@ -42,7 +42,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { WebLogo } from "../ui/WebLogo";
 
 const NavItem = ({ to, icon: Icon, title, active }) => (
   <Link
@@ -75,16 +74,6 @@ const directMenus = [
     title: "Transactions",
   },
   {
-    to: "/admin/vouchers",
-    icon: TicketPercent,
-    title: "Vouchers",
-  },
-  {
-    to: "/admin/reviews",
-    icon: MessageSquare,
-    title: "Reviews",
-  },
-  {
     to: "/admin/notifications",
     icon: Bell,
     title: "Notifications",
@@ -92,6 +81,19 @@ const directMenus = [
 ];
 
 const accordionMenus = [
+  {
+    value: "vouchers",
+    icon: TicketPercent,
+    title: "Vouchers",
+    children: [
+      { to: "/admin/vouchers", title: "Vouchers List", icon: List },
+      {
+        to: "/admin/vouchers/add",
+        title: "New Vouchers",
+        icon: PlusSquareIcon,
+      },
+    ],
+  },
   {
     value: "instructor",
     icon: BookUser,

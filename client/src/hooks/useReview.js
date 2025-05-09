@@ -3,20 +3,12 @@ import { toast } from "sonner";
 import * as reviewService from "@/services/review";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// =====================
-// QUERY: GET REVIEWS BY CLASS ID
-// =====================
-
 export const useClassReviewsQuery = (classId) =>
   useQuery({
     queryKey: ["reviews", classId],
     queryFn: () => reviewService.getReviewsByClass(classId),
     enabled: !!classId,
   });
-
-// =====================
-// MUTATION: CREATE REVIEW (Auth Required)
-// =====================
 
 export const useCreateReviewMutation = () => {
   const qc = useQueryClient();
@@ -26,6 +18,7 @@ export const useCreateReviewMutation = () => {
     onSuccess: (_, { classId }) => {
       toast.success("Review submitted successfully");
       qc.invalidateQueries({ queryKey: ["reviews", classId] });
+      qc.invalidateQueries({ queryKey: ["attendances"] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Failed to submit review");

@@ -1,5 +1,5 @@
-import * as attendService from "@/services/attendance";
 import { toast } from "sonner";
+import * as attendService from "@/services/attendance";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useAttendancesQuery = () =>
@@ -23,6 +23,7 @@ export const useAttendanceMutation = () => {
     onSuccess: () => {
       toast.success(msg);
       qc.invalidateQueries({ queryKey: ["attendances"] });
+      qc.invalidateQueries({ queryKey: ["user", "bookings"] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Something went wrong");

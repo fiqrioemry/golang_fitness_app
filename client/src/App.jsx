@@ -14,9 +14,10 @@ import ScheduleDetail from "./pages/ScheduleDetail";
 // admin pages
 import Dashboard from "./pages/admin/Dashboard";
 import UsersList from "./pages/admin/UsersList";
-import AddClass from "./pages/admin/classes/AddClass";
+import ClassAdd from "./pages/admin/classes/ClassAdd";
 import BookingsList from "./pages/admin/BookingsList";
-import VouchersList from "./pages/admin/VouchersList";
+import VouchersAdd from "./pages/admin/vouchers/VouchersAdd";
+import VouchersList from "./pages/admin/vouchers/VouchersList";
 import ReviewsLists from "./pages/admin/ReviewsLists";
 import AddPackage from "./pages/admin/packages/AddPackage";
 import ClassesList from "./pages/admin/classes/ClassesList";
@@ -33,6 +34,7 @@ import ValidateAttendancePage from "./pages/admin/ValidateAttendancePage";
 // customer pages
 import Profile from "./pages/customer/Profile";
 import UserBookings from "./pages/customer/UserBookings";
+import UserSettings from "./pages/customer/UserSettings";
 import UserPackages from "./pages/customer/UserPackages";
 import UserAttendances from "./pages/customer/UserAttendances";
 import UserTransactions from "./pages/customer/UserTransactions";
@@ -120,8 +122,8 @@ function App() {
           <Route index element={<Profile />} />
           <Route path="packages" element={<UserPackages />} />
           <Route path="bookings" element={<UserBookings />} />
+          <Route path="settings" element={<UserSettings />} />
           <Route path="attendances" element={<UserAttendances />} />
-
           <Route path="transactions" element={<UserTransactions />} />
           <Route path="notifications" element={<UserNotifications />} />
         </Route>
@@ -137,22 +139,28 @@ function App() {
         >
           <Route path="users" element={<UsersList />} />
           <Route path="dashboard" element={<Dashboard />} />
+          {/* classes */}
           <Route path="classes" element={<ClassesList />} />
-          <Route path="classes/add" element={<AddClass />} />
-          <Route path="reviews" element={<ReviewsLists />} />
+          <Route path="classes/add" element={<ClassAdd />} />
+          <Route path="classes/options" element={<ClassOptions />} />
+          <Route path="classes/recuring" element={<ClassRecuring />} />
+          <Route path="classes/schedules" element={<ClassSchedules />} />
+          {/* vouchers */}
           <Route path="vouchers" element={<VouchersList />} />
-          <Route path="bookings" element={<BookingsList />} />
+          <Route path="vouchers/add" element={<VouchersAdd />} />
+          {/* packages */}
           <Route path="packages" element={<PackagesList />} />
+          <Route path="packages/add" element={<AddPackage />} />
+          {/* instructors */}
+          <Route path="instructors" element={<InstructorsList />} />
+          <Route path="instructors/add" element={<AddInstructors />} />
+
+          <Route path="reviews" element={<ReviewsLists />} />
+          <Route path="bookings" element={<BookingsList />} />
+          <Route path="transactions" element={<TransactionsList />} />
+          <Route path="notifications" element={<NotificationsList />} />
           <Route path="validate" element={<ValidateAttendancePage />} />
 
-          <Route path="packages/add" element={<AddPackage />} />
-          <Route path="instructors" element={<InstructorsList />} />
-          <Route path="classes/options" element={<ClassOptions />} />
-          <Route path="transactions" element={<TransactionsList />} />
-          <Route path="instructors/add" element={<AddInstructors />} />
-          <Route path="notifications" element={<NotificationsList />} />
-          <Route path="classes/schedules" element={<ClassSchedules />} />
-          <Route path="classes/recuring" element={<ClassRecuring />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 

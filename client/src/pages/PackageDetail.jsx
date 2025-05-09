@@ -1,32 +1,62 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import { Loading } from "@/components/ui/Loading";
-import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { useAuthStore } from "@/store/useAuthStore";
 import { usePackageDetailQuery } from "@/hooks/usePackage";
 import { usePackageTransaction } from "@/hooks/usePackageTransaction";
+import { useApplyVoucherMutation } from "@/hooks/useVouchers";
 import { MidtransScriptLoader } from "@/components/midtrans/MidtransScriptLoader";
 
 const PackageDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const [voucherCode, setVoucherCode] = useState("");
+  const [voucherInfo, setVoucherInfo] = useState(null);
 
-  const { data: pkg, isLoading, isError, refetch } = usePackageDetailQuery(id);
+  const { data: pkg, isLoading, isError } = usePackageDetailQuery(id);
+  const { mutate: applyVoucher, isPending: applying } =
+    useApplyVoucherMutation();
+  const { handleBuyNow, isPending: buying } = usePackageTransaction(
+    id,
+    voucherInfo?.code
+  );
 
-  const { handleBuyNow, isPending } = usePackageTransaction(id);
+  useEffect(() => {
+    if (!isLoading && (isError || !pkg?.id)) {
+      navigate("/not-found", { replace: true });
+    }
+  }, [isLoading, isError, pkg, navigate]);
 
-  if (isLoading) return <Loading />;
-
-  if (isError) return <ErrorDialog onRetry={refetch} />;
+  if (isLoading || !pkg?.id) return <Loading />;
 
   const discountedPrice =
-    pkg.Discount && pkg.Discount > 0
-      ? pkg.price * (1 - pkg.Discount / 100)
-      : pkg.price;
-  const tax = discountedPrice * 0.1;
+    pkg.Discount > 0 ? pkg.price * (1 - pkg.Discount / 100) : pkg.price;
+  const voucherDiscount = voucherInfo?.discountValue || 0;
+  const priceAfterVoucher = discountedPrice - voucherDiscount;
+  const tax = priceAfterVoucher * 0.1;
+  const finalTotal = priceAfterVoucher + tax;
 
-  const totalPrice = discountedPrice + tax;
+  const handleApplyVoucher = () => {
+    if (!voucherCode.trim()) return;
+    applyVoucher(
+      { userId: user?.id, code: voucherCode, total: priceAfterVoucher },
+      {
+        onSuccess: (res) => {
+          setVoucherInfo(res);
+          toast.success(`Voucher "${res.code}" applied`);
+        },
+        onError: () => {
+          setVoucherInfo(null);
+        },
+      }
+    );
+  };
 
   return (
     <>
@@ -34,7 +64,7 @@ const PackageDetail = () => {
       <section className="section py-24 text-foreground">
         <div className="mb-6">
           <button
-            onClick={() => history.back()}
+            onClick={() => navigate(-1)}
             className="flex items-center text-sm text-muted-foreground hover:text-primary transition"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
@@ -43,105 +73,42 @@ const PackageDetail = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
-          {/* Left Content */}
+          {/* LEFT */}
           <div className="md:col-span-2 space-y-5">
             <img
               src={pkg.image}
               alt={pkg.name}
-              className="rounded-xl w-full h-[400px] object-cover border border-border shadow"
+              className="rounded-xl w-full h-[400px] object-cover border"
             />
 
-            <div>
-              <h2 className="text-3xl font-bold">{pkg.name}</h2>
-              <p className="text-muted-foreground text-sm mt-1">
-                {pkg.description}
-              </p>
+            <h2 className="text-3xl font-bold">{pkg.name}</h2>
+            <p className="text-muted-foreground text-sm">{pkg.description}</p>
 
-              <div className="mt-2 flex items-center gap-2 flex-wrap">
-                <Badge variant="outline">
-                  {pkg.credit} Credits •{" "}
-                  {pkg.Discount > 0 ? (
-                    <>
-                      <span className="line-through text-muted ml-1">
-                        Rp {pkg.price.toLocaleString("id-ID")}
-                      </span>
-                      <span className="ml-2 text-red-600 font-semibold">
-                        Rp {discountedPrice.toLocaleString("id-ID")}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="ml-1">
-                      Rp {pkg.price.toLocaleString("id-ID")}
-                    </span>
-                  )}
+            <div className="mt-2 flex items-center gap-2 flex-wrap">
+              <Badge variant="outline">
+                {pkg.credit} Credits • Rp {pkg.price.toLocaleString("id-ID")}
+              </Badge>
+              {pkg.Discount > 0 && (
+                <Badge className="bg-green-600 text-white">
+                  {pkg.Discount}% Discount
                 </Badge>
-                {pkg.Discount > 0 && (
-                  <Badge className="bg-green-600 text-white">
-                    {pkg.Discount}% Discount
-                  </Badge>
-                )}
-              </div>
+              )}
             </div>
 
-            <div className="space-y-2 text-sm">
-              <p>
-                <span className="font-medium">Duration:</span> Valid for{" "}
-                <span className="text-primary">{pkg.expired}</span> days
-              </p>
-              <ul className="list-disc text-muted-foreground pl-5">
-                {pkg.additional?.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-
-            {pkg.classes?.length > 0 && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-3">
-                  🧘 Classes Included
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {pkg.classes.map((cls) => (
-                    <div
-                      key={cls.id}
-                      className="flex items-center gap-4 bg-muted/50 border border-border rounded-xl p-3"
-                    >
-                      <img
-                        src={cls.image}
-                        alt={cls.title}
-                        className="w-16 h-16 rounded object-cover border border-border"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">{cls.title}</p>
-                        <p className="text-muted-foreground text-xs">
-                          {cls.duration} minutes
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <ul className="list-disc text-muted-foreground pl-5">
+              {pkg.additional?.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
           </div>
 
-          {/* Checkout */}
-          <div className="bg-card border border-border shadow-md rounded-2xl p-5 sticky top-24 space-y-4">
+          {/* RIGHT */}
+          <div className="bg-card border shadow-md rounded-2xl p-5 sticky top-24 space-y-4">
             <h3 className="text-xl font-semibold mb-1">Checkout</h3>
 
-            <div className="text-sm text-muted-foreground items-center flex justify-between">
+            <div className="text-sm flex justify-between text-muted-foreground">
               <span>Base Price</span>
-              {pkg.Discount > 0 ? (
-                <span>
-                  <span className="line-through text-muted-foreground mr-1">
-                    Rp {pkg.price.toLocaleString("id-ID")}
-                  </span>
-                  <span className="text-red-600 font-semibold text-lg">
-                    Rp {discountedPrice.toLocaleString("id-ID")}
-                  </span>
-                </span>
-              ) : (
-                <span>Rp {pkg.price.toLocaleString("id-ID")}</span>
-              )}
+              <span>Rp {pkg.price.toLocaleString("id-ID")}</span>
             </div>
 
             {pkg.Discount > 0 && (
@@ -151,9 +118,34 @@ const PackageDetail = () => {
               </div>
             )}
 
-            <div className="text-sm text-muted-foreground flex justify-between">
+            <div className="text-sm flex justify-between text-muted-foreground">
               <span>Tax (10%)</span>
               <span>Rp {tax.toLocaleString("id-ID")}</span>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Promo Code</label>
+              <div className="flex items-center gap-2">
+                <Input
+                  value={voucherCode}
+                  onChange={(e) => setVoucherCode(e.target.value)}
+                  placeholder="Enter code"
+                  className="flex-1"
+                />
+                <Button
+                  size="sm"
+                  onClick={handleApplyVoucher}
+                  disabled={applying}
+                >
+                  Apply
+                </Button>
+              </div>
+              {voucherInfo && (
+                <p className="text-xs text-green-600">
+                  Applied: {voucherInfo.code} (Save Rp{" "}
+                  {voucherDiscount.toLocaleString("id-ID")})
+                </p>
+              )}
             </div>
 
             <hr />
@@ -161,17 +153,17 @@ const PackageDetail = () => {
             <div className="text-base font-semibold flex justify-between">
               <span>Total</span>
               <span className="text-primary">
-                Rp {totalPrice.toLocaleString("id-ID")}
+                Rp {finalTotal.toLocaleString("id-ID")}
               </span>
             </div>
 
             <Button
               size="lg"
-              disabled={isPending}
+              disabled={buying}
               className="w-full mt-2"
               onClick={handleBuyNow}
             >
-              {isPending ? "Processing..." : "Buy Now"}
+              {buying ? "Processing..." : "Buy Now"}
             </Button>
           </div>
         </div>

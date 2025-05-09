@@ -15,7 +15,6 @@ const UserBookings = () => {
 
   const bookings = data || [];
 
-  console.log(bookings);
   return (
     <section className="section p-8 space-y-6">
       <div className="space-y-1 text-center">

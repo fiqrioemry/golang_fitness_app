@@ -7,26 +7,38 @@ export const TransactionCard = ({ transactions }) => {
   return (
     <div className="space-y-4">
       {transactions.map((tx) => (
-        <Card key={tx.id} className="card card-hover p-0">
-          <CardContent className="p-5">
-            <div className="flex justify-between items-start gap-4">
-              <div className="space-y-1">
-                <h3 className="text-base font-semibold text-foreground">
-                  {tx.packageName}
-                </h3>
-                <p className="text-subtitle">
-                  Paid at: {formatDateTime(tx.paidAt)}
-                </p>
-                <p className="text-subtitle">
-                  Method: {tx.paymentMethod.toUpperCase()}
-                </p>
+        <Card
+          key={tx.id}
+          className="border border-border bg-card shadow-sm hover:shadow-md transition"
+        >
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-6">
+              {/* Package Name */}
+              <div className="flex-1 text-sm font-medium text-foreground truncate">
+                {tx.packageName}
               </div>
 
-              <div className="text-right space-y-1">
-                <p className="text-lg font-semibold text-primary">
-                  {formatRupiah(tx.price)}
-                </p>
-                <Badge variant="success" className="capitalize text-xs">
+              {/* Paid At */}
+              <div className="text-sm text-muted-foreground whitespace-nowrap">
+                {formatDateTime(tx.paidAt)}
+              </div>
+
+              {/* Method */}
+              <div className="text-sm text-muted-foreground whitespace-nowrap uppercase">
+                {tx.paymentMethod}
+              </div>
+
+              {/* Price */}
+              <div className="text-sm font-semibold text-primary whitespace-nowrap">
+                {formatRupiah(tx.price)}
+              </div>
+
+              {/* Status */}
+              <div className="whitespace-nowrap">
+                <Badge
+                  variant={tx.status === "success" ? "success" : "outline"}
+                  className="capitalize text-xs"
+                >
                   {tx.status}
                 </Badge>
               </div>

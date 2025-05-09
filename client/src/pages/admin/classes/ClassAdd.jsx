@@ -10,7 +10,7 @@ import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
 
-const AddClass = () => {
+const ClassAdd = () => {
   const { createClass } = useClassMutation();
 
   return (
@@ -112,4 +112,4 @@ const AddClass = () => {
   );
 };
 
-export default AddClass;
+export default ClassAdd;
