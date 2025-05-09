@@ -19,7 +19,7 @@ import BookingsList from "./pages/admin/BookingsList";
 import VouchersAdd from "./pages/admin/vouchers/VouchersAdd";
 import VouchersList from "./pages/admin/vouchers/VouchersList";
 import ReviewsLists from "./pages/admin/ReviewsLists";
-import AddPackage from "./pages/admin/packages/AddPackage";
+import PackageAdd from "./pages/admin/packages/PackageAdd";
 import ClassesList from "./pages/admin/classes/ClassesList";
 import ClassOptions from "./pages/admin/classes/ClassOptions";
 import TransactionsList from "./pages/admin/TransactionsList";
@@ -150,7 +150,7 @@ function App() {
           <Route path="vouchers/add" element={<VouchersAdd />} />
           {/* packages */}
           <Route path="packages" element={<PackagesList />} />
-          <Route path="packages/add" element={<AddPackage />} />
+          <Route path="packages/add" element={<PackageAdd />} />
           {/* instructors */}
           <Route path="instructors" element={<InstructorsList />} />
           <Route path="instructors/add" element={<AddInstructors />} />

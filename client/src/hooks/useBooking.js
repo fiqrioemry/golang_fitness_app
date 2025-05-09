@@ -1,11 +1,7 @@
-// src/hooks/useBooking.js
 import { toast } from "sonner";
 import * as booking from "@/services/booking";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-// =====================
-// POST /api/bookings
-// =====================
 export const useCreateBookingMutation = () => {
   const queryClient = useQueryClient();
 

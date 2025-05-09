@@ -1,13 +1,7 @@
-// src/hooks/usePackage.js
 import { toast } from "sonner";
 import * as packageService from "@/services/package";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// =====================
-// QUERIES
-// =====================
-
-// GET /api/packages
 export const usePackagesQuery = () =>
   useQuery({
     queryKey: ["packages"],
@@ -15,7 +9,6 @@ export const usePackagesQuery = () =>
     keepPreviousData: true,
   });
 
-// GET /api/packages/:id
 export const usePackageDetailQuery = (id) =>
   useQuery({
     queryKey: ["package", id],
@@ -29,10 +22,6 @@ export const useClassPackagesQuery = (id) =>
     queryFn: () => packageService.getClassPackages(id),
     enabled: !!id,
   });
-
-// =====================
-// MUTATIONS (Admin Only)
-// =====================
 
 export const usePackageMutation = () => {
   const qc = useQueryClient();
@@ -57,7 +46,6 @@ export const usePackageMutation = () => {
     updatePackage: useMutation({
       mutationFn: ({ id, data }) => packageService.updatePackage(id, data),
       ...mutationOpts("Package updated successfully", ({ id }) => {
-        qc.invalidateQueries({ queryKey: ["package", id] });
         qc.invalidateQueries({ queryKey: ["packages"] });
       }),
     }),

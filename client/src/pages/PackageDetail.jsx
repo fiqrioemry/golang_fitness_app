@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
-import { useParams, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import { Loading } from "@/components/ui/Loading";
+import React, { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useVoucherMutation } from "@/hooks/useVouchers";
+import { useParams, useNavigate } from "react-router-dom";
 import { usePackageDetailQuery } from "@/hooks/usePackage";
 import { usePackageTransaction } from "@/hooks/usePackageTransaction";
-import { useApplyVoucherMutation } from "@/hooks/useVouchers";
 import { MidtransScriptLoader } from "@/components/midtrans/MidtransScriptLoader";
 
 const PackageDetail = () => {
@@ -19,9 +19,8 @@ const PackageDetail = () => {
   const [voucherCode, setVoucherCode] = useState("");
   const [voucherInfo, setVoucherInfo] = useState(null);
 
+  const { applyVoucher } = useVoucherMutation();
   const { data: pkg, isLoading, isError } = usePackageDetailQuery(id);
-  const { mutate: applyVoucher, isPending: applying } =
-    useApplyVoucherMutation();
   const { handleBuyNow, isPending: buying } = usePackageTransaction(
     id,
     voucherInfo?.code
@@ -44,7 +43,7 @@ const PackageDetail = () => {
 
   const handleApplyVoucher = () => {
     if (!voucherCode.trim()) return;
-    applyVoucher(
+    applyVoucher.mutate(
       { userId: user?.id, code: voucherCode, total: priceAfterVoucher },
       {
         onSuccess: (res) => {
@@ -135,7 +134,7 @@ const PackageDetail = () => {
                 <Button
                   size="sm"
                   onClick={handleApplyVoucher}
-                  disabled={applying}
+                  disabled={applyVoucher.isPending}
                 >
                   Apply
                 </Button>

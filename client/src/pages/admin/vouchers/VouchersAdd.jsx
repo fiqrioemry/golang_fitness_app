@@ -2,13 +2,13 @@ import React from "react";
 import { createVoucherSchema } from "@/lib/schema";
 import { createVoucherState } from "@/lib/constant";
 import { FormInput } from "@/components/form/FormInput";
-import { useCreateVoucherMutation } from "@/hooks/useVouchers";
 import { SwitchElement } from "@/components/input/SwitchElement";
 import { SelectElement } from "@/components/input/SelectElement";
 import { InputDateElement } from "@/components/input/InputDateElement";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
+import { useVoucherMutation } from "@/hooks/useVouchers";
 
 const discountTypeOptions = [
   { label: "Fixed", value: "fixed" },
@@ -16,7 +16,7 @@ const discountTypeOptions = [
 ];
 
 const VoucherAdd = () => {
-  const { mutate: createVoucher, isPending } = useCreateVoucherMutation();
+  const { createVoucher } = useVoucherMutation();
 
   return (
     <section className="section">
@@ -33,8 +33,8 @@ const VoucherAdd = () => {
           className="w-72"
           state={createVoucherState}
           schema={createVoucherSchema}
-          isLoading={isPending}
-          action={createVoucher}
+          isLoading={createVoucher.isPending}
+          action={createVoucher.mutate}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputTextElement

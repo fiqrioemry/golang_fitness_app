@@ -1,13 +1,7 @@
-// src/hooks/useCategory.js
 import { toast } from "sonner";
 import * as category from "@/services/categories";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// =====================
-// QUERIES
-// =====================
-
-// GET /api/categories
 export const useCategoriesQuery = () =>
   useQuery({
     queryKey: ["categories"],
@@ -15,17 +9,12 @@ export const useCategoriesQuery = () =>
     keepPreviousData: true,
   });
 
-// GET /api/categories/:id
 export const useCategoryDetailQuery = (id) =>
   useQuery({
     queryKey: ["category", id],
     queryFn: () => category.getCategoryById(id),
     enabled: !!id,
   });
-
-// =====================
-// MUTATIONS (ADMIN)
-// =====================
 
 export const useCategoryMutation = () => {
   const queryClient = useQueryClient();

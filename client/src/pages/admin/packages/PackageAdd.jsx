@@ -10,7 +10,7 @@ import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { MultiSelectElement } from "@/components/input/MultiSelectElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
-const AddPackage = () => {
+const PackageAdd = () => {
   const { createPackage } = usePackageMutation();
 
   return (
@@ -96,4 +96,4 @@ const AddPackage = () => {
   );
 };
 
-export default AddPackage;
+export default PackageAdd;

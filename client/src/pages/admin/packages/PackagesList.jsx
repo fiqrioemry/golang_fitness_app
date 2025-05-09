@@ -14,8 +14,8 @@ import { Loading } from "@/components/ui/Loading";
 import { usePackagesQuery } from "@/hooks/usePackage";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { DeletePackage } from "@/components/admin/packages/DeletePackage";
-import { UpdatePackage } from "@/components/admin/packages/UpdatePackage";
+import { PackageDelete } from "@/components/admin/packages/PackageDelete";
+import { PackageUpdate } from "@/components/admin/packages/PackageUpdate";
 
 const PackagesList = () => {
   const {
@@ -110,8 +110,8 @@ const PackagesList = () => {
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex justify-center gap-2">
-                        <UpdatePackage pkg={pkg} />
-                        <DeletePackage pkg={pkg} />
+                        <PackageUpdate pkg={pkg} />
+                        <PackageDelete pkg={pkg} />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -171,8 +171,8 @@ const PackagesList = () => {
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <UpdatePackage pkg={pkg} />
-                  <DeletePackage pkg={pkg} />
+                  <PackageUpdate pkg={pkg} />
+                  <PackageDelete pkg={pkg} />
                 </div>
               </div>
             ))}

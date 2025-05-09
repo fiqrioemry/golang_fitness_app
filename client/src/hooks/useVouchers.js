@@ -2,6 +2,10 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as voucherService from "@/services/voucher";
 
+// =====================
+// QUERIES
+// =====================
+
 export const useVouchersQuery = () =>
   useQuery({
     queryKey: ["vouchers"],
@@ -9,52 +13,47 @@ export const useVouchersQuery = () =>
     staleTime: 1000 * 60 * 10,
   });
 
-export const useCreateVoucherMutation = () => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: voucherService.createVoucher,
-    onSuccess: () => {
-      toast.success("Voucher created successfully");
-      qc.invalidateQueries({ queryKey: ["vouchers"] });
-    },
-    onError: (err) => {
-      toast.error(err?.response?.data?.message);
-    },
-  });
-};
+// =====================
+// MUTATIONS
+// =====================
 
-export const useApplyVoucherMutation = () =>
-  useMutation({
-    mutationFn: voucherService.applyVoucher,
+export const useVoucherMutation = () => {
+  const qc = useQueryClient();
+
+  const mutationOpts = (msg, refetchFn) => ({
+    onSuccess: (res, vars) => {
+      toast.success(res?.message || msg);
+      if (typeof refetchFn === "function") refetchFn(vars);
+      else qc.invalidateQueries({ queryKey: ["vouchers"] });
+    },
     onError: (err) => {
-      toast.error(err?.response?.data?.message);
+      toast.error(err?.response?.data?.message || "Something went wrong");
     },
   });
 
-export const useUpdateVoucherMutation = () => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: voucherService.updateVoucher,
-    onSuccess: () => {
-      toast.success("Voucher updated successfully");
-      qc.invalidateQueries({ queryKey: ["vouchers"] });
-    },
-    onError: (err) => {
-      toast.error(err?.response?.data?.message || "Failed to update voucher");
-    },
-  });
-};
+  return {
+    createVoucher: useMutation({
+      mutationFn: voucherService.createVoucher,
+      ...mutationOpts("Voucher created successfully"),
+    }),
 
-export const useDeleteVoucherMutation = () => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: voucherService.deleteVoucher,
-    onSuccess: () => {
-      toast.success("Voucher deleted successfully");
-      qc.invalidateQueries({ queryKey: ["vouchers"] });
-    },
-    onError: (err) => {
-      toast.error(err?.response?.data?.message || "Failed to delete voucher");
-    },
-  });
+    updateVoucher: useMutation({
+      mutationFn: ({ id, data }) => voucherService.updateVoucher({ id, data }),
+      ...mutationOpts("Voucher updated successfully", () => {
+        qc.invalidateQueries({ queryKey: ["vouchers"] });
+      }),
+    }),
+
+    deleteVoucher: useMutation({
+      mutationFn: voucherService.deleteVoucher,
+      ...mutationOpts("Voucher deleted successfully"),
+    }),
+
+    applyVoucher: useMutation({
+      mutationFn: voucherService.applyVoucher,
+      onError: (err) => {
+        toast.error(err?.response?.data?.message || "Failed to apply voucher");
+      },
+    }),
+  };
 };

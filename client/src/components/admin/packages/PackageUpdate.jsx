@@ -10,17 +10,16 @@ import { InputFileElement } from "@/components/input/InputFileElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
-const UpdatePackage = ({ pkg }) => {
+const PackageUpdate = ({ pkg }) => {
   const { updatePackage } = usePackageMutation();
-  const { isPending, mutateAsync } = updatePackage;
 
   return (
     <FormUpdateDialog
       state={pkg}
-      loading={isPending}
-      action={mutateAsync}
       title="Update Package"
       schema={packageSchema}
+      loading={updatePackage.isPending}
+      action={updatePackage.mutateAsync}
     >
       <InputTextElement
         name="name"
@@ -66,4 +65,4 @@ const UpdatePackage = ({ pkg }) => {
   );
 };
 
-export { UpdatePackage };
+export { PackageUpdate };

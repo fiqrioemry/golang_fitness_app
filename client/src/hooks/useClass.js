@@ -2,7 +2,6 @@ import { toast } from "sonner";
 import * as classService from "@/services/class";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// GET /api/classes
 export const useClassesQuery = (params = {}) =>
   useQuery({
     queryKey: ["classes", params],
@@ -10,14 +9,12 @@ export const useClassesQuery = (params = {}) =>
     keepPreviousData: true,
   });
 
-// GET /api/classes/active
 export const useActiveClassesQuery = () =>
   useQuery({
     queryKey: ["classes", "active"],
     queryFn: classService.getActiveClasses,
   });
 
-// GET /api/classes/:id
 export const useClassDetailQuery = (id) =>
   useQuery({
     queryKey: ["class", id],

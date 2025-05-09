@@ -1,6 +1,6 @@
 import React from "react";
 import { createVoucherSchema } from "@/lib/schema";
-import { useUpdateVoucherMutation } from "@/hooks/useVouchers";
+import { useVoucherMutation } from "@/hooks/useVouchers";
 import { SwitchElement } from "@/components/input/SwitchElement";
 import { SelectElement } from "@/components/input/SelectElement";
 import { FormUpdateDialog } from "@/components/form/FormUpdateDialog";
@@ -15,7 +15,7 @@ const discountTypeOptions = [
 ];
 
 const VoucherUpdate = ({ voucher }) => {
-  const { mutateAsync, isPending } = useUpdateVoucherMutation();
+  const { mutateAsync, isPending } = useVoucherMutation();
 
   return (
     <FormUpdateDialog
