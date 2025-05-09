@@ -1113,22 +1113,4 @@ func SeedVouchers(db *gorm.DB) {
 
 	log.Println("✅ Vouchers seeding completed!")
 
-	var user models.User
-	if err := db.Where("email = ?", "customer01@example.com").First(&user).Error; err != nil {
-		log.Printf("❌ Failed to find user for UsedVoucher: %v", err)
-		return
-	}
-
-	used := models.UsedVoucher{
-		ID:        uuid.New(),
-		UserID:    user.ID,
-		VoucherID: voucher1.ID,
-		UsedAt:    time.Now(),
-	}
-
-	if err := db.Create(&used).Error; err != nil {
-		log.Printf("❌ Failed to seed UsedVoucher: %v", err)
-	} else {
-		log.Println("✅ UsedVoucher seeded for customer01@example.com and FIT50")
-	}
 }

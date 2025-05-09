@@ -143,7 +143,7 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 	if payment.Status == "success" {
 
 		if payment.VoucherCode != nil && *payment.VoucherCode != "" {
-			if err := s.voucherService.DecreaseQuota(*payment.VoucherCode); err != nil {
+			if err := s.voucherService.DecreaseQuota(payment.UserID, *payment.VoucherCode); err != nil {
 				return err
 			}
 		}

@@ -5,13 +5,15 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
+	"strings"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
 
 type VoucherService interface {
-	DecreaseQuota(code string) error
+	DecreaseQuota(userID uuid.UUID, code string) error
 	CreateVoucher(dto.CreateVoucherRequest) error
 	GetAllVouchers() ([]dto.VoucherResponse, error)
 	ApplyVoucher(req dto.ApplyVoucherRequest) (*dto.ApplyVoucherResponse, error)
@@ -45,7 +47,16 @@ func (s *voucherService) CreateVoucher(req dto.CreateVoucherRequest) error {
 		CreatedAt:    time.Now(),
 	}
 
-	return s.repo.Create(&voucher)
+	err = s.repo.Create(&voucher)
+	if err != nil {
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 && strings.Contains(mysqlErr.Message, "code") {
+			return errors.New("voucher code must be unique")
+		}
+		return err
+	}
+
+	return nil
 }
 
 func (s *voucherService) GetAllVouchers() ([]dto.VoucherResponse, error) {
@@ -105,17 +116,10 @@ func (s *voucherService) ApplyVoucher(req dto.ApplyVoucherRequest) (*dto.ApplyVo
 			discountValue = *voucher.MaxDiscount
 		}
 	} else {
-		discountValue = voucher.Discount
-		if discountValue > req.Total {
-			discountValue = req.Total
-		}
+		discountValue = min(voucher.Discount, req.Total)
 	}
 
 	final := req.Total - discountValue
-
-	if hasUser && !voucher.IsReusable {
-		_ = s.repo.InsertUsedVoucher(userUUID, voucher.ID)
-	}
 
 	return &dto.ApplyVoucherResponse{
 		Code:          voucher.Code,
@@ -127,11 +131,16 @@ func (s *voucherService) ApplyVoucher(req dto.ApplyVoucherRequest) (*dto.ApplyVo
 	}, nil
 }
 
-func (s *voucherService) DecreaseQuota(code string) error {
+func (s *voucherService) DecreaseQuota(userID uuid.UUID, code string) error {
 	voucher, err := s.repo.GetByCode(code)
 	if err != nil {
 		return err
 	}
+
+	if !voucher.IsReusable {
+		_ = s.repo.InsertUsedVoucher(userID, voucher.ID)
+	}
+
 	if voucher.Quota > 0 {
 		voucher.Quota -= 1
 		return s.repo.UpdateVoucher(voucher)

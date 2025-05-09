@@ -24,7 +24,7 @@ func (h *VoucherHandler) CreateVoucher(c *gin.Context) {
 	}
 
 	if err := h.service.CreateVoucher(req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create voucher", "error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 

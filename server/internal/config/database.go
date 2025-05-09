@@ -33,7 +33,7 @@ func InitDatabase() {
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", username, password, host, port, database)
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 		if err == nil {
 			break

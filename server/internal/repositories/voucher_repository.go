@@ -13,8 +13,8 @@ type VoucherRepository interface {
 	GetAll() ([]models.Voucher, error)
 	UpdateVoucher(v *models.Voucher) error
 	GetByCode(code string) (*models.Voucher, error)
-	CheckVoucherUsed(userID, voucherID uuid.UUID) (bool, error)
 	InsertUsedVoucher(userID, voucherID uuid.UUID) error
+	CheckVoucherUsed(userID, voucherID uuid.UUID) (bool, error)
 	GetValidVoucherByCode(code string) (*models.Voucher, error)
 }
 
