@@ -22,10 +22,11 @@ type AttendanceService interface {
 type attendanceService struct {
 	attendanceRepo repositories.AttendanceRepository
 	bookingRepo    repositories.BookingRepository
+	reviewRepo     repositories.ReviewRepository
 }
 
-func NewAttendanceService(attendanceRepo repositories.AttendanceRepository, bookingRepo repositories.BookingRepository) AttendanceService {
-	return &attendanceService{attendanceRepo, bookingRepo}
+func NewAttendanceService(attendanceRepo repositories.AttendanceRepository, bookingRepo repositories.BookingRepository, reviewRepo repositories.ReviewRepository) AttendanceService {
+	return &attendanceService{attendanceRepo, bookingRepo, reviewRepo}
 }
 
 func (s *attendanceService) GetBookingInfo(bookingID string) (*models.Booking, error) {
@@ -39,6 +40,16 @@ func (s *attendanceService) GetAllAttendances(userID string) ([]dto.AttendanceRe
 	}
 	var result []dto.AttendanceResponse
 	for _, a := range attendances {
+
+		classID := a.ClassSchedule.Class.ID.String()
+
+		reviews, err := s.reviewRepo.GetUserReviewStatus(userID, classID)
+		if err != nil {
+			return nil, err
+		}
+
+		reviewed := reviews == nil
+
 		checkedAt := ""
 		if a.CheckedAt != nil {
 			checkedAt = a.CheckedAt.Format(time.RFC3339)
@@ -46,7 +57,7 @@ func (s *attendanceService) GetAllAttendances(userID string) ([]dto.AttendanceRe
 		result = append(result, dto.AttendanceResponse{
 			ID: a.ID.String(),
 			Class: dto.ClassBrief{
-				ID:       a.ClassSchedule.Class.ID.String(),
+				ID:       classID,
 				Title:    a.ClassSchedule.Class.Title,
 				Image:    a.ClassSchedule.Class.Image,
 				Duration: a.ClassSchedule.Class.Duration,
@@ -61,6 +72,7 @@ func (s *attendanceService) GetAllAttendances(userID string) ([]dto.AttendanceRe
 			StartHour:   a.ClassSchedule.StartHour,
 			StartMinute: a.ClassSchedule.StartMinute,
 			Status:      a.Status,
+			Reviewed:    reviewed,
 			CheckedAt:   checkedAt,
 		})
 	}

@@ -98,7 +98,7 @@ func main() {
 	subcategoryService := services.NewSubcategoryService(subcategoryRepo)
 	notificationService := services.NewNotificationService(notificationRepo)
 	instructorService := services.NewInstructorService(instructorRepo, authRepo)
-	attendanceService := services.NewAttendanceService(attendanceRepo, bookingRepo)
+	attendanceService := services.NewAttendanceService(attendanceRepo, bookingRepo, reviewRepo)
 	paymentService := services.NewPaymentService(paymentRepo, packageRepo, userPackageRepo, authRepo)
 	bookingService := services.NewBookingService(bookingRepo, classScheduleRepo, userPackageRepo, packageRepo)
 	scheduleTemplateService := services.NewScheduleTemplateService(scheduleTemplateRepo, classRepo, classScheduleRepo)

@@ -524,6 +524,7 @@ type AttendanceResponse struct {
 	StartMinute int             `json:"startMinute"`
 	Status      string          `json:"status"`
 	CheckedAt   string          `json:"checkedAt"`
+	Reviewed    bool            `json:"reviewed"`
 	Verified    bool            `json:"verified"`
 }
 
