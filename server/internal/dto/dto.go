@@ -719,7 +719,18 @@ type CreateVoucherRequest struct {
 	DiscountType string   `json:"discountType" binding:"required,oneof=fixed percentage"`
 	Discount     float64  `json:"discount" binding:"required,gt=0"`
 	MaxDiscount  *float64 `json:"maxDiscount,omitempty"`
+	IsReusable   bool     `json:"isReusable"`
 	Quota        int      `json:"quota" binding:"required,gt=0"`
+	ExpiredAt    string   `json:"expiredAt" binding:"required,datetime=2006-01-02"`
+}
+
+type UpdateVoucherRequest struct {
+	Description  string   `json:"description" binding:"required"`
+	DiscountType string   `json:"discountType" binding:"required,oneof=fixed percentage"`
+	Discount     float64  `json:"discount" binding:"required,gt=0"`
+	MaxDiscount  *float64 `json:"maxDiscount,omitempty"`
+	Quota        int      `json:"quota" binding:"required,gt=0"`
+	IsReusable   bool     `json:"isReusable"`
 	ExpiredAt    string   `json:"expiredAt" binding:"required,datetime=2006-01-02"`
 }
 

@@ -16,6 +16,8 @@ type VoucherService interface {
 	DecreaseQuota(userID uuid.UUID, code string) error
 	CreateVoucher(dto.CreateVoucherRequest) error
 	GetAllVouchers() ([]dto.VoucherResponse, error)
+	DeleteVoucher(id string) error
+	UpdateVoucher(id string, req dto.UpdateVoucherRequest) error
 	ApplyVoucher(req dto.ApplyVoucherRequest) (*dto.ApplyVoucherResponse, error)
 }
 
@@ -36,12 +38,12 @@ func (s *voucherService) CreateVoucher(req dto.CreateVoucherRequest) error {
 	}
 
 	voucher := models.Voucher{
-		ID:           uuid.New(),
 		Code:         req.Code,
 		Description:  req.Description,
 		DiscountType: req.DiscountType,
 		Discount:     req.Discount,
 		MaxDiscount:  req.MaxDiscount,
+		IsReusable:   req.IsReusable,
 		Quota:        req.Quota,
 		ExpiredAt:    expiredAt,
 		CreatedAt:    time.Now(),
@@ -146,4 +148,39 @@ func (s *voucherService) DecreaseQuota(userID uuid.UUID, code string) error {
 		return s.repo.UpdateVoucher(voucher)
 	}
 	return nil
+}
+
+func (s *voucherService) UpdateVoucher(id string, req dto.UpdateVoucherRequest) error {
+	voucherID, err := uuid.Parse(id)
+	if err != nil {
+		return errors.New("invalid voucher ID")
+	}
+
+	voucher, err := s.repo.GetByID(voucherID)
+	if err != nil {
+		return errors.New("voucher not found")
+	}
+
+	expiredAt, err := time.Parse("2006-01-02", req.ExpiredAt)
+	if err != nil {
+		return err
+	}
+
+	voucher.Description = req.Description
+	voucher.DiscountType = req.DiscountType
+	voucher.Discount = req.Discount
+	voucher.MaxDiscount = req.MaxDiscount
+	voucher.Quota = req.Quota
+	voucher.IsReusable = req.IsReusable
+	voucher.ExpiredAt = expiredAt
+
+	return s.repo.UpdateVoucher(voucher)
+}
+
+func (s *voucherService) DeleteVoucher(id string) error {
+	voucherID, err := uuid.Parse(id)
+	if err != nil {
+		return errors.New("invalid voucher ID")
+	}
+	return s.repo.DeleteByID(voucherID)
 }

@@ -14,8 +14,8 @@ type User struct {
 	Email     string         `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
 	Password  string         `gorm:"type:text;not null" json:"-"`
 	Role      string         `gorm:"type:varchar(255);default:'customer';check:role IN ('customer','admin','instructor')" json:"role"`
-	CreatedAt time.Time      `json:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt"`
+	CreatedAt time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Profile      Profile       `gorm:"foreignKey:UserID" json:"profile"`
@@ -30,8 +30,8 @@ type Token struct {
 	UserID    uuid.UUID      `gorm:"type:char(36);index;not null" json:"userId"`
 	Token     string         `gorm:"type:text;not null" json:"token"`
 	ExpiredAt time.Time      `json:"expiredAt"`
-	CreatedAt time.Time      `json:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt"`
+	CreatedAt time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
@@ -44,8 +44,8 @@ type Profile struct {
 	Gender    string     `gorm:"type:varchar(10)" json:"gender"`
 	Avatar    string     `gorm:"type:varchar(255)" json:"avatar"`
 	Bio       string     `gorm:"type:text" json:"bio"`
-	CreatedAt time.Time  `json:"createdAt"`
-	UpdatedAt time.Time  `json:"updatedAt"`
+	CreatedAt time.Time  `gorm:"autoCreateTime"`
+	UpdatedAt time.Time  `gorm:"autoUpdateTime"`
 }
 
 type Class struct {
@@ -62,7 +62,8 @@ type Class struct {
 	LocationID     uuid.UUID      `json:"locationId"`
 	CategoryID     uuid.UUID      `json:"categoryId"`
 	SubcategoryID  uuid.UUID      `json:"subcategoryId"`
-	CreatedAt      time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// relationship one - to - many
@@ -114,8 +115,8 @@ type Package struct {
 	Expired        int            `json:"expired"`
 	Additional     string         `gorm:"type:longtext" json:"-"`
 	AdditionalList []string       `gorm:"-" json:"additional"`
-	CreatedAt      time.Time      `json:"createdAt"`
-	UpdatedAt      time.Time      `json:"updatedAt"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Classes []Class `gorm:"many2many:package_classes;" json:"classes,omitempty"`
@@ -167,7 +168,7 @@ type ScheduleTemplate struct {
 	IsActive     bool           `gorm:"default:true" json:"isActive"`
 	Color        string         `gorm:"type:varchar(20)" json:"color"`
 	EndDate      *time.Time     `gorm:"default:null" json:"endDate"`
-	CreatedAt    time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	CreatedAt    time.Time      `gorm:"autoCreateTime"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
@@ -179,7 +180,7 @@ type Booking struct {
 	UserID          uuid.UUID      `gorm:"type:char(36);not null" json:"userId"`
 	ClassScheduleID uuid.UUID      `gorm:"type:char(36);not null" json:"classScheduleId"`
 	Status          string         `gorm:"type:varchar(50);not null;default:'booked';check:status IN ('booked','checked_in','canceled')" json:"status"`
-	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	CreatedAt       time.Time      `gorm:"autoCreateTime"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 
 	ClassSchedule ClassSchedule `gorm:"foreignKey:ClassScheduleID" json:"classSchedule"`
@@ -294,7 +295,7 @@ type NotificationType struct {
 	Category       string         `gorm:"type:varchar(100)"`
 	DefaultEnabled bool           `gorm:"default:true"`
 	IsRequired     bool           `gorm:"default:false"`
-	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt      gorm.DeletedAt `gorm:"index"`
 }
 
@@ -304,8 +305,8 @@ type NotificationSetting struct {
 	NotificationTypeID uuid.UUID      `gorm:"type:char(36);index;not null"`
 	Channel            string         `gorm:"type:varchar(20);not null;check:channel IN ('email','browser')"`
 	Enabled            bool           `gorm:"default:true"`
-	CreatedAt          time.Time      `gorm:"autoCreateTime"`
-	UpdatedAt          time.Time      `gorm:"autoUpdateTime"`
+	CreatedAt          time.Time      `gorm:"autoCreateTime" json:"createdAt"`
+	UpdatedAt          time.Time      `gorm:"autoUpdateTime" json:"updatedAt"`
 	DeletedAt          gorm.DeletedAt `gorm:"index"`
 
 	NotificationType NotificationType `gorm:"foreignKey:NotificationTypeID"`
@@ -319,7 +320,7 @@ type Notification struct {
 	Message   string         `gorm:"type:text;not null"`
 	Channel   string         `gorm:"type:varchar(50);not null"`
 	IsRead    bool           `gorm:"default:false"`
-	CreatedAt time.Time      `gorm:"autoCreateTime"`
+	CreatedAt time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
@@ -444,6 +445,12 @@ func (c *Class) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+func (c *Voucher) BeforeCreate(tx *gorm.DB) (err error) {
+	if c.ID == uuid.Nil {
+		c.ID = uuid.New()
+	}
+	return
+}
 func (pc *PackageClass) BeforeCreate(tx *gorm.DB) (err error) {
 	if pc.ID == uuid.Nil {
 		pc.ID = uuid.New()

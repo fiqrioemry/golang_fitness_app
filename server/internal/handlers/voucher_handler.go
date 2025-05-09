@@ -53,3 +53,30 @@ func (h *VoucherHandler) ApplyVoucher(c *gin.Context) {
 
 	c.JSON(http.StatusOK, res)
 }
+
+func (h *VoucherHandler) UpdateVoucher(c *gin.Context) {
+	id := c.Param("id")
+
+	var req dto.UpdateVoucherRequest
+	if !utils.BindAndValidateJSON(c, &req) {
+		return
+	}
+
+	if err := h.service.UpdateVoucher(id, req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Voucher updated"})
+}
+
+func (h *VoucherHandler) DeleteVoucher(c *gin.Context) {
+	id := c.Param("id")
+
+	if err := h.service.DeleteVoucher(id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Voucher deleted"})
+}

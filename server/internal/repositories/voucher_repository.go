@@ -13,6 +13,8 @@ type VoucherRepository interface {
 	GetAll() ([]models.Voucher, error)
 	UpdateVoucher(v *models.Voucher) error
 	GetByCode(code string) (*models.Voucher, error)
+	GetByID(id uuid.UUID) (*models.Voucher, error)
+	DeleteByID(id uuid.UUID) error
 	InsertUsedVoucher(userID, voucherID uuid.UUID) error
 	CheckVoucherUsed(userID, voucherID uuid.UUID) (bool, error)
 	GetValidVoucherByCode(code string) (*models.Voucher, error)
@@ -72,4 +74,14 @@ func (r *voucherRepository) InsertUsedVoucher(userID, voucherID uuid.UUID) error
 		VoucherID: voucherID,
 		UsedAt:    time.Now(),
 	}).Error
+}
+
+func (r *voucherRepository) GetByID(id uuid.UUID) (*models.Voucher, error) {
+	var v models.Voucher
+	err := r.db.First(&v, "id = ?", id).Error
+	return &v, err
+}
+
+func (r *voucherRepository) DeleteByID(id uuid.UUID) error {
+	return r.db.Delete(&models.Voucher{}, "id = ?", id).Error
 }
