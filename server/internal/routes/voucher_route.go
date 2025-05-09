@@ -12,8 +12,8 @@ func VoucherRoutes(r *gin.Engine, h *handlers.VoucherHandler) {
 	v.Use(middleware.AuthRequired())
 	{
 		v.GET("", h.GetAllVouchers)
-		v.POST("", middleware.AdminOnly(), h.CreateVoucher)
 		v.POST("/apply", h.ApplyVoucher)
+		v.POST("", middleware.AdminOnly(), h.CreateVoucher)
 
 	}
 }
