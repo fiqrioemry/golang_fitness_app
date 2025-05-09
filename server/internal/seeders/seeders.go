@@ -1066,3 +1066,69 @@ func SeedDummyNotifications(db *gorm.DB) {
 		log.Println("✅ Dummy notifications for customer01@example.com seeded!")
 	}
 }
+func SeedVouchers(db *gorm.DB) {
+	var count int64
+	db.Model(&models.Voucher{}).Count(&count)
+	if count > 0 {
+		log.Println("Vouchers already seeded, skipping...")
+		return
+	}
+
+	now := time.Now()
+	expired := now.AddDate(0, 1, 0)
+
+	max1 := 30000.0
+	max2 := 50000.0
+
+	voucher1 := models.Voucher{
+		ID:           uuid.New(),
+		Code:         "FIT50",
+		Description:  "Dapatkan diskon 50% hingga 30.000",
+		DiscountType: "percentage",
+		Discount:     50,
+		MaxDiscount:  &max1,
+		Quota:        10,
+		IsReusable:   false,
+		ExpiredAt:    expired,
+		CreatedAt:    now,
+	}
+
+	voucher2 := models.Voucher{
+		ID:           uuid.New(),
+		Code:         "HEALTHY100K",
+		Description:  "Diskon langsung 100.000",
+		DiscountType: "fixed",
+		Discount:     100000,
+		MaxDiscount:  &max2,
+		Quota:        10,
+		IsReusable:   true,
+		ExpiredAt:    expired,
+		CreatedAt:    now,
+	}
+
+	if err := db.Create([]models.Voucher{voucher1, voucher2}).Error; err != nil {
+		log.Printf("❌ Failed to seed vouchers: %v", err)
+		return
+	}
+
+	log.Println("✅ Vouchers seeding completed!")
+
+	var user models.User
+	if err := db.Where("email = ?", "customer01@example.com").First(&user).Error; err != nil {
+		log.Printf("❌ Failed to find user for UsedVoucher: %v", err)
+		return
+	}
+
+	used := models.UsedVoucher{
+		ID:        uuid.New(),
+		UserID:    user.ID,
+		VoucherID: voucher1.ID,
+		UsedAt:    time.Now(),
+	}
+
+	if err := db.Create(&used).Error; err != nil {
+		log.Printf("❌ Failed to seed UsedVoucher: %v", err)
+	} else {
+		log.Println("✅ UsedVoucher seeded for customer01@example.com and FIT50")
+	}
+}

@@ -230,9 +230,18 @@ type Voucher struct {
 	Discount     float64        `gorm:"not null" json:"discount"`
 	MaxDiscount  *float64       `json:"maxDiscount,omitempty"`
 	Quota        int            `gorm:"not null" json:"quota"`
+	IsReusable   bool           `gorm:"default:false" json:"isReusable"`
 	ExpiredAt    time.Time      `gorm:"not null" json:"expiredAt"`
 	CreatedAt    time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+type UsedVoucher struct {
+	ID        uuid.UUID      `gorm:"type:char(36);primaryKey"`
+	UserID    uuid.UUID      `gorm:"type:char(36);index;not null"`
+	VoucherID uuid.UUID      `gorm:"type:char(36);index;not null"`
+	UsedAt    time.Time      `gorm:"autoCreateTime"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 type Review struct {

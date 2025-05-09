@@ -736,8 +736,9 @@ type VoucherResponse struct {
 }
 
 type ApplyVoucherRequest struct {
-	Code  string  `json:"code" binding:"required"`
-	Total float64 `json:"total" binding:"required"`
+	UserID *string `json:"userId"`
+	Code   string  `json:"code" binding:"required"`
+	Total  float64 `json:"total" binding:"required"`
 }
 
 type ApplyVoucherResponse struct {

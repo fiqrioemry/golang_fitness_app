@@ -140,8 +140,14 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 		return err
 	}
 
-	// On success, handle UserPackage logic
 	if payment.Status == "success" {
+
+		if payment.VoucherCode != nil && *payment.VoucherCode != "" {
+			if err := s.voucherService.DecreaseQuota(*payment.VoucherCode); err != nil {
+				return err
+			}
+		}
+
 		pkg, err := s.packageRepo.GetPackageByID(payment.PackageID.String())
 		if err != nil {
 			return err
@@ -157,7 +163,6 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 		}
 
 		if existing.ID == uuid.Nil {
-			// Kondisi 1: belum punya, buat baru
 			expired := now.AddDate(0, 0, pkg.Expired)
 			newUP := models.UserPackage{
 				ID:              uuid.New(),
@@ -169,7 +174,6 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 			}
 			return s.userPackageRepo.CreateUserPackage(&newUP)
 		} else {
-			// Kondisi 2: sudah punya dan masih aktif
 			existing.RemainingCredit += pkg.Credit
 			if existing.ExpiredAt != nil {
 				*existing.ExpiredAt = existing.ExpiredAt.AddDate(0, 0, pkg.Expired)

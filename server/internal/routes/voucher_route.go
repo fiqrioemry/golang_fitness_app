@@ -9,10 +9,10 @@ import (
 
 func VoucherRoutes(r *gin.Engine, h *handlers.VoucherHandler) {
 	v := r.Group("/api/vouchers")
+	v.POST("/apply", h.ApplyVoucher)
 	v.Use(middleware.AuthRequired())
 	{
 		v.GET("", h.GetAllVouchers)
-		v.POST("/apply", h.ApplyVoucher)
 		v.POST("", middleware.AdminOnly(), h.CreateVoucher)
 
 	}

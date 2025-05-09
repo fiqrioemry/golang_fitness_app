@@ -11,6 +11,7 @@ import (
 )
 
 type VoucherService interface {
+	DecreaseQuota(code string) error
 	CreateVoucher(dto.CreateVoucherRequest) error
 	GetAllVouchers() ([]dto.VoucherResponse, error)
 	ApplyVoucher(req dto.ApplyVoucherRequest) (*dto.ApplyVoucherResponse, error)
@@ -77,13 +78,33 @@ func (s *voucherService) ApplyVoucher(req dto.ApplyVoucherRequest) (*dto.ApplyVo
 		return nil, errors.New("invalid or expired voucher")
 	}
 
+	var userUUID uuid.UUID
+	hasUser := req.UserID != nil && *req.UserID != ""
+
+	if hasUser {
+		userUUID, err = uuid.Parse(*req.UserID)
+		if err != nil {
+			return nil, errors.New("invalid user id")
+		}
+
+		if !voucher.IsReusable {
+			used, err := s.repo.CheckVoucherUsed(userUUID, voucher.ID)
+			if err != nil {
+				return nil, err
+			}
+			if used {
+				return nil, errors.New("voucher already used")
+			}
+		}
+	}
+
 	var discountValue float64
 	if voucher.DiscountType == "percentage" {
 		discountValue = req.Total * (voucher.Discount / 100)
 		if voucher.MaxDiscount != nil && discountValue > *voucher.MaxDiscount {
 			discountValue = *voucher.MaxDiscount
 		}
-	} else if voucher.DiscountType == "fixed" {
+	} else {
 		discountValue = voucher.Discount
 		if discountValue > req.Total {
 			discountValue = req.Total
@@ -91,6 +112,10 @@ func (s *voucherService) ApplyVoucher(req dto.ApplyVoucherRequest) (*dto.ApplyVo
 	}
 
 	final := req.Total - discountValue
+
+	if hasUser && !voucher.IsReusable {
+		_ = s.repo.InsertUsedVoucher(userUUID, voucher.ID)
+	}
 
 	return &dto.ApplyVoucherResponse{
 		Code:          voucher.Code,
@@ -100,4 +125,16 @@ func (s *voucherService) ApplyVoucher(req dto.ApplyVoucherRequest) (*dto.ApplyVo
 		DiscountValue: discountValue,
 		FinalTotal:    final,
 	}, nil
+}
+
+func (s *voucherService) DecreaseQuota(code string) error {
+	voucher, err := s.repo.GetByCode(code)
+	if err != nil {
+		return err
+	}
+	if voucher.Quota > 0 {
+		voucher.Quota -= 1
+		return s.repo.UpdateVoucher(voucher)
+	}
+	return nil
 }
