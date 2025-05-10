@@ -99,12 +99,3 @@ func (h *AttendanceHandler) ValidateQRCodeScan(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": info})
 }
-
-// buat cron job
-func (h *AttendanceHandler) MarkAbsentAttendances(c *gin.Context) {
-	if err := h.attendanceService.MarkAbsentAttendances(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "absent marked"})
-}

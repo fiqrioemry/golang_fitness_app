@@ -15,6 +15,9 @@ type BookingRepository interface {
 	UpdateBookingStatus(bookingID uuid.UUID, status string) error
 	IsUserBookedSchedule(userID, scheduleID string) (bool, error)
 	FindByUserAndSchedule(userID, scheduleID string) (*models.Booking, error)
+
+	// ** cron job
+	GetAllBookedWithScheduleAndClass() ([]models.Booking, error)
 }
 
 type bookingRepository struct {
@@ -82,4 +85,16 @@ func (r *bookingRepository) FindByUserAndSchedule(userID, scheduleID string) (*m
 		Where("user_id = ? AND class_schedule_id = ?", userID, scheduleID).
 		First(&booking).Error
 	return &booking, err
+}
+
+// ** cron job
+func (r *bookingRepository) GetAllBookedWithScheduleAndClass() ([]models.Booking, error) {
+	var bookings []models.Booking
+	err := r.db.
+		Preload("ClassSchedule").
+		Preload("ClassSchedule.Class").
+		Where("status = ?", "booked").
+		Find(&bookings).Error
+
+	return bookings, err
 }

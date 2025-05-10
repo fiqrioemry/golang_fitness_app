@@ -13,18 +13,21 @@ type CronManager struct {
 	paymentService      services.PaymentService
 	scheduleService     services.ScheduleTemplateService
 	notificationService services.NotificationService
+	attendanceService   services.AttendanceService
 }
 
 func NewCronManager(
 	payment services.PaymentService,
 	schedule services.ScheduleTemplateService,
 	notification services.NotificationService,
+	attendance services.AttendanceService,
 ) *CronManager {
 	return &CronManager{
 		c:                   cron.New(cron.WithSeconds()),
 		paymentService:      payment,
 		scheduleService:     schedule,
 		notificationService: notification,
+		attendanceService:   attendance,
 	}
 }
 
@@ -49,15 +52,23 @@ func (cm *CronManager) RegisterJobs() {
 		}
 	})
 
-	// Kirim notifikasi reminder kelas (setiap 15 menit)
+	// Reminder dan Mark Absent setiap 15 menit
 	cm.c.AddFunc("@every 15m", func() {
-		log.Println("Cron: Sending class reminders...")
+		log.Println("⏰ Cron: Sending class reminders...")
 		if err := cm.notificationService.SendClassReminder(); err != nil {
-			log.Println("Failed to send class reminders:", err)
+			log.Println("❌ Reminder failed:", err)
 		} else {
-			log.Println("Class reminders sent successfully")
+			log.Println("✅ Class reminders sent")
+		}
+
+		log.Println("⏰ Cron: Marking absents for missed bookings...")
+		if err := cm.attendanceService.MarkAbsentBookings(); err != nil {
+			log.Println("❌ Marking absents failed:", err)
+		} else {
+			log.Println("✅ Marked absent attendees")
 		}
 	})
+
 }
 
 func (cm *CronManager) Start() {

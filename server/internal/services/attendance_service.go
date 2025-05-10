@@ -2,11 +2,14 @@ package services
 
 import (
 	"errors"
+	"log"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
 	"server/internal/utils"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type AttendanceService interface {
@@ -18,7 +21,7 @@ type AttendanceService interface {
 	GetAttendanceDetail(scheduleID string) ([]dto.AttendanceDetailResponse, error)
 
 	//
-	MarkAbsentAttendances() error
+	MarkAbsentBookings() error
 }
 
 type attendanceService struct {
@@ -91,6 +94,7 @@ func (s *attendanceService) CheckinAttendance(userID, bookingID string) (string,
 		return "", errors.New("unauthorized access")
 	}
 
+	// ! Uncomment kalau sudah deployment. hanya untuk pengujian di comment
 	// schedule := booking.ClassSchedule
 
 	// loc, _ := time.LoadLocation("Asia/Jakarta")
@@ -119,21 +123,6 @@ func (s *attendanceService) CheckinAttendance(userID, bookingID string) (string,
 
 	qr := utils.GenerateBase64QR(attendance.ID.String())
 	return qr, nil
-}
-
-func (s *attendanceService) MarkAbsentAttendances() error {
-	now := time.Now()
-	schedules, err := s.attendanceRepo.FindAllSchedulesBefore(now.Add(-30 * time.Minute))
-	if err != nil {
-		return err
-	}
-	for _, sched := range schedules {
-		err := s.attendanceRepo.MarkAbsentIfNotCheckedIn(sched.ID)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (s *attendanceService) GetAttendanceDetail(scheduleID string) ([]dto.AttendanceDetailResponse, error) {
@@ -217,4 +206,50 @@ func (s *attendanceService) ValidateQRCodeData(qr string) (*dto.AttendanceRespon
 		CheckedAt:   attendance.CheckedAt.Format(time.RFC1123),
 	}, nil
 
+}
+
+// ** buat cron job
+func (s *attendanceService) MarkAbsentBookings() error {
+	now := time.Now()
+
+	bookings, err := s.bookingRepo.GetAllBookedWithScheduleAndClass()
+	if err != nil {
+		return err
+	}
+
+	var totalMarked int
+	for _, b := range bookings {
+		schedule := b.ClassSchedule
+		class := schedule.Class
+
+		loc, _ := time.LoadLocation("Asia/Jakarta")
+
+		startTime := time.Date(
+			schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
+			schedule.StartHour, schedule.StartMinute, 0, 0, loc,
+		)
+		endTime := startTime.Add(time.Duration(class.Duration) * time.Minute)
+
+		if now.After(endTime) {
+			exists, err := s.attendanceRepo.CheckAttendanceExists(b.UserID, b.ID)
+			if err != nil {
+				continue
+			}
+			if !exists {
+				attendance := &models.Attendance{
+					ID:              uuid.New(),
+					UserID:          b.UserID,
+					ClassScheduleID: schedule.ID,
+					Status:          "absent",
+				}
+				err := s.attendanceRepo.CreateAttendance(attendance)
+				if err == nil {
+					totalMarked++
+				}
+			}
+		}
+	}
+
+	log.Printf(" Marked %d users as absent\n", totalMarked)
+	return nil
 }

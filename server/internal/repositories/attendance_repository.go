@@ -11,11 +11,15 @@ import (
 type AttendanceRepository interface {
 	UpdateAttendance(att *models.Attendance) error
 	MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) error
-	FindAllSchedulesBefore(t time.Time) ([]models.ClassSchedule, error)
 	GetClassAttendance(scheduleID string) ([]models.Attendance, error)
+	FindAllSchedulesBefore(t time.Time) ([]models.ClassSchedule, error)
 	GetAllAttendancesByUser(userID string) ([]models.Attendance, error)
 	MarkAsAttendance(userID string, bookingID string) (*models.Attendance, error)
 	FindByUserBooking(userID string, bookingID string) (*models.Attendance, error)
+
+	// ** cron job
+	CreateAttendance(attendance *models.Attendance) error
+	CheckAttendanceExists(userID, bookingID uuid.UUID) (bool, error)
 }
 type attendanceRepository struct {
 	db *gorm.DB
@@ -122,4 +126,17 @@ func (r *attendanceRepository) MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) er
 		}
 	}
 	return nil
+}
+
+func (r *attendanceRepository) CheckAttendanceExists(userID, bookingID uuid.UUID) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.Attendance{}).
+		Where("user_id = ? AND class_schedule_id = (SELECT class_schedule_id FROM bookings WHERE id = ?)", userID, bookingID).
+		Count(&count).Error
+
+	return count > 0, err
+}
+
+func (r *attendanceRepository) CreateAttendance(attendance *models.Attendance) error {
+	return r.db.Create(attendance).Error
 }

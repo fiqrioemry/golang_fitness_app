@@ -43,7 +43,7 @@ func main() {
 	h := bootstrap.InitHandlers(s)
 
 	// ========== Cron Job ==========
-	cronManager := cron.NewCronManager(s.PaymentService, s.ScheduleTemplateService, s.NotificationService)
+	cronManager := cron.NewCronManager(s.PaymentService, s.ScheduleTemplateService, s.NotificationService, s.AttendanceService)
 	cronManager.RegisterJobs()
 	cronManager.Start()
 
