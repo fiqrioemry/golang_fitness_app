@@ -4,22 +4,22 @@ import { profileSchema } from "@/lib/schema";
 import { genderOptions } from "@/lib/constant";
 import { Button } from "@/components/ui/button";
 import { useProfileMutation } from "@/hooks/useProfile";
-import { SelectElement } from "@/components/input/SelectElement";
 import { FormAddDialog } from "@/components/form/FormAddDialog";
+import { SelectElement } from "@/components/input/SelectElement";
 import { InputDateElement } from "@/components/input/InputDateElement";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
 export const UpdateProfile = ({ profile }) => {
   const { updateProfile } = useProfileMutation();
-  const { mutateAsync, isPending } = updateProfile;
+
   return (
     <FormAddDialog
       icon={true}
       state={profile}
       title="Edit Profile"
-      loading={isPending}
-      action={mutateAsync}
+      loading={updateProfile.isPending}
+      action={updateProfile.mutateAsync}
       schema={profileSchema}
       buttonText={
         <Button variant="secondary" type="button">

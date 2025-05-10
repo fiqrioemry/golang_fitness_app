@@ -13,10 +13,12 @@ import {
   LayoutList,
   ShoppingCart,
   TicketPercent,
-  MessageSquare,
   LogOut,
   Repeat,
   PlusSquareIcon,
+  MessageCircle,
+  MessageSquare,
+  MailOpen,
 } from "lucide-react";
 import {
   Accordion,
@@ -64,19 +66,14 @@ const directMenus = [
     title: "Users",
   },
   {
-    to: "/admin/bookings",
-    icon: LayoutList,
-    title: "Bookings",
-  },
-  {
     to: "/admin/transactions",
     icon: ShoppingCart,
     title: "Transactions",
   },
   {
-    to: "/admin/notifications",
-    icon: Bell,
-    title: "Notifications",
+    to: "/admin/messages",
+    icon: MailOpen,
+    title: "Message",
   },
 ];
 

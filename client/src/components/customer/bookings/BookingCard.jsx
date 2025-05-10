@@ -1,10 +1,10 @@
 import {
-  CalendarIcon,
+  UserIcon,
+  InfoIcon,
   ClockIcon,
   MapPinIcon,
-  UserIcon,
   QrCodeIcon,
-  InfoIcon,
+  CalendarIcon,
   AlertCircleIcon,
 } from "lucide-react";
 import {
@@ -21,8 +21,8 @@ import { buildDateTime, getTimeLeft, isAttendanceWindow } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export const BookingCard = ({ booking }) => {
-  const [timeLeft, setTimeLeft] = useState("");
   const [showQR, setShowQR] = useState(false);
+  const [timeLeft, setTimeLeft] = useState("");
   const [canAttend, setCanAttend] = useState(false);
 
   const startTime = buildDateTime(

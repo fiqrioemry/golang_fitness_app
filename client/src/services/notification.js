@@ -1,4 +1,3 @@
-// src/services/notification.js
 import { authInstance } from ".";
 
 export const getNotificationSettings = async () => {
@@ -20,6 +19,7 @@ export const getAllBrowserNotifications = async () => {
   const res = await authInstance.get("/notifications");
   return res.data;
 };
+
 export const sendPromoNotification = async (payload) => {
   const res = await authInstance.post("/notifications/promo", payload);
   return res.data;

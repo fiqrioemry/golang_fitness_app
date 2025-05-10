@@ -14,9 +14,7 @@ import { Loading } from "@/components/ui/Loading";
 import { usePackagesQuery } from "@/hooks/usePackage";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-
-const packagesTitle =
-  "Packages - Find the right plan that matches your fitness goals and schedule";
+import { packagesTitle } from "@/lib/constant";
 
 const Packages = () => {
   useDocumentTitle(packagesTitle);

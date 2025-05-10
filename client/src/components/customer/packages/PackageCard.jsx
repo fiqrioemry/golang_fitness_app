@@ -1,21 +1,20 @@
-import React from "react";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { format, differenceInDays, isBefore } from "date-fns";
-import {
-  CalendarCheck,
   Clock,
-  AlertTriangle,
   XCircle,
   CheckCircle,
+  AlertTriangle,
+  CalendarCheck,
 } from "lucide-react";
+import {
+  Card,
+  CardTitle,
+  CardHeader,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
+import React from "react";
+import { Badge } from "@/components/ui/badge";
+import { format, differenceInDays, isBefore } from "date-fns";
 
 export const PackageCard = ({ pkgs }) => {
   const today = new Date();

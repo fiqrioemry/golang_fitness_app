@@ -5,7 +5,7 @@ const DeleteTemplate = ({ template }) => {
   const { deleteTemplate } = useScheduleTemplateMutation();
 
   const handleDeleteTemplate = () => {
-    deleteTemplate.mutateAsync(template.id);
+    deleteTemplate.mutate(template.id);
   };
 
   return (

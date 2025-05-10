@@ -30,8 +30,8 @@ const PackagesList = () => {
     refetch();
   }, []);
 
-  console.log(packages);
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (

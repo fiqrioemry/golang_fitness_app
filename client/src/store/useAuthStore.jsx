@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { create } from "zustand";
 import auth from "@/services/auth";
 import { persist } from "zustand/middleware";
-import { queryClient } from "../lib/react-query";
+import { queryClient } from "@/lib/react-query";
 
 export const useAuthStore = create(
   persist(
@@ -52,6 +52,17 @@ export const useAuthStore = create(
           toast.error(error.response?.data?.message || "Login failed");
         } finally {
           set({ loading: false });
+        }
+      },
+
+      googleLogin: async (idToken) => {
+        try {
+          const { message } = await auth.googleSignIn(idToken);
+          toast.success(message);
+          await get().authMe();
+        } catch (error) {
+          console.error(error);
+          toast.error(error.response?.data?.message || "Google Sign-In failed");
         }
       },
 

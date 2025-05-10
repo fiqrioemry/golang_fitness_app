@@ -15,15 +15,15 @@ const discountTypeOptions = [
 ];
 
 const VoucherUpdate = ({ voucher }) => {
-  const { mutateAsync, isPending } = useVoucherMutation();
+  const { createVoucher } = useVoucherMutation();
 
   return (
     <FormUpdateDialog
       state={voucher}
-      loading={isPending}
-      action={({ id, ...data }) => mutateAsync({ id, data })}
       title="Update Voucher"
       schema={createVoucherSchema}
+      loading={createVoucher.isPending}
+      action={({ id, ...data }) => createVoucher.mutateAsync({ id, data })}
     >
       <InputTextElement
         name="code"
@@ -31,10 +31,10 @@ const VoucherUpdate = ({ voucher }) => {
         disabled
       />
       <InputTextareaElement
+        maxLength={200}
         name="description"
         label="Description"
         placeholder="e.g. Diskon 50% untuk semua kelas"
-        maxLength={200}
       />
       <SelectElement
         name="discountType"
@@ -52,7 +52,6 @@ const VoucherUpdate = ({ voucher }) => {
           name="maxDiscount"
           label="Max Discount (if %)"
           placeholder="e.g. 30000"
-          isOptional
         />
         <InputNumberElement name="quota" label="Quota" placeholder="e.g. 10" />
       </div>

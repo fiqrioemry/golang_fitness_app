@@ -8,48 +8,40 @@
 
 @layer base {
   :root {
-    /* Warna dasar */
-    --background: 0 0% 0%; /* Hitam */
-    --foreground: 0 0% 100%; /* Putih */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
 
-    --card: 0 0% 5%; /* Hitam tua */
-    --card-foreground: 0 0% 100%; /* Putih */
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 100%;
 
     --popover: 0 0% 5%;
     --popover-foreground: 0 0% 100%;
 
-    /* Warna utama sesuai logo */
-    --primary: 72 100% 60%; /* Neon Yellow-Green / #D4FF00 */
-    --primary-foreground: 0 0% 0%; /* Hitam */
+    --primary: 72 100% 60%;
+    --primary-foreground: 0 0% 0%;
 
-    /* Warna sekunder untuk elemen ringan */
     --secondary: 0 0% 20%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Warna netral & teks sekunder */
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 70%;
 
     --accent: 72 100% 60%;
     --accent-foreground: 0 0% 0%;
 
-    /* Warna error */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Border & input */
     --border: 0 0% 20%;
     --input: 0 0% 25%;
     --ring: 72 100% 60%;
 
-    /* Warna grafik */
     --chart-1: 72 100% 60%;
     --chart-2: 0 0% 100%;
     --chart-3: 0 0% 50%;
     --chart-4: 144 50% 50%;
     --chart-5: 300 60% 60%;
 
-    /* Sidebar */
     --sidebar-background: 0 0% 5%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 72 100% 60%;
@@ -59,43 +51,54 @@
     --sidebar-border: 0 0% 25%;
     --sidebar-ring: 72 100% 60%;
 
-    /* Radius */
     --radius: 1rem;
   }
 
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 12%;
+
+    --popover: 0 0% 99%;
+    --popover-foreground: 0 0% 15%;
+
+    --primary: 72 100% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 25%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 72 100% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 85%;
+    --input: 0 0% 92%;
+    --ring: 72 100% 42%;
+
+    --chart-1: 72 100% 42%;
+    --chart-2: 0 0% 20%;
+    --chart-3: 0 0% 50%;
+    --chart-4: 144 50% 35%;
+    --chart-5: 300 60% 55%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 72 100% 42%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 0 0% 95%;
+    --sidebar-accent-foreground: 0 0% 25%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 72 100% 42%;
+
+    --radius: 1rem;
   }
 }
 

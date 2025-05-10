@@ -1,9 +1,4 @@
-// src/services/payment.js
 import { publicInstance, authInstance } from ".";
-
-// =====================
-// PAYMENT
-// =====================
 
 // GET /api/payments?q=&page=&limit=
 export const getAllUserPayments = async (params) => {
@@ -11,9 +6,8 @@ export const getAllUserPayments = async (params) => {
   return res.data;
 };
 
-// POST /api/payments (auth required)
+// POST /api/payments
 export const createPayment = async (data) => {
-  console.log(data);
   const res = await authInstance.post("/payments", data);
   return res.data;
 };

@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WebLogo } from "@/components/ui/WebLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { FormInput } from "@/components/form/FormInput";
 import { InputTextElement } from "@/components/input/InputTextElement";
-import { registerSchema, sendOTPSchema, verifyOTPSchema } from "@/lib/schema";
 import { sendOTPState, verifyOTPState, registerState } from "@/lib/constant";
+import { registerSchema, sendOTPSchema, verifyOTPSchema } from "@/lib/schema";
 
 const SignUp = () => {
-  const { register, step, loading, resetStep, sendOTP } = useAuthStore();
+  const { register, step, googleLogin, loading, resetStep, sendOTP } =
+    useAuthStore();
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [sentEmail, setSentEmail] = useState("");
@@ -29,9 +30,27 @@ const SignUp = () => {
   };
 
   const handleGoogleAuth = () => {
-    window.location.href = `${import.meta.env.VITE_BASE_URL}/auth/google`;
+    if (!window.google?.accounts?.id) return;
+    console.log("RESPONSE", window.google.accounts.id);
+    window.google.accounts.id.prompt();
   };
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.onload = () => {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: (response) => {
+          googleLogin(response.credential);
+        },
+      });
+    };
+    document.body.appendChild(script);
+
+    return () => document.body.removeChild(script);
+  }, []);
   const handleResendOTP = () => {
     if (!canResend || !sentEmail) return;
     sendOTP({ email: sentEmail });
@@ -63,8 +82,6 @@ const SignUp = () => {
   return (
     <section className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
-        {/* Left Illustration */}
-
         <div className="hidden md:block relative h-[550px]">
           <img
             src="/register.png"
@@ -72,25 +89,12 @@ const SignUp = () => {
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
-        {/* <div className="hidden md:flex flex-col justify-center items-center bg-muted text-primary px-6 py-10">
-          <h2 className="text-3xl font-bold mb-2">Stay Strong With Us!</h2>
-          <p className="text-sm text-muted-foreground text-center">
-            Stay fit and join us now
-          </p>
-          <img
-            src="/signup-wallpaper.webp"
-            alt="sign-up"
-            className="w-full h-auto mt-6 rounded"
-          />
-        </div> */}
 
-        {/* Right Form */}
         <div className="px-6 py-10">
           <div className="mb-6 flex justify-center text-center">
             <WebLogo />
           </div>
 
-          {/* Step Indicator */}
           <div className="flex justify-center mb-6 gap-2">
             {[1, 2, 3].map((s) => (
               <div

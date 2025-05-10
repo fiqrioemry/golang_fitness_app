@@ -1,9 +1,5 @@
 import { publicInstance, authInstance } from ".";
 
-// =====================
-// LEVEL (Public + Admin)
-// =====================
-
 // GET /api/levels
 export const getAllLevels = async () => {
   const res = await publicInstance.get("/levels");

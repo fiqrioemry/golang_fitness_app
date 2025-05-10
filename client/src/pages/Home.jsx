@@ -1,10 +1,10 @@
+import { homeTitle } from "@/lib/constant";
 import { OurClasses } from "@/components/home/OurClasses";
 import { Membership } from "@/components/home/Membership";
 import { HeroSection } from "@/components/home/HeroSection";
 import { OurLocation } from "@/components/home/OurLocation";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
-const homeTitle = "Home -  high-intensity workouts,";
 export default function Home() {
   useDocumentTitle(homeTitle);
   return (

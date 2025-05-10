@@ -1,4 +1,3 @@
-// src/services/instructor.js
 import { publicInstance, authInstance } from ".";
 
 export const getAllInstructors = async () => {

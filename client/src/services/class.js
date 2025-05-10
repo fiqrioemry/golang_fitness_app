@@ -1,6 +1,6 @@
 // src/services/class.js
-import { publicInstance, authInstance } from ".";
 import { buildFormData } from "@/lib/utils";
+import { publicInstance, authInstance } from ".";
 
 export const getAllClasses = async (params) => {
   const res = await publicInstance.get("/classes", { params });
@@ -39,6 +39,7 @@ export const deleteClass = async (id) => {
   return res.data;
 };
 
+// POST /api/classes/:id/gallery
 export const uploadClassGallery = async (id, images) => {
   const formData = buildFormData({ images });
   const res = await authInstance.post(`/classes/${id}/gallery`, formData);

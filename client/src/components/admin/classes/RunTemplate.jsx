@@ -2,16 +2,16 @@ import { FormToggle } from "@/components/form/FormToggle";
 import { useScheduleTemplateMutation } from "@/hooks/useSchedules";
 
 const RunTemplate = ({ template }) => {
-  const { runTemplate, isPending } = useScheduleTemplateMutation();
+  const { runTemplate } = useScheduleTemplateMutation();
 
   const handleRunTemplate = () => {
-    runTemplate.mutateAsync(template.id);
+    runTemplate.mutate(template.id);
   };
 
   return (
     <FormToggle
       type="start"
-      loading={isPending}
+      loading={runTemplate.isPending}
       title="Run Recuring Schedule"
       onToggle={handleRunTemplate}
       description="Are you sure want to Run this recuring schedule ?"

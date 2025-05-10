@@ -5,7 +5,7 @@ import {
   FaInstagram,
   FaEnvelope,
 } from "react-icons/fa";
-import { WebLogo } from "../ui/WebLogo";
+import { WebLogo } from "@/components/ui/WebLogo";
 
 const Footer = () => {
   return (

@@ -1,7 +1,7 @@
 import React from "react";
 import { localizer } from "@/lib/utils";
-import { Calendar, Views } from "react-big-calendar";
 import ClassScheduleHead from "./ClassScheduleHead";
+import { Calendar, Views } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const ClassScheduleCalendar = ({ onEmptySlotClick, onSelectEvent, events }) => {

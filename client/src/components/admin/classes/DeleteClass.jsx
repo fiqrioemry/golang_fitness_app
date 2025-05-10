@@ -5,7 +5,7 @@ const DeleteClass = ({ classes }) => {
   const { deleteClass } = useClassMutation();
 
   const handleDeleteClass = () => {
-    deleteClass.mutateAsync(classes.id);
+    deleteClass.mutate(classes.id);
   };
 
   return (

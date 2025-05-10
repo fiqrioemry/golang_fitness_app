@@ -2,20 +2,12 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as voucherService from "@/services/voucher";
 
-// =====================
-// QUERIES
-// =====================
-
 export const useVouchersQuery = () =>
   useQuery({
     queryKey: ["vouchers"],
     queryFn: voucherService.getAllVouchers,
     staleTime: 1000 * 60 * 10,
   });
-
-// =====================
-// MUTATIONS
-// =====================
 
 export const useVoucherMutation = () => {
   const qc = useQueryClient();

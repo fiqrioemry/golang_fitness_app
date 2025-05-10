@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button";
 
 const NotFound = () => {
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+    <section className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="text-center max-w-xl w-full">
         <img
           src="/page-not-found.webp"

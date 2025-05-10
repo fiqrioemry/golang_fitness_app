@@ -1,9 +1,5 @@
-import { publicInstance, authInstance } from ".";
 import { buildFormData } from "@/lib/utils";
-
-// =====================
-// PACKAGE (Public + Admin)
-// =====================
+import { publicInstance, authInstance } from ".";
 
 export const getAllPackages = async () => {
   const res = await publicInstance.get("/packages");

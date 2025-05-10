@@ -1,30 +1,30 @@
 import {
+  Bell,
+  User,
+  LogOut,
+  Package,
+  Calendar,
+  Settings2,
+  ShoppingCart,
+} from "lucide-react";
+import {
   Sidebar,
   SidebarMenu,
   SidebarHeader,
   SidebarFooter,
   SidebarContent,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { WebLogo } from "@/components/ui/WebLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Link, useLocation } from "react-router-dom";
-import {
-  Calendar,
-  Package,
-  ShoppingCart,
-  Bell,
-  User,
-  LogOut,
-  Settings2,
-} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 
 const NavItem = ({ to, icon: Icon, title, active }) => (
   <Link
@@ -105,14 +105,14 @@ const CustomerSidebar = () => {
             <div className="flex items-center gap-3 cursor-pointer hover:bg-muted px-3 py-2 rounded-md transition">
               <Avatar className="w-9 h-9">
                 <AvatarImage src={user?.avatar} alt={user?.fullname} />
-                <AvatarFallback>{user?.fullname?.[0] || "A"}</AvatarFallback>
+                <AvatarFallback>{user?.fullname?.[0]}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col text-left overflow-hidden">
                 <span className="text-sm font-medium text-foreground truncate">
-                  {user?.fullname || "Admin"}
+                  {user?.fullname}
                 </span>
                 <span className="text-xs text-muted-foreground truncate">
-                  {user?.email || "admin@gmail.com"}
+                  {user?.email}
                 </span>
               </div>
             </div>

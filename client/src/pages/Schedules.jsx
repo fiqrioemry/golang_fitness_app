@@ -9,8 +9,13 @@ import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/store/useAuthStore";
 import { format, isSameDay, addDays } from "date-fns";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import React, { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 
 const Schedules = () => {
   const { user } = useAuthStore();
@@ -42,12 +47,44 @@ const Schedules = () => {
   }, [data, selectedDate]);
 
   if (isLoading) return <Loading />;
-
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (
     <section className="section py-24 text-foreground">
-      <div className="flex items-center justify-center gap-4">
+      {/* Mobile: Carousel */}
+      <div className="block md:hidden">
+        <Carousel opts={{ align: "start" }} className="w-full mb-6">
+          <CarouselContent>
+            {dateRange.map((date) => {
+              const isSelected = isSameDay(date, selectedDate);
+              return (
+                <CarouselItem
+                  key={format(date, "yyyy-MM-dd")}
+                  className="basis-auto px-2"
+                >
+                  <button
+                    onClick={() => setSelectedDate(date)}
+                    aria-label={`Select ${format(date, "EEEE, dd MMMM")}`}
+                    className={`w-14 h-16 flex flex-col items-center justify-center rounded-lg transition font-medium flex-shrink-0 ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-accent hover:text-background text-muted-foreground"
+                    }`}
+                  >
+                    <span className="text-xs">{format(date, "EEE")}</span>
+                    <span className="text-lg font-bold">
+                      {format(date, "dd")}
+                    </span>
+                  </button>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+        </Carousel>
+      </div>
+
+      {/* Desktop: Static Horizontal Layout */}
+      <div className="hidden md:flex items-center justify-center gap-4 mb-6">
         {dateRange.map((date) => {
           const isSelected = isSameDay(date, selectedDate);
           return (
@@ -55,7 +92,7 @@ const Schedules = () => {
               key={format(date, "yyyy-MM-dd")}
               onClick={() => setSelectedDate(date)}
               aria-label={`Select ${format(date, "EEEE, dd MMMM")}`}
-              className={`w-14 min-w-14 h-16 flex flex-col items-center justify-center rounded-lg transition font-medium ${
+              className={`w-14 h-16 flex flex-col items-center justify-center rounded-lg transition font-medium ${
                 isSelected
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted hover:bg-accent hover:text-background text-muted-foreground"
@@ -69,7 +106,7 @@ const Schedules = () => {
       </div>
 
       {/* Summary */}
-      <div className="text-sm text-muted-foreground mb-6">
+      <div className="text-sm text-muted-foreground mb-6 text-center">
         <strong className="text-foreground">
           {format(selectedDate, "EEEE, dd MMM")}
         </strong>{" "}

@@ -6,7 +6,7 @@ const DeleteInstructor = ({ instructor }) => {
   const { deleteInstructor } = useInstructorMutation();
 
   const handleDelete = () => {
-    deleteInstructor.mutateAsync(instructor.id);
+    deleteInstructor.mutate(instructor.id);
   };
 
   return (

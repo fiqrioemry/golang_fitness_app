@@ -1,9 +1,4 @@
-// src/services/booking.js
 import { authInstance } from ".";
-
-// =====================
-// BOOKING (Auth Required)
-// =====================
 
 // POST /api/bookings
 export const createBooking = async (data) => {

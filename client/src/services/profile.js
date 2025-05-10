@@ -28,7 +28,6 @@ export const getUserPackages = async () => {
 
 // GET /api/user/packages
 export const getUserPackagesByClassID = async (id) => {
-  console.log("getting package", id);
   const res = await authInstance.get(`/user/packages/class/${id}`);
   return res.data;
 };

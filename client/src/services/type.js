@@ -1,9 +1,5 @@
 import { publicInstance, authInstance } from ".";
 
-// =====================
-// TYPE (Public + Admin)
-// =====================
-
 // GET /api/types
 export const getAllTypes = async () => {
   const res = await publicInstance.get("/types");
@@ -17,7 +13,6 @@ export const getTypeById = async (id) => {
 };
 
 // POST /api/types (Admin Only)
-
 export const createType = async (data) => {
   const res = await authInstance.post("/types", data);
   return res.data;

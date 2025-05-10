@@ -1,9 +1,4 @@
-// src/services/category.js
 import { publicInstance, authInstance } from ".";
-
-// =====================
-// CATEGORY (Public + Admin)
-// =====================
 
 // GET /api/categories
 export const getAllCategories = async () => {
@@ -17,19 +12,19 @@ export const getCategoryById = async (id) => {
   return res.data;
 };
 
-// POST /api/categories (Admin Only)
+// POST /api/categories
 export const createCategory = async (data) => {
   const res = await authInstance.post("/categories", data);
   return res.data;
 };
 
-// PUT /api/categories/:id (Admin Only)
+// PUT /api/categories/:id
 export const updateCategory = async (id, data) => {
   const res = await authInstance.put(`/categories/${id}`, data);
   return res.data;
 };
 
-// DELETE /api/categories/:id (Admin Only)
+// DELETE /api/categories/:id
 export const deleteCategory = async (id) => {
   const res = await authInstance.delete(`/categories/${id}`);
   return res.data;

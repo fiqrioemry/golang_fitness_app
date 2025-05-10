@@ -30,7 +30,6 @@ export const updateVoucher = async ({ id, data }) => {
 
 //  DELETE /api/vouchers/:id
 export const deleteVoucher = async (id) => {
-  console.log(id);
   const res = await authInstance.delete(`/vouchers/${id}`);
   return res.data;
 };

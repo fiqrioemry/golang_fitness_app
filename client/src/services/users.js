@@ -2,7 +2,6 @@
 import { authInstance } from ".";
 
 //   GET /api/admin/users
-
 export const getAllUsers = async (params) => {
   const res = await authInstance.get("/admin/users", { params });
   return res.data;

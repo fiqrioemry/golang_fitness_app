@@ -15,21 +15,18 @@ import ScheduleDetail from "./pages/ScheduleDetail";
 import Dashboard from "./pages/admin/Dashboard";
 import UsersList from "./pages/admin/UsersList";
 import ClassAdd from "./pages/admin/classes/ClassAdd";
-import BookingsList from "./pages/admin/BookingsList";
-import VouchersAdd from "./pages/admin/vouchers/VouchersAdd";
-import VouchersList from "./pages/admin/vouchers/VouchersList";
-import ReviewsLists from "./pages/admin/ReviewsLists";
 import PackageAdd from "./pages/admin/packages/PackageAdd";
 import ClassesList from "./pages/admin/classes/ClassesList";
+import VouchersAdd from "./pages/admin/vouchers/VouchersAdd";
 import ClassOptions from "./pages/admin/classes/ClassOptions";
 import TransactionsList from "./pages/admin/TransactionsList";
+import VouchersList from "./pages/admin/vouchers/VouchersList";
 import PackagesList from "./pages/admin/packages/PackagesList";
 import NotificationsList from "./pages/admin/NotificationsList";
 import ClassRecuring from "./pages/admin/classes/ClassRecuring";
 import ClassSchedules from "./pages/admin/classes/ClassSchedules";
 import AddInstructors from "./pages/admin/instructors/AddInstructors";
 import InstructorsList from "./pages/admin/instructors/InstructorsList";
-import ValidateAttendancePage from "./pages/admin/ValidateAttendancePage";
 
 // customer pages
 import Profile from "./pages/customer/Profile";
@@ -154,12 +151,8 @@ function App() {
           {/* instructors */}
           <Route path="instructors" element={<InstructorsList />} />
           <Route path="instructors/add" element={<AddInstructors />} />
-
-          <Route path="reviews" element={<ReviewsLists />} />
-          <Route path="bookings" element={<BookingsList />} />
           <Route path="transactions" element={<TransactionsList />} />
-          <Route path="notifications" element={<NotificationsList />} />
-          <Route path="validate" element={<ValidateAttendancePage />} />
+          <Route path="messages" element={<NotificationsList />} />
 
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>

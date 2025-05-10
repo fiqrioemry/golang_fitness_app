@@ -83,7 +83,7 @@ const RecurringSection = () => {
       {!isRecurring && <SelectCalendarElement name="date" label="Event Date" />}
       {isRecurring && (
         <>
-          <DaySelectorElement name="dayOfWeeks" label="Recurring Days" />
+          <DaySelectorElement name="dayOfWeeks" label="Days" />
           <SelectCalendarElement name="endDate" label="End Date" />
         </>
       )}

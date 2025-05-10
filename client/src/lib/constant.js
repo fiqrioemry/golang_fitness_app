@@ -146,6 +146,20 @@ export const createVoucherState = {
   expiredAt: "",
 };
 
-// seo setup
+export const operationMinutes = [0, 15, 30, 45];
+
+export const operationHours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+
+export const homeTitle = "Home -  high-intensity workouts with sweat up";
+
+export const aboutTitle =
+  "About Us – Empowering Your Wellness Journey with Sweat Up";
+
 export const scheduleTitle =
   "Discover and book fitness classes that fit your lifestyle. Explore real-time schedules with flexible times, expert instructors, and a variety of wellness programs at FitBook Studio.";
+
+export const classesTitle =
+  "Classes - Discover personalized sessions tailored for your needs, from beginner to advanced levels";
+
+export const packagesTitle =
+  "Packages - Find the right plan that matches your fitness goals and schedule";

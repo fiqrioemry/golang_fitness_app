@@ -6,15 +6,14 @@ import { InputTextElement } from "@/components/input/InputTextElement";
 
 const EditInstructor = ({ instructor }) => {
   const { updateInstructor } = useInstructorMutation();
-  const { isPending, mutateAsync } = updateInstructor;
 
   return (
     <FormUpdateDialog
       state={instructor}
-      loading={isPending}
-      action={mutateAsync}
       schema={instructorSchema}
       title="Update Instructors"
+      loading={updateInstructor.isPending}
+      action={updateInstructor.mutateAsync}
     >
       <InputTextElement
         name="userId"

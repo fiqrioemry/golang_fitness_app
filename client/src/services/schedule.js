@@ -1,9 +1,5 @@
 import { authInstance, publicInstance } from ".";
 
-// =====================
-// CLASS SCHEDULE AND TEMPLATE
-// =====================
-
 // GET /api/schedules
 export const getAllClassSchedules = async () => {
   const res = await publicInstance.get("/schedules");
@@ -90,6 +86,7 @@ export const stopScheduleTemplate = async (id) => {
   return res.data;
 };
 
+// TODO : belum diimplementasikan - next feature
 // // POST /api/schedule-templates/recurring
 // export const createScheduleTemplate = async (data) => {
 //   const res = await authInstance.post("/schedule-templates", data);

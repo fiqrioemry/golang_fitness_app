@@ -2,17 +2,17 @@ import { FormDelete } from "@/components/form/FormDelete";
 import { useMutationOptions } from "@/hooks/useSelectOptions";
 
 const DeleteOptions = ({ option, activeTab }) => {
-  const { deleteOptions, isLoading } = useMutationOptions(activeTab);
+  const { deleteOption, isPending } = useMutationOptions(activeTab);
 
   const handleDeleteOptions = () => {
-    deleteOptions.mutateAsync(option.id);
+    deleteOption.mutate(option.id);
   };
 
   return (
     <FormDelete
-      loading={isLoading}
       title={`Delete ${activeTab}`}
       onDelete={handleDeleteOptions}
+      loading={isPending}
       description={`Are you sure want to delete this ${activeTab}?`}
     />
   );

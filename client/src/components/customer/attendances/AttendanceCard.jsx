@@ -5,10 +5,10 @@ import {
   CalendarIcon,
   CheckCircleIcon,
 } from "lucide-react";
+import { ReviewClass } from "./ReviewClass";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, isBefore } from "date-fns";
 import { Card, CardTitle } from "@/components/ui/card";
-import { ReviewClass } from "./ReviewClass";
 
 export const AttendanceCard = ({ attendance }) => {
   const {

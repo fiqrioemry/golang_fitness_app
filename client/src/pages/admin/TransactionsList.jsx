@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
 } from "@/components/ui/table";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loading } from "@/components/ui/Loading";

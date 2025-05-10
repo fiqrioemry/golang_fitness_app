@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import React from "react";
 import { Link } from "react-router-dom";
+import { aboutTitle } from "@/lib/constant";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
@@ -15,7 +16,7 @@ import { HeartPulse, CalendarClock, Users } from "lucide-react";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const About = () => {
-  useDocumentTitle("About Us – Empowering Your Wellness Journey");
+  useDocumentTitle(aboutTitle);
   const {
     data: instructors = [],
     isLoading,

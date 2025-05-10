@@ -3,13 +3,9 @@ import { z } from "zod";
 const imageItemSchema = z
   .any()
   .optional()
-  .refine(
-    (file) =>
-      !file || // kosong = lolos
-      file instanceof File ||
-      typeof file === "string",
-    { message: "Input must be a file or a valid URL" }
-  )
+  .refine((file) => !file || file instanceof File || typeof file === "string", {
+    message: "Input must be a file or a valid URL",
+  })
   .refine(
     (file) =>
       !file || typeof file === "string" || file.type?.startsWith("image/"),
@@ -45,7 +41,6 @@ const requiredNumberField = (label, { min, max } = {}) =>
       )
   );
 
-// Register
 export const sendOTPSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
@@ -61,7 +56,6 @@ export const registerSchema = z.object({
   fullname: z.string().min(1, "Full name is required"),
 });
 
-// Login
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -85,7 +79,6 @@ export const avatarSchema = z.object({
   }),
 });
 
-// package
 export const packageSchema = z.object({
   name: z.string().min(6, "Package name must be at least 6 characters"),
   description: z.string().min(20, "Description must be at least 20 characters"),
@@ -104,7 +97,6 @@ export const packageSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-// options
 export const optionSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
 });
@@ -160,7 +152,6 @@ export const updateRecuringScheduleSchema = z.object({
   capacity: requiredNumberField("Capacity", { min: 1 }),
 });
 
-// classes
 export const classSchema = z.object({
   title: z.string().min(6, "Title must be at least 6 characters"),
   duration: requiredNumberField("Duration", { min: 15, max: 180 }),

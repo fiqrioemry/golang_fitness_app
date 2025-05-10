@@ -8,7 +8,6 @@ import { InputFileElement } from "@/components/input/InputFileElement";
 
 export const UploadAvatar = ({ profile }) => {
   const { updateAvatar } = useProfileMutation();
-  const { mutateAsync, isPending } = updateAvatar;
 
   return (
     <div className="relative flex flex-col justify-center items-center space-y-4">
@@ -22,8 +21,8 @@ export const UploadAvatar = ({ profile }) => {
         state={profile}
         title="Edit Avatar"
         schema={avatarSchema}
-        loading={isPending}
-        action={mutateAsync}
+        loading={updateAvatar.isPending}
+        action={updateAvatar.mutateAsync}
         buttonText={
           <Button className="w-full" type="button">
             <Camera className="w-4 h-4" />
