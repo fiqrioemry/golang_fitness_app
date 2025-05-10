@@ -7,6 +7,7 @@ import (
 )
 
 type RepositoryContainer struct {
+	DashboardRepo        repositories.DashboardRepository
 	AuthRepo             repositories.AuthRepository
 	UserRepo             repositories.UserRepository
 	TypeRepo             repositories.TypeRepository
@@ -31,6 +32,7 @@ type RepositoryContainer struct {
 
 func InitRepositories(db *gorm.DB) *RepositoryContainer {
 	return &RepositoryContainer{
+		DashboardRepo:        repositories.NewDashboardRepository(db),
 		AuthRepo:             repositories.NewAuthRepository(db),
 		UserRepo:             repositories.NewUserRepository(db),
 		TypeRepo:             repositories.NewTypeRepository(db),

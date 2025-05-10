@@ -765,3 +765,27 @@ type ApplyVoucherResponse struct {
 type GoogleSignInRequest struct {
 	IDToken string `json:"idToken" binding:"required"`
 }
+
+type DashboardSummaryResponse struct {
+	TotalUsers         int     `json:"totalUsers"`
+	TotalInstructors   int     `json:"totalInstructors"`
+	TotalClasses       int     `json:"totalClasses"`
+	TotalBookings      int     `json:"totalBookings"`
+	TotalPayments      int     `json:"totalPayments"`
+	TotalRevenue       float64 `json:"totalRevenue"`
+	ActivePackages     int     `json:"activePackages"`
+	TotalAttendance    int     `json:"totalAttendance"`
+	AbsentAttendance   int     `json:"absentAttendance"`
+	AttendedAttendance int     `json:"attendedAttendance"`
+}
+
+type RevenueStatRequest struct {
+	Range string `form:"range" binding:"omitempty,oneof=daily monthly yearly"`
+}
+
+type RevenueStatResponse struct {
+	TotalRevenue float64 `json:"totalRevenue"`
+	TotalSuccess int     `json:"totalSuccess"`
+	TotalPending int     `json:"totalPending"`
+	TotalFailed  int     `json:"totalFailed"`
+}

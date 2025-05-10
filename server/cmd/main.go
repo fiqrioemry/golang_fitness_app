@@ -48,6 +48,7 @@ func main() {
 	cronManager.Start()
 
 	// ========== Route Binding ==========
+	routes.DashboardRoutes(r, h.DashboardHandler)
 	routes.AuthRoutes(r, h.AuthHandler)
 	routes.UserRoutes(r, h.UserHandler)
 	routes.TypeRoutes(r, h.TypeHandler)

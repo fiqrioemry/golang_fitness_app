@@ -5,6 +5,7 @@ import (
 )
 
 type ServiceContainer struct {
+	DashboardService        services.DashboardService
 	AuthService             services.AuthService
 	UserService             services.UserService
 	TypeService             services.TypeService
@@ -30,6 +31,7 @@ func InitServices(repo *RepositoryContainer) *ServiceContainer {
 	voucherSvc := services.NewVoucherService(repo.VoucherRepo)
 
 	return &ServiceContainer{
+		DashboardService:        services.NewDashboardService(repo.DashboardRepo),
 		AuthService:             services.NewAuthService(repo.AuthRepo, repo.NotificationRepo),
 		UserService:             services.NewUserService(repo.UserRepo),
 		TypeService:             services.NewTypeService(repo.TypeRepo),

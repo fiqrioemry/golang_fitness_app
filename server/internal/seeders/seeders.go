@@ -605,20 +605,20 @@ func SeedPackages(db *gorm.DB) {
 	}
 
 	if err := db.Create(&packages).Error; err != nil {
-		log.Printf("❌ Failed seeding packages: %v", err)
+		log.Printf("Failed seeding packages: %v", err)
 	} else {
 		log.Println("✅ Successfully seeded packages!")
 	}
 
 	var classes []models.Class
 	if err := db.Find(&classes).Error; err != nil {
-		log.Println("❌ Failed to fetch classes:", err)
+		log.Println("Failed to fetch classes:", err)
 		return
 	}
 
 	var allPackages []models.Package
 	if err := db.Find(&allPackages).Error; err != nil {
-		log.Println("❌ Failed to fetch packages:", err)
+		log.Println("Failed to fetch packages:", err)
 		return
 	}
 
@@ -641,7 +641,7 @@ func SeedPackages(db *gorm.DB) {
 		}
 
 		if err := db.Model(&allPackages[i]).Association("Classes").Replace(&selectedClasses); err != nil {
-			log.Printf("❌ Failed associating package %s: %v", pkg.Name, err)
+			log.Printf("Failed associating package %s: %v", pkg.Name, err)
 		} else {
 			log.Printf("✅ Associated %d classes to package %s", len(selectedClasses), pkg.Name)
 		}
@@ -651,7 +651,7 @@ func SeedPackages(db *gorm.DB) {
 		if !classHasPackage[class.ID] {
 			randomPkg := allPackages[rand.Intn(len(allPackages))]
 			if err := db.Model(&randomPkg).Association("Classes").Append(&class); err != nil {
-				log.Printf("❌ Failed assigning fallback package to class %s: %v", class.Title, err)
+				log.Printf("Failed assigning fallback package to class %s: %v", class.Title, err)
 			} else {
 				log.Printf("Fallback assigned 1 package to class %s", class.Title)
 			}
@@ -760,14 +760,14 @@ func SeedUserPackages(db *gorm.DB) {
 	// Ambil user dengan email customer01 dan customer02
 	var users []models.User
 	if err := db.Where("email IN ?", []string{"customer01@example.com", "customer02@example.com"}).Find(&users).Error; err != nil || len(users) < 2 {
-		log.Println("❌ Failed to fetch users with specified emails")
+		log.Println("Failed to fetch users with specified emails")
 		return
 	}
 
 	// Ambil 2 package aktif pertama
 	var packages []models.Package
 	if err := db.Where("is_active = ?", true).Limit(2).Find(&packages).Error; err != nil || len(packages) < 2 {
-		log.Println("❌ Failed to fetch at least 2 active packages")
+		log.Println("Failed to fetch at least 2 active packages")
 		return
 	}
 
@@ -791,7 +791,7 @@ func SeedUserPackages(db *gorm.DB) {
 	}
 
 	if err := db.Create(&userPackages).Error; err != nil {
-		log.Printf("❌ Failed seeding user packages: %v", err)
+		log.Printf("Failed seeding user packages: %v", err)
 	} else {
 		log.Println("✅ UserPackages seeding completed!")
 	}
@@ -983,13 +983,13 @@ func SeedReviews(db *gorm.DB) {
 
 func SeedScheduleTemplate(db *gorm.DB) {
 	if err := db.Exec("DELETE FROM recurrence_rules").Error; err != nil {
-		log.Println("❌ Failed to clear recurrence_rules:", err)
+		log.Println("Failed to clear recurrence_rules:", err)
 	} else {
 		log.Println("🧹 RecurrenceRules cleared")
 	}
 
 	if err := db.Exec("DELETE FROM schedule_templates").Error; err != nil {
-		log.Println("❌ Failed to clear schedule_templates:", err)
+		log.Println("Failed to clear schedule_templates:", err)
 	} else {
 		log.Println("🧹 ScheduleTemplates cleared")
 	}
@@ -1012,7 +1012,7 @@ func SeedNotificationTypes(db *gorm.DB) {
 func generateNotificationSettingsForUser(db *gorm.DB, user models.User) {
 	var notifTypes []models.NotificationType
 	if err := db.Find(&notifTypes).Error; err != nil {
-		log.Printf("❌ Failed to get notification types for user %s: %v", user.Email, err)
+		log.Printf("Failed to get notification types for user %s: %v", user.Email, err)
 		return
 	}
 
@@ -1026,7 +1026,7 @@ func generateNotificationSettingsForUser(db *gorm.DB, user models.User) {
 				Enabled:            nt.DefaultEnabled,
 			}
 			if err := db.Create(&setting).Error; err != nil {
-				log.Printf("❌ Failed to create notification setting for user %s: %v", user.Email, err)
+				log.Printf("Failed to create notification setting for user %s: %v", user.Email, err)
 			}
 		}
 	}
@@ -1035,7 +1035,7 @@ func generateNotificationSettingsForUser(db *gorm.DB, user models.User) {
 func SeedDummyNotifications(db *gorm.DB) {
 	var user models.User
 	if err := db.Where("email = ?", "customer01@example.com").First(&user).Error; err != nil {
-		log.Println("❌ customer01@example.com not found")
+		log.Println("customer01@example.com not found")
 		return
 	}
 
@@ -1061,7 +1061,7 @@ func SeedDummyNotifications(db *gorm.DB) {
 	}
 
 	if err := db.Create(&notifications).Error; err != nil {
-		log.Printf("❌ Failed to seed dummy notifications: %v", err)
+		log.Printf("Failed to seed dummy notifications: %v", err)
 	} else {
 		log.Println("✅ Dummy notifications for customer01@example.com seeded!")
 	}
@@ -1107,7 +1107,7 @@ func SeedVouchers(db *gorm.DB) {
 	}
 
 	if err := db.Create([]models.Voucher{voucher1, voucher2}).Error; err != nil {
-		log.Printf("❌ Failed to seed vouchers: %v", err)
+		log.Printf("Failed to seed vouchers: %v", err)
 		return
 	}
 
