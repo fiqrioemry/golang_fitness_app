@@ -8,12 +8,11 @@ import (
 )
 
 func NotificationRoutes(r *gin.Engine, h *handlers.NotificationHandler) {
-	route := r.Group("/api/notifications")
-	route.Use(middleware.AuthRequired())
-	route.GET("", h.GetAllNotifications)
+	notif := r.Group("/api/notifications")
+	notif.Use(middleware.AuthRequired())
+	notif.GET("/settings", h.GetNotificationSettings)
+	notif.PUT("/settings", h.UpdateNotificationSetting)
+	notif.PATCH("/read", h.MarkAllNotificationsAsRead)
 
-	route.GET("/settings", h.GetNotificationSettings)
-	route.PUT("/settings", h.UpdateNotificationSetting)
-	route.POST("/promo", h.SendPromoNotification)
-	route.PATCH("/read", h.MarkAllNotificationsAsRead)
+	notif.POST("/broadcast", middleware.AdminOnly(), h.SendNewNotificatioon)
 }

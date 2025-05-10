@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"server/internal/config"
 	"server/internal/dto"
 	"server/internal/models"
@@ -16,6 +17,7 @@ import (
 )
 
 type PaymentService interface {
+	ExpireOldPendingPayments() error
 	HandlePaymentNotification(req dto.MidtransNotificationRequest) error
 	GetAllUserPayments(query string, page, limit int) (*dto.AdminPaymentListResponse, error)
 	CreatePayment(userID string, req dto.CreatePaymentRequest) (*dto.CreatePaymentResponse, error)
@@ -218,4 +220,17 @@ func (s *paymentService) GetAllUserPayments(query string, page, limit int) (*dto
 		Page:     page,
 		Limit:    limit,
 	}, nil
+}
+
+// ** khusus cron job update status to failed
+func (s *paymentService) ExpireOldPendingPayments() error {
+	rows, err := s.paymentRepo.ExpireOldPendingPayments()
+	if err != nil {
+		return fmt.Errorf("failed to expire pending payments: %w", err)
+	}
+	if rows == 0 {
+		return fmt.Errorf("no expired pending payments found")
+	}
+	fmt.Printf("✅ %d pending payments marked as failed\n", rows)
+	return nil
 }

@@ -310,6 +310,7 @@ type NotificationSetting struct {
 	DeletedAt          gorm.DeletedAt `gorm:"index"`
 
 	NotificationType NotificationType `gorm:"foreignKey:NotificationTypeID"`
+	User             User             `gorm:"foreignKey:UserID"`
 }
 
 type Notification struct {
@@ -336,6 +337,7 @@ func (p *Payment) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 	return
 }
+
 func (cs *ClassSchedule) BeforeCreate(tx *gorm.DB) (err error) {
 	if cs.ID == uuid.Nil {
 		cs.ID = uuid.New()
@@ -409,10 +411,23 @@ func (t *Type) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 	return
 }
+func (p *Attendance) BeforeCreate(tx *gorm.DB) (err error) {
+	if p.ID == uuid.Nil {
+		p.ID = uuid.New()
+	}
+	return
+}
 
 func (p *Package) BeforeCreate(tx *gorm.DB) (err error) {
 	if p.ID == uuid.Nil {
 		p.ID = uuid.New()
+	}
+	return
+}
+
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	if u.ID == uuid.Nil {
+		u.ID = uuid.New()
 	}
 	return
 }
@@ -427,13 +442,6 @@ func (p *Profile) BeforeCreate(tx *gorm.DB) (err error) {
 func (t *Token) BeforeCreate(tx *gorm.DB) (err error) {
 	if t.ID == uuid.Nil {
 		t.ID = uuid.New()
-	}
-	return
-}
-
-func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
-	if u.ID == uuid.Nil {
-		u.ID = uuid.New()
 	}
 	return
 }

@@ -212,7 +212,11 @@ func (s *scheduleTemplateService) DeleteTemplate(id string) error {
 func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 	templates, err := s.templateRepo.GetActiveTemplates()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to fetch templates: %w", err)
+	}
+
+	if len(templates) == 0 {
+		return fmt.Errorf("no active schedule templates found")
 	}
 
 	today := time.Now().Truncate(24 * time.Hour)
@@ -228,9 +232,7 @@ func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 			continue
 		}
 
-		generateUntil := oneMonthAhead
-
-		for d := today; !d.After(generateUntil); d = d.AddDate(0, 0, 1) {
+		for d := today; !d.After(oneMonthAhead); d = d.AddDate(0, 0, 1) {
 			if !utils.IsDayMatched(int(d.Weekday()), days) {
 				continue
 			}
@@ -248,7 +250,7 @@ func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 			}
 
 			if err := s.classScheduleRepo.CreateClassSchedule(&schedule); err != nil {
-				errs = append(errs, fmt.Sprintf("template %s: failed to create schedule on %s", template.ID, d))
+				errs = append(errs, fmt.Sprintf("template %s: failed to create schedule on %s", template.ID, d.Format("2006-01-02")))
 				continue
 			}
 
@@ -256,12 +258,12 @@ func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 		}
 	}
 
-	if !anySuccess {
-		return fmt.Errorf("no schedules were successfully generated: %v", errs)
+	if len(errs) > 0 && !anySuccess {
+		return fmt.Errorf("no schedules generated: %v", errs)
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("partial success with some errors: %v", errs)
+		return fmt.Errorf("some schedules generated, with errors: %v", errs)
 	}
 
 	return nil

@@ -14,9 +14,10 @@ type NotificationRepository interface {
 	GetAllNotificationTypes() ([]models.NotificationType, error)
 	UpdateNotificationSetting(setting *models.NotificationSetting) error
 	CreateNotificationSetting(setting *models.NotificationSetting) error
+	GetTypeByCode(code string) (*models.NotificationType, error)
 	GetAllBrowserNotifications(userID uuid.UUID) ([]models.Notification, error)
 	GetNotificationSettingsByUser(userID uuid.UUID) ([]models.NotificationSetting, error)
-	GetUsersWithEnabledPromoNotifications() ([]models.NotificationSetting, error)
+	GetUsersWithEnabledNotification(typeCode string) ([]models.NotificationSetting, error)
 	FindSetting(userID, typeID uuid.UUID, channel string) (*models.NotificationSetting, error)
 }
 
@@ -81,13 +82,20 @@ func (r *notificationRepository) GetAllBrowserNotifications(userID uuid.UUID) ([
 	return notifs, err
 }
 
-func (r *notificationRepository) GetUsersWithEnabledPromoNotifications() ([]models.NotificationSetting, error) {
+func (r *notificationRepository) GetUsersWithEnabledNotification(typeCode string) ([]models.NotificationSetting, error) {
 	var settings []models.NotificationSetting
 	err := r.db.
 		Preload("NotificationType").
+		Preload("User").
 		Where("channel IN ?", []string{"browser", "email"}).
-		Where("enabled = ? AND notification_type_id IN (SELECT id FROM notification_types WHERE code = ?)", true, "promo_offer").
+		Where("enabled = ? AND notification_type_id IN (SELECT id FROM notification_types WHERE code = ?)", true, typeCode).
 		Find(&settings).Error
 
 	return settings, err
+}
+
+func (r *notificationRepository) GetTypeByCode(code string) (*models.NotificationType, error) {
+	var nt models.NotificationType
+	err := r.db.Where("code = ?", code).First(&nt).Error
+	return &nt, err
 }

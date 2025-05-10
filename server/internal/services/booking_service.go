@@ -41,7 +41,6 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 		return fmt.Errorf("class schedule not found")
 	}
 
-	// Validasi userPackage
 	var userPackage models.UserPackage
 	err = s.userPackageRepo.FindActiveByUserAndPackage(userID, packageID, &userPackage)
 	if err != nil {
@@ -51,7 +50,6 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 		return fmt.Errorf("not enough credit")
 	}
 
-	// Cek kapasitas
 	count, err := s.bookingRepo.CountBookingBySchedule(schedule.ID.String())
 	if err != nil {
 		return fmt.Errorf("failed to count schedule bookings")
@@ -60,9 +58,7 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 		return fmt.Errorf("class schedule is full")
 	}
 
-	// Buat booking baru
 	booking := models.Booking{
-		ID:              uuid.New(),
 		UserID:          uuid.MustParse(userID),
 		ClassScheduleID: schedule.ID,
 		Status:          "booked",
@@ -71,13 +67,11 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 		return err
 	}
 
-	// Kurangi kredit dari UserPackage
 	userPackage.RemainingCredit -= 1
 	if err := s.userPackageRepo.UpdateUserPackage(&userPackage); err != nil {
 		return err
 	}
 
-	// Tambah Booked di ClassSchedule
 	if err := s.classScheduleRepo.IncrementBooked(schedule.ID); err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"server/internal/models"
 
 	"gorm.io/gorm"
@@ -25,11 +26,12 @@ func NewAuthRepository(db *gorm.DB) AuthRepository {
 }
 func (r *authRepository) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
-	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := r.db.Preload("Profile").Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
+
 func (r *authRepository) UpdateUser(user *models.User) error {
 	return r.db.Save(user).Error
 }
@@ -43,9 +45,10 @@ func (r *authRepository) GetUserByID(userID string) (*models.User, error) {
 }
 
 func (r *authRepository) CreateUser(user *models.User) error {
-	return r.db.Create(user).Error
+	err := r.db.Create(user).Error
+	fmt.Println("📌 User ID setelah CreateUser:", user.ID) // DEBUG
+	return err
 }
-
 func (r *authRepository) StoreRefreshToken(token *models.Token) error {
 	return r.db.Create(token).Error
 }

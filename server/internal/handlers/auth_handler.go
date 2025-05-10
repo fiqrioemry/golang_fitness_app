@@ -94,9 +94,10 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	}
 
 	utils.ClearAccessTokenCookie(c)
+
 	utils.ClearRefreshTokenCookie(c)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Logout success"})
+	c.JSON(http.StatusOK, gin.H{"message": "Logout Successfully"})
 }
 
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
@@ -116,7 +117,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 
 	utils.SetRefreshTokenCookie(c, tokens.RefreshToken)
 
-	c.JSON(http.StatusOK, gin.H{"message": "refresh successful"})
+	c.JSON(http.StatusOK, gin.H{"message": "Refresh Successfully"})
 }
 
 func (h *AuthHandler) AuthMe(c *gin.Context) {
@@ -137,4 +138,22 @@ func (h *AuthHandler) AuthMe(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *AuthHandler) GoogleSignIn(c *gin.Context) {
+	var req dto.GoogleSignInRequest
+	if !utils.BindAndValidateJSON(c, &req) {
+		return
+	}
+
+	tokens, err := h.authService.GoogleSignIn(req.IDToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
+		return
+	}
+
+	utils.SetAccessTokenCookie(c, tokens.AccessToken)
+	utils.SetRefreshTokenCookie(c, tokens.RefreshToken)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Google Sign-In successful"})
 }

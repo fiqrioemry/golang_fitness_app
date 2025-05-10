@@ -707,9 +707,10 @@ type NotificationResponse struct {
 	CreatedAt string `json:"createdAt"`
 }
 
-type SendPromoNotificationRequest struct {
-	Title   string `json:"title" binding:"required"`
-	Message string `json:"message" binding:"required"`
+type SendNotificationRequest struct {
+	TypeCode string `json:"typeCode" binding:"required"`
+	Title    string `json:"title" binding:"required"`
+	Message  string `json:"message" binding:"required"`
 }
 
 // VOUCHER
@@ -759,4 +760,8 @@ type ApplyVoucherResponse struct {
 	MaxDiscount   *float64 `json:"maxDiscount,omitempty"`
 	DiscountValue float64  `json:"discountValue"`
 	FinalTotal    float64  `json:"finalTotal"`
+}
+
+type GoogleSignInRequest struct {
+	IDToken string `json:"idToken" binding:"required"`
 }

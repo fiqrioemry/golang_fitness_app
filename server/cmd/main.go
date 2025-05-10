@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"server/internal/config"
+	"server/internal/cron"
 	"server/internal/handlers"
 	"server/internal/middleware"
 	"server/internal/repositories"
@@ -13,29 +14,7 @@ import (
 	"server/internal/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/robfig/cron/v3"
 )
-
-func startCronJobs(service services.ScheduleTemplateService) {
-	c := cron.New()
-	c.AddFunc("0 12 * * *", func() {
-		log.Println("Cron Auto generating class schedules...")
-		if err := service.AutoGenerateSchedules(); err != nil {
-			log.Printf("Cron Error: %v\n", err)
-		} else {
-			log.Println("Cron Success generating schedules")
-		}
-	})
-	c.Start()
-}
-
-func StartScheduler(attendanceService services.AttendanceService) {
-	c := cron.New()
-	c.AddFunc("@every 15m", func() {
-		_ = attendanceService.MarkAbsentAttendances()
-	})
-	c.Start()
-}
 
 func main() {
 	utils.LoadEnv()
@@ -52,7 +31,8 @@ func main() {
 		middleware.Recovery(),
 		middleware.CORS(),
 		middleware.RateLimiter(5, 10),
-		middleware.LimitFileSize(12<<20), // batas maksimal 12mb (total 6 gambar jadi pergambar 2mb)
+		middleware.LimitFileSize(12<<20),
+		middleware.APIKeyGateway([]string{"/api/payments"}),
 	)
 
 	// ========== Seeder ==========
@@ -126,8 +106,11 @@ func main() {
 	classScheduleHandler := handlers.NewClassScheduleHandler(classScheduleService, scheduleTemplateService)
 
 	// ========== Cron Job ==========
-	StartScheduler(attendanceService)
-	startCronJobs(scheduleTemplateService)
+	cronManager := cron.NewCronManager(paymentService, scheduleTemplateService, notificationService)
+	cronManager.RegisterJobs()
+	cronManager.Start()
+
+	// StartBackupJob()
 
 	// ========== Route Binding ==========
 	routes.AuthRoutes(r, authHandler)

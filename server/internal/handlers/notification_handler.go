@@ -68,17 +68,18 @@ func (h *NotificationHandler) MarkAllNotificationsAsRead(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "all notifications marked as read"})
 }
-func (h *NotificationHandler) SendPromoNotification(c *gin.Context) {
-	var req dto.SendPromoNotificationRequest
+
+func (h *NotificationHandler) SendNewNotificatioon(c *gin.Context) {
+	var req dto.SendNotificationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload"})
 		return
 	}
 
-	if err := h.service.SendPromoNotification(req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to send promo notification"})
+	if err := h.service.SendNotificationByType(req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to send notification"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "promo notification sent"})
+	c.JSON(http.StatusOK, gin.H{"message": "notification sent"})
 }

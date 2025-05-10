@@ -9,11 +9,11 @@ import (
 )
 
 type CategoryService interface {
-	CreateCategory(req dto.CreateCategoryRequest) error
-	UpdateCategory(id string, req dto.UpdateCategoryRequest) error
 	DeleteCategory(id string) error
 	GetAllCategories() ([]dto.CategoryResponse, error)
+	CreateCategory(req dto.CreateCategoryRequest) error
 	GetCategoryByID(id string) (*dto.CategoryResponse, error)
+	UpdateCategory(id string, req dto.UpdateCategoryRequest) error
 }
 
 type categoryService struct {

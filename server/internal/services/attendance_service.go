@@ -10,13 +10,15 @@ import (
 )
 
 type AttendanceService interface {
-	MarkAbsentAttendances() error
 	GetBookingInfo(bookingID string) (*models.Booking, error)
 	ValidateQRCodeData(qr string) (*dto.AttendanceResponse, error)
-	CheckinAttendance(userID string, bookingID string) (string, error)
 	GetAllAttendances(userID string) ([]dto.AttendanceResponse, error)
+	CheckinAttendance(userID string, bookingID string) (string, error)
 	GetQRCode(userID, bookingID string) (string, *models.Booking, error)
 	GetAttendanceDetail(scheduleID string) ([]dto.AttendanceDetailResponse, error)
+
+	//
+	MarkAbsentAttendances() error
 }
 
 type attendanceService struct {

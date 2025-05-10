@@ -1,8 +1,10 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"os"
 	"server/internal/config"
 	"server/internal/dto"
 	"server/internal/models"
@@ -11,16 +13,18 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"google.golang.org/api/idtoken"
 )
 
 type AuthService interface {
-	GetUserProfile(userID string) (*models.User, error)
-	Register(req *dto.RegisterRequest) (*dto.AuthResponse, error)
-	Login(req *dto.LoginRequest) (*dto.AuthResponse, error)
-	Logout(refreshToken string) error
-	RefreshToken(refreshToken string) (*dto.AuthResponse, error)
 	SendOTP(email string) error
+	Logout(refreshToken string) error
 	VerifyOTP(email, otp string) error
+	GetUserProfile(userID string) (*models.User, error)
+	Login(req *dto.LoginRequest) (*dto.AuthResponse, error)
+	GoogleSignIn(idToken string) (*dto.AuthResponse, error)
+	Register(req *dto.RegisterRequest) (*dto.AuthResponse, error)
+	RefreshToken(refreshToken string) (*dto.AuthResponse, error)
 }
 
 type authService struct {
@@ -33,11 +37,13 @@ func NewAuthService(repo repositories.AuthRepository, notificationRepo repositor
 }
 
 func (s *authService) SendOTP(email string) error {
-	_, err := s.repo.GetUserByEmail(email)
+	user, err := s.repo.GetUserByEmail(email)
 	if err == nil {
+		if user.Password == "-" {
+			return errors.New("email already registered via Google Sign-In")
+		}
 		return errors.New("email already registered")
 	}
-
 	subject := "One-Time Password (OTP) xxxxx"
 	otp := utils.GenerateOTP(6)
 	body := fmt.Sprintf("Your OTP code is %s", otp)
@@ -51,13 +57,8 @@ func (s *authService) SendOTP(email string) error {
 	return err
 }
 
-func (s *authService) GetUserProfile(userID string) (*models.User, error) {
-	user, err := s.repo.GetUserByID(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
+func (s *authService) Logout(refreshToken string) error {
+	return s.repo.DeleteRefreshToken(refreshToken)
 }
 
 func (s *authService) VerifyOTP(email, otp string) error {
@@ -72,6 +73,50 @@ func (s *authService) VerifyOTP(email, otp string) error {
 
 	config.RedisClient.Del(config.Ctx, "otp:"+email)
 	return nil
+}
+
+func (s *authService) GetUserProfile(userID string) (*models.User, error) {
+	user, err := s.repo.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (s *authService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
+	user, err := s.repo.GetUserByEmail(req.Email)
+	if err != nil {
+		return nil, errors.New("invalid email or password")
+	}
+
+	if !utils.CheckPasswordHash(req.Password, user.Password) {
+		return nil, errors.New("invalid email or password")
+	}
+
+	accessToken, err := utils.GenerateAccessToken(user.ID.String(), user.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := utils.GenerateRefreshToken(user.ID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	tokenModel := &models.Token{
+		UserID:    user.ID,
+		Token:     refreshToken,
+		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
+	}
+	if err := s.repo.StoreRefreshToken(tokenModel); err != nil {
+		return nil, err
+	}
+
+	return &dto.AuthResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
 func (s *authService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, error) {
@@ -123,45 +168,6 @@ func (s *authService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, err
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
-}
-
-func (s *authService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
-	user, err := s.repo.GetUserByEmail(req.Email)
-	if err != nil {
-		return nil, errors.New("invalid credentials")
-	}
-
-	if !utils.CheckPasswordHash(req.Password, user.Password) {
-		return nil, errors.New("invalid credentials")
-	}
-
-	accessToken, err := utils.GenerateAccessToken(user.ID.String(), user.Role)
-	if err != nil {
-		return nil, err
-	}
-
-	refreshToken, err := utils.GenerateRefreshToken(user.ID.String())
-	if err != nil {
-		return nil, err
-	}
-
-	tokenModel := &models.Token{
-		UserID:    user.ID,
-		Token:     refreshToken,
-		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
-	}
-	if err := s.repo.StoreRefreshToken(tokenModel); err != nil {
-		return nil, err
-	}
-
-	return &dto.AuthResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-	}, nil
-}
-
-func (s *authService) Logout(refreshToken string) error {
-	return s.repo.DeleteRefreshToken(refreshToken)
 }
 
 func (s *authService) RefreshToken(refreshToken string) (*dto.AuthResponse, error) {
@@ -229,4 +235,75 @@ func (s *authService) generateDefaultSettingsForUser(userID uuid.UUID) {
 			_ = s.notificationRepo.CreateNotificationSetting(&setting)
 		}
 	}
+}
+
+func (s *authService) GoogleSignIn(idToken string) (*dto.AuthResponse, error) {
+	payload, err := idtoken.Validate(context.Background(), idToken, os.Getenv("GOOGLE_CLIENT_ID"))
+	if err != nil {
+		return nil, errors.New("invalid Google ID token")
+	}
+
+	email, ok := payload.Claims["email"].(string)
+	if !ok || email == "" {
+		return nil, errors.New("email not found in token")
+	}
+	name, _ := payload.Claims["name"].(string)
+	picture, _ := payload.Claims["picture"].(string)
+
+	user, err := s.repo.GetUserByEmail(email)
+	if err != nil {
+		user = &models.User{
+			Email:    email,
+			Password: "-",
+			Role:     "customer",
+			Profile: models.Profile{
+				Fullname: name,
+				Avatar:   picture,
+			},
+		}
+
+		if err := s.repo.CreateUser(user); err != nil {
+			return nil, err
+		}
+
+		if user.ID == uuid.Nil {
+			return nil, errors.New("failed to assign UUID to user")
+		}
+		fmt.Println("✅ User created with ID:", user.ID)
+
+		s.generateDefaultSettingsForUser(user.ID)
+	}
+
+	fmt.Println("➡️ Login Google untuk user ID:", user.ID)
+
+	accessToken, err := utils.GenerateAccessToken(user.ID.String(), user.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := utils.GenerateRefreshToken(user.ID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	tokenModel := &models.Token{
+		UserID:    user.ID,
+		Token:     refreshToken,
+		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
+	}
+
+	// ⛏️ Cek user ID sebelum simpan token
+	if tokenModel.UserID == uuid.Nil {
+		return nil, errors.New("user ID kosong saat menyimpan token")
+	}
+	fmt.Println("✅ Simpan refresh token untuk user ID:", tokenModel.UserID)
+
+	if err := s.repo.StoreRefreshToken(tokenModel); err != nil {
+		return nil, err
+	}
+
+	return &dto.AuthResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
 }

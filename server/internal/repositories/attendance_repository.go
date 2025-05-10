@@ -11,9 +11,9 @@ import (
 type AttendanceRepository interface {
 	UpdateAttendance(att *models.Attendance) error
 	MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) error
+	FindAllSchedulesBefore(t time.Time) ([]models.ClassSchedule, error)
 	GetClassAttendance(scheduleID string) ([]models.Attendance, error)
 	GetAllAttendancesByUser(userID string) ([]models.Attendance, error)
-	FindAllSchedulesBefore(t time.Time) ([]models.ClassSchedule, error)
 	MarkAsAttendance(userID string, bookingID string) (*models.Attendance, error)
 	FindByUserBooking(userID string, bookingID string) (*models.Attendance, error)
 }
@@ -87,7 +87,6 @@ func (r *attendanceRepository) MarkAsAttendance(userID string, bookingID string)
 	}
 
 	newAttendance := models.Attendance{
-		ID:              uuid.New(),
 		UserID:          uuid.MustParse(userID),
 		ClassScheduleID: booking.ClassScheduleID,
 		Status:          "attended",
@@ -113,11 +112,9 @@ func (r *attendanceRepository) MarkAbsentIfNotCheckedIn(scheduleID uuid.UUID) er
 		err := r.db.Where("user_id = ? AND class_schedule_id = ?", booking.UserID, booking.ClassScheduleID).First(&existing).Error
 		if err == gorm.ErrRecordNotFound {
 			attendance := models.Attendance{
-				ID:              uuid.New(),
 				UserID:          booking.UserID,
 				ClassScheduleID: booking.ClassScheduleID,
 				Status:          "absent",
-				CreatedAt:       time.Now(),
 			}
 			if err := r.db.Create(&attendance).Error; err != nil {
 				return err

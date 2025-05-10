@@ -2,14 +2,16 @@ package repositories
 
 import (
 	"server/internal/models"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type PaymentRepository interface {
+	ExpireOldPendingPayments() (int64, error)
 	CreatePayment(payment *models.Payment) error
-	GetPaymentByID(id string) (*models.Payment, error)
 	UpdatePayment(payment *models.Payment) error
+	GetPaymentByID(id string) (*models.Payment, error)
 	GetPaymentByOrderID(orderID string) (*models.Payment, error)
 	GetAllUserPayments(query string, limit, offset int) ([]models.Payment, int64, error)
 }
@@ -70,4 +72,15 @@ func (r *paymentRepository) GetAllUserPayments(query string, limit, offset int) 
 	}
 
 	return payments, count, nil
+}
+
+// ** khusus cron job update status ke failed
+func (r *paymentRepository) ExpireOldPendingPayments() (int64, error) {
+	threshold := time.Now().Add(-24 * time.Hour)
+
+	result := r.db.Model(&models.Payment{}).
+		Where("status = ? AND paid_at <= ?", "pending", threshold).
+		Update("status", "failed")
+
+	return result.RowsAffected, result.Error
 }

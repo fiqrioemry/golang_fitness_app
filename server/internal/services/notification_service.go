@@ -1,18 +1,21 @@
 package services
 
 import (
+	"fmt"
+	"server/internal/config"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
+	"server/internal/utils"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type NotificationService interface {
+	SendClassReminder() error
 	MarkAllAsRead(userID string) error
-	CreateNotification(input dto.CreateNotificationRequest) error
-	SendPromoNotification(req dto.SendPromoNotificationRequest) error
+	SendNotificationByType(req dto.SendNotificationRequest) error
 	GetAllNotifications(userID string) ([]dto.NotificationResponse, error)
 	UpdateSetting(userID string, req dto.UpdateNotificationSettingRequest) error
 	GetSettingsByUser(userID string) ([]dto.NotificationSettingResponse, error)
@@ -61,19 +64,6 @@ func (s *notificationService) UpdateSetting(userID string, req dto.UpdateNotific
 	return s.repo.UpdateNotificationSetting(setting)
 }
 
-func (s *notificationService) CreateNotification(input dto.CreateNotificationRequest) error {
-	notif := models.Notification{
-		ID:       uuid.New(),
-		UserID:   uuid.MustParse(input.UserID),
-		TypeCode: input.TypeCode,
-		Title:    input.Title,
-		Message:  input.Message,
-		Channel:  input.Channel,
-	}
-
-	return s.repo.CreateNotification(&notif)
-}
-
 func (s *notificationService) GetAllNotifications(userID string) ([]dto.NotificationResponse, error) {
 	notifs, err := s.repo.GetAllBrowserNotifications(uuid.MustParse(userID))
 	if err != nil {
@@ -100,8 +90,8 @@ func (s *notificationService) MarkAllAsRead(userID string) error {
 	return s.repo.MarkAllNotificationsRead(uuid.MustParse(userID))
 }
 
-func (s *notificationService) SendPromoNotification(req dto.SendPromoNotificationRequest) error {
-	settings, err := s.repo.GetUsersWithEnabledPromoNotifications()
+func (s *notificationService) SendNotificationByType(req dto.SendNotificationRequest) error {
+	settings, err := s.repo.GetUsersWithEnabledNotification(req.TypeCode)
 	if err != nil {
 		return err
 	}
@@ -111,12 +101,68 @@ func (s *notificationService) SendPromoNotification(req dto.SendPromoNotificatio
 		notifs = append(notifs, models.Notification{
 			ID:       uuid.New(),
 			UserID:   setting.UserID,
-			TypeCode: "promo_offer",
+			TypeCode: req.TypeCode,
 			Title:    req.Title,
 			Message:  req.Message,
 			Channel:  setting.Channel,
 		})
+
+		if setting.Channel == "email" && setting.User.Email != "" {
+			go func(email, title, msg string) {
+				if err := utils.SendNotificationEmail(email, title, msg); err != nil {
+					fmt.Printf("failed to send email to %s: %v\n", email, err)
+				}
+			}(setting.User.Email, req.Title, req.Message)
+		}
 	}
 
 	return s.repo.InsertNotifications(notifs)
+}
+
+func (s *notificationService) SendClassReminder() error {
+	reminderTime := time.Now().Add(1 * time.Hour).Truncate(time.Minute)
+
+	var bookings []models.Booking
+	err := config.DB.Preload("User").Preload("ClassSchedule.Class").
+		Where("status = ? AND DATE(date) = ? AND start_hour = ? AND start_minute = ?",
+			"booked",
+			reminderTime.Format("2006-01-02"),
+			reminderTime.Hour(),
+			reminderTime.Minute(),
+		).Joins("JOIN class_schedules ON class_schedules.id = bookings.class_schedule_id").
+		Find(&bookings).Error
+	if err != nil {
+		return err
+	}
+
+	notifType, err := s.repo.GetTypeByCode("class_reminder")
+	if err != nil {
+		return err
+	}
+
+	for _, booking := range bookings {
+		user := booking.User
+		class := booking.ClassSchedule.Class
+
+		setting, err := s.repo.FindSetting(user.ID, notifType.ID, "email")
+		if err != nil || !setting.Enabled {
+			continue
+		}
+
+		message := fmt.Sprintf("Reminder: You have a class '%s' at %02d:%02d today.",
+			class.Title, booking.ClassSchedule.StartHour, booking.ClassSchedule.StartMinute)
+
+		go utils.SendNotificationEmail(user.Email, "Class Reminder", message)
+
+		notif := models.Notification{
+			UserID:   user.ID,
+			TypeCode: "class_reminder",
+			Title:    "Class Reminder",
+			Message:  message,
+			Channel:  "email",
+		}
+		_ = s.repo.CreateNotification(&notif)
+	}
+
+	return nil
 }
