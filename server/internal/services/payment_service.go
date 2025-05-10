@@ -207,7 +207,7 @@ func (s *paymentService) GetAllUserPayments(query string, page, limit int) (*dto
 			Fullname:      p.User.Profile.Fullname,
 			PackageID:     p.PackageID.String(),
 			PackageName:   p.Package.Name,
-			Price:         p.Package.Price,
+			Price:         p.Total,
 			PaymentMethod: p.PaymentMethod,
 			Status:        p.Status,
 			PaidAt:        p.PaidAt.Format("2006-01-02 15:04:05"),

@@ -12,6 +12,7 @@ func NotificationRoutes(r *gin.Engine, h *handlers.NotificationHandler) {
 	notif.Use(middleware.AuthRequired())
 	notif.GET("/settings", h.GetNotificationSettings)
 	notif.PUT("/settings", h.UpdateNotificationSetting)
+	notif.GET("", h.GetAllNotifications)
 	notif.PATCH("/read", h.MarkAllNotificationsAsRead)
 
 	notif.POST("/broadcast", middleware.AdminOnly(), h.SendNewNotificatioon)

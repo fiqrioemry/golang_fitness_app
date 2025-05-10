@@ -7,7 +7,7 @@ import (
 
 type DashboardService interface {
 	GetSummary() (*dto.DashboardSummaryResponse, error)
-	GetRevenueStats(filter dto.RevenueStatRequest) (*dto.RevenueStatResponse, error)
+	GetRevenueStats(rangeType string) (*dto.RevenueStatsResponse, error)
 }
 
 type dashboardService struct {
@@ -43,6 +43,15 @@ func (s *dashboardService) GetSummary() (*dto.DashboardSummaryResponse, error) {
 	}, nil
 }
 
-func (s *dashboardService) GetRevenueStats(filter dto.RevenueStatRequest) (*dto.RevenueStatResponse, error) {
-	return s.repo.GetRevenueStats(filter)
+func (s *dashboardService) GetRevenueStats(rangeType string) (*dto.RevenueStatsResponse, error) {
+	stats, total, err := s.repo.GetRevenueStatsByRange(rangeType)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.RevenueStatsResponse{
+		Range:         rangeType,
+		TotalRevenue:  total,
+		RevenueSeries: stats,
+	}, nil
 }

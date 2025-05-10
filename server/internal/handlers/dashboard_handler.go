@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"server/internal/dto"
 	"server/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -24,19 +23,14 @@ func (h *DashboardHandler) GetSummary(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, data)
 }
-
 func (h *DashboardHandler) GetRevenueStats(c *gin.Context) {
-	var req dto.RevenueStatRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid query parameter"})
-		return
-	}
+	rangeType := c.DefaultQuery("range", "daily")
 
-	stats, err := h.dashboardService.GetRevenueStats(req)
+	result, err := h.dashboardService.GetRevenueStats(rangeType)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to get revenue stats"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, stats)
+	c.JSON(http.StatusOK, result)
 }

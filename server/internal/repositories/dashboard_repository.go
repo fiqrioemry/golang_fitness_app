@@ -3,7 +3,6 @@ package repositories
 import (
 	"server/internal/dto"
 	"server/internal/models"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -16,7 +15,8 @@ type DashboardRepository interface {
 	CountPayments() (int, error)
 	SumRevenue() (float64, error)
 	CountActivePackages() (int, error)
-	GetRevenueStats(filter dto.RevenueStatRequest) (*dto.RevenueStatResponse, error)
+
+	GetRevenueStatsByRange(rangeType string) ([]dto.RevenueStat, float64, error)
 	CountAttendanceByStatus(status string) (int, error)
 }
 
@@ -76,45 +76,44 @@ func (r *dashboardRepository) CountAttendanceByStatus(status string) (int, error
 	return int(count), err
 }
 
-func (r *dashboardRepository) GetRevenueStats(filter dto.RevenueStatRequest) (*dto.RevenueStatResponse, error) {
-	var result dto.RevenueStatResponse
+func (r *dashboardRepository) GetRevenueStatsByRange(rangeType string) ([]dto.RevenueStat, float64, error) {
+	var stats []dto.RevenueStat
+	var total float64
 
-	var startDate time.Time
-	now := time.Now()
+	query := r.db.Model(&models.Payment{}).Where("status = ?", "success")
 
-	switch filter.Range {
+	selectClause := ""
+	groupClause := ""
+	orderClause := ""
+
+	switch rangeType {
 	case "daily":
-		startDate = now.Truncate(24 * time.Hour)
+		selectClause = "DATE(paid_at) as date"
+		groupClause = "DATE(paid_at)"
+		orderClause = "DATE(paid_at)"
 	case "monthly":
-		startDate = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+		selectClause = "DATE_FORMAT(paid_at, '%Y-%m') as date"
+		groupClause = "DATE_FORMAT(paid_at, '%Y-%m')"
+		orderClause = "DATE_FORMAT(paid_at, '%Y-%m')"
 	case "yearly":
-		startDate = time.Date(now.Year(), 1, 1, 0, 0, 0, 0, now.Location())
+		selectClause = "YEAR(paid_at) as date"
+		groupClause = "YEAR(paid_at)"
+		orderClause = "YEAR(paid_at)"
 	default:
-		startDate = time.Time{} // All time
+		selectClause = "DATE(paid_at) as date"
+		groupClause = "DATE(paid_at)"
+		orderClause = "DATE(paid_at)"
 	}
 
-	query := r.db.Model(&models.Payment{}).Where("paid_at >= ?", startDate)
-
-	if err := query.
-		Where("status = ?", "success").
-		Select("COALESCE(SUM(total), 0) as total_revenue, COUNT(*) as total_success").
-		Scan(&result).Error; err != nil {
-		return nil, err
+	err := query.
+		Select(selectClause + ", SUM(total) as total").
+		Group(groupClause).
+		Order(orderClause + " ASC").
+		Scan(&stats).Error
+	if err != nil {
+		return nil, 0, err
 	}
 
-	var pending, failed int64
-
-	if err := query.
-		Where("status = ?", "pending").
-		Count(&pending).Error; err != nil {
-		return nil, err
-	}
-
-	if err := query.
-		Where("status = ?", "failed").
-		Count(&failed).Error; err != nil {
-		return nil, err
-	}
-
-	return &result, nil
+	err = query.Select("SUM(total)").Scan(&total).Error
+	return stats, total, err
 }

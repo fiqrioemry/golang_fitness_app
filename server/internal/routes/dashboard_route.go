@@ -7,9 +7,9 @@ import (
 )
 
 func DashboardRoutes(r *gin.Engine, handler *handlers.DashboardHandler) {
-	admin := r.Group("/admin")
+	admin := r.Group("/api/admin")
 	{
 		admin.GET("/dashboard/summary", handler.GetSummary)
-		admin.GET("/revenue", handler.GetRevenueStats)
+		admin.GET("/dashboard/revenue", handler.GetRevenueStats)
 	}
 }

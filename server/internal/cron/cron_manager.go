@@ -54,18 +54,18 @@ func (cm *CronManager) RegisterJobs() {
 
 	// Reminder dan Mark Absent setiap 15 menit
 	cm.c.AddFunc("@every 15m", func() {
-		log.Println("⏰ Cron: Sending class reminders...")
+		log.Println("Cron: Sending class reminders...")
 		if err := cm.notificationService.SendClassReminder(); err != nil {
-			log.Println("❌ Reminder failed:", err)
+			log.Println(" Reminder failed:", err)
 		} else {
-			log.Println("✅ Class reminders sent")
+			log.Println("Class reminders sent")
 		}
 
-		log.Println("⏰ Cron: Marking absents for missed bookings...")
+		log.Println("Cron: Marking absents for missed bookings...")
 		if err := cm.attendanceService.MarkAbsentBookings(); err != nil {
-			log.Println("❌ Marking absents failed:", err)
+			log.Println(" Marking absents failed:", err)
 		} else {
-			log.Println("✅ Marked absent attendees")
+			log.Println("Marked absent attendees")
 		}
 	})
 

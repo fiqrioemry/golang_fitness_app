@@ -1,7 +1,6 @@
 package seeders
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -191,9 +190,8 @@ func SeedUsers(db *gorm.DB) {
 		generateNotificationSettingsForUser(db, user)
 	}
 
-	log.Println("✅ User seeding completed with notification settings!")
+	log.Println("User seeding completed with notification settings!")
 }
-
 func SeedCategories(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Category{}).Count(&count)
@@ -205,21 +203,16 @@ func SeedCategories(db *gorm.DB) {
 
 	categories := []models.Category{
 		{ID: uuid.New(), Name: "Yoga"},
-		{ID: uuid.New(), Name: "Strength Training"},
-		{ID: uuid.New(), Name: "Cardio"},
-		{ID: uuid.New(), Name: "Martial Arts"},
 		{ID: uuid.New(), Name: "Pilates"},
-		{ID: uuid.New(), Name: "Dance Fitness"},
-		{ID: uuid.New(), Name: "Meditation"},
-		{ID: uuid.New(), Name: "Crossfit"},
-		{ID: uuid.New(), Name: "Bootcamp"},
-		{ID: uuid.New(), Name: "Kids Classes"},
+		{ID: uuid.New(), Name: "Cardio"},
+		{ID: uuid.New(), Name: "Strength Training"},
+		{ID: uuid.New(), Name: "Martial Arts"},
 	}
 
 	if err := db.Create(&categories).Error; err != nil {
 		log.Printf("failed seeding categories: %v", err)
 	} else {
-		log.Println("✅ Categories seeding completed!")
+		log.Println("Categories seeding completed!")
 	}
 }
 
@@ -233,22 +226,10 @@ func SeedSubcategories(db *gorm.DB) {
 	}
 
 	subcategoryData := map[string][]string{
-		"Pilates": {
-			"Mat Pilates",
-			"Reformer Pilates",
-			"Clinical Pilates",
-		},
-		"Yoga": {
-			"Hatha Yoga",
-			"Vinyasa Yoga",
-			"Yin Yoga",
-			"Power Yoga",
-		},
-		"Cardio": {
-			"HIIT",
-			"Zumba",
-			"Indoor Cycling",
-		},
+		"Yoga":         {"Hatha Yoga", "Vinyasa Yoga"},
+		"Pilates":      {"Mat Pilates", "Reformer Pilates"},
+		"Cardio":       {"HIIT", "Zumba", "Aerobic Dance"},
+		"Martial Arts": {"Boxing", "Muay Thai", "Kickboxing"},
 	}
 
 	var categories []models.Category
@@ -281,7 +262,7 @@ func SeedSubcategories(db *gorm.DB) {
 	if err := db.Create(&subcategories).Error; err != nil {
 		log.Printf("failed seeding subcategories: %v", err)
 	} else {
-		log.Println("✅ subcategories seeding completed!")
+		log.Println("Subcategories seeding completed!")
 	}
 }
 
@@ -296,16 +277,14 @@ func SeedTypes(db *gorm.DB) {
 
 	types := []models.Type{
 		{ID: uuid.New(), Name: "Group Class"},
-		{ID: uuid.New(), Name: "Personal Training"},
+		{ID: uuid.New(), Name: "Private Class"},
 		{ID: uuid.New(), Name: "Virtual Class"},
-		{ID: uuid.New(), Name: "Outdoor Training"},
-		{ID: uuid.New(), Name: "Workshop"},
 	}
 
 	if err := db.Create(&types).Error; err != nil {
 		log.Printf("failed seeding types: %v", err)
 	} else {
-		log.Println("✅ Successfully seeded types!")
+		log.Println("Successfully seeded types!")
 	}
 }
 
@@ -328,7 +307,7 @@ func SeedLevels(db *gorm.DB) {
 	if err := db.Create(&levels).Error; err != nil {
 		log.Printf("failed seeding levels: %v", err)
 	} else {
-		log.Println("✅ Successfully seeded levels!")
+		log.Println("Successfully seeded levels!")
 	}
 }
 
@@ -344,134 +323,126 @@ func SeedLocations(db *gorm.DB) {
 	locations := []models.Location{
 		{
 			ID:          uuid.New(),
-			Name:        "Fitness Studio A",
+			Name:        "Sweat Up Studio A",
 			Address:     "123 Fitness St, New York, NY",
-			GeoLocation: "40.712776,-74.005974", // Contoh lat, long
+			GeoLocation: "40.712776,-74.005974",
 		},
 		{
 			ID:          uuid.New(),
-			Name:        "Gym B",
+			Name:        "Sweat Up Studio B",
 			Address:     "456 Gym Ave, Los Angeles, CA",
-			GeoLocation: "34.052235,-118.243683", // Contoh lat, long
-		},
-		{
-			ID:          uuid.New(),
-			Name:        "Yoga Center C",
-			Address:     "789 Yoga Rd, San Francisco, CA",
-			GeoLocation: "37.774929,-122.419418", // Contoh lat, long
+			GeoLocation: "34.052235,-118.243683",
 		},
 	}
 
 	if err := db.Create(&locations).Error; err != nil {
 		log.Printf("failed seeding locations: %v", err)
 	} else {
-		log.Println("✅ Successfully seeded locations!")
+		log.Println("Successfully seeded locations!")
 	}
 }
 
 func SeedClasses(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Class{}).Count(&count)
-
 	if count > 0 {
 		log.Println("Classes already seeded, skipping...")
 		return
 	}
 
 	var categories []models.Category
-	if err := db.Find(&categories).Error; err != nil {
-		log.Printf("failed to fetch categories: %v", err)
-		return
-	}
-
 	var subcategories []models.Subcategory
-	if err := db.Find(&subcategories).Error; err != nil {
-		log.Printf("failed to fetch subcategories: %v", err)
-		return
-	}
-
 	var types []models.Type
-	if err := db.Find(&types).Error; err != nil {
-		log.Printf("failed to fetch types: %v", err)
-		return
-	}
-
 	var levels []models.Level
-	if err := db.Find(&levels).Error; err != nil {
-		log.Printf("failed to fetch levels: %v", err)
-		return
-	}
-
 	var locations []models.Location
-	if err := db.Find(&locations).Error; err != nil {
-		log.Printf("failed to fetch locations: %v", err)
-		return
+
+	db.Find(&categories)
+	db.Find(&subcategories)
+	db.Find(&types)
+	db.Find(&levels)
+	db.Find(&locations)
+
+	categoryMap := make(map[string]uuid.UUID)
+	for _, c := range categories {
+		categoryMap[c.Name] = c.ID
 	}
 
-	// Create sample class data
+	subcategoryMap := make(map[string]uuid.UUID)
+	for _, s := range subcategories {
+		subcategoryMap[s.Name] = s.ID
+	}
+
 	classes := []models.Class{
 		{
-			ID:             uuid.New(),
-			Title:          "Yoga Beginners",
-			Image:          "https://placehold.co/400x400/blue/white",
-			Duration:       60,
-			Description:    "A gentle introduction to yoga.",
-			AdditionalList: []string{"Beginner", "Stretching", "Breathing"},
-			TypeID:         types[0].ID,  // Group Class
-			LevelID:        levels[0].ID, // Beginner
-			LocationID:     locations[0].ID,
-			CategoryID:     categories[0].ID,    // Yoga
-			SubcategoryID:  subcategories[0].ID, // Hatha Yoga
-			IsActive:       true,
+			ID: uuid.New(), Title: "Hatha Yoga for Beginners",
+			Image: "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746879286/fitness_booking_app/fx8mm2yumhlpen2fckgf.webp", Duration: 60,
+			Description:    "This class is designed for those who are new to yoga. With a focus on breathing techniques, gentle stretches, and foundational postures, participants are introduced to the calming and strengthening principles of yoga. The goal is to cultivate awareness of body alignment and mental stillness. The instructor will guide each movement at a steady pace, ensuring comfort and safety for all levels. This class is ideal for reducing stress, improving flexibility, and setting the stage for a long-term yoga practice.",
+			AdditionalList: []string{"Hatha Yoga", "Yoga"},
+			TypeID:         types[0].ID, LevelID: levels[0].ID, LocationID: locations[0].ID,
+			CategoryID: categoryMap["Yoga"], SubcategoryID: subcategoryMap["Hatha Yoga"], IsActive: true,
 		},
 		{
-			ID:             uuid.New(),
-			Title:          "Strength Training - Intermediate",
-			Image:          "https://placehold.co/400x400/blue/white",
-			Duration:       90,
-			Description:    "A strength-building session for intermediate athletes.",
-			AdditionalList: []string{"Intermediate", "Strength", "Weightlifting"},
-			TypeID:         types[0].ID,  // Group Class
-			LevelID:        levels[1].ID, // Intermediate
-			LocationID:     locations[1].ID,
-			CategoryID:     categories[1].ID,    // Strength Training
-			SubcategoryID:  subcategories[1].ID, // Bodyweight Training
-			IsActive:       true,
+			ID: uuid.New(), Title: "Vinyasa Flow Intermediate",
+			Image: "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746879490/fitness_booking_app/o5uyu6r3qtmmb2py0c6f.webp", Duration: 75,
+			Description:    "Vinyasa Flow is a dynamic yoga style that links breath with movement. This intermediate-level class focuses on building strength and flexibility through a fluid sequence of poses. Expect smooth transitions, moderate intensity, and a creative flow that challenges both body and mind. Participants should have some yoga experience, as the class moves at a faster pace. It’s perfect for deepening your practice, enhancing balance, and developing endurance in a mindful way.",
+			AdditionalList: []string{"Vinyasa Yoga", "Yoga"},
+			TypeID:         types[0].ID, LevelID: levels[1].ID, LocationID: locations[1].ID,
+			CategoryID: categoryMap["Yoga"], SubcategoryID: subcategoryMap["Vinyasa Yoga"], IsActive: true,
 		},
 		{
-			ID:             uuid.New(),
-			Title:          "Zumba Dance Party",
-			Image:          "https://placehold.co/400x400/purple/white",
-			Duration:       60,
-			Description:    "A high-energy, fun dance workout.",
-			AdditionalList: []string{"Dance", "Cardio", "Party"},
-			TypeID:         types[0].ID,  // Group Class
-			LevelID:        levels[2].ID, // Advanced
-			LocationID:     locations[2].ID,
-			CategoryID:     categories[2].ID,    // Cardio
-			SubcategoryID:  subcategories[2].ID, // Zumba
-			IsActive:       true,
+			ID: uuid.New(), Title: "Mat Pilates Core Challenge",
+			Image: "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746879424/fitness_booking_app/ckauvapfizz7fbyzrd9h.webp", Duration: 60,
+			Description:    "This Mat Pilates class is centered on strengthening the core muscles using bodyweight exercises. With a series of precise and controlled movements, participants develop stability, coordination, and postural alignment, which are essential for everyday mobility and injury prevention. It’s suitable for all levels and serves as a great complement to other workouts. Over time, you'll notice improvements in core strength, spinal alignment, and total-body awareness.",
+			AdditionalList: []string{"Mat Pilates", "Pilates"},
+			TypeID:         types[0].ID, LevelID: levels[2].ID, LocationID: locations[1].ID,
+			CategoryID: categoryMap["Pilates"], SubcategoryID: subcategoryMap["Mat Pilates"], IsActive: true,
 		},
 		{
-			ID:             uuid.New(),
-			Title:          "Private Yoga Session",
-			Image:          "https://placehold.co/400x400/green/white",
-			Duration:       45,
-			Description:    "A one-on-one session with a yoga instructor.",
-			AdditionalList: []string{"Private", "Yoga", "Therapy"},
-			TypeID:         types[1].ID,
-			LevelID:        levels[0].ID,
-			LocationID:     locations[0].ID,
-			CategoryID:     categories[0].ID,
-			SubcategoryID:  subcategories[0].ID,
-			IsActive:       true,
+			ID: uuid.New(), Title: "Reformer Pilates Sculpt",
+			Image: "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746879388/fitness_booking_app/ew3uvgaxgecyaxz0xmgv.webp", Duration: 60,
+			Description:    "Using the Reformer machine, this class adds resistance training to the Pilates experience. Participants will engage in slow, deliberate movements that sculpt lean muscles and improve flexibility without putting stress on the joints. Each session targets core, glutes, legs, and arms while enhancing balance and coordination. Reformer Pilates is ideal for anyone seeking low-impact yet highly effective full-body conditioning",
+			AdditionalList: []string{"Reformer Pilates", "Pilates"},
+			TypeID:         types[1].ID, LevelID: levels[1].ID, LocationID: locations[0].ID,
+			CategoryID: categoryMap["Pilates"], SubcategoryID: subcategoryMap["Reformer Pilates"], IsActive: true,
+		},
+		{
+			ID: uuid.New(), Title: "HIIT Total Body Burn",
+			Image: "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746879477/fitness_booking_app/uudvfiyquve8cd4fdexh.webp", Duration: 45,
+			Description:    "This High-Intensity Interval Training (HIIT) class is designed to burn maximum calories in minimum time. It combines cardio drills and bodyweight strength exercises in timed intervals, making it both efficient and effective. You’ll improve cardiovascular fitness, metabolism, and muscular endurance. Suitable for all fitness levels, this class offers modifications for beginners and challenges for advanced participants.",
+			AdditionalList: []string{"HIIT", "Cardio"},
+			TypeID:         types[0].ID, LevelID: levels[2].ID, LocationID: locations[1].ID,
+			CategoryID: categoryMap["Cardio"], SubcategoryID: subcategoryMap["HIIT"], IsActive: true,
+		},
+		{
+			ID: uuid.New(), Title: "Zumba Dance Energy",
+			Image: "https://placehold.co/400x400", Duration: 60,
+			Description:    "Zumba Dance Energy is a fun and high-energy workout that blends Latin rhythms with easy-to-follow dance routines. It’s a full-body cardio session that feels more like a dance party than a workout.Perfect for all levels, this class improves endurance, burns calories, and boosts your mood. No dance experience is required—just come ready to move and enjoy the beat!",
+			AdditionalList: []string{"Zumba", "Cardio"},
+			TypeID:         types[0].ID, LevelID: levels[3].ID, LocationID: locations[0].ID,
+			CategoryID: categoryMap["Cardio"], SubcategoryID: subcategoryMap["Zumba"], IsActive: true,
+		},
+		{
+			ID: uuid.New(), Title: "Boxing Fundamentals",
+			Image: "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746879364/fitness_booking_app/cfawvclumu5hjtgviini.webp", Duration: 60,
+			Description:    "Learn the basics of boxing in this empowering, non-contact class. Participants will be introduced to proper stance, punches, footwork, and defensive techniques while improving coordination and reaction time. Boxing a full-body workout that enhances strength, agility, and mental focus. This class is beginner-friendly and also a great stress reliever.",
+			AdditionalList: []string{"Boxing", "Martial Arts"},
+			TypeID:         types[0].ID, LevelID: levels[0].ID, LocationID: locations[0].ID,
+			CategoryID: categoryMap["Martial Arts"], SubcategoryID: subcategoryMap["Boxing"], IsActive: true,
+		},
+		{
+			ID: uuid.New(), Title: "Muay Thai Conditioning",
+			Image: "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746879461/fitness_booking_app/lbt5otnjqiujqcokugbm.webp", Duration: 75,
+			Description:    "Muay Thai is a powerful martial art that combines striking techniques with intense physical conditioning. In this class, participants will practice punches, kicks, elbows, and knees in controlled combinations, along with bodyweight drills for endurance. hether you're training for fitness or technique, Muay Thai offers an excellent way to improve power, discipline, and cardiovascular performance in one dynamic session.",
+			AdditionalList: []string{"Muay Thai", "Martial Arts"},
+			TypeID:         types[0].ID, LevelID: levels[1].ID, LocationID: locations[1].ID,
+			CategoryID: categoryMap["Martial Arts"], SubcategoryID: subcategoryMap["Muay Thai"], IsActive: true,
 		},
 	}
 
 	if err := db.Create(&classes).Error; err != nil {
 		log.Printf("failed seeding classes: %v", err)
 	} else {
-		log.Println("✅ Successfully seeded classes!")
+		log.Println("Successfully seeded 8 professional fitness classes!")
 	}
 }
 
@@ -494,13 +465,51 @@ func SeedClassGalleries(db *gorm.DB) {
 		return
 	}
 
+	// Mapping: class title → image URLs
+	galleryMap := map[string][]string{
+		"Hatha Yoga for Beginners": {
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880275/fitness_booking_app/zfuaa53iljyvzl9ux3wc.webp",
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880274/fitness_booking_app/uluaivkhpndaymslbkht.webp",
+		},
+		"Vinyasa Flow Intermediate": {
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746879960/fitness_booking_app/ez14mm0svmysibda2rzj.webp",
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746879959/fitness_booking_app/ozzdnzx5zvncibeknfqb.webp",
+		},
+		"HIIT Total Body Burn": {
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880255/fitness_booking_app/zaar3efvfdctw3qed79m.webp",
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880254/fitness_booking_app/di0zpt8a9l3rjcykpwah.webp",
+		},
+		"Zumba Dance Energy": {
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880169/fitness_booking_app/vnnrrr1nv6kt3yoq56nz.webp",
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880169/fitness_booking_app/ocmjzmyyhrkvudcqbq2q.webp",
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880168/fitness_booking_app/tolouxu0lecscg832dwi.webp",
+		},
+		"Mat Pilates Core Challenge": {
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880141/fitness_booking_app/uwlxbomqugaliffncscs.webp",
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880140/fitness_booking_app/tozp2hvl25kllrmq1amp.webp",
+		},
+		"Reformer Pilates Sculpt": {
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880139/fitness_booking_app/si4hk7k5txauk4rju517.webp",
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880141/fitness_booking_app/uwlxbomqugaliffncscs.webp",
+		},
+		"Boxing Fundamentals": {
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880115/fitness_booking_app/p7e0pl96xn8s7tnwponl.webp",
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880114/fitness_booking_app/dqdjuest25qrjqzhplup.webp",
+		},
+		"Muay Thai Conditioning": {
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880228/fitness_booking_app/ckskvayptwsjdytj1gus.webp",
+			"https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746880227/fitness_booking_app/v78tjjzijecqoswyrmxf.webp",
+		},
+	}
+
 	var galleries []models.ClassGallery
 	for _, class := range classes {
-		for i := 1; i <= 3; i++ {
+		images := galleryMap[class.Title]
+		for _, url := range images {
 			galleries = append(galleries, models.ClassGallery{
 				ID:        uuid.New(),
 				ClassID:   class.ID,
-				URL:       fmt.Sprintf("https://placehold.co/400x400?text=%s+Img%d", generateGalleryText(class.Title), i),
+				URL:       url,
 				CreatedAt: time.Now(),
 			})
 		}
@@ -509,20 +518,8 @@ func SeedClassGalleries(db *gorm.DB) {
 	if err := db.Create(&galleries).Error; err != nil {
 		log.Printf("failed seeding class galleries: %v", err)
 	} else {
-		log.Println("✅ ClassGalleries seeding completed!")
+		log.Println("ClassGalleries seeding completed with Cloudinary URLs!")
 	}
-}
-
-func generateGalleryText(title string) string {
-	if len(title) == 0 {
-		return "CLASS"
-	}
-	for i, r := range title {
-		if r == ' ' {
-			return title[:i]
-		}
-	}
-	return title
 }
 
 func SeedPackages(db *gorm.DB) {
@@ -530,75 +527,85 @@ func SeedPackages(db *gorm.DB) {
 
 	var count int64
 	db.Model(&models.Package{}).Count(&count)
-
 	if count > 0 {
 		log.Println("Packages already seeded, skipping...")
 		return
 	}
 
+	// Load semua class dan kelompokkan berdasarkan category
+	var classes []models.Class
+	if err := db.Preload("Category").Find(&classes).Error; err != nil {
+		log.Fatalf("Failed fetching classes: %v", err)
+	}
+
+	categoryClasses := map[string][]models.Class{}
+	for _, class := range classes {
+		categoryClasses[class.Category.Name] = append(categoryClasses[class.Category.Name], class)
+	}
+
 	packages := []models.Package{
 		{
 			ID:             uuid.New(),
-			Name:           "Trial Session",
-			Description:    "1x Class Trial for new members.",
-			Price:          500000,
+			Name:           "Yoga Wellness Trial",
+			Description:    "Try 1 Yoga class to relieve stress and boost flexibility.",
+			Price:          120000,
 			Credit:         1,
-			Discount:       25,
-			Expired:        14, // 14 hari
+			Discount:       20,
+			Expired:        14,
 			AdditionalList: []string{"Valid for 14 days after first booking."},
-			Image:          "https://placehold.co/400x400/orange/white",
-			IsActive:       true,
-			CreatedAt:      time.Now(),
-		},
-		{
-			ID:             uuid.New(),
-			Name:           "5 Sessions Package",
-			Description:    "Enjoy 5 reformer classes package.",
-			Price:          2250000,
-			Credit:         5,
-			Discount:       15,
-			Expired:        60, // 2 bulan
-			AdditionalList: []string{"Valid for 2 months after first booking.", "Cannot Be Refund"},
-			Image:          "https://placehold.co/400x400/blue/white",
-			IsActive:       true,
-			CreatedAt:      time.Now(),
-		},
-		{
-			ID:             uuid.New(),
-			Name:           "10 Sessions Package",
-			Description:    "Maximize your training with 10 sessions!",
-			Price:          4100000,
-			Credit:         10,
-			Discount:       0,
-			Expired:        120, // 4 bulan
-			AdditionalList: []string{"Valid for 4 months after first booking.", "Cannot Be Refund"},
 			Image:          "https://placehold.co/400x400/green/white",
 			IsActive:       true,
 			CreatedAt:      time.Now(),
 		},
 		{
 			ID:             uuid.New(),
-			Name:           "FTM x SANE Single Visit Promo",
-			Description:    "Special promo for FTM x SANE group class.",
-			Price:          100000,
-			Credit:         1,
-			Discount:       5,
-			Expired:        14,
-			AdditionalList: []string{"Valid for 14 days after first booking."},
+			Name:           "Pilates Core Pack (5x)",
+			Description:    "Enjoy 5 Mat/Reformer Pilates sessions to build core strength and posture.",
+			Price:          600000,
+			Credit:         5,
+			Discount:       10,
+			Expired:        60,
+			AdditionalList: []string{"Valid for 2 months", "Non-refundable"},
+			Image:          "https://placehold.co/400x400/blue/white",
+			IsActive:       true,
+			CreatedAt:      time.Now(),
+		},
+		{
+			ID:             uuid.New(),
+			Name:           "Cardio Burnout Pass (10x)",
+			Description:    "Get your heart pumping with 10 sessions of HIIT, Zumba, and Aerobic workouts.",
+			Price:          1000000,
+			Credit:         10,
+			Discount:       15,
+			Expired:        120,
+			AdditionalList: []string{"Valid for 4 months", "Non-refundable"},
 			Image:          "https://placehold.co/400x400/orange/white",
 			IsActive:       true,
 			CreatedAt:      time.Now(),
 		},
 		{
 			ID:             uuid.New(),
-			Name:           "FTM x SANE Bundle 2 Classes",
-			Description:    "Bundle of 2 classes for group sessions.",
-			Price:          275000,
-			Credit:         2,
+			Name:           "Combat Starter (1x)",
+			Description:    "Experience our Martial Arts class in one exciting session.",
+			Price:          150000,
+			Credit:         1,
 			Discount:       0,
-			Expired:        20,
-			AdditionalList: []string{"Valid for 20 days after first booking."},
-			Image:          "https://placehold.co/400x400/blue/white",
+			Expired:        14,
+			AdditionalList: []string{"Valid for 14 days after booking."},
+			Image:          "https://placehold.co/400x400/red/white",
+			IsActive:       true,
+			CreatedAt:      time.Now(),
+		},
+		{
+			ID:             uuid.New(),
+			Name:           "Warrior Pack (5x)",
+			Description:    "Boost your skills with 5 sessions of Boxing, Muay Thai, or Kickboxing.",
+			Price:          650000,
+			Credit:         5,
+			Discount:       5,
+			Expired:        60,
+			AdditionalList: []string{"Valid for 2 months", "No refunds after activation."},
+			Image:          "https://placehold.co/400x400/black/white",
 			IsActive:       true,
 			CreatedAt:      time.Now(),
 		},
@@ -606,59 +613,39 @@ func SeedPackages(db *gorm.DB) {
 
 	if err := db.Create(&packages).Error; err != nil {
 		log.Printf("Failed seeding packages: %v", err)
-	} else {
-		log.Println("✅ Successfully seeded packages!")
-	}
-
-	var classes []models.Class
-	if err := db.Find(&classes).Error; err != nil {
-		log.Println("Failed to fetch classes:", err)
 		return
 	}
+	log.Println("Successfully seeded packages!")
 
-	var allPackages []models.Package
-	if err := db.Find(&allPackages).Error; err != nil {
-		log.Println("Failed to fetch packages:", err)
-		return
+	packageClassMap := map[string]string{
+		"Yoga Wellness Trial":       "Yoga",
+		"Pilates Core Pack (5x)":    "Pilates",
+		"Cardio Burnout Pass (10x)": "Cardio",
+		"Combat Starter (1x)":       "Martial Arts",
+		"Warrior Pack (5x)":         "Martial Arts",
 	}
 
-	// Pastikan setiap class punya minimal 1 relasi package
-	classHasPackage := map[uuid.UUID]bool{}
+	for i, pkg := range packages {
+		categoryName := packageClassMap[pkg.Name]
+		classList := categoryClasses[categoryName]
 
-	for i, pkg := range allPackages {
-		n := 1 + rand.Intn(3)
-
-		selected := map[uuid.UUID]bool{}
-		var selectedClasses []models.Class
-		for len(selectedClasses) < n {
-			idx := rand.Intn(len(classes))
-			class := classes[idx]
-			if !selected[class.ID] {
-				selected[class.ID] = true
-				selectedClasses = append(selectedClasses, class)
-				classHasPackage[class.ID] = true
-			}
+		if len(classList) == 0 {
+			log.Printf("⚠️ No class found for category: %s", categoryName)
+			continue
 		}
 
-		if err := db.Model(&allPackages[i]).Association("Classes").Replace(&selectedClasses); err != nil {
-			log.Printf("Failed associating package %s: %v", pkg.Name, err)
+		n := min(2+rand.Intn(3), len(classList))
+		rand.Shuffle(len(classList), func(i, j int) { classList[i], classList[j] = classList[j], classList[i] })
+		selected := classList[:n]
+
+		if err := db.Model(&packages[i]).Association("Classes").Replace(&selected); err != nil {
+			log.Printf(" Failed associating package %s: %v", pkg.Name, err)
 		} else {
-			log.Printf("✅ Associated %d classes to package %s", len(selectedClasses), pkg.Name)
+			log.Printf("Associated %d classes to package %s", len(selected), pkg.Name)
 		}
 	}
 
-	for _, class := range classes {
-		if !classHasPackage[class.ID] {
-			randomPkg := allPackages[rand.Intn(len(allPackages))]
-			if err := db.Model(&randomPkg).Association("Classes").Append(&class); err != nil {
-				log.Printf("Failed assigning fallback package to class %s: %v", class.Title, err)
-			} else {
-				log.Printf("Fallback assigned 1 package to class %s", class.Title)
-			}
-		}
-	}
-
-	log.Println("✅ Package-Class association completed!")
+	log.Println("Package-Class association per category completed!")
 }
 
 func SeedInstructors(db *gorm.DB) {
@@ -669,8 +656,6 @@ func SeedInstructors(db *gorm.DB) {
 		log.Println("Instructors already seeded, skipping...")
 		return
 	}
-
-	// Cari user dengan role instructor
 	var instructorsUser []models.User
 	if err := db.Where("role = ?", "instructor").Find(&instructorsUser).Error; err != nil {
 		log.Println("Failed to fetch instructor users:", err)
@@ -698,7 +683,7 @@ func SeedInstructors(db *gorm.DB) {
 	if err := db.Create(&instructors).Error; err != nil {
 		log.Printf("failed seeding instructors: %v", err)
 	} else {
-		log.Println("✅ Successfully seeded instructors!")
+		log.Println("Successfully seeded instructors!")
 	}
 }
 
@@ -712,7 +697,6 @@ func SeedPayments(db *gorm.DB) {
 	}
 
 	var user models.User
-
 	var pkg models.Package
 	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
 		log.Println("Failed to find customer user:", err)
@@ -722,12 +706,14 @@ func SeedPayments(db *gorm.DB) {
 		log.Println("Failed to find package:", err)
 		return
 	}
+
 	taxRate := utils.GetTaxRate()
 	discounted := pkg.Price * (1 - pkg.Discount/100)
 	base := discounted
 	tax := base * taxRate
 	total := base + tax
 
+	now := time.Now()
 	payments := []models.Payment{
 		{
 			ID:            uuid.New(),
@@ -738,14 +724,58 @@ func SeedPayments(db *gorm.DB) {
 			Tax:           tax,
 			Total:         total,
 			Status:        "success",
-			PaidAt:        time.Now(),
+			PaidAt:        now,
+		},
+		{
+			ID:            uuid.New(),
+			UserID:        user.ID,
+			PackageID:     pkg.ID,
+			PaymentMethod: "bank_transfer",
+			BasePrice:     base,
+			Tax:           tax,
+			Total:         total,
+			Status:        "success",
+			PaidAt:        now,
+		},
+		{
+			ID:            uuid.New(),
+			UserID:        user.ID,
+			PackageID:     pkg.ID,
+			PaymentMethod: "bank_transfer",
+			BasePrice:     base,
+			Tax:           tax,
+			Total:         total,
+			Status:        "success",
+			PaidAt:        now.AddDate(0, 0, -1),
+		},
+		{
+			ID:            uuid.New(),
+			UserID:        user.ID,
+			PackageID:     pkg.ID,
+			PaymentMethod: "bank_transfer",
+			BasePrice:     base,
+			Tax:           tax,
+			Total:         total,
+			Status:        "success",
+			PaidAt:        now.AddDate(0, 0, -2),
+		},
+		{
+			ID:            uuid.New(),
+			UserID:        user.ID,
+			PackageID:     pkg.ID,
+			PaymentMethod: "bank_transfer",
+			BasePrice:     base,
+			Tax:           tax,
+			Total:         total,
+			Status:        "failed",
+			PaidAt:        now.AddDate(0, 0, -2),
 		},
 	}
 
 	if err := db.Create(&payments).Error; err != nil {
 		log.Printf("failed seeding payments: %v", err)
 	} else {
-		log.Println("✅ Payments seeding completed!")
+		log.Println("Payments seeding completed with multiple dates!")
 	}
 }
 
@@ -775,7 +805,7 @@ func SeedUserPackages(db *gorm.DB) {
 	var userPackages []models.UserPackage
 
 	// Assign 1 package untuk setiap user
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		pkg := packages[i]
 		user := users[i]
 		expired := now.AddDate(0, 0, getExpiredDays(pkg))
@@ -793,7 +823,7 @@ func SeedUserPackages(db *gorm.DB) {
 	if err := db.Create(&userPackages).Error; err != nil {
 		log.Printf("Failed seeding user packages: %v", err)
 	} else {
-		log.Println("✅ UserPackages seeding completed!")
+		log.Println("UserPackages seeding completed!")
 	}
 }
 
@@ -812,7 +842,6 @@ func SeedClassSchedules(db *gorm.DB) {
 	var classes []models.Class
 	var instructor models.Instructor
 
-	// Ambil minimal 2 class & 1 instructor
 	if err := db.Limit(2).Find(&classes).Error; err != nil || len(classes) < 2 {
 		log.Println("Failed to find classes:", err)
 		return
@@ -841,7 +870,7 @@ func SeedClassSchedules(db *gorm.DB) {
 	if err := db.Create(&schedules).Error; err != nil {
 		log.Printf("failed seeding class schedules: %v", err)
 	} else {
-		log.Println("✅ ClassSchedules seeding completed!")
+		log.Println("ClassSchedules seeding completed!")
 	}
 }
 
@@ -872,7 +901,6 @@ func SeedBookings(db *gorm.DB) {
 		return
 	}
 
-	// Create dummy bookings
 	var bookings []models.Booking
 	for _, schedule := range schedules {
 		booking := models.Booking{
@@ -887,7 +915,7 @@ func SeedBookings(db *gorm.DB) {
 	if err := db.Create(&bookings).Error; err != nil {
 		log.Printf("failed seeding bookings: %v", err)
 	} else {
-		log.Println("✅ Bookings seeding completed!")
+		log.Println("Bookings seeding completed!")
 	}
 }
 
@@ -900,7 +928,6 @@ func SeedAttendances(db *gorm.DB) {
 		return
 	}
 
-	// Fetch bookings
 	var bookings []models.Booking
 	if err := db.Limit(3).Find(&bookings).Error; err != nil {
 		log.Println("Failed to fetch bookings:", err)
@@ -929,7 +956,7 @@ func SeedAttendances(db *gorm.DB) {
 	if err := db.Create(&attendances).Error; err != nil {
 		log.Printf("failed seeding attendances: %v", err)
 	} else {
-		log.Println("✅ Attendances seeding completed!")
+		log.Println("Attendances seeding completed!")
 	}
 }
 
@@ -942,14 +969,12 @@ func SeedReviews(db *gorm.DB) {
 		return
 	}
 
-	// Fetch user (customer)
 	var user models.User
 	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
 		log.Println("Failed to find customer user:", err)
 		return
 	}
 
-	// Fetch classes
 	var classes []models.Class
 	if err := db.Limit(3).Find(&classes).Error; err != nil {
 		log.Println("Failed to fetch classes:", err)
@@ -968,7 +993,7 @@ func SeedReviews(db *gorm.DB) {
 			ID:      uuid.New(),
 			UserID:  user.ID,
 			ClassID: class.ID,
-			Rating:  4 + (i % 2), // 4 atau 5 bervariasi
+			Rating:  4 + (i % 2),
 			Comment: "Great class experience!",
 		}
 		reviews = append(reviews, review)
@@ -977,7 +1002,7 @@ func SeedReviews(db *gorm.DB) {
 	if err := db.Create(&reviews).Error; err != nil {
 		log.Printf("failed seeding reviews: %v", err)
 	} else {
-		log.Println("✅ Reviews seeding completed!")
+		log.Println("Reviews seeding completed!")
 	}
 }
 
@@ -994,14 +1019,13 @@ func SeedScheduleTemplate(db *gorm.DB) {
 		log.Println("🧹 ScheduleTemplates cleared")
 	}
 
-	log.Println("✅ ScheduleTemplate reset completed!")
+	log.Println("ScheduleTemplate reset completed!")
 }
 
 func SeedNotificationTypes(db *gorm.DB) {
 	defaultTypes := []models.NotificationType{
-		{ID: uuid.New(), Code: "system_message", Title: "System Announcement", Category: "announcement", DefaultEnabled: true}, // for login info, payment notification, booking success, and other
+		{ID: uuid.New(), Code: "system_message", Title: "System Announcement", Category: "announcement", DefaultEnabled: false},
 		{ID: uuid.New(), Code: "class_reminder", Title: "Class Reminder", Category: "reminder", DefaultEnabled: false},
-		{ID: uuid.New(), Code: "daily_reminder", Title: "Daily Class Reminder", Category: "reminder", DefaultEnabled: false},
 		{ID: uuid.New(), Code: "promo_offer", Title: "New Promotion Available", Category: "promotion", DefaultEnabled: false},
 	}
 	for _, t := range defaultTypes {
@@ -1063,7 +1087,7 @@ func SeedDummyNotifications(db *gorm.DB) {
 	if err := db.Create(&notifications).Error; err != nil {
 		log.Printf("Failed to seed dummy notifications: %v", err)
 	} else {
-		log.Println("✅ Dummy notifications for customer01@example.com seeded!")
+		log.Println("Dummy notifications for customer01@example.com seeded!")
 	}
 }
 func SeedVouchers(db *gorm.DB) {
@@ -1111,6 +1135,6 @@ func SeedVouchers(db *gorm.DB) {
 		return
 	}
 
-	log.Println("✅ Vouchers seeding completed!")
+	log.Println("Vouchers seeding completed!")
 
 }

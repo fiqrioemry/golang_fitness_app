@@ -229,7 +229,7 @@ type CreatePackageRequest struct {
 	Discount    float64               `form:"discount"`
 	Additional  []string              `form:"additional[]"`
 	IsActive    bool                  `form:"isActive"`
-	ClassIDs    []string              `form:"classIds[]"`
+	ClassIDs    []string              `form:"classIds[]" binding:"required"`
 	Image       *multipart.FileHeader `form:"image" binding:"required"`
 	ImageURL    string                `form:"-"`
 }
@@ -243,7 +243,7 @@ type UpdatePackageRequest struct {
 	Discount    float64               `form:"discount"`
 	Additional  []string              `form:"additional[]"`
 	IsActive    bool                  `form:"isActive"`
-	ClassIDs    []string              `form:"classIds[]"`
+	ClassIDs    []string              `form:"classIds[]" binding:"required"`
 	Image       *multipart.FileHeader `form:"image" binding:"required"`
 	ImageURL    string                `form:"-"`
 }
@@ -783,9 +783,13 @@ type RevenueStatRequest struct {
 	Range string `form:"range" binding:"omitempty,oneof=daily monthly yearly"`
 }
 
-type RevenueStatResponse struct {
-	TotalRevenue float64 `json:"totalRevenue"`
-	TotalSuccess int     `json:"totalSuccess"`
-	TotalPending int     `json:"totalPending"`
-	TotalFailed  int     `json:"totalFailed"`
+type RevenueStat struct {
+	Date  string  `json:"date"`
+	Total float64 `json:"total"`
+}
+
+type RevenueStatsResponse struct {
+	Range         string        `json:"range"`
+	TotalRevenue  float64       `json:"totalRevenue"`
+	RevenueSeries []RevenueStat `json:"revenueSeries"`
 }
