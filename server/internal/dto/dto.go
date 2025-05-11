@@ -369,6 +369,45 @@ type AdminPaymentListResponse struct {
 	Limit    int                    `json:"limit"`
 }
 
+// NOTIFICATIONS
+type NotificationSettingResponse struct {
+	TypeID  string `json:"typeId"`
+	Code    string `json:"code"`
+	Title   string `json:"title"`
+	Channel string `json:"channel"`
+	Enabled bool   `json:"enabled"`
+}
+
+type UpdateNotificationSettingRequest struct {
+	TypeID  string `json:"typeId" binding:"required"`
+	Channel string `json:"channel" binding:"required,oneof=email browser"`
+	Enabled bool   `json:"enabled"`
+}
+
+type CreateNotificationRequest struct {
+	UserID   string `json:"userId"`
+	TypeCode string `json:"typeCode"`
+	Title    string `json:"title"`
+	Message  string `json:"message"`
+	Channel  string `json:"channel"` // "email" / "browser"
+}
+
+type NotificationResponse struct {
+	ID        string `json:"id"`
+	TypeCode  string `json:"typeCode"`
+	Title     string `json:"title"`
+	Message   string `json:"message"`
+	Channel   string `json:"channel"`
+	IsRead    bool   `json:"isRead"`
+	CreatedAt string `json:"createdAt"`
+}
+
+type SendNotificationRequest struct {
+	TypeCode string `json:"typeCode" binding:"required"`
+	Title    string `json:"title" binding:"required"`
+	Message  string `json:"message" binding:"required"`
+}
+
 // CLASS-SCHEDULE ====================
 type CreateClassScheduleRequest struct {
 	ClassID      string    `json:"classId" binding:"required"`
@@ -672,45 +711,6 @@ type BookingListResponse struct {
 	Total    int64             `json:"total"`
 	Page     int               `json:"page"`
 	Limit    int               `json:"limit"`
-}
-
-// NOTIFICATIONS
-type NotificationSettingResponse struct {
-	TypeID  string `json:"typeId"`
-	Code    string `json:"code"`
-	Title   string `json:"title"`
-	Channel string `json:"channel"`
-	Enabled bool   `json:"enabled"`
-}
-
-type UpdateNotificationSettingRequest struct {
-	TypeID  string `json:"typeId" binding:"required"`
-	Channel string `json:"channel" binding:"required,oneof=email browser"`
-	Enabled bool   `json:"enabled"`
-}
-
-type CreateNotificationRequest struct {
-	UserID   string `json:"userId"`
-	TypeCode string `json:"typeCode"`
-	Title    string `json:"title"`
-	Message  string `json:"message"`
-	Channel  string `json:"channel"` // "email" / "browser"
-}
-
-type NotificationResponse struct {
-	ID        string `json:"id"`
-	TypeCode  string `json:"typeCode"`
-	Title     string `json:"title"`
-	Message   string `json:"message"`
-	Channel   string `json:"channel"`
-	IsRead    bool   `json:"isRead"`
-	CreatedAt string `json:"createdAt"`
-}
-
-type SendNotificationRequest struct {
-	TypeCode string `json:"typeCode" binding:"required"`
-	Title    string `json:"title" binding:"required"`
-	Message  string `json:"message" binding:"required"`
 }
 
 // VOUCHER

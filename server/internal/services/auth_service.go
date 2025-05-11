@@ -292,7 +292,6 @@ func (s *authService) GoogleSignIn(idToken string) (*dto.AuthResponse, error) {
 		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
 	}
 
-	// ⛏️ Cek user ID sebelum simpan token
 	if tokenModel.UserID == uuid.Nil {
 		return nil, errors.New("user ID kosong saat menyimpan token")
 	}
