@@ -29,12 +29,6 @@ const SignUp = () => {
     }
   };
 
-  const handleGoogleAuth = () => {
-    if (!window.google?.accounts?.id) return;
-    console.log("RESPONSE", window.google.accounts.id);
-    window.google.accounts.id.prompt();
-  };
-
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
