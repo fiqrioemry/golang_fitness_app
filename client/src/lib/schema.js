@@ -280,3 +280,12 @@ export const createVoucherSchema = z
       });
     }
   });
+
+export const notificationSchema = z.object({
+  title: z.string().min(3, "Title is required"),
+  message: z
+    .string()
+    .min(5, "Message is required")
+    .max(200, "Maximum 200 characters allowed"),
+  typeCode: z.enum(["system_message", "class_reminder", "promo_offer"]),
+});

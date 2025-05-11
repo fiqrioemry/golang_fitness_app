@@ -136,6 +136,12 @@ export const genderOptions = [
   { value: "female", label: "Female" },
 ];
 
+export const typeCode = [
+  { label: "System Message", value: "system_message" },
+  { label: "Class Reminder", value: "class_reminder" },
+  { label: "Promo Offer", value: "promo_offer" },
+];
+
 export const createVoucherState = {
   code: "",
   description: "",
@@ -144,6 +150,11 @@ export const createVoucherState = {
   maxDiscount: null,
   quota: 1,
   expiredAt: "",
+};
+export const notificationState = {
+  title: "",
+  message: "",
+  typeCode: "",
 };
 
 export const operationMinutes = [0, 15, 30, 45];

@@ -105,15 +105,20 @@ const TransactionsList = () => {
                             {tx.status}
                           </Badge>
                         </TableCell>
-                        <TableCell>{formatDateTime(tx.paidAt)}</TableCell>
+                        <TableCell>
+                          {" "}
+                          {tx.status === "success"
+                            ? formatDateTime(tx.paidAt)
+                            : "-"}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </div>
 
-              {/* Mobile Cards */}
-              <div className="md:hidden space-y-4 p-4">
+              {/* Mobile view */}
+              <div className="md:hidden space-y-4 p-4  w-full">
                 {transactions.map((tx) => (
                   <div
                     key={tx.id}
@@ -125,27 +130,36 @@ const TransactionsList = () => {
                         {tx.userEmail}
                       </p>
                     </div>
-                    <div className="text-sm space-y-1">
-                      <p>
-                        Package: <strong>{tx.packageName}</strong>
-                      </p>
-                      <p>Price: {formatRupiah(tx.price)}</p>
-                      <p>Method: {tx.paymentMethod?.toUpperCase() || "-"}</p>
-                      <p>
-                        Status:{" "}
-                        <Badge
-                          variant={
-                            tx.status === "success"
-                              ? "default"
-                              : tx.status === "failed"
-                              ? "destructive"
-                              : "secondary"
-                          }
-                        >
-                          {tx.status}
-                        </Badge>
-                      </p>
-                      <p>Paid At: {formatDateTime(tx.paidAt)}</p>
+                    <div className="text-sm space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <p>
+                          <strong>{tx.packageName}</strong>
+                        </p>
+                        <p>{formatRupiah(tx.price)}</p>
+                        <p>{tx.paymentMethod?.toUpperCase() || "-"}</p>
+                        <p>
+                          <Badge
+                            variant={
+                              tx.status === "success"
+                                ? "default"
+                                : tx.status === "failed"
+                                ? "destructive"
+                                : "secondary"
+                            }
+                          >
+                            {tx.status}
+                          </Badge>
+                        </p>
+                      </div>
+                      <div className="space-x-4">
+                        {" "}
+                        <span className="text-muted-foreground">Paid At</span>
+                        <span className="text-right whitespace-nowrap">
+                          {tx.status === "success"
+                            ? formatDateTime(tx.paidAt)
+                            : "-"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}

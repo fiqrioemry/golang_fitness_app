@@ -22,7 +22,7 @@ import ClassOptions from "./pages/admin/classes/ClassOptions";
 import TransactionsList from "./pages/admin/TransactionsList";
 import VouchersList from "./pages/admin/vouchers/VouchersList";
 import PackagesList from "./pages/admin/packages/PackagesList";
-import NotificationsList from "./pages/admin/NotificationsList";
+import Notifications from "./pages/admin/Notifications";
 import ClassRecuring from "./pages/admin/classes/ClassRecuring";
 import ClassSchedules from "./pages/admin/classes/ClassSchedules";
 import AddInstructors from "./pages/admin/instructors/AddInstructors";
@@ -152,7 +152,7 @@ function App() {
           <Route path="instructors" element={<InstructorsList />} />
           <Route path="instructors/add" element={<AddInstructors />} />
           <Route path="transactions" element={<TransactionsList />} />
-          <Route path="messages" element={<NotificationsList />} />
+          <Route path="messages" element={<Notifications />} />
 
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>

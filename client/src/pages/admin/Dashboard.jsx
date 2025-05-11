@@ -53,7 +53,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Revenue Chart with Filter */}
       <div>
         <h3 className="mb-4">Transaction Volume</h3>
         <div className="bg-background rounded-xl shadow p-6">
@@ -79,6 +78,7 @@ const Dashboard = () => {
         <h3 className="mb-4">Recent transaction</h3>
         <Card className="border shadow-sm">
           <CardContent className="overflow-x-auto p-0">
+            {/* dekstop view */}
             <div className="bg-background hidden md:block w-full">
               <Table>
                 <TableHeader>
@@ -118,11 +118,64 @@ const Dashboard = () => {
                           {tx.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>{formatDateTime(tx.paidAt)}</TableCell>
+                      <TableCell>
+                        {" "}
+                        {tx.status === "success"
+                          ? formatDateTime(tx.paidAt)
+                          : "-"}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+            </div>
+
+            {/* mobile view */}
+            <div className="md:hidden space-y-4 p-4  w-full">
+              {transactions.map((tx) => (
+                <div
+                  key={tx.id}
+                  className="border rounded-lg p-4 shadow-sm space-y-2"
+                >
+                  <div>
+                    <h3 className="text-base font-semibold">{tx.fullname}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {tx.userEmail}
+                    </p>
+                  </div>
+                  <div className="text-sm space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <p>
+                        <strong>{tx.packageName}</strong>
+                      </p>
+                      <p>{formatRupiah(tx.price)}</p>
+                      <p>{tx.paymentMethod?.toUpperCase() || "-"}</p>
+                      <p>
+                        <Badge
+                          variant={
+                            tx.status === "success"
+                              ? "default"
+                              : tx.status === "failed"
+                              ? "destructive"
+                              : "secondary"
+                          }
+                        >
+                          {tx.status}
+                        </Badge>
+                      </p>
+                    </div>
+                    <div className="space-x-4">
+                      {" "}
+                      <span className="text-muted-foreground">Paid At</span>
+                      <span className="text-right whitespace-nowrap">
+                        {tx.status === "success"
+                          ? formatDateTime(tx.paidAt)
+                          : "-"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
