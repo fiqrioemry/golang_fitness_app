@@ -856,7 +856,7 @@ func SeedClassSchedules(db *gorm.DB) {
 
 	schedules := []models.ClassSchedule{
 		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID, ClassName: classes[0].Title, ClassImage: classes[0].Image,
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID, InstructorName: instructor.User.Profile.Fullname, ClassName: classes[0].Title, ClassImage: classes[0].Image,
 			Date: date, StartHour: 9, StartMinute: 0, Capacity: 10, Duration: classes[0].Duration,
 			IsActive: true, Color: "#60a5fa",
 		},
