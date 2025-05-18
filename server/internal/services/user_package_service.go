@@ -37,8 +37,8 @@ func (s *userPackageService) GetUserPackages(userID string) ([]dto.UserPackageRe
 
 		result = append(result, dto.UserPackageResponse{
 			ID:              up.ID.String(),
-			PackageID:       up.Package.ID.String(),
-			PackageName:     up.Package.Name,
+			PackageID:       up.PackageID.String(),
+			PackageName:     up.PackageName,
 			RemainingCredit: up.RemainingCredit,
 			ExpiredAt:       expiredAt,
 			ExpiredInDays:   expiredInDays,

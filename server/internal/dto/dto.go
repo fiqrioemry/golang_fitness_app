@@ -460,6 +460,12 @@ type ClassScheduleResponse struct {
 	IsBooked    bool            `json:"isBooked"`
 }
 
+type InstructorBrief struct {
+	ID       string  `json:"id"`
+	Fullname string  `json:"fullname"`
+	Rating   float64 `json:"rating"`
+}
+
 type ClassScheduleDetailResponse struct {
 	ClassScheduleResponse
 	Packages []PackageResponse `json:"packages"`
@@ -565,12 +571,6 @@ type AttendanceResponse struct {
 	CheckedAt   string          `json:"checkedAt"`
 	Reviewed    bool            `json:"reviewed"`
 	Verified    bool            `json:"verified"`
-}
-
-type InstructorBrief struct {
-	ID       string  `json:"id"`
-	Fullname string  `json:"fullname"`
-	Rating   float64 `json:"rating"`
 }
 
 type ClassBrief struct {

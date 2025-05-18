@@ -94,6 +94,7 @@ type UserPackage struct {
 	ID              uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	UserID          uuid.UUID      `gorm:"type:char(36);not null" json:"userId"`
 	PackageID       uuid.UUID      `gorm:"type:char(36);not null" json:"packageId"`
+	PackageName     string         `gorm:"type:varchar(255);not null" json:"packageName"`
 	RemainingCredit int            `gorm:"not null;default:0" json:"remainingCredit"`
 	ExpiredAt       *time.Time     `json:"expiredAt"`
 	PurchasedAt     time.Time      `gorm:"autoCreateTime" json:"purchasedAt"`
@@ -125,6 +126,7 @@ type Package struct {
 type Payment struct {
 	ID              uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	PackageID       uuid.UUID `gorm:"type:char(36);not null" json:"packageId"`
+	PackageName     string    `gorm:"type:varchar(255);not null" json:"packageName"`
 	UserID          uuid.UUID `gorm:"type:char(36);not null" json:"userId"`
 	PaymentMethod   string    `gorm:"type:varchar(50);not null" json:"paymentMethod"`
 	Status          string    `gorm:"type:varchar(20);default:'pending';check:status IN ('success', 'pending', 'failed')" json:"status"`
