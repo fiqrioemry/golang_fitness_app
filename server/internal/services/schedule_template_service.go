@@ -72,6 +72,7 @@ func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleT
 
 	instructorID := uuid.MustParse(req.InstructorID)
 
+	// Cek konflik dengan jadwal aktual (class schedules)
 	existingSchedules, err := s.classScheduleRepo.GetClassSchedules()
 	if err != nil {
 		return err
@@ -89,13 +90,15 @@ func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleT
 				schedule.StartHour, schedule.StartMinute, 0, 0, time.Local)
 			existEnd := existStart.Add(time.Hour)
 
+			// Cek overlap waktu
 			if startTime.Before(existEnd) && existStart.Before(endTime) {
-				return fmt.Errorf("instructor already booked on day %d at %02d:%02d (from existing schedule)",
-					day, req.StartHour, req.StartMinute)
+				return fmt.Errorf("instructor already booked on %s at %02d:%02d (from actual schedule)",
+					schedule.Date.Weekday().String(), req.StartHour, req.StartMinute)
 			}
 		}
 	}
 
+	// Cek konflik dengan template lain
 	existingTemplates, err := s.templateRepo.GetAllTemplates()
 	if err != nil {
 		return err
@@ -127,7 +130,7 @@ func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleT
 		}
 	}
 
-	// 3. SIMPAN TEMPLATE
+	// Simpan Template Baru
 	template := models.ScheduleTemplate{
 		ID:           uuid.New(),
 		ClassID:      uuid.MustParse(req.ClassID),
@@ -158,13 +161,16 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 	startTime := time.Date(now.Year(), now.Month(), now.Day(), req.StartHour, req.StartMinute, 0, 0, time.Local)
 	endTime := startTime.Add(time.Hour)
 
+	instructorID := uuid.MustParse(req.InstructorID)
+
+	// 🔍 Cek konflik dengan jadwal aktual
 	existingSchedules, err := s.classScheduleRepo.GetClassSchedules()
 	if err != nil {
 		return err
 	}
 
 	for _, schedule := range existingSchedules {
-		if schedule.InstructorID != uuid.MustParse(req.InstructorID) {
+		if schedule.InstructorID != instructorID {
 			continue
 		}
 
@@ -173,6 +179,7 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 				continue
 			}
 
+			// skip jika itu adalah jadwal yang sama (sudah berasal dari template ini)
 			if schedule.ClassID == template.ClassID &&
 				schedule.InstructorID == template.InstructorID &&
 				schedule.StartHour == template.StartHour &&
@@ -185,13 +192,47 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 			existEnd := existStart.Add(time.Hour)
 
 			if startTime.Before(existEnd) && existStart.Before(endTime) {
-				return fmt.Errorf("instructor already booked on day %d at %02d:%02d",
+				return fmt.Errorf("instructor already booked on day %d at %02d:%02d (from actual schedule)",
 					day, req.StartHour, req.StartMinute)
 			}
 		}
 	}
+
+	// 🔍 Cek konflik dengan template lain
+	existingTemplates, err := s.templateRepo.GetAllTemplates()
+	if err != nil {
+		return err
+	}
+
+	for _, tpl := range existingTemplates {
+		if tpl.ID == template.ID || tpl.InstructorID != instructorID {
+			continue // skip diri sendiri atau instruktur berbeda
+		}
+
+		var tplDays []int
+		if err := json.Unmarshal(tpl.DayOfWeeks, &tplDays); err != nil {
+			continue
+		}
+
+		for _, day := range req.DayOfWeeks {
+			for _, tplDay := range tplDays {
+				if tplDay != day {
+					continue
+				}
+				tplStart := time.Date(now.Year(), now.Month(), now.Day(), tpl.StartHour, tpl.StartMinute, 0, 0, time.Local)
+				tplEnd := tplStart.Add(time.Hour)
+
+				if startTime.Before(tplEnd) && tplStart.Before(endTime) {
+					return fmt.Errorf("instructor already booked on day %d at %02d:%02d (from another template)",
+						day, req.StartHour, req.StartMinute)
+				}
+			}
+		}
+	}
+
+	// ✅ Update data template
 	template.ClassID = uuid.MustParse(req.ClassID)
-	template.InstructorID = uuid.MustParse(req.InstructorID)
+	template.InstructorID = instructorID
 	template.DayOfWeeks = utils.IntSliceToJSON(req.DayOfWeeks)
 	template.StartHour = req.StartHour
 	template.StartMinute = req.StartMinute

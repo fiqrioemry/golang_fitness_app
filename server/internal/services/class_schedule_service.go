@@ -91,6 +91,7 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 		return err
 	}
 
+	instructorID := uuid.MustParse(req.InstructorID)
 	parsedDate := req.Date.In(time.Local)
 
 	newStart := time.Date(
@@ -115,8 +116,9 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 		if other.ID == schedule.ID {
 			continue
 		}
-		if other.InstructorID == uuid.MustParse(req.InstructorID) && other.Date.Equal(parsedDate) {
-			existStart := time.Date(other.Date.Year(), other.Date.Month(), other.Date.Day(), other.StartHour, other.StartMinute, 0, 0, time.Local)
+		if other.InstructorID == instructorID && other.Date.Equal(parsedDate) {
+			existStart := time.Date(other.Date.Year(), other.Date.Month(), other.Date.Day(),
+				other.StartHour, other.StartMinute, 0, 0, time.Local)
 			existEnd := existStart.Add(time.Hour)
 
 			if newStart.Before(existEnd) && existStart.Before(newEnd) {
@@ -128,11 +130,12 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 	if req.Capacity < schedule.Booked {
 		return fmt.Errorf("capacity cannot be less than booked participant (%d)", schedule.Booked)
 	}
+
 	schedule.Date = parsedDate
 	schedule.StartHour = req.StartHour
 	schedule.StartMinute = req.StartMinute
 	schedule.ClassID = uuid.MustParse(req.ClassID)
-	schedule.InstructorID = uuid.MustParse(req.InstructorID)
+	schedule.InstructorID = instructorID
 	schedule.Capacity = req.Capacity
 	schedule.Color = req.Color
 
@@ -140,6 +143,30 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 }
 
 func (s *classScheduleService) DeleteClassSchedule(id string) error {
+	schedule, err := s.repo.GetClassScheduleByID(id)
+	if err != nil {
+		return fmt.Errorf("schedule not found")
+	}
+
+	// Hitung waktu mulai kelas
+	startTime := time.Date(
+		schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
+		schedule.StartHour, schedule.StartMinute, 0, 0, time.Local,
+	)
+
+	if startTime.Before(time.Now().In(time.Local)) {
+		return fmt.Errorf("cannot delete past or ongoing class schedule")
+	}
+
+	// Cek apakah sudah dibooking
+	isBooked, err := s.repo.HasActiveBooking(schedule.ID)
+	if err != nil {
+		return fmt.Errorf("failed to check booking: %w", err)
+	}
+	if isBooked {
+		return fmt.Errorf("cannot delete schedule with active bookings")
+	}
+
 	return s.repo.DeleteClassSchedule(id)
 }
 

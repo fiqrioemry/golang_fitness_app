@@ -91,8 +91,9 @@ func (h *ClassScheduleHandler) UpdateClassSchedule(c *gin.Context) {
 func (h *ClassScheduleHandler) DeleteClassSchedule(c *gin.Context) {
 	id := c.Param("id")
 
-	if err := h.scheduleService.DeleteClassSchedule(id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to delete schedule", "error": err.Error()})
+	err := h.scheduleService.DeleteClassSchedule(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Failed to delete schedule", "error": err.Error()})
 		return
 	}
 

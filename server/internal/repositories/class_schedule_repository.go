@@ -15,6 +15,7 @@ type ClassScheduleRepository interface {
 	GetClassSchedules() ([]models.ClassSchedule, error)
 	CreateClassSchedule(schedule *models.ClassSchedule) error
 	UpdateClassSchedule(schedule *models.ClassSchedule) error
+	HasActiveBooking(scheduleID uuid.UUID) (bool, error)
 	GetClassScheduleByID(id string) (*models.ClassSchedule, error)
 	GetClassSchedulesWithFilter(filter dto.ClassScheduleQueryParam) ([]models.ClassSchedule, error)
 }
@@ -107,4 +108,14 @@ func (r *classScheduleRepository) IncrementBooked(scheduleID uuid.UUID) error {
 	return r.db.Model(&models.ClassSchedule{}).
 		Where("id = ?", scheduleID).
 		Update("booked", gorm.Expr("booked + 1")).Error
+}
+func (r *classScheduleRepository) HasActiveBooking(scheduleID uuid.UUID) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.Booking{}).
+		Where("class_schedule_id = ? AND status = ?", scheduleID, "booked").
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
