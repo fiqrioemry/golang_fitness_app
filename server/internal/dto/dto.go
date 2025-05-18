@@ -567,17 +567,17 @@ type AttendanceResponse struct {
 	Verified    bool            `json:"verified"`
 }
 
+type InstructorBrief struct {
+	ID       string  `json:"id"`
+	Fullname string  `json:"fullname"`
+	Rating   float64 `json:"rating"`
+}
+
 type ClassBrief struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
 	Image    string `json:"image"`
 	Duration int    `json:"duration"`
-}
-
-type InstructorBrief struct {
-	ID       string  `json:"id"`
-	Fullname string  `json:"fullname"`
-	Rating   float64 `json:"rating"`
 }
 
 type AttendanceDetailResponse struct {
