@@ -856,13 +856,13 @@ func SeedClassSchedules(db *gorm.DB) {
 
 	schedules := []models.ClassSchedule{
 		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID,
-			Date: date, StartHour: 9, StartMinute: 0, Capacity: 10,
+			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID, ClassName: classes[0].Title, ClassImage: classes[0].Image,
+			Date: date, StartHour: 9, StartMinute: 0, Capacity: 10, Duration: classes[0].Duration,
 			IsActive: true, Color: "#60a5fa",
 		},
 		{
-			ID: uuid.New(), ClassID: classes[1].ID, InstructorID: instructor.ID, InstructorName: instructor.User.Profile.Fullname,
-			Date: date.AddDate(0, 0, 1), StartHour: 10, StartMinute: 30, Capacity: 12,
+			ID: uuid.New(), ClassID: classes[1].ID, ClassName: classes[1].Title, ClassImage: classes[1].Image, InstructorID: instructor.ID, InstructorName: instructor.User.Profile.Fullname,
+			Date: date.AddDate(0, 0, 1), StartHour: 10, StartMinute: 30, Duration: classes[1].Duration, Capacity: 12,
 			IsActive: true, Color: "#a78bfa",
 		},
 	}

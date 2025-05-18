@@ -450,6 +450,7 @@ type ClassScheduleResponse struct {
 	ID             string    `json:"id"`
 	ClassID        string    `json:"classId"`
 	ClassName      string    `json:"className"`
+	ClassImage     string    `json:"classImage"`
 	InstructorID   string    `json:"instructorId"`
 	InstructorName string    `json:"instructorName"`
 	Category       string    `json:"category"`
@@ -458,6 +459,7 @@ type ClassScheduleResponse struct {
 	StartMinute    int       `json:"startMinute"`
 	Capacity       int       `json:"capacity"`
 	BookedCount    int       `json:"bookedCount"`
+	Duration       int       `json:"duration"`
 	Color          string    `json:"color"`
 	IsBooked       bool      `json:"isBooked"`
 }
@@ -480,19 +482,20 @@ type ClassScheduleQueryParam struct {
 }
 
 type ScheduleTemplateResponse struct {
-	ID           uuid.UUID `json:"id"`
-	ClassID      uuid.UUID `json:"classId"`
-	ClassName    string    `json:"className"`
-	InstructorID uuid.UUID `json:"instructorId"`
-	Instructor   string    `json:"instructor"`
-	DayOfWeeks   []int     `json:"dayOfWeeks"`
-	StartHour    int       `json:"startHour"`
-	StartMinute  int       `json:"startMinute"`
-	Capacity     int       `json:"capacity"`
-	IsActive     bool      `json:"isActive"`
-	Frequency    string    `json:"frequency"`
-	EndDate      string    `json:"endDate"`
-	CreatedAt    string    `json:"createdAt"`
+	ID             uuid.UUID `json:"id"`
+	ClassID        uuid.UUID `json:"classId"`
+	ClassName      string    `json:"className"`
+	InstructorID   uuid.UUID `json:"instructorId"`
+	InstructorName string    `json:"instructorName"`
+	Instructor     string    `json:"instructor"`
+	DayOfWeeks     []int     `json:"dayOfWeeks"`
+	StartHour      int       `json:"startHour"`
+	StartMinute    int       `json:"startMinute"`
+	Capacity       int       `json:"capacity"`
+	IsActive       bool      `json:"isActive"`
+	Frequency      string    `json:"frequency"`
+	EndDate        string    `json:"endDate"`
+	CreatedAt      string    `json:"createdAt"`
 }
 
 type CreateScheduleTemplateRequest struct {

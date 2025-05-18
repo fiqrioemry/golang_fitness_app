@@ -47,18 +47,18 @@ func (s *scheduleTemplateService) GetAllTemplates() ([]dto.ScheduleTemplateRespo
 		var days []int
 		_ = json.Unmarshal(t.DayOfWeeks, &days)
 		resp := dto.ScheduleTemplateResponse{
-			ID:           t.ID,
-			ClassID:      t.ClassID,
-			ClassName:    t.Class.Title,
-			InstructorID: t.InstructorID,
-			Instructor:   t.Instructor.User.Profile.Fullname,
-			DayOfWeeks:   days,
-			StartHour:    t.StartHour,
-			StartMinute:  t.StartMinute,
-			Capacity:     t.Capacity,
-			IsActive:     t.IsActive,
-			EndDate:      t.EndDate.Format(time.RFC3339),
-			CreatedAt:    t.CreatedAt.Format(time.RFC3339),
+			ID:             t.ID,
+			ClassID:        t.ClassID,
+			ClassName:      t.Class.Title,
+			InstructorID:   t.InstructorID,
+			InstructorName: t.Instructor.User.Profile.Fullname,
+			DayOfWeeks:     days,
+			StartHour:      t.StartHour,
+			StartMinute:    t.StartMinute,
+			Capacity:       t.Capacity,
+			IsActive:       t.IsActive,
+			EndDate:        t.EndDate.Format(time.RFC3339),
+			CreatedAt:      t.CreatedAt.Format(time.RFC3339),
 		}
 		result = append(result, resp)
 	}
@@ -129,19 +129,30 @@ func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleT
 			}
 		}
 	}
+	class, err := s.classScheduleRepo.GetClassByID(uuid.MustParse(req.ClassID))
+	if err != nil {
+		return fmt.Errorf("class not found: %w", err)
+	}
+
+	instructor, err := s.classScheduleRepo.GetInstructorWithProfileByID(uuid.MustParse(req.InstructorID))
+	if err != nil {
+		return fmt.Errorf("instructor not found: %w", err)
+	}
 
 	// Simpan Template Baru
 	template := models.ScheduleTemplate{
-		ID:           uuid.New(),
-		ClassID:      uuid.MustParse(req.ClassID),
-		InstructorID: instructorID,
-		DayOfWeeks:   utils.IntSliceToJSON(req.DayOfWeeks),
-		StartHour:    req.StartHour,
-		StartMinute:  req.StartMinute,
-		Capacity:     req.Capacity,
-		IsActive:     false,
-		Color:        req.Color,
-		EndDate:      req.EndDate,
+		ID:             uuid.New(),
+		ClassID:        uuid.MustParse(req.ClassID),
+		ClassName:      class.Title,
+		InstructorID:   instructor.ID,
+		InstructorName: instructor.User.Profile.Fullname,
+		DayOfWeeks:     utils.IntSliceToJSON(req.DayOfWeeks),
+		StartHour:      req.StartHour,
+		StartMinute:    req.StartMinute,
+		Capacity:       req.Capacity,
+		IsActive:       false,
+		Color:          req.Color,
+		EndDate:        req.EndDate,
 	}
 
 	return s.templateRepo.CreateTemplate(&template)
@@ -229,10 +240,20 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 			}
 		}
 	}
+	class, err := s.classScheduleRepo.GetClassByID(uuid.MustParse(req.ClassID))
+	if err != nil {
+		return fmt.Errorf("class not found: %w", err)
+	}
 
-	// ✅ Update data template
-	template.ClassID = uuid.MustParse(req.ClassID)
-	template.InstructorID = instructorID
+	instructor, err := s.classScheduleRepo.GetInstructorWithProfileByID(uuid.MustParse(req.InstructorID))
+	if err != nil {
+		return fmt.Errorf("instructor not found: %w", err)
+	}
+
+	template.ClassID = class.ID
+	template.ClassName = class.Title
+	template.InstructorID = instructor.ID
+	template.InstructorName = instructor.User.Profile.Fullname
 	template.DayOfWeeks = utils.IntSliceToJSON(req.DayOfWeeks)
 	template.StartHour = req.StartHour
 	template.StartMinute = req.StartMinute
@@ -279,15 +300,18 @@ func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 			}
 
 			schedule := models.ClassSchedule{
-				ID:           uuid.New(),
-				ClassID:      template.ClassID,
-				InstructorID: template.InstructorID,
-				Capacity:     template.Capacity,
-				IsActive:     true,
-				Date:         d,
-				Color:        template.Color,
-				StartHour:    template.StartHour,
-				StartMinute:  template.StartMinute,
+				ID:             uuid.New(),
+				ClassID:        template.ClassID,
+				ClassName:      template.Class.Title,
+				ClassImage:     template.Class.Image,
+				InstructorID:   template.InstructorID,
+				InstructorName: template.InstructorName,
+				Capacity:       template.Capacity,
+				IsActive:       true,
+				Date:           d,
+				Color:          template.Color,
+				StartHour:      template.StartHour,
+				StartMinute:    template.StartMinute,
 			}
 
 			if err := s.classScheduleRepo.CreateClassSchedule(&schedule); err != nil {

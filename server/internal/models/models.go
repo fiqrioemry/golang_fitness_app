@@ -144,6 +144,7 @@ type Payment struct {
 type ClassSchedule struct {
 	ID             uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	ClassID        uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
+	ClassImage     string         `gorm:"type:varchar(255);not null" json:"classImage"`
 	ClassName      string         `gorm:"type:varchar(255);not null" json:"className"`
 	InstructorID   uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
 	InstructorName string         `gorm:"type:varchar(255);not null" json:"instructorName"`
@@ -152,8 +153,9 @@ type ClassSchedule struct {
 	Color          string         `gorm:"type:varchar(20)" json:"color"`
 	Date           time.Time      `gorm:"not null" json:"date"`
 	Booked         int            `gorm:"not null;default:0" json:"booked"`
-	StartHour      int            `json:"startHour"`
-	StartMinute    int            `json:"startMinute"`
+	StartHour      int            `gorm:"not null" json:"startHour"`
+	StartMinute    int            `gorm:"not null" json:"startMinute"`
+	Duration       int            `gorm:"not null" json:"duration"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Class       Class        `gorm:"foreignKey:ClassID" json:"class"`
