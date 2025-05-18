@@ -70,16 +70,28 @@ func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRe
 		}
 	}
 
+	class, err := s.repo.GetClassByID(uuid.MustParse(req.ClassID))
+	if err != nil {
+		return fmt.Errorf("class not found: %w", err)
+	}
+
+	instructor, err := s.repo.GetInstructorWithProfileByID(uuid.MustParse(req.InstructorID))
+	if err != nil {
+		return fmt.Errorf("instructor not found: %w", err)
+	}
+
 	schedule := models.ClassSchedule{
-		ID:           uuid.New(),
-		ClassID:      uuid.MustParse(req.ClassID),
-		InstructorID: uuid.MustParse(req.InstructorID),
-		Capacity:     req.Capacity,
-		IsActive:     true,
-		Color:        req.Color,
-		Date:         localDate,
-		StartHour:    req.StartHour,
-		StartMinute:  req.StartMinute,
+		ID:             uuid.New(),
+		ClassID:        class.ID,
+		ClassName:      class.Title,
+		InstructorID:   instructor.ID,
+		InstructorName: instructor.User.Profile.Fullname,
+		Capacity:       req.Capacity,
+		IsActive:       true,
+		Color:          req.Color,
+		Date:           localDate,
+		StartHour:      req.StartHour,
+		StartMinute:    req.StartMinute,
 	}
 
 	return s.repo.CreateClassSchedule(&schedule)
@@ -88,17 +100,15 @@ func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRe
 func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error {
 	schedule, err := s.repo.GetClassScheduleByID(id)
 	if err != nil {
-		return err
+		return fmt.Errorf("schedule not found")
 	}
 
 	instructorID := uuid.MustParse(req.InstructorID)
+	classID := uuid.MustParse(req.ClassID)
 	parsedDate := req.Date.In(time.Local)
 
-	newStart := time.Date(
-		parsedDate.Year(), parsedDate.Month(), parsedDate.Day(),
-		req.StartHour, req.StartMinute, 0, 0, time.Local,
-	)
-
+	newStart := time.Date(parsedDate.Year(), parsedDate.Month(), parsedDate.Day(),
+		req.StartHour, req.StartMinute, 0, 0, time.Local)
 	now := time.Now().In(time.Local)
 
 	if newStart.Before(now) {
@@ -131,11 +141,23 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 		return fmt.Errorf("capacity cannot be less than booked participant (%d)", schedule.Booked)
 	}
 
+	class, err := s.repo.GetClassByID(classID)
+	if err != nil {
+		return fmt.Errorf("class not found: %w", err)
+	}
+
+	instructor, err := s.repo.GetInstructorWithProfileByID(instructorID)
+	if err != nil {
+		return fmt.Errorf("instructor not found: %w", err)
+	}
+
 	schedule.Date = parsedDate
 	schedule.StartHour = req.StartHour
 	schedule.StartMinute = req.StartMinute
-	schedule.ClassID = uuid.MustParse(req.ClassID)
-	schedule.InstructorID = instructorID
+	schedule.ClassID = class.ID
+	schedule.ClassName = class.Title
+	schedule.InstructorID = instructor.ID
+	schedule.InstructorName = instructor.User.Profile.Fullname
 	schedule.Capacity = req.Capacity
 	schedule.Color = req.Color
 
@@ -179,26 +201,19 @@ func (s *classScheduleService) GetAllClassSchedules() ([]dto.ClassScheduleRespon
 	var result []dto.ClassScheduleResponse
 	for _, schedule := range schedules {
 		result = append(result, dto.ClassScheduleResponse{
-			ID: schedule.ID.String(),
-			Class: dto.ClassBrief{
-				ID:       schedule.Class.ID.String(),
-				Title:    schedule.Class.Title,
-				Image:    schedule.Class.Image,
-				Duration: schedule.Class.Duration,
-			},
-			Instructor: dto.InstructorBrief{
-				ID:       schedule.Instructor.ID.String(),
-				Fullname: schedule.Instructor.User.Profile.Fullname,
-				Rating:   schedule.Instructor.Rating,
-			},
-			Category:    schedule.Class.Category.Name,
-			Date:        schedule.Date,
-			StartHour:   schedule.StartHour,
-			StartMinute: schedule.StartMinute,
-			Capacity:    schedule.Capacity,
-			BookedCount: schedule.Booked,
-			Color:       schedule.Color,
-			IsBooked:    false,
+			ID:             schedule.ID.String(),
+			ClassID:        schedule.ClassID.String(),
+			ClassName:      schedule.ClassName,
+			InstructorID:   schedule.InstructorID.String(),
+			InstructorName: schedule.InstructorName,
+			Category:       schedule.Class.Category.Name,
+			Date:           schedule.Date,
+			StartHour:      schedule.StartHour,
+			StartMinute:    schedule.StartMinute,
+			Capacity:       schedule.Capacity,
+			BookedCount:    schedule.Booked,
+			Color:          schedule.Color,
+			IsBooked:       false,
 		})
 	}
 
@@ -230,26 +245,19 @@ func (s *classScheduleService) GetClassScheduleByID(scheduleID, userID string) (
 
 	return &dto.ClassScheduleDetailResponse{
 		ClassScheduleResponse: dto.ClassScheduleResponse{
-			ID: schedule.ID.String(),
-			Class: dto.ClassBrief{
-				ID:       schedule.Class.ID.String(),
-				Title:    schedule.Class.Title,
-				Image:    schedule.Class.Image,
-				Duration: schedule.Class.Duration,
-			},
-			Instructor: dto.InstructorBrief{
-				ID:       schedule.Instructor.ID.String(),
-				Fullname: schedule.Instructor.User.Profile.Fullname,
-				Rating:   schedule.Instructor.Rating,
-			},
-			Category:    schedule.Class.Category.Name,
-			Date:        schedule.Date,
-			StartHour:   schedule.StartHour,
-			StartMinute: schedule.StartMinute,
-			Capacity:    schedule.Capacity,
-			BookedCount: schedule.Booked,
-			Color:       schedule.Color,
-			IsBooked:    isBooked,
+			ID:             schedule.ID.String(),
+			ClassID:        schedule.ClassID.String(),
+			ClassName:      schedule.ClassName,
+			InstructorID:   schedule.InstructorID.String(),
+			InstructorName: schedule.InstructorName,
+			Category:       schedule.Class.Category.Name,
+			Date:           schedule.Date,
+			StartHour:      schedule.StartHour,
+			StartMinute:    schedule.StartMinute,
+			Capacity:       schedule.Capacity,
+			BookedCount:    schedule.Booked,
+			Color:          schedule.Color,
+			IsBooked:       isBooked,
 		},
 		Packages: pkgResponses,
 	}, nil
@@ -264,26 +272,19 @@ func (s *classScheduleService) GetSchedulesByFilter(filter dto.ClassScheduleQuer
 	var result []dto.ClassScheduleResponse
 	for _, schedule := range schedules {
 		result = append(result, dto.ClassScheduleResponse{
-			ID: schedule.ID.String(),
-			Class: dto.ClassBrief{
-				ID:       schedule.Class.ID.String(),
-				Title:    schedule.Class.Title,
-				Image:    schedule.Class.Image,
-				Duration: schedule.Class.Duration,
-			},
-			Instructor: dto.InstructorBrief{
-				ID:       schedule.Instructor.ID.String(),
-				Fullname: schedule.Instructor.User.Profile.Fullname,
-				Rating:   schedule.Instructor.Rating,
-			},
-			Category:    schedule.Class.Category.Name,
-			Date:        schedule.Date,
-			StartHour:   schedule.StartHour,
-			StartMinute: schedule.StartMinute,
-			Capacity:    schedule.Capacity,
-			BookedCount: schedule.Booked,
-			Color:       schedule.Color,
-			IsBooked:    false,
+			ID:             schedule.ID.String(),
+			ClassID:        schedule.ClassID.String(),
+			ClassName:      schedule.ClassName,
+			InstructorID:   schedule.InstructorID.String(),
+			InstructorName: schedule.InstructorName,
+			Category:       schedule.Class.Category.Name,
+			Date:           schedule.Date,
+			StartHour:      schedule.StartHour,
+			StartMinute:    schedule.StartMinute,
+			Capacity:       schedule.Capacity,
+			BookedCount:    schedule.Booked,
+			Color:          schedule.Color,
+			IsBooked:       false,
 		})
 	}
 
@@ -301,26 +302,19 @@ func (s *classScheduleService) GetSchedulesWithBookingStatus(userID string) ([]d
 		isBooked, _ := s.bookingRepo.IsUserBookedSchedule(userID, schedule.ID.String())
 
 		result = append(result, dto.ClassScheduleResponse{
-			ID: schedule.ID.String(),
-			Class: dto.ClassBrief{
-				ID:       schedule.Class.ID.String(),
-				Title:    schedule.Class.Title,
-				Image:    schedule.Class.Image,
-				Duration: schedule.Class.Duration,
-			},
-			Instructor: dto.InstructorBrief{
-				ID:       schedule.Instructor.ID.String(),
-				Fullname: schedule.Instructor.User.Profile.Fullname,
-				Rating:   schedule.Instructor.Rating,
-			},
-			Category:    schedule.Class.Category.Name,
-			Date:        schedule.Date,
-			StartHour:   schedule.StartHour,
-			StartMinute: schedule.StartMinute,
-			Capacity:    schedule.Capacity,
-			BookedCount: schedule.Booked,
-			Color:       schedule.Color,
-			IsBooked:    isBooked,
+			ID:             schedule.ID.String(),
+			ClassID:        schedule.ClassID.String(),
+			ClassName:      schedule.ClassName,
+			InstructorID:   schedule.InstructorID.String(),
+			InstructorName: schedule.InstructorName,
+			Category:       schedule.Class.Category.Name,
+			Date:           schedule.Date,
+			StartHour:      schedule.StartHour,
+			StartMinute:    schedule.StartMinute,
+			Capacity:       schedule.Capacity,
+			BookedCount:    schedule.Booked,
+			Color:          schedule.Color,
+			IsBooked:       isBooked,
 		})
 	}
 

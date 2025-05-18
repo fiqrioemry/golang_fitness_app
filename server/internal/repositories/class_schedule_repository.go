@@ -13,10 +13,12 @@ type ClassScheduleRepository interface {
 	DeleteClassSchedule(id string) error
 	IncrementBooked(scheduleID uuid.UUID) error
 	GetClassSchedules() ([]models.ClassSchedule, error)
+	GetClassByID(id uuid.UUID) (*models.Class, error)
+	HasActiveBooking(scheduleID uuid.UUID) (bool, error)
 	CreateClassSchedule(schedule *models.ClassSchedule) error
 	UpdateClassSchedule(schedule *models.ClassSchedule) error
-	HasActiveBooking(scheduleID uuid.UUID) (bool, error)
 	GetClassScheduleByID(id string) (*models.ClassSchedule, error)
+	GetInstructorWithProfileByID(id uuid.UUID) (*models.Instructor, error)
 	GetClassSchedulesWithFilter(filter dto.ClassScheduleQueryParam) ([]models.ClassSchedule, error)
 }
 
@@ -45,9 +47,7 @@ func (r *classScheduleRepository) GetClassScheduleByID(id string) (*models.Class
 	if err := r.db.Preload("Class", func(db *gorm.DB) *gorm.DB {
 		return db.Unscoped()
 	}).
-		Preload("Instructor.User.Profile", func(db *gorm.DB) *gorm.DB {
-			return db.Unscoped()
-		}).First(&schedule, "id = ?", id).Error; err != nil {
+		First(&schedule, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &schedule, nil
@@ -57,9 +57,6 @@ func (r *classScheduleRepository) GetClassSchedules() ([]models.ClassSchedule, e
 	var schedules []models.ClassSchedule
 	if err := r.db.
 		Preload("Class", func(db *gorm.DB) *gorm.DB {
-			return db.Unscoped()
-		}).
-		Preload("Instructor.User.Profile", func(db *gorm.DB) *gorm.DB {
 			return db.Unscoped()
 		}).
 		Order("date asc").
@@ -75,9 +72,6 @@ func (r *classScheduleRepository) GetClassSchedulesWithFilter(filter dto.ClassSc
 	var schedules []models.ClassSchedule
 	db := r.db.
 		Preload("Class", func(db *gorm.DB) *gorm.DB {
-			return db.Unscoped()
-		}).
-		Preload("Instructor.User.Profile", func(db *gorm.DB) *gorm.DB {
 			return db.Unscoped()
 		}).
 		Order("start_hour asc").
@@ -118,4 +112,24 @@ func (r *classScheduleRepository) HasActiveBooking(scheduleID uuid.UUID) (bool, 
 		return false, err
 	}
 	return count > 0, nil
+}
+
+func (r *classScheduleRepository) GetClassByID(id uuid.UUID) (*models.Class, error) {
+	var class models.Class
+	if err := r.db.Unscoped().First(&class, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &class, nil
+}
+
+func (r *classScheduleRepository) GetInstructorWithProfileByID(id uuid.UUID) (*models.Instructor, error) {
+	var instructor models.Instructor
+	if err := r.db.
+		Preload("User.Profile", func(db *gorm.DB) *gorm.DB {
+			return db.Unscoped()
+		}).
+		First(&instructor, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &instructor, nil
 }

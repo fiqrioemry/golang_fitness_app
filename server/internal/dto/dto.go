@@ -447,17 +447,19 @@ type ScheduleTemplateToggleRequest struct {
 }
 
 type ClassScheduleResponse struct {
-	ID          string          `json:"id"`
-	Class       ClassBrief      `json:"class"`
-	Instructor  InstructorBrief `json:"instructor"`
-	Category    string          `json:"category"`
-	Date        time.Time       `json:"date"`
-	StartHour   int             `json:"startHour"`
-	StartMinute int             `json:"startMinute"`
-	Capacity    int             `json:"capacity"`
-	BookedCount int             `json:"bookedCount"`
-	Color       string          `json:"color"`
-	IsBooked    bool            `json:"isBooked"`
+	ID             string    `json:"id"`
+	ClassID        string    `json:"classId"`
+	ClassName      string    `json:"className"`
+	InstructorID   string    `json:"instructorId"`
+	InstructorName string    `json:"instructorName"`
+	Category       string    `json:"category"`
+	Date           time.Time `json:"date"`
+	StartHour      int       `json:"startHour"`
+	StartMinute    int       `json:"startMinute"`
+	Capacity       int       `json:"capacity"`
+	BookedCount    int       `json:"bookedCount"`
+	Color          string    `json:"color"`
+	IsBooked       bool      `json:"isBooked"`
 }
 
 type InstructorBrief struct {

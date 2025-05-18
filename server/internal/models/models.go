@@ -142,17 +142,19 @@ type Payment struct {
 }
 
 type ClassSchedule struct {
-	ID           uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
-	ClassID      uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
-	InstructorID uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
-	Capacity     int            `gorm:"not null" json:"capacity"`
-	IsActive     bool           `gorm:"default:true" json:"isActive"`
-	Color        string         `gorm:"type:varchar(20)" json:"color"`
-	Date         time.Time      `gorm:"not null" json:"date"`
-	Booked       int            `gorm:"not null;default:0" json:"booked"`
-	StartHour    int            `json:"startHour"`
-	StartMinute  int            `json:"startMinute"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	ID             uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	ClassID        uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
+	ClassName      string         `gorm:"type:varchar(255);not null" json:"className"`
+	InstructorID   uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
+	InstructorName string         `gorm:"type:varchar(255);not null" json:"instructorName"`
+	Capacity       int            `gorm:"not null" json:"capacity"`
+	IsActive       bool           `gorm:"default:true" json:"isActive"`
+	Color          string         `gorm:"type:varchar(20)" json:"color"`
+	Date           time.Time      `gorm:"not null" json:"date"`
+	Booked         int            `gorm:"not null;default:0" json:"booked"`
+	StartHour      int            `json:"startHour"`
+	StartMinute    int            `json:"startMinute"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Class       Class        `gorm:"foreignKey:ClassID" json:"class"`
 	Instructor  Instructor   `gorm:"foreignKey:InstructorID" json:"instructor"`
@@ -160,18 +162,20 @@ type ClassSchedule struct {
 }
 
 type ScheduleTemplate struct {
-	ID           uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
-	ClassID      uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
-	InstructorID uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
-	DayOfWeeks   datatypes.JSON `gorm:"type:json" json:"dayOfWeeks"`
-	StartHour    int            `gorm:"not null" json:"startHour"`
-	StartMinute  int            `gorm:"not null" json:"startMinute"`
-	Capacity     int            `gorm:"not null" json:"capacity"`
-	IsActive     bool           `gorm:"default:true" json:"isActive"`
-	Color        string         `gorm:"type:varchar(20)" json:"color"`
-	EndDate      *time.Time     `gorm:"default:null" json:"endDate"`
-	CreatedAt    time.Time      `gorm:"autoCreateTime"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	ID             uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	ClassID        uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
+	ClassName      string         `gorm:"type:varchar(255);not null" json:"className"`
+	InstructorID   uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
+	InstructorName string         `gorm:"type:varchar(255);not null" json:"instructorName"`
+	DayOfWeeks     datatypes.JSON `gorm:"type:json" json:"dayOfWeeks"`
+	StartHour      int            `gorm:"not null" json:"startHour"`
+	StartMinute    int            `gorm:"not null" json:"startMinute"`
+	Capacity       int            `gorm:"not null" json:"capacity"`
+	IsActive       bool           `gorm:"default:true" json:"isActive"`
+	Color          string         `gorm:"type:varchar(20)" json:"color"`
+	EndDate        *time.Time     `gorm:"default:null" json:"endDate"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
 	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`

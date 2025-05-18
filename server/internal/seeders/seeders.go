@@ -861,7 +861,7 @@ func SeedClassSchedules(db *gorm.DB) {
 			IsActive: true, Color: "#60a5fa",
 		},
 		{
-			ID: uuid.New(), ClassID: classes[1].ID, InstructorID: instructor.ID,
+			ID: uuid.New(), ClassID: classes[1].ID, InstructorID: instructor.ID, InstructorName: instructor.User.Profile.Fullname,
 			Date: date.AddDate(0, 0, 1), StartHour: 10, StartMinute: 30, Capacity: 12,
 			IsActive: true, Color: "#a78bfa",
 		},
