@@ -227,18 +227,34 @@ export const scheduleSchema = z
 export const updateScheduleSchema = z.object({
   classId: z.string().min(1, "Class is required"),
   instructorId: z.string().min(1, "Instructor is required"),
-
-  endDate: z.string().refine((val) => !val || !isNaN(Date.parse(val)), {
-    message: "Date must be a valid date",
-  }),
-  dayOfWeeks: z.array(z.number().int().min(0).max(6)).optional().default([]),
+  date: z
+    .string()
+    .optional()
+    .refine((val) => !val || !isNaN(Date.parse(val)), {
+      message: "Date must be a valid date",
+    }),
   startHour: z.number().min(0).max(23),
   startMinute: z.number().max(59),
   capacity: requiredNumberField("Capacity", { min: 1 }),
 });
 
-export const createReviewSchema = z.object({
+export const updateTemplateSchema = z.object({
   classId: z.string().min(1, "Class is required"),
+  instructorId: z.string().min(1, "Instructor is required"),
+  capacity: requiredNumberField("Capacity", { min: 1 }),
+  startHour: z.number().min(0).max(23),
+  startMinute: z.number().max(59),
+  dayOfWeeks: z.array(z.number().int().min(0).max(6)).optional().default([]),
+  endDate: z
+    .string()
+    .optional()
+    .refine((val) => !val || !isNaN(Date.parse(val)), {
+      message: "End Date must be a valid date",
+    }),
+});
+
+export const createReviewSchema = z.object({
+  classScheduleId: z.string().min(1, "Class is required"),
   rating: z
     .number({
       required_error: "Rating is required",

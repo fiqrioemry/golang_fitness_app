@@ -3,11 +3,6 @@ import { toast } from "sonner";
 import * as instructor from "@/services/instructor";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// =====================
-// QUERIES
-// =====================
-
-// GET /api/instructors
 export const useInstructorsQuery = () =>
   useQuery({
     queryKey: ["instructors"],
@@ -15,17 +10,12 @@ export const useInstructorsQuery = () =>
     keepPreviousData: true,
   });
 
-// GET /api/instructors/:id
 export const useInstructorDetailQuery = (id) =>
   useQuery({
     queryKey: ["instructor", id],
     queryFn: () => instructor.getInstructorById(id),
     enabled: !!id,
   });
-
-// =====================
-// MUTATIONS (Admin Only)
-// =====================
 
 export const useInstructorMutation = () => {
   const qc = useQueryClient();

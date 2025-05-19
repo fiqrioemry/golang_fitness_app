@@ -75,6 +75,11 @@ const directMenus = [
     icon: MailOpen,
     title: "Message",
   },
+  {
+    to: "/admin/instructors",
+    icon: UserPlus,
+    title: "Instructors",
+  },
 ];
 
 const accordionMenus = [
@@ -89,15 +94,6 @@ const accordionMenus = [
         title: "New Vouchers",
         icon: PlusSquareIcon,
       },
-    ],
-  },
-  {
-    value: "instructor",
-    icon: BookUser,
-    title: "Instructors",
-    children: [
-      { to: "/admin/instructors", title: "Instructor List", icon: List },
-      { to: "/admin/instructors/add", title: "Add Instructor", icon: UserPlus },
     ],
   },
   {

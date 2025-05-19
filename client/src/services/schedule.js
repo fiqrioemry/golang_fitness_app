@@ -48,15 +48,6 @@ export const createTemplate = async (data) => {
   return res.data;
 };
 
-// POST /api/schedule-templates/auto-generate
-export const autoGenerateSchedules = async (data) => {
-  const res = await authInstance.post(
-    "/schedule-templates/auto-generate",
-    data
-  );
-  return res.data;
-};
-
 // GET /api/schedule-templates
 export const getAllRecuringSchedule = async () => {
   const res = await authInstance.get(`/schedule-templates`);
@@ -85,10 +76,3 @@ export const stopScheduleTemplate = async (id) => {
   const res = await authInstance.post(`/schedule-templates/${id}/stop`);
   return res.data;
 };
-
-// TODO : belum diimplementasikan - next feature
-// // POST /api/schedule-templates/recurring
-// export const createScheduleTemplate = async (data) => {
-//   const res = await authInstance.post("/schedule-templates", data);
-//   return res.data;
-// };

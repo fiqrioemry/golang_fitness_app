@@ -49,6 +49,7 @@ const Schedules = () => {
   if (isLoading) return <Loading />;
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
+  console.log(filteredSchedules);
   return (
     <section className="section py-24 text-foreground">
       {/* Mobile: Carousel */}
@@ -127,9 +128,9 @@ const Schedules = () => {
                   {format(s.startTime, "h:mm a")} •{" "}
                   {Math.round((s.endTime - s.startTime) / 60000)} mins
                 </p>
-                <p className="font-medium text-base">{s.class.title}</p>
+                <p className="font-medium text-base">{s.className}</p>
                 <p className="text-sm text-muted-foreground">
-                  {s.instructor.fullname}
+                  {s.instructorName}
                 </p>
               </div>
 

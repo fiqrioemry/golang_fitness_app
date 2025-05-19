@@ -95,7 +95,7 @@ const ClassRecuring = () => {
                   </div>
                   <ul className="text-sm text-muted-foreground space-y-0.5 mt-1">
                     <li>
-                      <strong>Instructor:</strong> {t.instructor}
+                      <strong>Instructor:</strong> {t.instructorName}
                     </li>
                     <li>
                       <strong>Capacity:</strong> {t.capacity}

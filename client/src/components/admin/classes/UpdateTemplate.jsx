@@ -1,9 +1,8 @@
-import React from "react";
-import { updateScheduleSchema } from "@/lib/schema";
+import { updateTemplateSchema } from "@/lib/schema";
 import { SelectElement } from "@/components/input/SelectElement";
 import { operationHours, operationMinutes } from "@/lib/constant";
 import { useScheduleTemplateMutation } from "@/hooks/useSchedules";
-import { FormUpdateDialog } from "@/components/form/FormUpdateDialog";
+import { FormUpdateSheet } from "@/components/form/FormUpdateSheet";
 import { DaySelectorElement } from "@/components/input/DaySelectorElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
@@ -13,10 +12,10 @@ const UpdateTemplate = ({ template }) => {
   const { updateTemplate } = useScheduleTemplateMutation();
 
   return (
-    <FormUpdateDialog
+    <FormUpdateSheet
       icon={false}
       state={template}
-      schema={updateScheduleSchema}
+      schema={updateTemplateSchema}
       title="Update Recurence Schedule"
       loading={updateTemplate.isPending}
       action={updateTemplate.mutateAsync}
@@ -33,8 +32,7 @@ const UpdateTemplate = ({ template }) => {
         name="instructorId"
         placeholder="Select instructor"
       />
-      <SelectCalendarElement name="endDate" label="Event Date" />
-
+      <SelectCalendarElement name="endDate" label="End Date" />
       <DaySelectorElement name="dayOfWeeks" label="Recurring Days" />
       <div className="grid grid-cols-3 gap-4">
         <SelectElement
@@ -53,7 +51,7 @@ const UpdateTemplate = ({ template }) => {
         />
         <InputNumberElement name="capacity" label="Capacity" />
       </div>
-    </FormUpdateDialog>
+    </FormUpdateSheet>
   );
 };
 

@@ -5,37 +5,29 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { CalendarIcon, ClockIcon, UserIcon } from "lucide-react";
 
 export const PastAttendanceCard = ({ attendance }) => {
-  const {
-    class: classData,
-    instructor,
-    date,
-    startHour,
-    startMinute,
-    status,
-    checkedAt,
-    reviewed,
-  } = attendance;
-
-  const formattedDate = format(parseISO(date), "EEEE, dd MMM yyyy");
-  const formattedTime = `${String(startHour).padStart(2, "0")}:${String(
-    startMinute
-  ).padStart(2, "0")}`;
-  const checkedTime = checkedAt ? format(parseISO(checkedAt), "HH:mm") : "-";
+  const formattedDate = format(parseISO(attendance.date), "EEEE, dd MMM yyyy");
+  const formattedTime = `${String(attendance.startHour).padStart(
+    2,
+    "0"
+  )}:${String(attendance.startMinute).padStart(2, "0")}`;
+  const checkedTime = attendance.checkedAt
+    ? format(parseISO(attendance.checkedAt), "HH:mm")
+    : "-";
 
   return (
     <Card className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 shadow-sm border border-border bg-muted/20">
       <img
-        src={classData.image}
-        alt={classData.title}
+        src={attendance.classImage}
+        alt={attendance.className}
         className="w-full sm:w-48 h-32 object-cover rounded-xl"
       />
 
       <div className="flex-1 space-y-1">
         <CardTitle className="text-lg font-semibold">
-          {classData.title}
+          {attendance.className}
         </CardTitle>
         <div className="text-sm text-muted-foreground">
-          {classData.duration} min
+          {attendance.duration} min
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarIcon className="w-4 h-4" />
@@ -47,18 +39,18 @@ export const PastAttendanceCard = ({ attendance }) => {
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <UserIcon className="w-4 h-4" />
-          <span>{instructor.fullname}</span>
+          <span>{attendance.instructorName}</span>
         </div>
 
-        {!reviewed && <ReviewClass cls={classData} />}
+        {!attendance.reviewed && <ReviewClass attendance={attendance} />}
       </div>
 
       <div className="flex flex-col gap-1 items-end w-full sm:w-48">
         <Badge
-          variant={status === "attended" ? "success" : "destructive"}
+          variant={attendance.status === "attended" ? "success" : "destructive"}
           className="w-fit"
         >
-          {status.toUpperCase()}
+          {attendance.status.toUpperCase()}
         </Badge>
         <div className="text-xs text-muted-foreground">
           Checked at: <span className="font-medium">{checkedTime}</span>

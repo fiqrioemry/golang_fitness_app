@@ -1,20 +1,29 @@
+import { instructorState } from "@/lib/constant";
 import { instructorSchema } from "@/lib/schema";
 import { useInstructorMutation } from "@/hooks/useInstructor";
-import { FormUpdateDialog } from "@/components/form/FormUpdateDialog";
+import { FormAddDialog } from "@/components/form/FormAddDialog";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
+import { SelectUsersElement } from "@/components/input/SelectUsersElement";
 
-const EditInstructor = ({ instructor }) => {
-  const { updateInstructor } = useInstructorMutation();
+const AddInstructor = () => {
+  const { createInstructor } = useInstructorMutation();
 
   return (
-    <FormUpdateDialog
-      state={instructor}
+    <FormAddDialog
+      className="w-72"
+      state={instructorState}
       schema={instructorSchema}
-      title="Update Instructors"
-      loading={updateInstructor.isPending}
-      action={updateInstructor.mutateAsync}
+      title="Appoint new instructor"
+      isLoading={createInstructor.isPending}
+      action={createInstructor.mutateAsync}
     >
+      <SelectUsersElement
+        name="userId"
+        data="users"
+        label="Instructor name"
+        placeholder="Select instructor name"
+      />
       <InputTextElement
         name="specialties"
         label="Specialties"
@@ -30,8 +39,8 @@ const EditInstructor = ({ instructor }) => {
         label="Experience"
         placeholder="Enter instructor Experience"
       />
-    </FormUpdateDialog>
+    </FormAddDialog>
   );
 };
 
-export { EditInstructor };
+export { AddInstructor };

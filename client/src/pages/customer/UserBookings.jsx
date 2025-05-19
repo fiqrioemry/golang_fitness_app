@@ -1,5 +1,4 @@
 // src/pages/customer/UserBookings.jsx
-import React from "react";
 import { Loading } from "@/components/ui/Loading";
 import { useUserBookingsQuery } from "@/hooks/useProfile";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";

@@ -5,6 +5,7 @@ import { Calendar, Views } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const ClassScheduleCalendar = ({ onEmptySlotClick, onSelectEvent, events }) => {
+  console.log(events);
   return (
     <section>
       {/* Calendar */}

@@ -18,11 +18,9 @@ export const useCreatePaymentMutation = () =>
   useMutation({
     mutationFn: paymentService.createPayment,
     onSuccess: (res) => {
-      console.log(res);
       toast.success(res?.message || "Payment created successfully");
     },
     onError: (err) => {
-      console.log(err);
       toast.error(err?.response?.data?.message || "Failed to create payment");
     },
   });

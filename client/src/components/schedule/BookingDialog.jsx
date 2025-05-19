@@ -12,14 +12,15 @@ import { useUserClassPackagesQuery } from "@/hooks/useProfile";
 
 export const BookingDialog = ({ schedule, openDialog, setOpenDialog }) => {
   const navigate = useNavigate();
+
   const [selectedPackageId, setSelectedPackageId] = useState(null);
 
   const bookingMutation = useCreateBookingMutation();
 
   const { data: userPackages = [], isLoading } = useUserClassPackagesQuery(
-    schedule?.class.id,
+    schedule?.classId,
     {
-      enabled: !!schedule?.class.id && openDialog,
+      enabled: !!schedule?.classI && openDialog,
     }
   );
 

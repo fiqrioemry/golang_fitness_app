@@ -15,18 +15,17 @@ import ScheduleDetail from "./pages/ScheduleDetail";
 import Dashboard from "./pages/admin/Dashboard";
 import UsersList from "./pages/admin/UsersList";
 import ClassAdd from "./pages/admin/classes/ClassAdd";
+import Notifications from "./pages/admin/Notifications";
 import PackageAdd from "./pages/admin/packages/PackageAdd";
 import ClassesList from "./pages/admin/classes/ClassesList";
+import InstructorsList from "./pages/admin/InstructorsList";
 import VouchersAdd from "./pages/admin/vouchers/VouchersAdd";
 import ClassOptions from "./pages/admin/classes/ClassOptions";
 import TransactionsList from "./pages/admin/TransactionsList";
 import VouchersList from "./pages/admin/vouchers/VouchersList";
 import PackagesList from "./pages/admin/packages/PackagesList";
-import Notifications from "./pages/admin/Notifications";
 import ClassRecuring from "./pages/admin/classes/ClassRecuring";
 import ClassSchedules from "./pages/admin/classes/ClassSchedules";
-import AddInstructors from "./pages/admin/instructors/AddInstructors";
-import InstructorsList from "./pages/admin/instructors/InstructorsList";
 
 // customer pages
 import Profile from "./pages/customer/Profile";
@@ -136,24 +135,18 @@ function App() {
         >
           <Route path="users" element={<UsersList />} />
           <Route path="dashboard" element={<Dashboard />} />
-          {/* classes */}
+          <Route path="messages" element={<Notifications />} />
           <Route path="classes" element={<ClassesList />} />
           <Route path="classes/add" element={<ClassAdd />} />
           <Route path="classes/options" element={<ClassOptions />} />
           <Route path="classes/recuring" element={<ClassRecuring />} />
           <Route path="classes/schedules" element={<ClassSchedules />} />
-          {/* vouchers */}
           <Route path="vouchers" element={<VouchersList />} />
           <Route path="vouchers/add" element={<VouchersAdd />} />
-          {/* packages */}
           <Route path="packages" element={<PackagesList />} />
           <Route path="packages/add" element={<PackageAdd />} />
-          {/* instructors */}
           <Route path="instructors" element={<InstructorsList />} />
-          <Route path="instructors/add" element={<AddInstructors />} />
           <Route path="transactions" element={<TransactionsList />} />
-          <Route path="messages" element={<Notifications />} />
-
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 

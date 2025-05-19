@@ -35,7 +35,6 @@ export const useScheduleMutation = () => {
       qc.invalidateQueries({ queryKey: ["schedules"] });
     },
     onError: (err) => {
-      console.log(err);
       toast.error(err?.response?.data?.message || "Something went wrong");
     },
   });

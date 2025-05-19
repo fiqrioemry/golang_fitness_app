@@ -36,7 +36,7 @@ const ClassSchedule = () => {
 
       return {
         id: item.id,
-        title: `${item.class.title} - ${item.instructor.fullname} (${item.bookedCount}/${item.capacity})`,
+        title: `${item.className} - ${item.instructorName} (${item.bookedCount}/${item.capacity})`,
         start,
         end,
         allDay: false,

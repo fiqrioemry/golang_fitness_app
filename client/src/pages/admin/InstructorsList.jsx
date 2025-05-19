@@ -1,13 +1,11 @@
-import React from "react";
+import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
-import { Star, CirclePlus } from "lucide-react";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useInstructorsQuery } from "@/hooks/useInstructor";
 import { EditInstructor } from "@/components/admin/instructors/EditInstructor";
 import { DeleteInstructor } from "@/components/admin/instructors/DeleteInstructor";
+import { AddInstructor } from "@/components/admin/instructors/AddInstructor";
 
 const InstructorsList = () => {
   const {
@@ -16,7 +14,6 @@ const InstructorsList = () => {
     isError,
     refetch,
   } = useInstructorsQuery();
-  const navigate = useNavigate();
 
   if (isLoading) return <Loading />;
 
@@ -34,10 +31,7 @@ const InstructorsList = () => {
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={() => navigate("/admin/instructors/add")}>
-          <CirclePlus className="w-4 h-4 mr-2" />
-          Add Instructor
-        </Button>
+        <AddInstructor />
       </div>
 
       {/* Instructors Grid */}
@@ -45,7 +39,7 @@ const InstructorsList = () => {
         {instructors.map((inst) => (
           <div
             key={inst.id}
-            className="bg-white shadow-sm border rounded-xl overflow-hidden flex flex-col"
+            className="bg-background shadow-sm border rounded-xl overflow-hidden flex flex-col"
           >
             <div className="p-4 flex gap-4 items-start">
               <img
@@ -71,18 +65,20 @@ const InstructorsList = () => {
 
             <div className="border-t px-4 py-3 space-y-1 text-sm text-muted-foreground">
               <p>
-                <span className="font-medium text-gray-800">Specialties:</span>{" "}
+                <span className="font-medium text-muted-foreground">
+                  Specialties :
+                </span>{" "}
                 {inst.specialties}
               </p>
               <p>
-                <span className="font-medium text-gray-800">
-                  Certifications:
+                <span className="font-medium text-muted-foreground">
+                  Certifications :
                 </span>{" "}
                 {inst.certifications}
               </p>
               <p>
-                <span className="font-medium text-gray-800">
-                  Total Classes:
+                <span className="font-medium text-muted-foreground">
+                  Total Classes :
                 </span>{" "}
                 <Badge variant="outline">{inst.totalClass}</Badge>
               </p>

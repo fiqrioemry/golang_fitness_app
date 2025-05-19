@@ -24,6 +24,7 @@ export const BookingCard = ({ booking }) => {
   const [showQR, setShowQR] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
   const [canAttend, setCanAttend] = useState(false);
+  const [isClassOver, setIsClassOver] = useState(false);
 
   const startTime = buildDateTime(
     booking.date,
@@ -42,8 +43,8 @@ export const BookingCard = ({ booking }) => {
       setCanAttend(
         isAttendanceWindow(startTime, Number(booking.duration || 0))
       );
+      setIsClassOver(endTime < new Date());
     };
-
     updateStatus();
     const timer = setInterval(updateStatus, 1000);
     return () => clearInterval(timer);
@@ -76,7 +77,7 @@ export const BookingCard = ({ booking }) => {
       <div className="grid grid-cols-1 sm:grid-cols-[215px_1fr]">
         <img
           src={booking.classImage}
-          alt={booking.classTitle}
+          alt={booking.className}
           className="w-full h-48 sm:h-full object-cover"
         />
 
@@ -84,10 +85,10 @@ export const BookingCard = ({ booking }) => {
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-bold text-foreground">
-                {booking.classTitle}
+                {booking.className}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {booking.instructor} • {booking.duration} mins
+                {booking.instructorName} • {booking.duration} mins
               </p>
             </div>
             <Badge className="text-xs" variant="outline">
@@ -144,7 +145,10 @@ export const BookingCard = ({ booking }) => {
                       ? handleShowQR
                       : handleAttend
                   }
-                  disabled={booking.status !== "checked_in" && !canAttend}
+                  disabled={
+                    booking.status !== "checked_in" &&
+                    (!canAttend || isClassOver)
+                  }
                 >
                   {booking.status === "checked_in" ? (
                     <>

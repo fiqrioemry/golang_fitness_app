@@ -33,7 +33,7 @@ const ScheduleDetail = () => {
   return (
     <section className="section py-24 text-foreground">
       <div className="space-y-4 text-center">
-        <h2 className="font-bold">{schedule.class.title}</h2>
+        <h2 className="font-bold">{schedule.className}</h2>
         <p className="text-muted-foreground text-sm">
           {formatDateTime(schedule.date)}
         </p>
@@ -41,17 +41,15 @@ const ScheduleDetail = () => {
 
       <div className="border rounded-xl p-6 flex flex-col md:flex-row gap-6 items-start">
         <img
-          src={schedule.class.image}
-          alt={schedule.class.title}
+          src={schedule.classImage}
+          alt={schedule.className}
           className="w-full md:w-64 aspect-square rounded-lg object-cover border"
         />
 
         <div className="flex-1 space-y-4">
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Duration</span>
-            <span className="font-medium">
-              {schedule.class.duration} minutes
-            </span>
+            <span className="font-medium">{schedule.duration} minutes</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Start Time</span>
@@ -68,15 +66,10 @@ const ScheduleDetail = () => {
           </div>
           <div className="flex items-center gap-4 pt-4 border-t mt-4">
             <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-lg font-bold uppercase">
-              {schedule.instructor.fullname.charAt(0)}
+              {schedule.instructorName.charAt(0)}
             </div>
             <div>
-              <div className="font-semibold">
-                {schedule.instructor.fullname}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Rating: {schedule.instructor.rating} ⭐
-              </div>
+              <div className="font-semibold">{schedule.instructorName}</div>
             </div>
           </div>
         </div>

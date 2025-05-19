@@ -90,7 +90,7 @@ export const getTimeLeft = (startTime) => {
 
 export const isAttendanceWindow = (startTime) => {
   const now = new Date();
-  const startWindow = new Date(startTime.getTime() - 12215 * 60000);
+  const startWindow = new Date(startTime.getTime() - 15 * 60000);
   const endWindow = new Date(startTime.getTime() + 30 * 60000);
   return now >= startWindow && now <= endWindow;
 };

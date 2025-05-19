@@ -1,4 +1,3 @@
-import React from "react";
 import { DeleteClassSchedule } from "./DeleteClassSchedule";
 import { UpdateClassSchedule } from "./UpdateClassSchedule";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -9,6 +8,7 @@ const ClassScheduleDetail = ({ open, onClose, event }) => {
   const { title, start, end, resource } = event;
 
   const isPast = new Date(resource?.date) < new Date();
+
   const hasBooking = resource?.bookedCount > 0;
 
   return (
@@ -20,7 +20,7 @@ const ClassScheduleDetail = ({ open, onClose, event }) => {
           {new Date(end).toLocaleTimeString()}
         </p>
         <p>
-          <strong>Instructor :</strong> {resource?.instructor}
+          <strong>Instructor :</strong> {resource?.instructorName}
         </p>
         <p>
           <strong>Capacity :</strong> {resource?.bookedCount || 0}/

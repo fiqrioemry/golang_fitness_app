@@ -20,8 +20,12 @@ export function FormAddDialog({
   schema,
   action,
   children,
-  icon = false,
-  buttonText = "",
+  buttonText = (
+    <Button type="button">
+      <PlusCircle className="w-4 h-4 mr-2" />
+      <span>Add new</span>
+    </Button>
+  ),
   loading = false,
   shouldReset = true,
 }) {
@@ -62,7 +66,12 @@ export function FormAddDialog({
 
   const handleSave = useCallback(
     async (data) => {
-      await action(data);
+      const payload = {
+        ...data,
+        date: data.date ? new Date(data.date).toISOString() : null,
+        endDate: data.endDate ? new Date(data.endDate).toISOString() : null,
+      };
+      await action(payload);
       if (formState.isValid && shouldReset) reset();
       setIsOpen(false);
     },
@@ -76,16 +85,7 @@ export function FormAddDialog({
         open={isOpen}
         onOpenChange={(open) => (!open ? handleCancel() : setIsOpen(open))}
       >
-        <DialogTrigger asChild>
-          {icon ? (
-            buttonText
-          ) : (
-            <Button type="button">
-              <PlusCircle className="w-4 h-4 mr-2" />
-              <span>Add new</span>
-            </Button>
-          )}
-        </DialogTrigger>
+        <DialogTrigger asChild>{buttonText}</DialogTrigger>
 
         <DialogContent className="sm:max-w-lg overflow-hidden rounded-xl p-0 bg-card border border-border">
           {loading ? (

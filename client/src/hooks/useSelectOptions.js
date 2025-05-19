@@ -9,6 +9,7 @@ import { useTypesQuery, useTypeMutation } from "@/hooks/useType";
 import { useLevelsQuery, useLevelMutation } from "@/hooks/useLevel";
 import { useLocationsQuery, useLocationMutation } from "@/hooks/useLocation";
 import { useCategoriesQuery, useCategoryMutation } from "@/hooks/useCategory";
+import { useUsersQuery } from "./useUsers";
 
 export const useSelectOptions = (type) => {
   switch (type) {
@@ -29,7 +30,6 @@ export const useSelectOptions = (type) => {
     }
     case "instructor":
       return useInstructorsQuery();
-
     case "class": {
       const { data = {}, ...rest } = useClassesQuery({ limit: 20 });
       return {
