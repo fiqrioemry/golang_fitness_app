@@ -119,7 +119,6 @@ func (h *PackageHandler) GetPackageByID(c *gin.Context) {
 	c.JSON(http.StatusOK, classPackage)
 }
 
-// DELETE  : /api/packages/:id
 func (h *PackageHandler) DeletePackage(c *gin.Context) {
 	id := c.Param("id")
 

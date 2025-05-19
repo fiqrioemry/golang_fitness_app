@@ -52,7 +52,7 @@ func (cm *CronManager) RegisterJobs() {
 		}
 	})
 
-	// Reminder dan Mark Absent setiap 15 menit
+	// Reminder dan Mark Absent  tiap 15 menit
 	cm.c.AddFunc("@every 15m", func() {
 		log.Println("Cron: Sending class reminders...")
 		if err := cm.notificationService.SendClassReminder(); err != nil {

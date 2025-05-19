@@ -13,6 +13,6 @@ func UserRoutes(r *gin.Engine, handler *handlers.UserHandler) {
 	admin.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 
 	admin.GET("", handler.GetAllUsers)
-	admin.GET("/stats", handler.GetUserStats)
 	admin.GET(":id", handler.GetUserDetail)
+	admin.GET("/stats", handler.GetUserStats)
 }

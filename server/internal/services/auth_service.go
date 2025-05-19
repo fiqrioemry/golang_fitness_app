@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/idtoken"
 )
 
@@ -25,6 +26,10 @@ type AuthService interface {
 	GoogleSignIn(idToken string) (*dto.AuthResponse, error)
 	Register(req *dto.RegisterRequest) (*dto.AuthResponse, error)
 	RefreshToken(refreshToken string) (*dto.AuthResponse, error)
+
+	//
+	GetGoogleOAuthURL() string
+	HandleGoogleOAuthCallback(code string) (*dto.AuthResponse, error)
 }
 
 type authService struct {
@@ -127,7 +132,7 @@ func (s *authService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, err
 
 	profile := models.Profile{
 		Fullname: req.Fullname,
-		Avatar:   utils.RandomUserAvatar(),
+		Avatar:   utils.RandomUserAvatar(req.Fullname),
 	}
 
 	user := models.User{
@@ -248,7 +253,6 @@ func (s *authService) GoogleSignIn(idToken string) (*dto.AuthResponse, error) {
 		return nil, errors.New("email not found in token")
 	}
 	name, _ := payload.Claims["name"].(string)
-	picture, _ := payload.Claims["picture"].(string)
 
 	user, err := s.repo.GetUserByEmail(email)
 	if err != nil {
@@ -258,7 +262,7 @@ func (s *authService) GoogleSignIn(idToken string) (*dto.AuthResponse, error) {
 			Role:     "customer",
 			Profile: models.Profile{
 				Fullname: name,
-				Avatar:   picture,
+				Avatar:   utils.RandomUserAvatar(name),
 			},
 		}
 
@@ -305,4 +309,22 @@ func (s *authService) GoogleSignIn(idToken string) (*dto.AuthResponse, error) {
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
+}
+
+func (s *authService) GetGoogleOAuthURL() string {
+	return config.GoogleOAuthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+}
+
+func (s *authService) HandleGoogleOAuthCallback(code string) (*dto.AuthResponse, error) {
+	token, err := config.GoogleOAuthConfig.Exchange(context.Background(), code)
+	if err != nil {
+		return nil, fmt.Errorf("failed to exchange code: %w", err)
+	}
+
+	rawIDToken, ok := token.Extra("id_token").(string)
+	if !ok {
+		return nil, errors.New("missing id_token in Google response")
+	}
+
+	return s.GoogleSignIn(rawIDToken)
 }

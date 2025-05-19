@@ -67,7 +67,6 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 		return
 	}
 
-	// Respond with success
 	c.JSON(http.StatusCreated, gin.H{"message": "Class created successfully"})
 }
 
@@ -169,10 +168,8 @@ func (h *ClassHandler) UploadClassGallery(c *gin.Context) {
 		return
 	}
 
-	// Ambil URL gambar lama yang dipertahankan
 	keepImages := form.Value["images"]
 
-	// Ambil file gambar baru yang diupload
 	files := form.File["images"]
 	var uploadedURLs []string
 
@@ -194,7 +191,6 @@ func (h *ClassHandler) UploadClassGallery(c *gin.Context) {
 		}
 	}
 
-	// Update data galeri
 	if err := h.classService.UpdateClassGallery(uuid.MustParse(classID), keepImages, uploadedURLs); err != nil {
 		utils.CleanupImagesOnError(uploadedURLs)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "failed to update gallery", "error": err.Error()})

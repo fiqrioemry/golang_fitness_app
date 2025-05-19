@@ -13,16 +13,8 @@ import (
 	"github.com/skip2/go-qrcode"
 )
 
-func RandomUserAvatar() string {
-	avatars := []string{
-		"Shopia", "Jameson", "Emery", "Sawyer", "Maria",
-		"Chase", "Jocelyn", "Liliana", "Robert", "Christian", "Nolan",
-	}
-
-	rand.Seed(time.Now().UnixNano())
-	avatar := avatars[rand.Intn(len(avatars))]
-
-	return fmt.Sprintf("https://api.dicebear.com/9.x/fun-emoji/svg?seed=%s", avatar)
+func RandomUserAvatar(avatar string) string {
+	return fmt.Sprintf("https://api.dicebear.com/6.x/initials/svg?seed=%s", avatar)
 }
 
 func GenerateOTP(length int) string {

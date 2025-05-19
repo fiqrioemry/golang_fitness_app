@@ -37,12 +37,12 @@ func ResetDatabase(db *gorm.DB) {
 		&models.Location{},
 	)
 	if err != nil {
-		log.Fatalf("❌ Failed to drop tables: %v", err)
+		log.Fatalf("Failed to drop tables: %v", err)
 	}
 
-	log.Println("✅ All tables dropped successfully.")
+	log.Println("All tables dropped successfully.")
 
-	log.Println("🚀 Migrating tables...")
+	log.Println("Migrating tables...")
 
 	err = db.AutoMigrate(
 		&models.User{},
@@ -71,12 +71,12 @@ func ResetDatabase(db *gorm.DB) {
 		&models.Location{},
 	)
 	if err != nil {
-		log.Fatalf("❌ Failed to migrate tables: %v", err)
+		log.Fatalf("Failed to migrate tables: %v", err)
 	}
 
-	log.Println("✅ Migration completed successfully.")
+	log.Println("Migration completed successfully.")
 
-	log.Println("🌱 Seeding dummy data...")
+	log.Println("Seeding dummy data...")
 
 	SeedNotificationTypes(db)
 	SeedUsers(db)
@@ -91,13 +91,11 @@ func ResetDatabase(db *gorm.DB) {
 	SeedInstructors(db)
 	SeedPayments(db)
 	SeedUserPackages(db)
-	SeedClassSchedules(db)
 	SeedScheduleTemplate(db)
-	SeedBookings(db)
-	SeedAttendances(db)
+	SeedClassSchedules(db)
 	SeedReviews(db)
 	SeedDummyNotifications(db)
 	SeedVouchers(db)
 
-	log.Println("✅ Seeding completed successfully.")
+	log.Println("Seeding completed successfully.")
 }

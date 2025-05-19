@@ -12,8 +12,8 @@ func ScheduleTemplateRoutes(r *gin.Engine, handler *handlers.ScheduleTemplateHan
 	template.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 
 	template.GET("", handler.GetAllTemplates)
-	template.DELETE("/:id", handler.DeleteTemplate)
+	template.PUT("/:id", handler.UpdateScheduleTemplate)
 	template.POST("/:id/run", handler.RunScheduleTemplate)
 	template.POST("/:id/stop", handler.StopScheduleTemplate)
-	template.PUT("/:id", handler.UpdateScheduleTemplate)
+	template.DELETE("/:id", middleware.RoleOnly("owner"), handler.DeleteTemplate)
 }

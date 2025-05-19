@@ -19,6 +19,6 @@ func ClassRoutes(r *gin.Engine, handler *handlers.ClassHandler) {
 	admin := class.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("", handler.CreateClass)
 	admin.PUT("/:id", handler.UpdateClass)
-	admin.DELETE("/:id", handler.DeleteClass)
 	admin.POST("/:id/gallery", handler.UploadClassGallery)
+	admin.DELETE("/:id", middleware.RoleOnly("owner"), handler.DeleteClass)
 }

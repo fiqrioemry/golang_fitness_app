@@ -22,6 +22,6 @@ func ClassScheduleRoutes(r *gin.Engine, h *handlers.ClassScheduleHandler) {
 	admin := schedule.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("", h.CreateClassSchedule)
 	admin.PUT("/:id", h.UpdateClassSchedule)
-	admin.DELETE("/:id", h.DeleteClassSchedule)
+	admin.DELETE("/:id", middleware.RoleOnly("owner"), h.DeleteClassSchedule)
 
 }

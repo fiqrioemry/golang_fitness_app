@@ -15,8 +15,11 @@ func AuthRoutes(r *gin.Engine, handler *handlers.AuthHandler) {
 		auth.POST("/register", handler.Register)
 		auth.POST("/login", handler.Login)
 		auth.POST("/logout", handler.Logout)
-		auth.POST("/google-signin", handler.GoogleSignIn)
 		auth.POST("/refresh-token", handler.RefreshToken)
+
+		// google
+		auth.GET("/google", handler.GoogleOAuthRedirect)
+		auth.GET("/google/callback", handler.GoogleOAuthCallback)
 
 		protected := auth.Group("")
 		protected.Use(middleware.AuthRequired())

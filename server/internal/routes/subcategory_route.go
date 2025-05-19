@@ -10,14 +10,12 @@ import (
 func SubcategoryRoutes(r *gin.Engine, h *handlers.SubcategoryHandler) {
 	subcategory := r.Group("/api/subcategories")
 
-	// Public Routes
 	subcategory.GET("", h.GetAllSubcategories)
 	subcategory.GET("/:id", h.GetSubcategoryByID)
 	subcategory.GET("/category/:categoryId", h.GetSubcategoriesByCategoryID)
 
-	// Admin Only Routes
 	admin := subcategory.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("", h.CreateSubcategory)
 	admin.PUT("/:id", h.UpdateSubcategory)
-	admin.DELETE("/:id", h.DeleteSubcategory)
+	admin.DELETE("/:id", middleware.RoleOnly("owner"), h.DeleteSubcategory)
 }

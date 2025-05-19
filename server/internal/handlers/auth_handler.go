@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 	"server/internal/dto"
 	"server/internal/services"
 	"server/internal/utils"
@@ -140,20 +141,27 @@ func (h *AuthHandler) AuthMe(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *AuthHandler) GoogleSignIn(c *gin.Context) {
-	var req dto.GoogleSignInRequest
-	if !utils.BindAndValidateJSON(c, &req) {
+func (h *AuthHandler) GoogleOAuthRedirect(c *gin.Context) {
+	url := h.authService.GetGoogleOAuthURL()
+	c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func (h *AuthHandler) GoogleOAuthCallback(c *gin.Context) {
+	code := c.Query("code")
+	if code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Authorization code is missing"})
 		return
 	}
 
-	tokens, err := h.authService.GoogleSignIn(req.IDToken)
+	tokens, err := h.authService.HandleGoogleOAuthCallback(code)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
 		return
 	}
 
 	utils.SetAccessTokenCookie(c, tokens.AccessToken)
+
 	utils.SetRefreshTokenCookie(c, tokens.RefreshToken)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Google Sign-In successful"})
+	c.Redirect(http.StatusTemporaryRedirect, os.Getenv("FRONTEND_REDIRECT_URL"))
 }

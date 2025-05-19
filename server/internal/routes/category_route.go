@@ -18,5 +18,5 @@ func CategoryRoutes(r *gin.Engine, h *handlers.CategoryHandler) {
 	admin := category.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("", h.CreateCategory)
 	admin.PUT("/:id", h.UpdateCategory)
-	admin.DELETE("/:id", h.DeleteCategory)
+	admin.DELETE("/:id", middleware.RoleOnly("owner"), h.DeleteCategory)
 }

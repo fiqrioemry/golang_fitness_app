@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"server/internal/utils"
 	"slices"
@@ -36,6 +37,6 @@ func RoleOnly(allowedRoles ...string) gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Forbidden: Access denied"})
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("Forbidden: Access denied. Only roles %v are allowed", allowedRoles)})
 	}
 }

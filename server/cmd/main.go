@@ -20,6 +20,7 @@ func main() {
 	config.InitMailer()
 	config.InitDatabase()
 	config.InitCloudinary()
+	config.InitGoogleOAuthConfig()
 	config.InitMidtrans()
 
 	db := config.DB
@@ -34,7 +35,7 @@ func main() {
 		middleware.CORS(),
 		middleware.RateLimiter(5, 10),
 		middleware.LimitFileSize(12<<20),
-		middleware.APIKeyGateway([]string{"/api/payments"}),
+		middleware.APIKeyGateway([]string{"/api/payments", "/api/auth/google", "/api/auth/google/callback"}),
 	)
 
 	// ========== layer ==========

@@ -299,9 +299,8 @@ func SeedLevels(db *gorm.DB) {
 
 	levels := []models.Level{
 		{ID: uuid.New(), Name: "Beginner"},
-		{ID: uuid.New(), Name: "Intermediate"},
 		{ID: uuid.New(), Name: "Advanced"},
-		{ID: uuid.New(), Name: "All Levels"},
+		{ID: uuid.New(), Name: "Intermediate"},
 	}
 
 	if err := db.Create(&levels).Error; err != nil {
@@ -418,7 +417,7 @@ func SeedClasses(db *gorm.DB) {
 			Image: "https://placehold.co/400x400", Duration: 60,
 			Description:    "Zumba Dance Energy is a fun and high-energy workout that blends Latin rhythms with easy-to-follow dance routines. It’s a full-body cardio session that feels more like a dance party than a workout.Perfect for all levels, this class improves endurance, burns calories, and boosts your mood. No dance experience is required—just come ready to move and enjoy the beat!",
 			AdditionalList: []string{"Zumba", "Cardio"},
-			TypeID:         types[0].ID, LevelID: levels[3].ID, LocationID: locations[0].ID,
+			TypeID:         types[0].ID, LevelID: levels[2].ID, LocationID: locations[0].ID,
 			CategoryID: categoryMap["Cardio"], SubcategoryID: subcategoryMap["Zumba"], IsActive: true,
 		},
 		{
@@ -690,35 +689,52 @@ func SeedInstructors(db *gorm.DB) {
 func SeedPayments(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Payment{}).Count(&count)
-
 	if count > 0 {
 		log.Println("Payments already seeded, skipping...")
 		return
 	}
 
-	var user models.User
-	var pkg models.Package
-	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
-		log.Println("Failed to find customer user:", err)
+	var customer1, customer2 models.User
+	if err := db.Where("email = ?", "customer01@example.com").First(&customer1).Error; err != nil {
+		log.Println("Failed to find customer01@example.com:", err)
 		return
 	}
+	if err := db.Where("email = ?", "customer02@example.com").First(&customer2).Error; err != nil {
+		log.Println("Failed to find customer02@example.com:", err)
+		return
+	}
+
+	var pkg models.Package
 	if err := db.First(&pkg).Error; err != nil {
 		log.Println("Failed to find package:", err)
 		return
 	}
 
+	now := time.Now()
 	taxRate := utils.GetTaxRate()
-	discounted := pkg.Price * (1 - pkg.Discount/100)
-	base := discounted
+	base := pkg.Price * (1 - pkg.Discount/100)
 	tax := base * taxRate
 	total := base + tax
 
-	now := time.Now()
 	payments := []models.Payment{
 		{
 			ID:            uuid.New(),
-			UserID:        user.ID,
+			UserID:        customer1.ID,
 			PackageID:     pkg.ID,
+			PackageName:   pkg.Name,
+			PaymentMethod: "bank_transfer",
+			BasePrice:     base,
+			Tax:           tax,
+			Total:         total,
+			Status:        "success",
+			PaidAt:        now.AddDate(0, 0, -3),
+		},
+
+		{
+			ID:            uuid.New(),
+			UserID:        customer2.ID,
+			PackageID:     pkg.ID,
+			PackageName:   pkg.Name,
 			PaymentMethod: "bank_transfer",
 			BasePrice:     base,
 			Tax:           tax,
@@ -728,8 +744,9 @@ func SeedPayments(db *gorm.DB) {
 		},
 		{
 			ID:            uuid.New(),
-			UserID:        user.ID,
+			UserID:        customer2.ID,
 			PackageID:     pkg.ID,
+			PackageName:   pkg.Name,
 			PaymentMethod: "bank_transfer",
 			BasePrice:     base,
 			Tax:           tax,
@@ -739,8 +756,9 @@ func SeedPayments(db *gorm.DB) {
 		},
 		{
 			ID:            uuid.New(),
-			UserID:        user.ID,
+			UserID:        customer2.ID,
 			PackageID:     pkg.ID,
+			PackageName:   pkg.Name,
 			PaymentMethod: "bank_transfer",
 			BasePrice:     base,
 			Tax:           tax,
@@ -750,8 +768,9 @@ func SeedPayments(db *gorm.DB) {
 		},
 		{
 			ID:            uuid.New(),
-			UserID:        user.ID,
+			UserID:        customer2.ID,
 			PackageID:     pkg.ID,
+			PackageName:   pkg.Name,
 			PaymentMethod: "bank_transfer",
 			BasePrice:     base,
 			Tax:           tax,
@@ -761,8 +780,9 @@ func SeedPayments(db *gorm.DB) {
 		},
 		{
 			ID:            uuid.New(),
-			UserID:        user.ID,
+			UserID:        customer2.ID,
 			PackageID:     pkg.ID,
+			PackageName:   pkg.Name,
 			PaymentMethod: "bank_transfer",
 			BasePrice:     base,
 			Tax:           tax,
@@ -773,9 +793,9 @@ func SeedPayments(db *gorm.DB) {
 	}
 
 	if err := db.Create(&payments).Error; err != nil {
-		log.Printf("failed seeding payments: %v", err)
+		log.Printf("Failed seeding payments: %v", err)
 	} else {
-		log.Println("Payments seeding completed with multiple dates!")
+		log.Println("Seeded 6 payments: 1 for customer01, 5 for customer02")
 	}
 }
 
@@ -787,43 +807,55 @@ func SeedUserPackages(db *gorm.DB) {
 		return
 	}
 
-	// Ambil user dengan email customer01 dan customer02
-	var users []models.User
-	if err := db.Where("email IN ?", []string{"customer01@example.com", "customer02@example.com"}).Find(&users).Error; err != nil || len(users) < 2 {
-		log.Println("Failed to fetch users with specified emails")
+	var customer1, customer2 models.User
+	if err := db.Where("email = ?", "customer01@example.com").First(&customer1).Error; err != nil {
+		log.Println("Failed to find customer01@example.com")
+		return
+	}
+	if err := db.Where("email = ?", "customer02@example.com").First(&customer2).Error; err != nil {
+		log.Println("Failed to find customer02@example.com")
 		return
 	}
 
-	// Ambil 2 package aktif pertama
-	var packages []models.Package
-	if err := db.Where("is_active = ?", true).Limit(2).Find(&packages).Error; err != nil || len(packages) < 2 {
-		log.Println("Failed to fetch at least 2 active packages")
+	var pkg models.Package
+	if err := db.First(&pkg).Error; err != nil {
+		log.Println("Failed to find package")
 		return
 	}
 
 	now := time.Now()
+	threeDaysAgo := now.AddDate(0, 0, -3)
+	expired := threeDaysAgo.AddDate(0, 0, getExpiredDays(pkg))
+
 	var userPackages []models.UserPackage
 
-	// Assign 1 package untuk setiap user
-	for i := range 2 {
-		pkg := packages[i]
-		user := users[i]
-		expired := now.AddDate(0, 0, getExpiredDays(pkg))
+	userPackages = append(userPackages, models.UserPackage{
+		ID:              uuid.New(),
+		UserID:          customer1.ID,
+		PackageID:       pkg.ID,
+		PackageName:     pkg.Name,
+		RemainingCredit: pkg.Credit - 2,
+		PurchasedAt:     threeDaysAgo,
+		ExpiredAt:       &expired,
+	})
 
+	for range 5 {
+		exp := now.AddDate(0, 0, getExpiredDays(pkg))
 		userPackages = append(userPackages, models.UserPackage{
 			ID:              uuid.New(),
-			UserID:          user.ID,
+			UserID:          customer2.ID,
 			PackageID:       pkg.ID,
+			PackageName:     pkg.Name,
 			RemainingCredit: pkg.Credit,
 			PurchasedAt:     now,
-			ExpiredAt:       &expired,
+			ExpiredAt:       &exp,
 		})
 	}
 
 	if err := db.Create(&userPackages).Error; err != nil {
 		log.Printf("Failed seeding user packages: %v", err)
 	} else {
-		log.Println("UserPackages seeding completed!")
+		log.Println("Seeded 6 user packages: 1 for customer01 with reduced credit, 5 for customer02")
 	}
 }
 
@@ -832,132 +864,117 @@ func getExpiredDays(pkg models.Package) int {
 }
 
 func SeedClassSchedules(db *gorm.DB) {
-	var count int64
-	db.Model(&models.ClassSchedule{}).Count(&count)
-	if count > 0 {
-		log.Println("ClassSchedules already seeded, skipping...")
+	var user models.User
+	if err := db.Where("email = ?", "customer01@example.com").First(&user).Error; err != nil {
+		log.Println("User customer01@example.com not found")
 		return
 	}
 
-	var classes []models.Class
+	var class models.Class
 	var instructor models.Instructor
-
-	if err := db.Limit(2).Find(&classes).Error; err != nil || len(classes) < 2 {
-		log.Println("Failed to find classes:", err)
+	if err := db.First(&class).Error; err != nil {
+		log.Println("No class found")
 		return
 	}
 	if err := db.Preload("User.Profile").First(&instructor).Error; err != nil {
-		log.Println("Failed to find instructor:", err)
+		log.Println("No instructor found")
 		return
 	}
 
-	now := time.Now()
-	date := now.AddDate(0, 0, 2).Truncate(24 * time.Hour)
-
-	schedules := []models.ClassSchedule{
-		{
-			ID: uuid.New(), ClassID: classes[0].ID, InstructorID: instructor.ID, InstructorName: instructor.User.Profile.Fullname, ClassName: classes[0].Title, ClassImage: classes[0].Image,
-			Date: date, StartHour: 9, StartMinute: 0, Capacity: 10, Duration: classes[0].Duration,
-			IsActive: true, Color: "#60a5fa",
-		},
-		{
-			ID: uuid.New(), ClassID: classes[1].ID, ClassName: classes[1].Title, ClassImage: classes[1].Image, InstructorID: instructor.ID, InstructorName: instructor.User.Profile.Fullname,
-			Date: date.AddDate(0, 0, 1), StartHour: 10, StartMinute: 30, Duration: classes[1].Duration, Capacity: 12,
-			IsActive: true, Color: "#a78bfa",
-		},
-	}
-
-	if err := db.Create(&schedules).Error; err != nil {
-		log.Printf("failed seeding class schedules: %v", err)
-	} else {
-		log.Println("ClassSchedules seeding completed!")
-	}
-}
-
-func SeedBookings(db *gorm.DB) {
-	var count int64
-	db.Model(&models.Booking{}).Count(&count)
-
-	if count > 0 {
-		log.Println("Bookings already seeded, skipping...")
-		return
-	}
-
-	var user models.User
-	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
-		log.Println("Failed to find customer user:", err)
-		return
-	}
-
-	var schedules []models.ClassSchedule
-	if err := db.Limit(3).Find(&schedules).Error; err != nil {
-		log.Println("Failed to fetch class schedules:", err)
-		return
-	}
-
-	if len(schedules) == 0 {
-		log.Println("No class schedules available for booking seeding.")
-		return
-	}
-
-	var bookings []models.Booking
-	for _, schedule := range schedules {
-		booking := models.Booking{
-			ID:              uuid.New(),
-			UserID:          user.ID,
-			ClassScheduleID: schedule.ID,
-			Status:          "booked",
-		}
-		bookings = append(bookings, booking)
-	}
-
-	if err := db.Create(&bookings).Error; err != nil {
-		log.Printf("failed seeding bookings: %v", err)
-	} else {
-		log.Println("Bookings seeding completed!")
-	}
-}
-
-func SeedAttendances(db *gorm.DB) {
-	var user models.User
-	if err := db.Where("email = ?", "customer01@example.com").First(&user).Error; err != nil {
-		log.Println("❌ User customer01@example.com not found")
-		return
-	}
-
-	var schedule models.ClassSchedule
-	if err := db.First(&schedule).Error; err != nil {
-		log.Println("❌ No ClassSchedule found")
-		return
-	}
-
-	now := time.Now()
+	now := time.Now().Truncate(time.Minute)
 	threeDaysAgo := now.AddDate(0, 0, -3)
 
-	attendances := []models.Attendance{
-		{
-			ID:              uuid.New(),
-			UserID:          user.ID,
-			ClassScheduleID: schedule.ID,
-			Status:          "attended",
-			CheckedAt:       &now,
-			Verified:        true,
-		},
-		{
-			ID:              uuid.New(),
-			UserID:          user.ID,
-			ClassScheduleID: schedule.ID,
-			Status:          "attended",
-			CheckedAt:       &threeDaysAgo,
-			Verified:        true,
-		},
+	schedulePast := models.ClassSchedule{
+		ID:             uuid.New(),
+		ClassID:        class.ID,
+		ClassName:      class.Title,
+		ClassImage:     class.Image,
+		InstructorID:   instructor.ID,
+		InstructorName: instructor.User.Profile.Fullname,
+		Date:           threeDaysAgo,
+		StartHour:      9,
+		StartMinute:    0,
+		Duration:       class.Duration,
+		Capacity:       10,
+		Booked:         1,
+		IsActive:       true,
+		Color:          "#f59e0b",
 	}
 
-	if err := db.Create(&attendances).Error; err != nil {
-		log.Printf("❌ Failed to seed attendances: %v", err)
-	} else {
-		log.Println("✅ Seeded 2 attendances for customer01@example.com")
+	bookingPast := models.Booking{
+		ID:              uuid.New(),
+		UserID:          user.ID,
+		ClassScheduleID: schedulePast.ID,
+		Status:          "checked_in",
+		CreatedAt:       threeDaysAgo,
 	}
+
+	attendancePast := models.Attendance{
+		ID:              uuid.New(),
+		UserID:          user.ID,
+		ClassScheduleID: schedulePast.ID,
+		Status:          "attended",
+		CheckedAt:       &threeDaysAgo,
+		Verified:        true,
+		CreatedAt:       threeDaysAgo,
+	}
+
+	scheduleToday := models.ClassSchedule{
+		ID:             uuid.New(),
+		ClassID:        class.ID,
+		ClassName:      class.Title,
+		ClassImage:     class.Image,
+		InstructorID:   instructor.ID,
+		InstructorName: instructor.User.Profile.Fullname,
+		Date:           now,
+		StartHour:      now.Hour(),
+		StartMinute:    now.Minute(),
+		Duration:       class.Duration,
+		Capacity:       10,
+		Booked:         1,
+		IsActive:       true,
+		Color:          "#10b981",
+	}
+
+	bookingToday := models.Booking{
+		ID:              uuid.New(),
+		UserID:          user.ID,
+		ClassScheduleID: scheduleToday.ID,
+		Status:          "booked",
+		CreatedAt:       now,
+	}
+
+	attendanceToday := models.Attendance{
+		ID:              uuid.New(),
+		UserID:          user.ID,
+		ClassScheduleID: scheduleToday.ID,
+		Status:          "attended",
+		CheckedAt:       &now,
+		Verified:        true,
+		CreatedAt:       now,
+	}
+
+	if err := db.Create(&schedulePast).Error; err != nil {
+		log.Println("Failed to create past schedule:", err)
+	}
+	if err := db.Create(&bookingPast).Error; err != nil {
+		log.Println("Failed to create past booking:", err)
+	}
+	if err := db.Create(&attendancePast).Error; err != nil {
+		log.Println("Failed to create past attendance:", err)
+	}
+
+	if err := db.Create(&scheduleToday).Error; err != nil {
+		log.Println("Failed to create today schedule:", err)
+	}
+	if err := db.Create(&bookingToday).Error; err != nil {
+		log.Println("Failed to create today booking:", err)
+	}
+	if err := db.Create(&attendanceToday).Error; err != nil {
+		log.Println("Failed to create today attendance:", err)
+	}
+
+	log.Println("Seeded ClassSchedules, Bookings, and Attendances (3 hari lalu & hari ini) for customer01@example.com")
 }
 
 func SeedReviews(db *gorm.DB) {
@@ -986,7 +1003,6 @@ func SeedReviews(db *gorm.DB) {
 		return
 	}
 
-	// Create dummy reviews
 	var reviews []models.Review
 	for i, class := range classes {
 		review := models.Review{
@@ -1010,13 +1026,13 @@ func SeedScheduleTemplate(db *gorm.DB) {
 	if err := db.Exec("DELETE FROM recurrence_rules").Error; err != nil {
 		log.Println("Failed to clear recurrence_rules:", err)
 	} else {
-		log.Println("🧹 RecurrenceRules cleared")
+		log.Println("RecurrenceRules cleared")
 	}
 
 	if err := db.Exec("DELETE FROM schedule_templates").Error; err != nil {
 		log.Println("Failed to clear schedule_templates:", err)
 	} else {
-		log.Println("🧹 ScheduleTemplates cleared")
+		log.Println("ScheduleTemplates cleared")
 	}
 
 	log.Println("ScheduleTemplate reset completed!")

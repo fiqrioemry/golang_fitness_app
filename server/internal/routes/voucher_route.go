@@ -15,6 +15,6 @@ func VoucherRoutes(r *gin.Engine, h *handlers.VoucherHandler) {
 		v.GET("", h.GetAllVouchers)
 		v.POST("", middleware.RoleOnly("admin"), h.CreateVoucher)
 		v.PUT(":id", h.UpdateVoucher)
-		v.DELETE(":id", h.DeleteVoucher)
+		v.DELETE(":id", middleware.RoleOnly("owner"), h.DeleteVoucher)
 	}
 }
