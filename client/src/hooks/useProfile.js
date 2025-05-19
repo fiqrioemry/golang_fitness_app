@@ -3,20 +3,12 @@ import { toast } from "sonner";
 import * as profileService from "@/services/profile";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// =====================
-// QUERY: GET PROFILE
-// =====================
-
 export const useProfileQuery = () =>
   useQuery({
     queryKey: ["user", "profile"],
     queryFn: profileService.getProfile,
     staleTime: 0,
   });
-
-// =====================
-// QUERY: USER PACKAGES
-// =====================
 
 export const useUserPackagesQuery = () =>
   useQuery({
@@ -32,28 +24,18 @@ export const useUserClassPackagesQuery = (id) =>
     enabled: !!id,
   });
 
-// =====================
-// QUERY: USER TRANSACTIONS
-// =====================
 export const useUserTransactionsQuery = (page = 1, limit = 10) =>
   useQuery({
     queryKey: ["user", "transactions", page, limit],
     queryFn: () => profileService.getUserTransactions(page, limit),
   });
 
-// =====================
-// QUERY: USER BOOKINGS
-// =====================
 export const useUserBookingsQuery = (page = 1, limit = 10) =>
   useQuery({
     queryKey: ["user", "bookings", page, limit],
     queryFn: () => profileService.getUserBookings(page, limit),
     staleTime: 0,
   });
-
-// =====================
-// MUTATION: UPDATE PROFILE
-// =====================
 
 export const useProfileMutation = () => {
   const qc = useQueryClient();

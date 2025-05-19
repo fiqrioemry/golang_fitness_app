@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
 import { useUsersQuery } from "@/hooks/useUsers";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 
 export const SelectUsersElement = ({
   name,

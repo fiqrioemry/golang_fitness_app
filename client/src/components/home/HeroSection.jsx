@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import React, { useEffect, useState } from "react";
 
-const HeroSection = () => {
+export const HeroSection = () => {
   const heroImages = [
     "/hero-image1.webp",
     "/hero-image2.webp",
@@ -50,5 +50,3 @@ const HeroSection = () => {
     </section>
   );
 };
-
-export { HeroSection };

@@ -11,10 +11,10 @@ import { Link } from "react-router-dom";
 import { scheduleTitle } from "@/lib/constant";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
+import { useState, useMemo, useRef } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { format, isSameDay, addDays } from "date-fns";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { useState, useMemo, useRef } from "react";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const Schedules = () => {
@@ -47,9 +47,9 @@ const Schedules = () => {
   }, [data, selectedDate]);
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
-  console.log(filteredSchedules);
   return (
     <section className="section py-24 text-foreground">
       {/* Mobile: Carousel */}

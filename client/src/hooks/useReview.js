@@ -1,4 +1,3 @@
-// src/hooks/useReview.js
 import { toast } from "sonner";
 import * as reviewService from "@/services/review";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

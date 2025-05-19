@@ -37,10 +37,10 @@ const ClassOptions = () => {
           src={mapUrl}
           width="100%"
           height="375"
-          allowFullScreen
           loading="lazy"
-          className="rounded-md"
+          allowFullScreen
           title="location-map"
+          className="rounded-md"
         ></iframe>
       </div>
     );

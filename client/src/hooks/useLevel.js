@@ -1,11 +1,6 @@
-// src/hooks/useLevel.js
 import { toast } from "sonner";
 import * as levelService from "@/services/level";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-// =====================
-// QUERIES
-// =====================
 
 // GET /api/levels
 export const useLevelsQuery = () =>
@@ -22,10 +17,6 @@ export const useLevelDetailQuery = (id) =>
     queryFn: () => levelService.getLevelById(id),
     enabled: !!id,
   });
-
-// =====================
-// MUTATIONS (Admin Only)
-// =====================
 
 export const useLevelMutation = () => {
   const qc = useQueryClient();

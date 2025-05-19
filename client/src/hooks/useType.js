@@ -1,11 +1,6 @@
-// src/hooks/useType.js
 import { toast } from "sonner";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as typeService from "@/services/type";
-
-// =====================
-// QUERIES
-// =====================
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // GET /api/types
 export const useTypesQuery = () =>
@@ -22,10 +17,6 @@ export const useTypeDetailQuery = (id) =>
     queryFn: () => typeService.getTypeById(id),
     enabled: !!id,
   });
-
-// =====================
-// MUTATIONS (Admin Only)
-// =====================
 
 export const useTypeMutation = () => {
   const qc = useQueryClient();

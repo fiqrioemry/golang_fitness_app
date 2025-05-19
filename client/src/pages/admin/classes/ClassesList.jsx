@@ -1,11 +1,4 @@
 import {
-  Select,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "@/components/ui/select";
-import {
   Table,
   TableBody,
   TableCell,
@@ -13,6 +6,13 @@ import {
   TableRow,
   TableHeader,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectItem,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+} from "@/components/ui/select";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";

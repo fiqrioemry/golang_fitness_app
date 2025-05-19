@@ -1,4 +1,3 @@
-// src/hooks/useSelectOptions.js
 import {
   useSubcategoriesQuery,
   useSubcategoryMutation,
@@ -9,7 +8,6 @@ import { useTypesQuery, useTypeMutation } from "@/hooks/useType";
 import { useLevelsQuery, useLevelMutation } from "@/hooks/useLevel";
 import { useLocationsQuery, useLocationMutation } from "@/hooks/useLocation";
 import { useCategoriesQuery, useCategoryMutation } from "@/hooks/useCategory";
-import { useUsersQuery } from "./useUsers";
 
 export const useSelectOptions = (type) => {
   switch (type) {

@@ -1,11 +1,6 @@
-// src/hooks/useLocation.js
 import { toast } from "sonner";
 import * as locationService from "@/services/location";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-// =====================
-// QUERIES
-// =====================
 
 // GET /api/locations
 export const useLocationsQuery = () =>
@@ -22,10 +17,6 @@ export const useLocationDetailQuery = (id) =>
     queryFn: () => locationService.getLocationById(id),
     enabled: !!id,
   });
-
-// =====================
-// MUTATIONS (Admin Only)
-// =====================
 
 export const useLocationMutation = () => {
   const qc = useQueryClient();

@@ -1,7 +1,6 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 
-const OurClasses = () => {
+export const OurClasses = () => {
   return (
     <section className="py-20 px-4 bg-muted">
       <h2 className="text-4xl font-bold text-center mb-4 font-heading">
@@ -39,5 +38,3 @@ const OurClasses = () => {
     </section>
   );
 };
-
-export { OurClasses };

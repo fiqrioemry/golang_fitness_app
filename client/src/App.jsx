@@ -39,9 +39,9 @@ import UserNotifications from "./pages/customer/UserNotifications";
 // route config & support
 import { Toaster } from "sonner";
 import { useEffect } from "react";
-import ScrollToTop from "./hooks/useScrollToTop";
 import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "./store/useAuthStore";
+import { ScrollToTop } from "./hooks/useScrollToTop";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AdminRoute, AuthRoute, NonAuthRoute, PublicRoute } from "./middleware";
 
@@ -138,15 +138,15 @@ function App() {
           <Route path="messages" element={<Notifications />} />
           <Route path="classes" element={<ClassesList />} />
           <Route path="classes/add" element={<ClassAdd />} />
-          <Route path="classes/options" element={<ClassOptions />} />
-          <Route path="classes/recuring" element={<ClassRecuring />} />
-          <Route path="classes/schedules" element={<ClassSchedules />} />
           <Route path="vouchers" element={<VouchersList />} />
           <Route path="vouchers/add" element={<VouchersAdd />} />
           <Route path="packages" element={<PackagesList />} />
           <Route path="packages/add" element={<PackageAdd />} />
           <Route path="instructors" element={<InstructorsList />} />
           <Route path="transactions" element={<TransactionsList />} />
+          <Route path="classes/options" element={<ClassOptions />} />
+          <Route path="classes/recuring" element={<ClassRecuring />} />
+          <Route path="classes/schedules" element={<ClassSchedules />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 

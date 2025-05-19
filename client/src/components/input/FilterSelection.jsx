@@ -1,5 +1,3 @@
-// src/components/input/ClassFilterSelect.jsx
-import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSelectOptions } from "@/hooks/useSelectOptions";

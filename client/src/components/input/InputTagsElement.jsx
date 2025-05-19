@@ -1,5 +1,3 @@
-// src/components/input/InputTagsElement.jsx
-
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

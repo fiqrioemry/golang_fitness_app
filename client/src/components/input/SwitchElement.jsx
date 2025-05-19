@@ -1,5 +1,3 @@
-// src/components/input/SwitchElement.jsx
-
 import { Switch } from "@/components/ui/switch";
 import { Controller, useFormContext } from "react-hook-form";
 

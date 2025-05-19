@@ -1,16 +1,16 @@
 import {
   Dialog,
-  DialogTrigger,
-  DialogContent,
   DialogTitle,
-  DialogDescription,
   DialogClose,
+  DialogContent,
+  DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Play, StopCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 
-const FormToggle = ({
+export const FormToggle = ({
   title,
   description,
   onToggle,
@@ -70,5 +70,3 @@ const FormToggle = ({
     </Dialog>
   );
 };
-
-export { FormToggle };

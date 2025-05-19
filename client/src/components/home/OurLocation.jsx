@@ -1,6 +1,4 @@
-import React from "react";
-
-const OurLocation = () => {
+export const OurLocation = () => {
   return (
     <section className="py-20 px-4 bg-muted border-t border-border">
       <div className="max-w-6xl mx-auto space-y-10">
@@ -46,5 +44,3 @@ const OurLocation = () => {
     </section>
   );
 };
-
-export { OurLocation };

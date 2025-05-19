@@ -1,4 +1,3 @@
-// src/hooks/useNotification.js
 import { toast } from "sonner";
 import * as notifService from "@/services/notification";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

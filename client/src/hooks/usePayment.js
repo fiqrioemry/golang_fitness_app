@@ -1,4 +1,3 @@
-// src/hooks/usePayment.js
 import { toast } from "sonner";
 import * as paymentService from "@/services/payment";
 import { useMutation, useQuery } from "@tanstack/react-query";

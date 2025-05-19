@@ -1,8 +1,7 @@
-// src/components/form/SubmitButton.jsx
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const SubmitButton = ({
+export const SubmitButton = ({
   text = "Submit",
   className = "",
   disabled = false,
@@ -20,5 +19,3 @@ const SubmitButton = ({
     </Button>
   );
 };
-
-export { SubmitButton };

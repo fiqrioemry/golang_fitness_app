@@ -11,8 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useInstructorsQuery } from "@/hooks/useInstructor";
-import { HeartPulse, CalendarClock, Users } from "lucide-react";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { HeartPulse, CalendarClock, Users } from "lucide-react";
 
 const About = () => {
   useDocumentTitle(aboutTitle);

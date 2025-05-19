@@ -1,4 +1,3 @@
-// src/hooks/useInstructor.js
 import { toast } from "sonner";
 import * as instructor from "@/services/instructor";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

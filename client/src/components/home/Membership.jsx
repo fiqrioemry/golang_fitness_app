@@ -1,7 +1,6 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 
-const Membership = () => {
+export const Membership = () => {
   return (
     <section className="py-20 px-4 max-w-7xl mx-auto">
       <h2 className="text-4xl font-bold text-center mb-4 font-heading">
@@ -39,5 +38,3 @@ const Membership = () => {
     </section>
   );
 };
-
-export { Membership };

@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-const UserDropdown = () => {
+export const UserDropdown = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
 
@@ -58,5 +58,3 @@ const UserDropdown = () => {
     </DropdownMenu>
   );
 };
-
-export default UserDropdown;

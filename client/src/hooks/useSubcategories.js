@@ -1,11 +1,6 @@
-// src/hooks/useSubcategory.js
 import { toast } from "sonner";
 import * as subcategoryService from "@/services/subcategories";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-// =====================
-// QUERIES
-// =====================
 
 // GET /api/subcategories
 export const useSubcategoriesQuery = () =>
@@ -30,10 +25,6 @@ export const useSubcategoriesByCategoryQuery = (categoryId) =>
     queryFn: () => subcategoryService.getSubcategoriesByCategory(categoryId),
     enabled: !!categoryId,
   });
-
-// =====================
-// MUTATIONS (Admin Only)
-// =====================
 
 export const useSubcategoryMutation = () => {
   const qc = useQueryClient();
