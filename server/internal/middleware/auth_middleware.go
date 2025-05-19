@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 	"server/internal/utils"
+	"slices"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,13 +29,13 @@ func AuthRequired() gin.HandlerFunc {
 	}
 }
 
-func AdminOnly() gin.HandlerFunc {
+func RoleOnly(allowedRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role := utils.MustGetRole(c)
-		if !utils.IsAdmin(role) {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Forbidden: Admin only"})
+		if slices.Contains(allowedRoles, role) {
+			c.Next()
 			return
 		}
-		c.Next()
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Forbidden: Access denied"})
 	}
 }

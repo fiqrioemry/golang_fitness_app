@@ -17,8 +17,9 @@ type ScheduleTemplateService interface {
 	RunTemplate(id string) error
 	StopTemplate(id string) error
 	DeleteTemplate(id string) error
+	GenerateScheduleByTemplateID(templateID string) error
 	GetAllTemplates() ([]dto.ScheduleTemplateResponse, error)
-	CreateScheduleTemplate(req dto.CreateScheduleTemplateRequest) error
+	CreateScheduleTemplate(req dto.CreateScheduleTemplateRequest) (string, error)
 	UpdateScheduleTemplate(id string, req dto.UpdateScheduleTemplateRequest) error
 }
 
@@ -57,7 +58,7 @@ func (s *scheduleTemplateService) GetAllTemplates() ([]dto.ScheduleTemplateRespo
 			StartMinute:    t.StartMinute,
 			Capacity:       t.Capacity,
 			IsActive:       t.IsActive,
-			EndDate:        t.EndDate.Format(time.RFC3339),
+			EndDate:        t.EndDate,
 			CreatedAt:      t.CreatedAt.Format(time.RFC3339),
 		}
 		result = append(result, resp)
@@ -65,85 +66,103 @@ func (s *scheduleTemplateService) GetAllTemplates() ([]dto.ScheduleTemplateRespo
 	return result, nil
 }
 
-func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleTemplateRequest) error {
+func containsInt(list []int, target int) bool {
+	for _, v := range list {
+		if v == target {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleTemplateRequest) (string, error) {
 	now := time.Now().In(time.Local)
-	startTime := time.Date(now.Year(), now.Month(), now.Day(), req.StartHour, req.StartMinute, 0, 0, time.Local)
-	endTime := startTime.Add(time.Hour)
+
+	if req.EndDate.Before(now) {
+		return "", fmt.Errorf("end date must be in the future")
+	}
 
 	instructorID := uuid.MustParse(req.InstructorID)
 
-	// Cek konflik dengan jadwal aktual (class schedules)
 	existingSchedules, err := s.classScheduleRepo.GetClassSchedules()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	for _, schedule := range existingSchedules {
-		if schedule.InstructorID != instructorID {
+	existingTemplates, err := s.templateRepo.GetAllTemplates()
+	if err != nil {
+		return "", err
+	}
+
+	simulationEnd := req.EndDate
+
+	for date := now; !date.After(simulationEnd); date = date.AddDate(0, 0, 1) {
+		weekday := int(date.Weekday())
+		if !containsInt(req.DayOfWeeks, weekday) {
 			continue
 		}
-		for _, day := range req.DayOfWeeks {
-			if int(schedule.Date.Weekday()) != day {
+
+		simulatedStart := time.Date(date.Year(), date.Month(), date.Day(),
+			req.StartHour, req.StartMinute, 0, 0, time.Local)
+		simulatedEnd := simulatedStart.Add(time.Hour)
+
+		for _, schedule := range existingSchedules {
+			if schedule.InstructorID != instructorID {
 				continue
 			}
+			if schedule.Date.Year() != date.Year() ||
+				schedule.Date.Month() != date.Month() ||
+				schedule.Date.Day() != date.Day() {
+				continue
+			}
+
 			existStart := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
 				schedule.StartHour, schedule.StartMinute, 0, 0, time.Local)
 			existEnd := existStart.Add(time.Hour)
 
-			// Cek overlap waktu
-			if startTime.Before(existEnd) && existStart.Before(endTime) {
-				return fmt.Errorf("instructor already booked on %s at %02d:%02d (from actual schedule)",
-					schedule.Date.Weekday().String(), req.StartHour, req.StartMinute)
+			if simulatedStart.Before(existEnd) && existStart.Before(simulatedEnd) {
+				return "", fmt.Errorf("instructor %s is already booked on %s at %02d:%02d (actual schedule)",
+					schedule.InstructorName, date.Format("2006-01-02"), req.StartHour, req.StartMinute)
 			}
 		}
-	}
 
-	// Cek konflik dengan template lain
-	existingTemplates, err := s.templateRepo.GetAllTemplates()
-	if err != nil {
-		return err
-	}
+		for _, tpl := range existingTemplates {
+			if tpl.InstructorID != instructorID {
+				continue
+			}
+			var tplDays []int
+			if err := json.Unmarshal(tpl.DayOfWeeks, &tplDays); err != nil {
+				continue
+			}
+			if !containsInt(tplDays, weekday) {
+				continue
+			}
 
-	for _, tpl := range existingTemplates {
-		if tpl.InstructorID != instructorID {
-			continue
-		}
+			tplStart := time.Date(date.Year(), date.Month(), date.Day(),
+				tpl.StartHour, tpl.StartMinute, 0, 0, time.Local)
+			tplEnd := tplStart.Add(time.Hour)
 
-		var tplDays []int
-		if err := json.Unmarshal(tpl.DayOfWeeks, &tplDays); err != nil {
-			continue
-		}
-
-		for _, day := range req.DayOfWeeks {
-			for _, tplDay := range tplDays {
-				if tplDay != day {
-					continue
-				}
-				tplStart := time.Date(now.Year(), now.Month(), now.Day(), tpl.StartHour, tpl.StartMinute, 0, 0, time.Local)
-				tplEnd := tplStart.Add(time.Hour)
-
-				if startTime.Before(tplEnd) && tplStart.Before(endTime) {
-					return fmt.Errorf("instructor already booked on day %d at %02d:%02d (from recurring template)",
-						day, req.StartHour, req.StartMinute)
-				}
+			if simulatedStart.Before(tplEnd) && tplStart.Before(simulatedEnd) {
+				return "", fmt.Errorf("instructor %s is already booked on %s at %02d:%02d (actual schedule)",
+					tpl.InstructorName, date.Format("2006-01-02"), req.StartHour, req.StartMinute)
 			}
 		}
 	}
 	class, err := s.classScheduleRepo.GetClassByID(uuid.MustParse(req.ClassID))
 	if err != nil {
-		return fmt.Errorf("class not found: %w", err)
+		return "", fmt.Errorf("class not found: %w", err)
 	}
 
-	instructor, err := s.classScheduleRepo.GetInstructorWithProfileByID(uuid.MustParse(req.InstructorID))
+	instructor, err := s.classScheduleRepo.GetInstructorWithProfileByID(instructorID)
 	if err != nil {
-		return fmt.Errorf("instructor not found: %w", err)
+		return "", fmt.Errorf("instructor not found: %w", err)
 	}
 
-	// Simpan Template Baru
 	template := models.ScheduleTemplate{
 		ID:             uuid.New(),
-		ClassID:        uuid.MustParse(req.ClassID),
+		ClassID:        class.ID,
 		ClassName:      class.Title,
+		ClassImage:     class.Image,
 		InstructorID:   instructor.ID,
 		InstructorName: instructor.User.Profile.Fullname,
 		DayOfWeeks:     utils.IntSliceToJSON(req.DayOfWeeks),
@@ -155,7 +174,12 @@ func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleT
 		EndDate:        req.EndDate,
 	}
 
-	return s.templateRepo.CreateTemplate(&template)
+	err = s.templateRepo.CreateTemplate(&template)
+	if err != nil {
+		return "", fmt.Errorf("failed to create template: %w", err)
+	}
+
+	return template.ID.String(), nil
 }
 
 func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.UpdateScheduleTemplateRequest) error {
@@ -209,7 +233,6 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 		}
 	}
 
-	// 🔍 Cek konflik dengan template lain
 	existingTemplates, err := s.templateRepo.GetAllTemplates()
 	if err != nil {
 		return err
@@ -217,7 +240,7 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 
 	for _, tpl := range existingTemplates {
 		if tpl.ID == template.ID || tpl.InstructorID != instructorID {
-			continue // skip diri sendiri atau instruktur berbeda
+			continue
 		}
 
 		var tplDays []int
@@ -334,6 +357,76 @@ func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 	return nil
 }
 
+func (s *scheduleTemplateService) GenerateScheduleByTemplateID(templateID string) error {
+	template, err := s.templateRepo.GetTemplateByID(templateID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch template: %w", err)
+	}
+
+	if !template.IsActive {
+		return fmt.Errorf("template is not active")
+	}
+
+	var days []int
+	if err := json.Unmarshal(template.DayOfWeeks, &days); err != nil {
+		return fmt.Errorf("failed to parse days of week: %w", err)
+	}
+
+	today := time.Now().Truncate(24 * time.Hour)
+	end := today.AddDate(0, 1, 0) // generate untuk 1 bulan ke depan
+
+	var hasSuccess bool
+	var errors []string
+
+	for d := today; !d.After(end); d = d.AddDate(0, 0, 1) {
+		if !utils.IsDayMatched(int(d.Weekday()), days) {
+			continue
+		}
+
+		// Cek konflik dengan jadwal yang sudah ada
+		conflict, err := s.checkInstructorConflict(d, template.InstructorID, template.StartHour, template.StartMinute)
+		if err != nil {
+			return err
+		}
+		if conflict {
+			errors = append(errors, fmt.Sprintf("conflict on %s at %02d:%02d", d.Format("2006-01-02"), template.StartHour, template.StartMinute))
+			continue
+		}
+
+		schedule := models.ClassSchedule{
+			ID:             uuid.New(),
+			ClassID:        template.ClassID,
+			ClassName:      template.ClassName,
+			ClassImage:     template.ClassImage,
+			InstructorID:   template.InstructorID,
+			InstructorName: template.InstructorName,
+			Capacity:       template.Capacity,
+			IsActive:       true,
+			Color:          template.Color,
+			Date:           d,
+			StartHour:      template.StartHour,
+			StartMinute:    template.StartMinute,
+		}
+
+		if err := s.classScheduleRepo.CreateClassSchedule(&schedule); err != nil {
+			errors = append(errors, fmt.Sprintf("failed to create on %s", d.Format("2006-01-02")))
+			continue
+		}
+
+		hasSuccess = true
+	}
+
+	if !hasSuccess {
+		return fmt.Errorf("failed to generate any schedule: %v", errors)
+	}
+
+	if len(errors) > 0 {
+		return fmt.Errorf("partial success: %v", errors)
+	}
+
+	return nil
+}
+
 func (s *scheduleTemplateService) RunTemplate(id string) error {
 	template, err := s.templateRepo.GetTemplateByID(id)
 	if err != nil {
@@ -356,4 +449,31 @@ func (s *scheduleTemplateService) StopTemplate(id string) error {
 	}
 	template.IsActive = false
 	return s.templateRepo.UpdateTemplate(template)
+}
+
+func (s *scheduleTemplateService) checkInstructorConflict(date time.Time, instructorID uuid.UUID, hour, minute int) (bool, error) {
+	schedules, err := s.classScheduleRepo.GetClassSchedules()
+	if err != nil {
+		return false, err
+	}
+
+	newStart := time.Date(date.Year(), date.Month(), date.Day(), hour, minute, 0, 0, time.Local)
+	newEnd := newStart.Add(time.Hour)
+
+	for _, s := range schedules {
+		if s.InstructorID != instructorID {
+			continue
+		}
+		if s.Date.Year() != date.Year() || s.Date.Month() != date.Month() || s.Date.Day() != date.Day() {
+			continue
+		}
+		existStart := time.Date(s.Date.Year(), s.Date.Month(), s.Date.Day(), s.StartHour, s.StartMinute, 0, 0, time.Local)
+		existEnd := existStart.Add(time.Hour)
+
+		if newStart.Before(existEnd) && existStart.Before(newEnd) {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

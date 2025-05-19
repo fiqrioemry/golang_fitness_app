@@ -12,6 +12,6 @@ func PaymentRoutes(r *gin.Engine, handler *handlers.PaymentHandler) {
 	p.POST("", middleware.AuthRequired(), handler.CreatePayment)
 	p.POST("/midtrans/notification", handler.HandlePaymentNotification)
 
-	admin := p.Use(middleware.AuthRequired(), middleware.AdminOnly())
+	admin := p.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.GET("", handler.GetAllUserPayments)
 }

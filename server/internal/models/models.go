@@ -166,6 +166,7 @@ type ClassSchedule struct {
 type ScheduleTemplate struct {
 	ID             uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
 	ClassID        uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
+	ClassImage     string         `gorm:"type:varchar(255);not null" json:"classImage"`
 	ClassName      string         `gorm:"type:varchar(255);not null" json:"className"`
 	InstructorID   uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
 	InstructorName string         `gorm:"type:varchar(255);not null" json:"instructorName"`
@@ -175,7 +176,7 @@ type ScheduleTemplate struct {
 	Capacity       int            `gorm:"not null" json:"capacity"`
 	IsActive       bool           `gorm:"default:true" json:"isActive"`
 	Color          string         `gorm:"type:varchar(20)" json:"color"`
-	EndDate        *time.Time     `gorm:"default:null" json:"endDate"`
+	EndDate        time.Time      `gorm:"not null" json:"endDate"`
 	CreatedAt      time.Time      `gorm:"autoCreateTime"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 
@@ -272,10 +273,10 @@ type Attendance struct {
 	ClassScheduleID uuid.UUID      `gorm:"type:char(36);not null;index" json:"classScheduleId"`
 	Status          string         `gorm:"type:varchar(20);not null;check:status IN ('attended', 'absent')" json:"status"`
 	CheckedAt       *time.Time     `json:"checkedAt,omitempty"`
-	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	Verified        bool           `gorm:"default:false" json:"verified"`
 	VerifiedAt      *time.Time     `json:"verifiedAt"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
+	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 
 	ClassSchedule ClassSchedule `gorm:"foreignKey:ClassScheduleID" json:"classSchedule"`
 	User          User          `gorm:"foreignKey:UserID"`

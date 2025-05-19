@@ -15,5 +15,5 @@ func NotificationRoutes(r *gin.Engine, h *handlers.NotificationHandler) {
 	notif.GET("", h.GetAllNotifications)
 	notif.PATCH("/read", h.MarkAllNotificationsAsRead)
 
-	notif.POST("/broadcast", middleware.AdminOnly(), h.SendNewNotificatioon)
+	notif.POST("/broadcast", middleware.RoleOnly("admin"), h.SendNewNotificatioon)
 }

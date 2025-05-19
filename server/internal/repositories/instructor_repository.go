@@ -3,15 +3,17 @@ package repositories
 import (
 	"server/internal/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type InstructorRepository interface {
-	CreateInstructor(instructor *models.Instructor) error
-	UpdateInstructor(instructor *models.Instructor) error
 	DeleteInstructor(id string) error
-	GetInstructorByID(id string) (*models.Instructor, error)
 	GetAllInstructors() ([]models.Instructor, error)
+	UpdateInstructor(instructor *models.Instructor) error
+	CreateInstructor(instructor *models.Instructor) error
+	GetInstructorByID(id string) (*models.Instructor, error)
+	UpdateRating(instructorID uuid.UUID, rating float64) error
 }
 
 type instructorRepository struct {
@@ -48,4 +50,10 @@ func (r *instructorRepository) GetAllInstructors() ([]models.Instructor, error) 
 		return nil, err
 	}
 	return instructors, nil
+}
+
+func (r *instructorRepository) UpdateRating(instructorID uuid.UUID, rating float64) error {
+	return r.db.Model(&models.Instructor{}).
+		Where("id = ?", instructorID).
+		Update("rating", rating).Error
 }

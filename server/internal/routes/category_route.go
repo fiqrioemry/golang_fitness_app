@@ -15,7 +15,7 @@ func CategoryRoutes(r *gin.Engine, h *handlers.CategoryHandler) {
 	category.GET("/:id", h.GetCategoryByID)
 
 	// Admin Only Routes
-	admin := category.Use(middleware.AuthRequired(), middleware.AdminOnly())
+	admin := category.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("", h.CreateCategory)
 	admin.PUT("/:id", h.UpdateCategory)
 	admin.DELETE("/:id", h.DeleteCategory)

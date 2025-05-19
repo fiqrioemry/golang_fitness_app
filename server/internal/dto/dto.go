@@ -494,29 +494,29 @@ type ScheduleTemplateResponse struct {
 	Capacity       int       `json:"capacity"`
 	IsActive       bool      `json:"isActive"`
 	Frequency      string    `json:"frequency"`
-	EndDate        string    `json:"endDate"`
+	EndDate        time.Time `json:"endDate"`
 	CreatedAt      string    `json:"createdAt"`
 }
 
 type CreateScheduleTemplateRequest struct {
-	ClassID      string     `json:"classId" binding:"required"`
-	InstructorID string     `json:"instructorId" binding:"required"`
-	DayOfWeeks   []int      `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
-	StartHour    int        `json:"startHour" binding:"required,min=0,max=23"`
-	StartMinute  int        `json:"startMinute" binding:"required,min=0,max=59"`
-	Capacity     int        `json:"capacity" binding:"required,gt=0"`
-	Color        string     `json:"color" binding:"required"`
-	EndDate      *time.Time `json:"endDate" binding:"required"`
+	ClassID      string    `json:"classId" binding:"required"`
+	InstructorID string    `json:"instructorId" binding:"required"`
+	DayOfWeeks   []int     `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
+	StartHour    int       `json:"startHour" binding:"required,min=0,max=23"`
+	StartMinute  int       `json:"startMinute" binding:"required,min=0,max=59"`
+	Capacity     int       `json:"capacity" binding:"required,gt=0"`
+	Color        string    `json:"color" binding:"required"`
+	EndDate      time.Time `json:"endDate" binding:"required"`
 }
 
 type UpdateScheduleTemplateRequest struct {
-	ClassID      string     `json:"classId" binding:"required"`
-	InstructorID string     `json:"instructorId" binding:"required"`
-	DayOfWeeks   []int      `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
-	StartHour    int        `json:"startHour" validate:"required,min=8,max=17"`
-	StartMinute  int        `json:"startMinute" validate:"required,oneof=0 15 30 45"`
-	Capacity     int        `json:"capacity" binding:"required,gt=0"`
-	EndDate      *time.Time `json:"endDate,omitempty"`
+	ClassID      string    `json:"classId" binding:"required"`
+	InstructorID string    `json:"instructorId" binding:"required"`
+	DayOfWeeks   []int     `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
+	StartHour    int       `json:"startHour" validate:"required,min=8,max=17"`
+	StartMinute  int       `json:"startMinute" validate:"required,oneof=0 15 30 45"`
+	Capacity     int       `json:"capacity" binding:"required,gt=0"`
+	EndDate      time.Time `json:"endDate" binding:"required"`
 }
 
 // CLASS-SCHEDULE =====================
@@ -565,24 +565,19 @@ type MarkAttendanceRequest struct {
 }
 
 type AttendanceResponse struct {
-	ID          string          `json:"id"`
-	Class       ClassBrief      `json:"class"`
-	Instructor  InstructorBrief `json:"instructor"`
-	Fullname    string          `json:"fullname"`
-	Date        string          `json:"date"`
-	StartHour   int             `json:"startHour"`
-	StartMinute int             `json:"startMinute"`
-	Status      string          `json:"status"`
-	CheckedAt   string          `json:"checkedAt"`
-	Reviewed    bool            `json:"reviewed"`
-	Verified    bool            `json:"verified"`
-}
-
-type ClassBrief struct {
-	ID       string `json:"id"`
-	Title    string `json:"title"`
-	Image    string `json:"image"`
-	Duration int    `json:"duration"`
+	ID             string `json:"id"`
+	ClassName      string `json:"class"`
+	ClassImage     string `json:"classImage"`
+	Duration       string `json:"duration"`
+	InstructorID   string `json:"instructorId"`
+	InstructorName string `json:"instructorName"`
+	Date           string `json:"date"`
+	StartHour      int    `json:"startHour"`
+	StartMinute    int    `json:"startMinute"`
+	Status         string `json:"status"`
+	CheckedAt      string `json:"checkedAt"`
+	Reviewed       bool   `json:"reviewed"`
+	Verified       bool   `json:"verified"`
 }
 
 type AttendanceDetailResponse struct {
@@ -596,9 +591,9 @@ type AttendanceDetailResponse struct {
 
 // REVIEWS ==========================
 type CreateReviewRequest struct {
-	ClassID string `json:"classId" binding:"required"`
-	Rating  int    `json:"rating" binding:"required,min=1,max=5"`
-	Comment string `json:"comment" binding:"omitempty"`
+	ClassScheduleID string `json:"classScheduleID" binding:"required"`
+	Rating          int    `json:"rating" binding:"required,min=1,max=5"`
+	Comment         string `json:"comment" binding:"omitempty"`
 }
 
 type ReviewResponse struct {

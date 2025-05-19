@@ -37,7 +37,7 @@ func InitServices(repo *RepositoryContainer) *ServiceContainer {
 		TypeService:             services.NewTypeService(repo.TypeRepo),
 		ClassService:            services.NewClassService(repo.ClassRepo),
 		LevelService:            services.NewLevelService(repo.LevelRepo),
-		ReviewService:           services.NewReviewService(repo.ReviewRepo),
+		ReviewService:           services.NewReviewService(repo.ReviewRepo, repo.ClassScheduleRepo, repo.InstructorRepo),
 		ProfileService:          services.NewProfileService(repo.ProfileRepo),
 		PackageService:          services.NewPackageService(repo.PackageRepo),
 		LocationService:         services.NewLocationService(repo.LocationRepo),

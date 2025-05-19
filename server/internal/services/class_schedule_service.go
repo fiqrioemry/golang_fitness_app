@@ -107,10 +107,13 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 
 	instructorID := uuid.MustParse(req.InstructorID)
 	classID := uuid.MustParse(req.ClassID)
-	parsedDate := req.Date.In(time.Local)
+	localDate := req.Date.In(time.Local)
 
-	newStart := time.Date(parsedDate.Year(), parsedDate.Month(), parsedDate.Day(),
-		req.StartHour, req.StartMinute, 0, 0, time.Local)
+	newStart := time.Date(
+		localDate.Year(), localDate.Month(), localDate.Day(),
+		req.StartHour, req.StartMinute, 0, 0, time.Local,
+	)
+
 	now := time.Now().In(time.Local)
 
 	if newStart.Before(now) {
@@ -128,7 +131,11 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 		if other.ID == schedule.ID {
 			continue
 		}
-		if other.InstructorID == instructorID && other.Date.Equal(parsedDate) {
+		if other.InstructorID == instructorID &&
+			other.Date.Year() == localDate.Year() &&
+			other.Date.Month() == localDate.Month() &&
+			other.Date.Day() == localDate.Day() {
+
 			existStart := time.Date(other.Date.Year(), other.Date.Month(), other.Date.Day(),
 				other.StartHour, other.StartMinute, 0, 0, time.Local)
 			existEnd := existStart.Add(time.Hour)
@@ -153,7 +160,7 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 		return fmt.Errorf("instructor not found: %w", err)
 	}
 
-	schedule.Date = parsedDate
+	schedule.Date = localDate
 	schedule.StartHour = req.StartHour
 	schedule.StartMinute = req.StartMinute
 	schedule.ClassID = class.ID

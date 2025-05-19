@@ -846,7 +846,7 @@ func SeedClassSchedules(db *gorm.DB) {
 		log.Println("Failed to find classes:", err)
 		return
 	}
-	if err := db.First(&instructor).Error; err != nil {
+	if err := db.Preload("User.Profile").First(&instructor).Error; err != nil {
 		log.Println("Failed to find instructor:", err)
 		return
 	}
@@ -883,7 +883,6 @@ func SeedBookings(db *gorm.DB) {
 		return
 	}
 
-	// Fetch customer user
 	var user models.User
 	if err := db.First(&user, "role = ?", "customer").Error; err != nil {
 		log.Println("Failed to find customer user:", err)

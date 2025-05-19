@@ -19,7 +19,7 @@ func ClassScheduleRoutes(r *gin.Engine, h *handlers.ClassScheduleHandler) {
 	customer.GET("/status", h.GetSchedulesWithBookingStatus)
 
 	// Admin Only
-	admin := schedule.Use(middleware.AuthRequired(), middleware.AdminOnly())
+	admin := schedule.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("", h.CreateClassSchedule)
 	admin.PUT("/:id", h.UpdateClassSchedule)
 	admin.DELETE("/:id", h.DeleteClassSchedule)

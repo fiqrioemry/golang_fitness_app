@@ -15,7 +15,7 @@ func PackageRoutes(r *gin.Engine, handler *handlers.PackageHandler) {
 	pkg.GET("/class/:id", handler.GetPackagesByClassID)
 
 	// Admin Only
-	admin := pkg.Use(middleware.AuthRequired(), middleware.AdminOnly())
+	admin := pkg.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("", handler.CreatePackage)
 	admin.PUT("/:id", handler.UpdatePackage)
 	admin.DELETE("/:id", handler.DeletePackage)

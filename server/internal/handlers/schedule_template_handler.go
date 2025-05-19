@@ -69,25 +69,3 @@ func (h *ScheduleTemplateHandler) StopScheduleTemplate(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Template deactivated successfully"})
 }
-
-// func (h *ScheduleTemplateHandler) AutoGenerateSchedules(c *gin.Context) {
-// 	if err := h.service.AutoGenerateSchedules(); err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to auto generate schedules", "error": err.Error()})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, gin.H{"message": "Schedules generated successfully"})
-// }
-// func (h *ScheduleTemplateHandler) CreateScheduleTemplate(c *gin.Context) {
-// 	var req dto.CreateScheduleTemplateRequest
-// 	if !utils.BindAndValidateJSON(c, &req) {
-// 		return
-// 	}
-
-// 	if err := h.service.CreateScheduleTemplate(req); err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create recurring schedule", "error": err.Error()})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusCreated, gin.H{"message": "Recurring schedule template created successfully"})
-// }

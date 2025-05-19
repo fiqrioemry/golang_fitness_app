@@ -16,7 +16,7 @@ func SubcategoryRoutes(r *gin.Engine, h *handlers.SubcategoryHandler) {
 	subcategory.GET("/category/:categoryId", h.GetSubcategoriesByCategoryID)
 
 	// Admin Only Routes
-	admin := subcategory.Use(middleware.AuthRequired(), middleware.AdminOnly())
+	admin := subcategory.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("", h.CreateSubcategory)
 	admin.PUT("/:id", h.UpdateSubcategory)
 	admin.DELETE("/:id", h.DeleteSubcategory)

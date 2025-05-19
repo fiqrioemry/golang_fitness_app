@@ -15,7 +15,7 @@ func LocationRoutes(r *gin.Engine, h *handlers.LocationHandler) {
 	locationGroup.GET("/:id", h.GetLocationByID)
 
 	// Admin Only Routes
-	admin := locationGroup.Use(middleware.AuthRequired(), middleware.AdminOnly())
+	admin := locationGroup.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("", h.CreateLocation)
 	admin.PUT("/:id", h.UpdateLocation)
 	admin.DELETE("/:id", h.DeleteLocation)

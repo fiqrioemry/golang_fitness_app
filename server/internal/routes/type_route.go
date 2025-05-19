@@ -15,7 +15,7 @@ func TypeRoutes(r *gin.Engine, h *handlers.TypeHandler) {
 	typeGroup.GET("/:id", h.GetTypeByID)
 
 	// Admin Only Routes
-	admin := typeGroup.Use(middleware.AuthRequired(), middleware.AdminOnly())
+	admin := typeGroup.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("", h.CreateType)
 	admin.PUT("/:id", h.UpdateType)
 	admin.DELETE("/:id", h.DeleteType)

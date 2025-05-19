@@ -17,6 +17,6 @@ func AttendanceRoutes(r *gin.Engine, h *handlers.AttendanceHandler) {
 	attendance.POST("/:id", h.CheckinAttendance)
 	attendance.GET("/:id/qr-code", h.RegenerateQRCode)
 
-	admin := attendance.Use(middleware.AuthRequired(), middleware.AdminOnly())
+	admin := attendance.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.POST("/validate", h.ValidateQRCodeScan)
 }

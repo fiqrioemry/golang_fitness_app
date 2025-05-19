@@ -60,25 +60,17 @@ func (s *attendanceService) GetAllAttendances(userID string) ([]dto.AttendanceRe
 			checkedAt = a.CheckedAt.Format(time.RFC3339)
 		}
 		result = append(result, dto.AttendanceResponse{
-			ID: a.ID.String(),
-			Class: dto.ClassBrief{
-				ID:       classID,
-				Title:    a.ClassSchedule.Class.Title,
-				Image:    a.ClassSchedule.Class.Image,
-				Duration: a.ClassSchedule.Class.Duration,
-			},
-			Instructor: dto.InstructorBrief{
-				ID:       a.ClassSchedule.Instructor.ID.String(),
-				Fullname: a.ClassSchedule.Instructor.User.Profile.Fullname,
-				Rating:   a.ClassSchedule.Instructor.Rating,
-			},
-			Fullname:    a.User.Profile.Fullname,
-			Date:        a.ClassSchedule.Date.Format(time.RFC3339),
-			StartHour:   a.ClassSchedule.StartHour,
-			StartMinute: a.ClassSchedule.StartMinute,
-			Status:      a.Status,
-			Reviewed:    reviewed,
-			CheckedAt:   checkedAt,
+			ID:             a.ID.String(),
+			ClassName:      a.ClassSchedule.ClassName,
+			ClassImage:     a.ClassSchedule.ClassImage,
+			InstructorID:   a.ClassSchedule.InstructorID.String(),
+			InstructorName: a.ClassSchedule.InstructorName,
+			Date:           a.ClassSchedule.Date.Format(time.RFC3339),
+			StartHour:      a.ClassSchedule.StartHour,
+			StartMinute:    a.ClassSchedule.StartMinute,
+			Status:         a.Status,
+			Reviewed:       reviewed,
+			CheckedAt:      checkedAt,
 		})
 	}
 	return result, nil
@@ -186,24 +178,17 @@ func (s *attendanceService) ValidateQRCodeData(qr string) (*dto.AttendanceRespon
 	}
 
 	return &dto.AttendanceResponse{
-		ID: attendance.ID.String(),
-		Class: dto.ClassBrief{
-			ID:       attendance.ClassSchedule.Class.ID.String(),
-			Title:    attendance.ClassSchedule.Class.Title,
-			Image:    attendance.ClassSchedule.Class.Image,
-			Duration: attendance.ClassSchedule.Class.Duration,
-		},
-		Instructor: dto.InstructorBrief{
-			ID:       attendance.ClassSchedule.Instructor.ID.String(),
-			Fullname: attendance.ClassSchedule.Instructor.User.Profile.Fullname,
-			Rating:   attendance.ClassSchedule.Instructor.Rating,
-		},
-		StartHour:   attendance.ClassSchedule.StartHour,
-		StartMinute: attendance.ClassSchedule.StartMinute,
-		Fullname:    attendance.User.Profile.Fullname,
-		Status:      attendance.Status,
-		Verified:    attendance.Verified,
-		CheckedAt:   attendance.CheckedAt.Format(time.RFC1123),
+		ID:             attendance.ID.String(),
+		ClassName:      attendance.ClassSchedule.ClassName,
+		ClassImage:     attendance.ClassSchedule.ClassImage,
+		InstructorID:   attendance.ClassSchedule.InstructorID.String(),
+		InstructorName: attendance.ClassSchedule.InstructorName,
+		Date:           attendance.ClassSchedule.Date.Format(time.RFC1123),
+		StartHour:      attendance.ClassSchedule.StartHour,
+		StartMinute:    attendance.ClassSchedule.StartMinute,
+		Status:         attendance.Status,
+		Verified:       attendance.Verified,
+		CheckedAt:      attendance.CheckedAt.Format(time.RFC1123),
 	}, nil
 
 }
