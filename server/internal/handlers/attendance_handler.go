@@ -51,11 +51,11 @@ func (h *AttendanceHandler) CheckinAttendance(c *gin.Context) {
 	booking, _ := h.attendanceService.GetBookingInfo(bookingID)
 
 	response := dto.QRCodeAttendanceResponse{
-		QR:         qr,
-		ClassTitle: booking.ClassSchedule.Class.Title,
-		Date:       booking.ClassSchedule.Date.Format("2006-01-02"),
-		Instructor: booking.ClassSchedule.Instructor.User.Profile.Fullname,
-		StartTime:  fmt.Sprintf("%02d:%02d", booking.ClassSchedule.StartHour, booking.ClassSchedule.StartMinute),
+		QR:             qr,
+		ClassName:      booking.ClassSchedule.ClassName,
+		Date:           booking.ClassSchedule.Date.Format("2006-01-02"),
+		InstructorName: booking.ClassSchedule.InstructorName,
+		StartTime:      fmt.Sprintf("%02d:%02d", booking.ClassSchedule.StartHour, booking.ClassSchedule.StartMinute),
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -72,11 +72,11 @@ func (h *AttendanceHandler) RegenerateQRCode(c *gin.Context) {
 	}
 
 	response := dto.QRCodeAttendanceResponse{
-		QR:         qr,
-		ClassTitle: info.ClassSchedule.Class.Title,
-		Date:       info.ClassSchedule.Date.Format("2006-01-02"),
-		Instructor: info.ClassSchedule.Instructor.User.Profile.Fullname,
-		StartTime:  fmt.Sprintf("%02d:%02d", info.ClassSchedule.StartHour, info.ClassSchedule.StartMinute),
+		QR:             qr,
+		ClassName:      info.ClassSchedule.ClassName,
+		InstructorName: info.ClassSchedule.InstructorName,
+		Date:           info.ClassSchedule.Date.Format("2006-01-02"),
+		StartTime:      fmt.Sprintf("%02d:%02d", info.ClassSchedule.StartHour, info.ClassSchedule.StartMinute),
 	}
 
 	c.JSON(http.StatusOK, response)

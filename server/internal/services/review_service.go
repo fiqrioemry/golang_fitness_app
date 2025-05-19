@@ -65,12 +65,12 @@ func (s *reviewService) GetReviewsByClassID(classID string) ([]dto.ReviewRespons
 	var result []dto.ReviewResponse
 	for _, r := range reviews {
 		result = append(result, dto.ReviewResponse{
-			ID:         r.ID.String(),
-			UserName:   r.User.Profile.Fullname,
-			ClassTitle: r.Class.Title,
-			Rating:     r.Rating,
-			Comment:    r.Comment,
-			CreatedAt:  r.CreatedAt.Format(time.RFC3339),
+			ID:        r.ID.String(),
+			UserName:  r.User.Profile.Fullname,
+			ClassName: r.Class.Title,
+			Rating:    r.Rating,
+			Comment:   r.Comment,
+			CreatedAt: r.CreatedAt.Format(time.RFC3339),
 		})
 	}
 	return result, nil

@@ -99,19 +99,19 @@ func (s *bookingService) GetUserBookings(userID string) ([]dto.BookingResponse, 
 		}
 
 		result = append(result, dto.BookingResponse{
-			ID:          b.ID.String(),
-			Status:      b.Status,
-			Date:        schedule.Date.Format("2006-01-02"),
-			BookedAt:    b.CreatedAt.Format("2006-01-02 15:04:05"),
-			ClassID:     class.ID.String(),
-			ClassTitle:  class.Title,
-			ClassImage:  class.Image,
-			Duration:    class.Duration,
-			StartHour:   schedule.StartHour,
-			StartMinute: schedule.StartMinute,
-			Location:    location.Name,
-			Instructor:  instructorName,
-			Participant: int(participantCount),
+			ID:             b.ID.String(),
+			Status:         b.Status,
+			Date:           schedule.Date.Format("2006-01-02"),
+			BookedAt:       b.CreatedAt.Format("2006-01-02 15:04:05"),
+			ClassID:        class.ID.String(),
+			ClassName:      class.Title,
+			ClassImage:     class.Image,
+			Duration:       class.Duration,
+			StartHour:      schedule.StartHour,
+			StartMinute:    schedule.StartMinute,
+			Location:       location.Name,
+			InstructorName: instructorName,
+			Participant:    int(participantCount),
 		})
 	}
 

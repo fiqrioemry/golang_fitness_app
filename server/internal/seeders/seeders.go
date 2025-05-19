@@ -919,43 +919,44 @@ func SeedBookings(db *gorm.DB) {
 }
 
 func SeedAttendances(db *gorm.DB) {
-	var count int64
-	db.Model(&models.Attendance{}).Count(&count)
-
-	if count > 0 {
-		log.Println("Attendances already seeded, skipping...")
+	var user models.User
+	if err := db.Where("email = ?", "customer01@example.com").First(&user).Error; err != nil {
+		log.Println("❌ User customer01@example.com not found")
 		return
 	}
 
-	var bookings []models.Booking
-	if err := db.Limit(3).Find(&bookings).Error; err != nil {
-		log.Println("Failed to fetch bookings:", err)
+	var schedule models.ClassSchedule
+	if err := db.First(&schedule).Error; err != nil {
+		log.Println("❌ No ClassSchedule found")
 		return
 	}
 
-	if len(bookings) == 0 {
-		log.Println("No bookings available for attendance seeding.")
-		return
-	}
-
-	var attendances []models.Attendance
 	now := time.Now()
+	threeDaysAgo := now.AddDate(0, 0, -3)
 
-	for _, booking := range bookings {
-		attendance := models.Attendance{
+	attendances := []models.Attendance{
+		{
 			ID:              uuid.New(),
-			UserID:          booking.UserID,
-			ClassScheduleID: booking.ClassScheduleID,
+			UserID:          user.ID,
+			ClassScheduleID: schedule.ID,
 			Status:          "attended",
 			CheckedAt:       &now,
-		}
-		attendances = append(attendances, attendance)
+			Verified:        true,
+		},
+		{
+			ID:              uuid.New(),
+			UserID:          user.ID,
+			ClassScheduleID: schedule.ID,
+			Status:          "attended",
+			CheckedAt:       &threeDaysAgo,
+			Verified:        true,
+		},
 	}
 
 	if err := db.Create(&attendances).Error; err != nil {
-		log.Printf("failed seeding attendances: %v", err)
+		log.Printf("❌ Failed to seed attendances: %v", err)
 	} else {
-		log.Println("Attendances seeding completed!")
+		log.Println("✅ Seeded 2 attendances for customer01@example.com")
 	}
 }
 

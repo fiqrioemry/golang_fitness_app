@@ -533,7 +533,7 @@ type BookingResponse struct {
 	BookedAt string `json:"bookedAt"`
 
 	ClassID    string `json:"classId"`
-	ClassTitle string `json:"classTitle"`
+	ClassName  string `json:"className"`
 	ClassImage string `json:"classImage"`
 	Duration   int    `json:"duration"`
 
@@ -542,15 +542,15 @@ type BookingResponse struct {
 	StartMinute int    `json:"startMinute"`
 	Location    string `json:"location"`
 
-	Instructor  string `json:"instructor"`
-	Participant int    `json:"participant"`
+	InstructorName string `json:"instructorName"`
+	Participant    int    `json:"participant"`
 }
 type QRCodeAttendanceResponse struct {
-	QR         string `json:"qr"`
-	ClassTitle string `json:"classTitle"`
-	Date       string `json:"date"`
-	Instructor string `json:"instructor"`
-	StartTime  string `json:"startTime"`
+	QR             string `json:"qr"`
+	ClassName      string `json:"className"`
+	InstructorName string `json:"instructorName"`
+	Date           string `json:"date"`
+	StartTime      string `json:"startTime"`
 }
 
 // ATTENDANCE ==========================
@@ -597,12 +597,12 @@ type CreateReviewRequest struct {
 }
 
 type ReviewResponse struct {
-	ID         string `json:"id"`
-	UserName   string `json:"userName"`
-	ClassTitle string `json:"classTitle"`
-	Rating     int    `json:"rating"`
-	Comment    string `json:"comment"`
-	CreatedAt  string `json:"createdAt"`
+	ID        string `json:"id"`
+	UserName  string `json:"userName"`
+	ClassName string `json:"className"`
+	Rating    int    `json:"rating"`
+	Comment   string `json:"comment"`
+	CreatedAt string `json:"createdAt"`
 }
 
 // ATTENDANCE ==========================
