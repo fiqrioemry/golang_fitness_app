@@ -1,11 +1,11 @@
-import React from "react";
 import {
   useNotificationSettingsQuery,
   useUpdateNotificationSetting,
 } from "@/hooks/useNotification";
+import { Switch } from "@/components/ui/switch";
 import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { Switch } from "@/components/ui/switch";
+import { SectionTitle } from "@/components/header/SectionTitle";
 
 const groupedByTitle = (notifications) => {
   return notifications.reduce((acc, item) => {
@@ -16,35 +16,29 @@ const groupedByTitle = (notifications) => {
 };
 
 const labelMap = {
-  email: "Email",
   sms: "SMS",
+  email: "Email",
   browser: "Browser notification",
 };
 
 const UserSettings = () => {
-  const {
-    data: notifications = [],
-    isError,
-    refetch,
-    isLoading,
-  } = useNotificationSettingsQuery();
+  const { data, isError, refetch, isLoading } = useNotificationSettingsQuery();
 
   const { mutate: updateSetting } = useUpdateNotificationSetting();
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
+  const notifications = data || [];
   const grouped = groupedByTitle(notifications);
 
   return (
     <section className="section p-8 space-y-6">
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Notification settings</h2>
-        <p className="text-muted-foreground text-sm">
-          Choose how you'd like to be notified
-        </p>
-      </div>
-
+      <SectionTitle
+        title="Notification settings"
+        description="Choose how you'd like to be notified"
+      />
       {Object.entries(grouped).map(([title, list]) => (
         <div key={title} className="border-b pb-6 space-y-4">
           <div>

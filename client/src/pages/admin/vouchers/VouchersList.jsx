@@ -7,7 +7,7 @@ import {
   TableHeader,
 } from "@/components/ui/table";
 import VoucherAdd from "./VouchersAdd";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { Loading } from "@/components/ui/Loading";
 import { useVouchersQuery } from "@/hooks/useVouchers";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { Card, CardContent } from "@/components/ui/card";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { VoucherUpdate } from "@/components/admin/vouchers/VoucherUpdate";
 import { VoucherDelete } from "@/components/admin/vouchers/VoucherDelete";
 
@@ -37,18 +38,12 @@ const VouchersList = () => {
 
   return (
     <section className="section">
-      {/* Header */}
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold text-foreground">
-          Vouchers Management
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          View, add, and manage training packages available for purchase by
-          users.
-        </p>
-      </div>
+      <SectionTitle
+        title="Vouchers Management"
+        description="View, add, and manage training packages available for purchase by
+          users."
+      />
 
-      {/* Add Button */}
       <div className="flex justify-end mt-4">
         <Button size="nav" onClick={() => navigate("/admin/vouchers/add")}>
           <CirclePlus className="w-4 h-4 mr-2" />
@@ -173,8 +168,8 @@ const VouchersList = () => {
                 </div>
 
                 <div className="flex justify-end gap-2">
+                  <VoucherDelete voucher={voucher} />
                   <VoucherUpdate voucher={voucher} />
-                  <VoucherAdd voucher={voucher} />
                 </div>
               </div>
             ))}

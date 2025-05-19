@@ -45,6 +45,7 @@ export const BookingCard = ({ booking }) => {
       );
       setIsClassOver(endTime < new Date());
     };
+
     updateStatus();
     const timer = setInterval(updateStatus, 1000);
     return () => clearInterval(timer);
@@ -127,10 +128,17 @@ export const BookingCard = ({ booking }) => {
             </div>
           )}
 
-          {booking.status !== "checked_in" && !canAttend && (
+          {booking.status !== "checked_in" && (
             <div className="flex items-center text-sm text-muted-foreground gap-2">
               <AlertCircleIcon className="w-4 h-4 text-yellow-500" />
               Attend button will be enabled 15 minutes before class.
+            </div>
+          )}
+
+          {isClassOver && (
+            <div className="flex items-center text-sm text-red-500 gap-2">
+              <AlertCircleIcon className="w-4 h-4" />
+              This class has already ended. You can no longer attend.
             </div>
           )}
 
@@ -146,7 +154,7 @@ export const BookingCard = ({ booking }) => {
                       : handleAttend
                   }
                   disabled={
-                    booking.status !== "checked_in" &&
+                    booking.status === "checked_in" &&
                     (!canAttend || isClassOver)
                   }
                 >

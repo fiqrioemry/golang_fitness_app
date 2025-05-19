@@ -65,9 +65,7 @@ export const loginSchema = z.object({
 // profiles
 export const profileSchema = z.object({
   fullname: z.string().min(6, "Fullname must be at least 6 characters"),
-  birthday: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: "Tanggal tidak valid",
-  }),
+  birthday: z.string().optional(),
   gender: z.string().optional(),
   phone: z.string().optional(),
   bio: z.string().optional(),

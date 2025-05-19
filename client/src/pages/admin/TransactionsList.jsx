@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { formatDateTime, formatRupiah } from "@/lib/utils";
 import { useAdminPaymentsQuery } from "@/hooks/usePayment";
+import { SectionTitle } from "@/components/header/SectionTitle";
 
 const TransactionsList = () => {
   const limit = 10;
@@ -37,12 +38,10 @@ const TransactionsList = () => {
 
   return (
     <section className="section">
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Transaction List</h2>
-        <p className="text-muted-foreground text-sm">
-          Manage all user transactions and monitor payment activities.
-        </p>
-      </div>
+      <SectionTitle
+        title="Transaction List"
+        description="Manage all user transactions and monitor payment activities."
+      />
 
       <div className="flex items-center justify-between gap-4">
         <Input

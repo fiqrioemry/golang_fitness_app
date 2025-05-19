@@ -1,3 +1,5 @@
+import { Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { updateTemplateSchema } from "@/lib/schema";
 import { SelectElement } from "@/components/input/SelectElement";
 import { operationHours, operationMinutes } from "@/lib/constant";
@@ -13,12 +15,17 @@ const UpdateTemplate = ({ template }) => {
 
   return (
     <FormUpdateSheet
-      icon={false}
       state={template}
       schema={updateTemplateSchema}
       title="Update Recurence Schedule"
       loading={updateTemplate.isPending}
       action={updateTemplate.mutateAsync}
+      buttonElement={
+        <Button variant="secondary" className="w-full" type="button">
+          <span>Update</span>
+          <Pencil className="w-4 h-4" />
+        </Button>
+      }
     >
       <SelectOptionsElement
         data="class"

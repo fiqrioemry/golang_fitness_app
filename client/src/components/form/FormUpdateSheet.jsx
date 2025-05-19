@@ -3,8 +3,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetContent,
-  SheetDescription,
   SheetTrigger,
+  SheetDescription,
 } from "@/components/ui/sheet";
 import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,9 +22,13 @@ export function FormUpdateSheet({
   schema,
   action,
   children,
-  icon = true,
   loading = false,
   shouldReset = true,
+  buttonElement = (
+    <Button variant="edit" size="icon" type="button">
+      <Pencil className="w-4 h-4" />
+    </Button>
+  ),
 }) {
   const [open, setOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -77,18 +81,7 @@ export function FormUpdateSheet({
         open={open}
         onOpenChange={(val) => (!val ? handleCancel() : setOpen(val))}
       >
-        <SheetTrigger asChild>
-          {icon ? (
-            <Button variant="edit" size="icon" type="button">
-              <Pencil className="w-4 h-4" />
-            </Button>
-          ) : (
-            <Button variant="secondary" className="w-full" type="button">
-              <Pencil className="w-4 h-4" />
-              <span>Update</span>
-            </Button>
-          )}
-        </SheetTrigger>
+        <SheetTrigger asChild>{buttonElement}</SheetTrigger>
 
         <SheetContent className="w-full sm:max-w-lg flex flex-col p-0">
           {loading ? (

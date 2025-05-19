@@ -11,9 +11,9 @@ const StopTemplate = ({ template }) => {
   return (
     <FormToggle
       type="stop"
-      loading={stopTemplate.isPending}
-      title="Stop Recuring Schedule"
       onToggle={handleStopTemplate}
+      title="Stop Recuring Schedule"
+      loading={stopTemplate.isPending}
       description="Are you sure want to Stop this recuring schedule ?"
     />
   );

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Loading } from "@/components/ui/loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useSelectOptions } from "@/hooks/useSelectOptions";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { AddOptions } from "@/components/admin/classes/AddOptions";
 import { UpdateOptions } from "@/components/admin/classes/UpdateOptions";
 import { DeleteOptions } from "@/components/admin/classes/DeleteOptions";
@@ -24,6 +25,7 @@ const ClassOptions = () => {
   } = useSelectOptions(activeTab);
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const renderMap = (geoLocation) => {
@@ -46,16 +48,12 @@ const ClassOptions = () => {
 
   return (
     <section className="section">
-      {/* Header */}
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold text-foreground">Class Options</h2>
-        <p className="text-sm text-muted-foreground">
-          Manage all static data such as class types, categories, levels, and
-          locations.
-        </p>
-      </div>
+      <SectionTitle
+        title="Class Options"
+        description="Manage all static data such as class types, categories, levels, and
+          locations."
+      />
 
-      {/* Tabs */}
       <div className="flex gap-2 border-b border-border overflow-x-auto mt-4">
         {tabs.map((tab) => (
           <button
@@ -72,7 +70,6 @@ const ClassOptions = () => {
         ))}
       </div>
 
-      {/* Content */}
       <div className="space-y-4 mt-6">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold capitalize text-foreground">

@@ -5,7 +5,6 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/card";
-import React from "react";
 import { Link } from "react-router-dom";
 import { aboutTitle } from "@/lib/constant";
 import { Button } from "@/components/ui/button";

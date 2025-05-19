@@ -14,23 +14,16 @@ const FormDelete = ({
   title,
   onDelete,
   description,
-  icon = true,
+  buttonElement = (
+    <Button variant="destructive" size="icon" type="button">
+      <Trash2 className="w-4 h-4" />
+    </Button>
+  ),
   loading = false,
 }) => {
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        {icon ? (
-          <Button variant="destructive" size="icon" type="button">
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        ) : (
-          <Button className="w-full" variant="destructive" type="button">
-            <Trash2 className="w-4 h-4" />
-            <span>Delete</span>
-          </Button>
-        )}
-      </DialogTrigger>
+      <DialogTrigger asChild>{buttonElement}</DialogTrigger>
 
       <DialogContent className="sm:max-w-md rounded-xl bg-background border border-border p-6 space-y-6">
         {loading ? (

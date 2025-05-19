@@ -1,20 +1,21 @@
+import {
+  useBrowserNotificationsQuery,
+  useMarkAllNotificationsAsRead,
+} from "@/hooks/useNotification";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { Loading } from "@/components/ui/Loading";
 import { CheckCheck, MailWarning } from "lucide-react";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  useBrowserNotificationsQuery,
-  useMarkAllNotificationsAsRead,
-} from "@/hooks/useNotification";
 
 const UserNotifications = () => {
   const [tab, setTab] = useState("unread");
+  const [hasMarkedRead, setHasMarkedRead] = useState(false);
   const { mutate: markAllAsRead } = useMarkAllNotificationsAsRead();
   const { data, isLoading, isError, refetch } = useBrowserNotificationsQuery();
-  const [hasMarkedRead, setHasMarkedRead] = useState(false);
 
   const notifications = data || [];
   const unread = notifications.filter((n) => !n.isRead);
@@ -28,6 +29,7 @@ const UserNotifications = () => {
   }, [tab, unread.length, hasMarkedRead, markAllAsRead]);
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const renderNotifications = (list) =>
@@ -71,13 +73,10 @@ const UserNotifications = () => {
 
   return (
     <section className="section p-8 space-y-6">
-      <div className="text-center space-y-1 mb-6">
-        <h2 className="text-2xl font-bold">Inbox</h2>
-        <p className="text-sm text-muted-foreground">
-          See all your recent notifications
-        </p>
-      </div>
-
+      <SectionTitle
+        title="My Inbox"
+        description="See all your recent notifications"
+      />
       <Tabs defaultValue="unread" onValueChange={(val) => setTab(val)}>
         <TabsList className="mb-4">
           <TabsTrigger value="unread">Unread ({unread.length})</TabsTrigger>

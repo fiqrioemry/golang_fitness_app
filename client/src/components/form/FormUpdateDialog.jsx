@@ -20,9 +20,13 @@ export function FormUpdateDialog({
   schema,
   action,
   children,
-  icon = true,
   loading = false,
   shouldReset = true,
+  buttonElement = (
+    <Button variant="edit" size="icon" type="button">
+      <Pencil className="w-4 h-4" />
+    </Button>
+  ),
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -81,18 +85,7 @@ export function FormUpdateDialog({
         open={isOpen}
         onOpenChange={(open) => (!open ? handleCancel() : setIsOpen(open))}
       >
-        <DialogTrigger asChild>
-          {icon ? (
-            <Button variant="edit" size="icon" type="button">
-              <Pencil className="w-4 h-4" />
-            </Button>
-          ) : (
-            <Button variant="secondary" className="w-full" type="button">
-              <Pencil className="w-4 h-4" />
-              <span>Update</span>
-            </Button>
-          )}
-        </DialogTrigger>
+        <DialogTrigger asChild>{buttonElement}</DialogTrigger>
 
         <DialogContent className="sm:max-w-lg overflow-hidden rounded-xl p-0">
           {loading ? (

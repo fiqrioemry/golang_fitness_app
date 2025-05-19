@@ -20,14 +20,14 @@ export function FormAddDialog({
   schema,
   action,
   children,
-  buttonText = (
+  loading = false,
+  shouldReset = true,
+  buttonElement = (
     <Button type="button">
       <PlusCircle className="w-4 h-4 mr-2" />
       <span>Add new</span>
     </Button>
   ),
-  loading = false,
-  shouldReset = true,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -85,7 +85,7 @@ export function FormAddDialog({
         open={isOpen}
         onOpenChange={(open) => (!open ? handleCancel() : setIsOpen(open))}
       >
-        <DialogTrigger asChild>{buttonText}</DialogTrigger>
+        <DialogTrigger asChild>{buttonElement}</DialogTrigger>
 
         <DialogContent className="sm:max-w-lg overflow-hidden rounded-xl p-0 bg-card border border-border">
           {loading ? (

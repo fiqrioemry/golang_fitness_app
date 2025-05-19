@@ -1,4 +1,9 @@
 import {
+  Carousel,
+  CarouselItem,
+  CarouselContent,
+} from "@/components/ui/carousel";
+import {
   useSchedulesQuery,
   useSchedulesWithStatusQuery,
 } from "@/hooks/useSchedules";
@@ -11,11 +16,6 @@ import { format, isSameDay, addDays } from "date-fns";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useState, useMemo, useRef } from "react";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 
 const Schedules = () => {
   const { user } = useAuthStore();

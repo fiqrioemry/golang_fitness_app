@@ -6,7 +6,7 @@ import {
   TableRow,
   TableHeader,
 } from "@/components/ui/table";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { Loading } from "@/components/ui/Loading";
 import { usePackagesQuery } from "@/hooks/usePackage";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { Card, CardContent } from "@/components/ui/card";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { PackageDelete } from "@/components/admin/packages/PackageDelete";
 import { PackageUpdate } from "@/components/admin/packages/PackageUpdate";
 
@@ -36,18 +37,11 @@ const PackagesList = () => {
 
   return (
     <section className="section">
-      {/* Header */}
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold text-foreground">
-          Package Management
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          View, add, and manage training packages available for purchase by
-          users.
-        </p>
-      </div>
-
-      {/* Add Button */}
+      <SectionTitle
+        title="Package Management"
+        description="View, add, and manage training packages available for purchase by
+          users."
+      />
       <div className="flex justify-end mt-4">
         <Button size="nav" onClick={() => navigate("/admin/packages/add")}>
           <CirclePlus className="w-4 h-4 mr-2" />
@@ -55,7 +49,6 @@ const PackagesList = () => {
         </Button>
       </div>
 
-      {/* Desktop Table */}
       <Card className="border shadow-sm">
         <CardContent className="overflow-x-auto p-0">
           <div className="hidden md:block max-w-8xl w-full">

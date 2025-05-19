@@ -1,23 +1,21 @@
-import { usePackageMutation } from "@/hooks/usePackage";
+import { notificationSchema } from "@/lib/schema";
 import { FormInput } from "@/components/form/FormInput";
+import { notificationState, typeCode } from "@/lib/constant";
+import { SectionTitle } from "@/components/header/SectionTitle";
+import { SelectElement } from "@/components/input/SelectElement";
+import { useSendPromoNotification } from "@/hooks/useNotification";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
-import { SelectElement } from "@/components/input/SelectElement";
-import { notificationState, typeCode } from "@/lib/constant";
-import { notificationSchema } from "@/lib/schema";
-import { useSendPromoNotification } from "@/hooks/useNotification";
 
 const Notifications = () => {
   const { mutate: sendPromo, isPending } = useSendPromoNotification();
 
   return (
     <section className="section">
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Send New Message</h2>
-        <p className="text-muted-foreground text-sm">
-          Send a notification through all your users with just on click
-        </p>
-      </div>
+      <SectionTitle
+        title="Send New Message"
+        description="Send a notification through all your users with just on click."
+      />
 
       <div className="bg-background  rounded-xl shadow-sm border p-6">
         <FormInput

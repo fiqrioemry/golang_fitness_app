@@ -1,5 +1,5 @@
-import { useScheduleMutation } from "@/hooks/useSchedules";
 import { FormDelete } from "@/components/form/FormDelete";
+import { useScheduleMutation } from "@/hooks/useSchedules";
 
 const DeleteClassSchedule = ({ schedule, onClose }) => {
   const { deleteSchedule } = useScheduleMutation();
@@ -11,7 +11,6 @@ const DeleteClassSchedule = ({ schedule, onClose }) => {
 
   return (
     <FormDelete
-      icon={false}
       title="Delete Schedule"
       onDelete={handleDeleteSchedule}
       loading={deleteSchedule.isPending}

@@ -1,8 +1,8 @@
-import React from "react";
 import { classSchema } from "@/lib/schema";
 import { classState } from "@/lib/constant";
 import { useClassMutation } from "@/hooks/useClass";
 import { FormInput } from "@/components/form/FormInput";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { InputFileElement } from "@/components/input/InputFileElement";
@@ -15,12 +15,10 @@ const ClassAdd = () => {
 
   return (
     <section className="section">
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Add New Class</h2>
-        <p className="text-muted-foreground text-sm">
-          Fill out the form below to add a new class to the system.
-        </p>
-      </div>
+      <SectionTitle
+        title="Add New Class"
+        description="Fill out the form below to add a new class to the system."
+      />
 
       <div className="bg-background border shadow-sm rounded-xl p-6">
         <FormInput

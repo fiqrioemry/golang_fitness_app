@@ -1,11 +1,11 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { format, startOfWeek, endOfWeek } from "date-fns";
 
 const ClassScheduleHead = ({ onNavigate, date }) => {
-  const start = startOfWeek(date, { weekStartsOn: 6 });
   const end = endOfWeek(date, { weekStartsOn: 6 });
+  const start = startOfWeek(date, { weekStartsOn: 6 });
+
   return (
     <div className="flex items-center justify-between p-2">
       <div className="flex gap-2">

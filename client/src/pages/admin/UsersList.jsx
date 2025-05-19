@@ -25,6 +25,7 @@ import { Eye, ArrowDown, ArrowUp } from "lucide-react";
 import { Pagination } from "@/components/ui/Pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { UserDetailDialog } from "@/components/admin/users/UserDetailDialog";
 
 const UsersList = () => {
@@ -53,13 +54,11 @@ const UsersList = () => {
 
   return (
     <section className="section px-4 py-10 space-y-6 text-foreground">
-      <div className="text-center space-y-1">
-        <h2 className="text-2xl font-bold">User List</h2>
-        <p className="text-muted-foreground text-sm">
-          Manage all registered users, monitor their activities, and maintain
-          platform integrity efficiently.
-        </p>
-      </div>
+      <SectionTitle
+        title="User List"
+        description="Manage all registered users, monitor their activities, and maintain
+          platform integrity efficiently."
+      />
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-4">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-2/3">

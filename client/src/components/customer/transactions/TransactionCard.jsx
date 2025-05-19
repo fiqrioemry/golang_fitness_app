@@ -12,8 +12,8 @@ export const TransactionCard = ({ transactions }) => {
           className="border border-border bg-card shadow-sm hover:shadow-md transition"
         >
           <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-6">
-              <div className="flex-1 text-sm font-medium text-foreground truncate">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-6 w-full ">
+              <div className="text-sm font-medium text-foreground truncate">
                 {tx.packageName}
               </div>
 

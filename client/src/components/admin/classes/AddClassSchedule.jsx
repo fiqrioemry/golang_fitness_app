@@ -1,6 +1,6 @@
 import { scheduleSchema } from "@/lib/schema";
-import { useScheduleMutation } from "@/hooks/useSchedules";
 import { FormSheet } from "@/components/form/FormSheet";
+import { useScheduleMutation } from "@/hooks/useSchedules";
 import { useFormContext, useWatch } from "react-hook-form";
 import { SelectElement } from "@/components/input/SelectElement";
 import { SwitchElement } from "@/components/input/SwitchElement";
@@ -15,16 +15,16 @@ const AddClassSchedule = ({ open, setOpen, defaultDateTime }) => {
   const { isPending, mutateAsync } = createSchedule;
 
   const initialState = {
-    isRecurring: false,
     classId: "",
-    instructorId: "",
     capacity: 0,
+    endDate: "",
+    dayOfWeeks: [],
+    instructorId: "",
     color: "#4ade80",
-    date: defaultDateTime ? defaultDateTime.toISOString().split("T")[0] : "",
+    isRecurring: false,
     startHour: defaultDateTime?.getHours(),
     startMinute: defaultDateTime?.getMinutes(),
-    dayOfWeeks: [],
-    endDate: "",
+    date: defaultDateTime ? defaultDateTime.toISOString().split("T")[0] : "",
   };
 
   return (

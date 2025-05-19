@@ -1,5 +1,5 @@
-import { operationMinutes } from "@/lib/constant";
 import { operationHours } from "@/lib/constant";
+import { operationMinutes } from "@/lib/constant";
 import { updateTemplateSchema } from "@/lib/schema";
 import { useScheduleMutation } from "@/hooks/useSchedules";
 import { SelectElement } from "@/components/input/SelectElement";
@@ -20,7 +20,6 @@ const UpdateClassSchedule = ({ schedule, onClose }) => {
 
   return (
     <FormUpdateSheet
-      icon={false}
       state={schedule}
       loading={isPending}
       title="Update Schedule"
@@ -36,24 +35,24 @@ const UpdateClassSchedule = ({ schedule, onClose }) => {
         placeholder="Select option for class"
       />
       <SelectOptionsElement
-        name="instructorId"
         data="instructor"
         label="Instructor"
+        name="instructorId"
         placeholder="select option for instructor"
       />
       <div className="grid grid-cols-2 gap-4">
         <SelectElement
           name="startHour"
-          label="Start Hour"
           isNumeric={true}
+          label="Start Hour"
           options={operationHours}
           placeholder="Select Hour"
         />
 
         <SelectElement
+          isNumeric={true}
           name="startMinute"
           label="Start Minute"
-          isNumeric={true}
           options={operationMinutes}
           placeholder="Select Minute"
         />

@@ -1,4 +1,3 @@
-import React from "react";
 import { createVoucherSchema } from "@/lib/schema";
 import { useVoucherMutation } from "@/hooks/useVouchers";
 import { SwitchElement } from "@/components/input/SwitchElement";
@@ -34,7 +33,7 @@ const VoucherUpdate = ({ voucher }) => {
         maxLength={200}
         name="description"
         label="Description"
-        placeholder="e.g. Diskon 50% untuk semua kelas"
+        placeholder="e.g. Diskon 50% for all classes"
       />
       <SelectElement
         name="discountType"
@@ -51,7 +50,7 @@ const VoucherUpdate = ({ voucher }) => {
         <InputNumberElement
           name="maxDiscount"
           label="Max Discount (if %)"
-          placeholder="e.g. 30000"
+          placeholder="e.g. 30000 (Rupiah)"
         />
         <InputNumberElement name="quota" label="Quota" placeholder="e.g. 10" />
       </div>
@@ -61,7 +60,7 @@ const VoucherUpdate = ({ voucher }) => {
         label="Expiration Date"
         placeholder="YYYY-MM-DD"
       />
-      <SwitchElement name="isReusable" label="Allow multiple usage?" />
+      <SwitchElement name="isReusable" label="Allow multiple usage ?" />
     </FormUpdateDialog>
   );
 };

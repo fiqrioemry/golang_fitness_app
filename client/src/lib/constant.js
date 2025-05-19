@@ -1,8 +1,8 @@
 export const registerState = {
+  otp: "",
   email: "",
   password: "",
   fullname: "",
-  otp: "",
 };
 
 export const sendOTPState = {
@@ -10,8 +10,8 @@ export const sendOTPState = {
 };
 
 export const verifyOTPState = {
-  email: "",
   otp: "",
+  email: "",
 };
 export const getLoginState = (rememberMe = false) => ({
   email: "",
@@ -20,23 +20,23 @@ export const getLoginState = (rememberMe = false) => ({
 });
 
 export const profileState = {
-  fullname: "",
-  birthday: "",
-  gender: "",
-  phone: "",
   bio: "",
+  phone: "",
+  gender: "",
+  birthday: "",
+  fullname: "",
 };
 
 export const classState = {
   title: "",
   duration: 0,
-  description: "",
   additional: [],
   typeId: "",
   levelId: "",
   locationId: "",
   categoryId: "",
   isActive: true,
+  description: "",
   subcategoryId: "",
   image: undefined,
   images: undefined,
@@ -45,12 +45,12 @@ export const classState = {
 export const updateClassState = {
   title: "",
   duration: 0,
-  description: "",
-  additional: [],
   typeId: "",
   levelId: "",
+  additional: [],
   locationId: "",
   categoryId: "",
+  description: "",
   subcategoryId: "",
   image: undefined,
 };
@@ -71,8 +71,8 @@ export const locationState = {
 };
 
 export const reviewState = {
-  classId: "",
   rating: 0,
+  classId: "",
   comment: "",
 };
 
@@ -87,24 +87,24 @@ export const bookingState = {
 
 export const createScheduleTemplateState = {
   classId: "",
-  instructorId: "",
+  capacity: 0,
   dayOfWeek: 0,
   startHour: 0,
   startMinute: 0,
-  capacity: 0,
+  instructorId: "",
 };
 
 export const updateClassScheduleState = {
-  startTime: "",
-  endTime: "",
   capacity: 0,
+  endTime: "",
+  startTime: "",
 };
 
 export const midtransNotificationState = {
-  transaction_status: "",
   order_id: "",
   payment_type: "",
   fraud_status: "",
+  transaction_status: "",
 };
 
 export const paymentState = {
@@ -120,15 +120,15 @@ export const instructorState = {
 
 export const packageState = {
   name: "",
-  description: "",
   price: 0,
   credit: 0,
   expired: 0,
-  isActive: true,
-  additional: [],
-  image: undefined,
   discount: 0,
   classIds: [],
+  isActive: true,
+  additional: [],
+  description: "",
+  image: undefined,
 };
 
 export const genderOptions = [
@@ -137,19 +137,19 @@ export const genderOptions = [
 ];
 
 export const typeCode = [
+  { label: "Promo Offer", value: "promo_offer" },
   { label: "System Message", value: "system_message" },
   { label: "Class Reminder", value: "class_reminder" },
-  { label: "Promo Offer", value: "promo_offer" },
 ];
 
 export const createVoucherState = {
   code: "",
-  description: "",
-  discountType: "fixed",
-  discount: 0,
-  maxDiscount: null,
   quota: 1,
+  discount: 0,
+  description: "",
   expiredAt: "",
+  maxDiscount: null,
+  discountType: "fixed",
 };
 export const notificationState = {
   title: "",
@@ -161,7 +161,7 @@ export const operationMinutes = [0, 15, 30, 45];
 
 export const operationHours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 
-export const homeTitle = "Home -  high-intensity workouts with sweat up";
+export const homeTitle = "Home - high-intensity workouts with sweat up";
 
 export const aboutTitle =
   "About Us – Empowering Your Wellness Journey with Sweat Up";

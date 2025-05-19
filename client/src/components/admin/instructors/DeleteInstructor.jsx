@@ -5,14 +5,14 @@ import { useInstructorMutation } from "@/hooks/useInstructor";
 const DeleteInstructor = ({ instructor }) => {
   const { deleteInstructor } = useInstructorMutation();
 
-  const handleDelete = () => {
+  const handleDeleteInstructor = () => {
     deleteInstructor.mutate(instructor.id);
   };
 
   return (
     <FormDelete
       title="Delete Instrutors"
-      onDelete={handleDelete}
+      onDelete={handleDeleteInstructor}
       loading={deleteInstructor.isPending}
       description="Are you sure want to remove this Instructors ?"
     />

@@ -1,4 +1,3 @@
-import React from "react";
 import { PencilIcon } from "lucide-react";
 import { profileSchema } from "@/lib/schema";
 import { genderOptions } from "@/lib/constant";
@@ -15,16 +14,14 @@ export const UpdateProfile = ({ profile }) => {
 
   return (
     <FormAddDialog
-      icon={true}
       state={profile}
       title="Edit Profile"
       loading={updateProfile.isPending}
       action={updateProfile.mutateAsync}
       schema={profileSchema}
       buttonText={
-        <Button variant="secondary" type="button">
+        <Button variant="secondary" size="icon" type="button">
           <PencilIcon className="w-4 h-4" />
-          <span>Edit Profile</span>
         </Button>
       }
     >

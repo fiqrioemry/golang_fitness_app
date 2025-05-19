@@ -1,5 +1,5 @@
-import { instructorState } from "@/lib/constant";
 import { instructorSchema } from "@/lib/schema";
+import { instructorState } from "@/lib/constant";
 import { useInstructorMutation } from "@/hooks/useInstructor";
 import { FormAddDialog } from "@/components/form/FormAddDialog";
 import { InputTextElement } from "@/components/input/InputTextElement";
@@ -15,12 +15,12 @@ const AddInstructor = () => {
       state={instructorState}
       schema={instructorSchema}
       title="Appoint new instructor"
-      isLoading={createInstructor.isPending}
       action={createInstructor.mutateAsync}
+      isLoading={createInstructor.isPending}
     >
       <SelectUsersElement
-        name="userId"
         data="users"
+        name="userId"
         label="Instructor name"
         placeholder="Select instructor name"
       />

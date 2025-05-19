@@ -1,6 +1,5 @@
-/* eslint-disable react/prop-types */
-import { FormDelete } from "@/components/form/FormDelete";
 import { useVoucherMutation } from "@/hooks/useVouchers";
+import { FormDelete } from "@/components/form/FormDelete";
 
 const VoucherDelete = ({ voucher }) => {
   const { deleteVoucher } = useVoucherMutation();
@@ -12,8 +11,8 @@ const VoucherDelete = ({ voucher }) => {
   return (
     <FormDelete
       title="Delete Vouchers"
-      loading={deleteVoucher.isPending}
       onDelete={handleDeleteVoucher}
+      loading={deleteVoucher.isPending}
       description="Are you sure want to delete this Voucher?"
     />
   );

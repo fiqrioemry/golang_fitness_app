@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
 import { CalendarClock, PlusCircle } from "lucide-react";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { useRecurringTemplatesQuery } from "@/hooks/useSchedules";
 import { RunTemplate } from "@/components/admin/classes/RunTemplate";
 import { StopTemplate } from "@/components/admin/classes/StopTemplate";
@@ -31,18 +32,17 @@ const ClassRecuring = () => {
   }, []);
 
   if (isLoading) return <Loading />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const templates = data || [];
 
   return (
     <section className="section max-w-7xl mx-auto px-4 py-10 text-foreground space-y-6">
-      <div className="text-center space-y-1">
-        <h2 className="text-2xl font-bold">Recurring Schedule Templates</h2>
-        <p className="text-muted-foreground text-sm">
-          Manage, activate, and generate recurring class schedules.
-        </p>
-      </div>
+      <SectionTitle
+        title="Recurring Schedule Templates"
+        description="Manage, activate, and generate recurring class schedules."
+      />
 
       {templates.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">

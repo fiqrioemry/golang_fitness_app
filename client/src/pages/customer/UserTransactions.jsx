@@ -1,7 +1,7 @@
-import React from "react";
 import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useUserTransactionsQuery } from "@/hooks/useProfile";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { NoTransaction } from "@/components/customer/transactions/NoTransaction";
 import { TransactionCard } from "@/components/customer/transactions/TransactionCard";
 
@@ -16,13 +16,11 @@ const UserTransactions = () => {
 
   return (
     <section className="section p-8 space-y-6">
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Transaction History</h2>
-        <p className="text-muted-foreground text-sm">
-          All your recent payment activities and package purchases are listed
-          here. Stay updated with your transaction status and history.
-        </p>
-      </div>
+      <SectionTitle
+        title="Transaction History"
+        description=" All your recent payment activities and package purchases are listed
+          here. Stay updated with your transaction status and history."
+      />
 
       {transactions.length === 0 ? (
         <NoTransaction />

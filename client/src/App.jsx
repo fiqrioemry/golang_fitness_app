@@ -28,10 +28,10 @@ import ClassRecuring from "./pages/admin/classes/ClassRecuring";
 import ClassSchedules from "./pages/admin/classes/ClassSchedules";
 
 // customer pages
-import Profile from "./pages/customer/Profile";
+import UserProfile from "./pages/customer/UserProfile";
 import UserBookings from "./pages/customer/UserBookings";
-import UserSettings from "./pages/customer/UserSettings";
 import UserPackages from "./pages/customer/UserPackages";
+import UserSettings from "./pages/customer/UserSettings";
 import UserAttendances from "./pages/customer/UserAttendances";
 import UserTransactions from "./pages/customer/UserTransactions";
 import UserNotifications from "./pages/customer/UserNotifications";
@@ -115,7 +115,7 @@ function App() {
             </AuthRoute>
           }
         >
-          <Route index element={<Profile />} />
+          <Route index element={<UserProfile />} />
           <Route path="packages" element={<UserPackages />} />
           <Route path="bookings" element={<UserBookings />} />
           <Route path="settings" element={<UserSettings />} />

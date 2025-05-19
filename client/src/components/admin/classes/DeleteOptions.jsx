@@ -10,9 +10,9 @@ const DeleteOptions = ({ option, activeTab }) => {
 
   return (
     <FormDelete
+      loading={isPending}
       title={`Delete ${activeTab}`}
       onDelete={handleDeleteOptions}
-      loading={isPending}
       description={`Are you sure want to delete this ${activeTab}?`}
     />
   );

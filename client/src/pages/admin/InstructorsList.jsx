@@ -3,9 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useInstructorsQuery } from "@/hooks/useInstructor";
+import { SectionTitle } from "@/components/header/SectionTitle";
+import { AddInstructor } from "@/components/admin/instructors/AddInstructor";
 import { EditInstructor } from "@/components/admin/instructors/EditInstructor";
 import { DeleteInstructor } from "@/components/admin/instructors/DeleteInstructor";
-import { AddInstructor } from "@/components/admin/instructors/AddInstructor";
 
 const InstructorsList = () => {
   const {
@@ -21,14 +22,11 @@ const InstructorsList = () => {
 
   return (
     <section className="section">
-      {/* Header */}
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Instructors List</h2>
-        <p className="text-muted-foreground text-sm">
-          Manage all instructors registered on the platform, including their
-          expertise, certifications, and teaching activity.
-        </p>
-      </div>
+      <SectionTitle
+        title="Instructors Lis"
+        description="Manage all instructors registered on the platform, including their
+          expertise, certifications, and teaching activity."
+      />
 
       <div className="flex justify-end">
         <AddInstructor />

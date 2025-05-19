@@ -2,6 +2,7 @@
 import { Loading } from "@/components/ui/Loading";
 import { useUserBookingsQuery } from "@/hooks/useProfile";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { NoBooking } from "@/components/customer/bookings/NoBooking";
 import { BookingCard } from "@/components/customer/bookings/BookingCard";
 
@@ -16,12 +17,10 @@ const UserBookings = () => {
 
   return (
     <section className="section p-8 space-y-6">
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">My Bookings</h2>
-        <p className="text-muted-foreground text-sm">
-          View and manage your upcoming and past class bookings.
-        </p>
-      </div>
+      <SectionTitle
+        title="My Bookings"
+        description="View and manage your upcoming and past class bookings."
+      />
       {bookings.length === 0 ? (
         <NoBooking />
       ) : (

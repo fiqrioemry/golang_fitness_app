@@ -1,4 +1,10 @@
-import React, { useState } from "react";
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -7,25 +13,20 @@ import {
   TableRow,
   TableHeader,
 } from "@/components/ui/table";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "@/components/ui/select";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useClassesQuery } from "@/hooks/useClass";
+import { Loading } from "@/components/ui/Loading";
+import { Pagination } from "@/components/ui/Pagination";
 import { Card, CardContent } from "@/components/ui/card";
+import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { DeleteClass } from "@/components/admin/classes/DeleteClass";
 import { UpdateClass } from "@/components/admin/classes/UpdateClass";
 import { UploadClassGallery } from "@/components/admin/classes/UploadClassGallery";
-import { Loading } from "@/components/ui/Loading";
-import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { Pagination } from "@/components/ui/Pagination";
 
 const ClassesList = () => {
   const navigate = useNavigate();
@@ -55,15 +56,11 @@ const ClassesList = () => {
 
   return (
     <section className="section px-4 py-10 space-y-6 text-foreground">
-      {/* Header */}
-      <div className="text-center space-y-1">
-        <h2 className="text-2xl font-bold">Class Management</h2>
-        <p className="text-sm text-muted-foreground">
-          View, add, and manage training classes available for users.
-        </p>
-      </div>
+      <SectionTitle
+        title="Class Management"
+        description="View, add, and manage training classes available for users."
+      />
 
-      {/* Filter Bar */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-4">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-2/3">
           <Input

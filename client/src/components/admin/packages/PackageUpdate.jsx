@@ -59,7 +59,7 @@ const PackageUpdate = ({ pkg }) => {
         label="Additional Information"
         placeholder="Enter info, press enter to add"
       />
-      <InputFileElement name="image" label="Thumbnail Image" isSingle />
+      <InputFileElement name="image" label="Thumbnail" isSingle />
       <SwitchElement name="isActive" label="Set as active package" />
     </FormUpdateDialog>
   );

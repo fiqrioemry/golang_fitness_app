@@ -55,20 +55,20 @@ const Classes = () => {
       <div className="sticky top-4 z-10 bg-card text-foreground border border-border shadow-sm rounded-xl p-4 mb-8">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <FilterSelection
-            paramKey="locationId"
-            label="Location"
             data="location"
+            label="Location"
+            paramKey="locationId"
           />
           <FilterSelection paramKey="typeId" label="Type" data="type" />
           <FilterSelection
-            paramKey="categoryId"
-            label="Category"
             data="category"
+            label="Category"
+            paramKey="categoryId"
           />
           <FilterSelection
-            paramKey="subcategoryId"
-            label="Subcategory"
             data="subcategory"
+            label="Subcategory"
+            paramKey="subcategoryId"
           />
           <FilterSelection paramKey="levelId" label="Level" data="level" />
         </div>
@@ -78,7 +78,7 @@ const Classes = () => {
         <div className="flex flex-col items-center justify-center text-center py-4 col-span-full">
           <img
             src="/no-classes.webp"
-            alt="No class found"
+            alt="no classes image found"
             className="w-72 mb-6 opacity-50"
           />
           <h3 className="text-xl font-semibold">No classes found</h3>
@@ -95,7 +95,6 @@ const Classes = () => {
           {classes.map((cls) => (
             <Link to={`/classes/${cls.id}`} key={cls.id}>
               <Card className="group h-full flex flex-col transition-transform hover:-translate-y-1 duration-300">
-                {/* Gambar */}
                 <div className="relative h-48 w-full overflow-hidden">
                   <img
                     src={cls.image}

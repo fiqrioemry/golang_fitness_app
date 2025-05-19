@@ -1,4 +1,3 @@
-import React from "react";
 import { classSchema } from "@/lib/schema";
 import { useClassMutation } from "@/hooks/useClass";
 import { SwitchElement } from "@/components/input/SwitchElement";

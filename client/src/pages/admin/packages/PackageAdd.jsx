@@ -1,8 +1,8 @@
-import React from "react";
 import { packageSchema } from "@/lib/schema";
 import { packageState } from "@/lib/constant";
 import { usePackageMutation } from "@/hooks/usePackage";
 import { FormInput } from "@/components/form/FormInput";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { InputFileElement } from "@/components/input/InputFileElement";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
@@ -15,13 +15,10 @@ const PackageAdd = () => {
 
   return (
     <section className="section">
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Add New Package</h2>
-        <p className="text-muted-foreground text-sm">
-          Complete the package information to offer it to users.
-        </p>
-      </div>
-
+      <SectionTitle
+        title="Add New Package"
+        description="Complete the package information to offer it to users."
+      />
       <div className="bg-background rounded-xl shadow-sm border p-6">
         <FormInput
           className="w-full md:w-72"

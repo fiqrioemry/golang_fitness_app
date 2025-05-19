@@ -1,8 +1,8 @@
+import { useState, useEffect } from "react";
 import { formatDateTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Loading } from "@/components/ui/Loading";
-import React, { useState, useEffect } from "react";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useParams, useNavigate } from "react-router-dom";
 import { useScheduleDetailQuery } from "@/hooks/useSchedules";

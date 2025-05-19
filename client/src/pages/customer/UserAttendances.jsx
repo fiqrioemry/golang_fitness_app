@@ -2,9 +2,10 @@ import { isBefore, parseISO } from "date-fns";
 import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useAttendancesQuery } from "@/hooks/useAttendance";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { NoAttendance } from "@/components/customer/attendances/NoAttendance";
-import { AttendanceCard } from "@/components/customer/attendances/AttendanceCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AttendanceCard } from "@/components/customer/attendances/AttendanceCard";
 import { PastAttendanceCard } from "@/components/customer/attendances/PastAttendanceCard";
 
 const UserAttendances = () => {
@@ -30,12 +31,10 @@ const UserAttendances = () => {
 
   return (
     <section className="section p-8 space-y-6">
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">My Attendance</h2>
-        <p className="text-muted-foreground text-sm">
-          View and attend your scheduled fitness classes.
-        </p>
-      </div>
+      <SectionTitle
+        title="My Attendance"
+        description="View and attend your scheduled fitness classes."
+      />
 
       <Tabs defaultValue="upcoming" className="w-full">
         <TabsList className="mb-4">

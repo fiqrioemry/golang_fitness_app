@@ -1,14 +1,14 @@
-import React from "react";
 import { createVoucherSchema } from "@/lib/schema";
 import { createVoucherState } from "@/lib/constant";
 import { FormInput } from "@/components/form/FormInput";
+import { useVoucherMutation } from "@/hooks/useVouchers";
+import { SectionTitle } from "@/components/header/SectionTitle";
 import { SwitchElement } from "@/components/input/SwitchElement";
 import { SelectElement } from "@/components/input/SelectElement";
 import { InputDateElement } from "@/components/input/InputDateElement";
 import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
-import { useVoucherMutation } from "@/hooks/useVouchers";
 
 const discountTypeOptions = [
   { label: "Fixed", value: "fixed" },
@@ -20,12 +20,10 @@ const VoucherAdd = () => {
 
   return (
     <section className="section">
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold">Create New Voucher</h2>
-        <p className="text-muted-foreground text-sm">
-          Fill out the form below to add a new voucher
-        </p>
-      </div>
+      <SectionTitle
+        title="Create New Voucher"
+        description="Fill out the form below to add a new voucher."
+      />
 
       <div className="bg-background border shadow-sm rounded-xl p-6">
         <FormInput
