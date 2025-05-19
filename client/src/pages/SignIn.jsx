@@ -4,6 +4,7 @@ import { getLoginState } from "@/lib/constant";
 import { WebLogo } from "@/components/ui/WebLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { FormInput } from "@/components/form/FormInput";
+import { GoogleOAuth } from "@/components/public/GoogleOAuth";
 import { SwitchElement } from "@/components/input/SwitchElement";
 import { InputTextElement } from "@/components/input/InputTextElement";
 
@@ -47,7 +48,11 @@ const SignIn = () => {
             />
             <SwitchElement name="rememberMe" label="Remember Me" />
           </FormInput>
+          <div className="text-center py-2 text-sm text-muted-foreground">
+            Or
+          </div>
 
+          <GoogleOAuth buttonText="Sign in with google" />
           <p className="text-sm text-center mt-6 text-muted-foreground">
             Don't have an account?{" "}
             <Link

@@ -11,6 +11,7 @@ import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
 export const UpdateProfile = ({ profile }) => {
   const { updateProfile } = useProfileMutation();
+  console.log(profile);
 
   return (
     <FormAddDialog
@@ -19,7 +20,7 @@ export const UpdateProfile = ({ profile }) => {
       loading={updateProfile.isPending}
       action={updateProfile.mutateAsync}
       schema={profileSchema}
-      buttonText={
+      buttonElement={
         <Button variant="secondary" size="icon" type="button">
           <PencilIcon className="w-4 h-4" />
         </Button>
