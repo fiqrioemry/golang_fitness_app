@@ -1022,22 +1022,6 @@ func SeedReviews(db *gorm.DB) {
 	}
 }
 
-func SeedScheduleTemplate(db *gorm.DB) {
-	if err := db.Exec("DELETE FROM recurrence_rules").Error; err != nil {
-		log.Println("Failed to clear recurrence_rules:", err)
-	} else {
-		log.Println("RecurrenceRules cleared")
-	}
-
-	if err := db.Exec("DELETE FROM schedule_templates").Error; err != nil {
-		log.Println("Failed to clear schedule_templates:", err)
-	} else {
-		log.Println("ScheduleTemplates cleared")
-	}
-
-	log.Println("ScheduleTemplate reset completed!")
-}
-
 func SeedNotificationTypes(db *gorm.DB) {
 	defaultTypes := []models.NotificationType{
 		{ID: uuid.New(), Code: "system_message", Title: "System Announcement", Category: "announcement", DefaultEnabled: false},
