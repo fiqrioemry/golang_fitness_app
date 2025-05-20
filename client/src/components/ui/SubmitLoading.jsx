@@ -1,5 +1,3 @@
-// src/components/loading/SubmitLoading.jsx
-
 import { Loader2 } from "lucide-react";
 
 const SubmitLoading = ({ text = "Saving...", className = "" }) => {

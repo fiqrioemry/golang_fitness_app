@@ -1,7 +1,6 @@
 import * as React from "react";
-import { Drawer as DrawerPrimitive } from "vaul";
-
 import { cn } from "@/lib/utils";
+import { Drawer as DrawerPrimitive } from "vaul";
 
 const Drawer = ({ shouldScaleBackground = true, ...props }) => (
   <DrawerPrimitive.Root
@@ -34,7 +33,7 @@ const DrawerContent = React.forwardRef(
         ref={ref}
         className={cn(
           "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
-          className,
+          className
         )}
         {...props}
       >
@@ -42,7 +41,7 @@ const DrawerContent = React.forwardRef(
         {children}
       </DrawerPrimitive.Content>
     </DrawerPortal>
-  ),
+  )
 );
 DrawerContent.displayName = "DrawerContent";
 
@@ -67,7 +66,7 @@ const DrawerTitle = React.forwardRef(({ className, ...props }, ref) => (
     ref={ref}
     className={cn(
       "text-lg font-semibold leading-none tracking-tight",
-      className,
+      className
     )}
     {...props}
   />

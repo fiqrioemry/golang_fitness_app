@@ -7,9 +7,9 @@ import {
   DialogDescription,
 } from "@/components/ui/Dialog";
 
-import { Button } from "./button";
 import { useState, useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 const ErrorDialog = ({ open = true, onRetry }) => {
   const [visible, setVisible] = useState(open);
