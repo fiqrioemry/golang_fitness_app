@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
+// file naming typo
 const Pagination = ({ page, limit, total, onPageChange }) => {
   const totalPages = Math.ceil(total / limit);
   const start = (page - 1) * limit + 1;
