@@ -13,18 +13,18 @@ import {
   SidebarHeader,
   SidebarFooter,
   SidebarContent,
-} from "@/components/ui/sidebar";
+} from "@/components/ui/Sidebar";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuContent,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/DropdownMenu";
 import { WebLogo } from "@/components/ui/WebLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Link, useLocation } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 
 const NavItem = ({ to, icon: Icon, title, active }) => (
   <Link

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { CalendarClock, PlusCircle } from "lucide-react";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";

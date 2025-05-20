@@ -5,25 +5,25 @@ import {
   TableBody,
   TableHead,
   TableHeader,
-} from "@/components/ui/table";
+} from "@/components/ui/Table";
 import {
   Select,
   SelectItem,
   SelectTrigger,
   SelectValue,
   SelectContent,
-} from "@/components/ui/select";
-import React, { useState } from "react";
+} from "@/components/ui/Select";
+import { useState } from "react";
 import { formatDateTime } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/Badge";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import { useUsersQuery } from "@/hooks/useUsers";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Loading } from "@/components/ui/Loading";
 import { Eye, ArrowDown, ArrowUp } from "lucide-react";
-import { Pagination } from "@/components/ui/pagination";
-import { Card, CardContent } from "@/components/ui/card";
+import { Pagination } from "@/components/ui/Pagination";
+import { Card, CardContent } from "@/components/ui/Card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { UserDetailDialog } from "@/components/admin/users/UserDetailDialog";

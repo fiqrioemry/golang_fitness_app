@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Loader } from "lucide-react";
 
 export const SectionSkeleton = () => {

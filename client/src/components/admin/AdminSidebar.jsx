@@ -25,7 +25,7 @@ import {
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
-} from "@/components/ui/accordion";
+} from "@/components/ui/Accordion";
 
 import {
   Sidebar,
@@ -33,17 +33,17 @@ import {
   SidebarHeader,
   SidebarFooter,
   SidebarContent,
-} from "@/components/ui/sidebar";
+} from "@/components/ui/Sidebar";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Link, useLocation } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/DropdownMenu";
 
 const NavItem = ({ to, icon: Icon, title, active }) => (
   <Link

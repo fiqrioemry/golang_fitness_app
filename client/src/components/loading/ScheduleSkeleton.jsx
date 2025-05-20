@@ -2,9 +2,9 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-} from "@/components/ui/carousel";
+} from "@/components/ui/Carousel";
 import { format, addDays } from "date-fns";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 export const SchedulesSkeleton = () => {
   const today = new Date();

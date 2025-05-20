@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useSelectOptions } from "@/hooks/useSelectOptions";
 import { Controller, useFormContext } from "react-hook-form";
 

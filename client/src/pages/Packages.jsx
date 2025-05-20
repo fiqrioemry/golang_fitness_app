@@ -5,11 +5,11 @@ import {
   CardHeader,
   CardContent,
   CardDescription,
-} from "@/components/ui/card";
+} from "@/components/ui/Card";
 import { CheckCircle2 } from "lucide-react";
 import { packagesTitle } from "@/lib/constant";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { usePackagesQuery } from "@/hooks/usePackage";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";

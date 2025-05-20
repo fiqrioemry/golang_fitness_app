@@ -4,7 +4,7 @@ import {
   SelectValue,
   SelectTrigger,
   SelectContent,
-} from "@/components/ui/select";
+} from "@/components/ui/Select";
 
 import {
   Table,
@@ -13,10 +13,10 @@ import {
   TableBody,
   TableHead,
   TableHeader,
-} from "@/components/ui/table";
+} from "@/components/ui/Table";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/Badge";
+import { Card, CardContent } from "@/components/ui/Card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { formatDateTime, formatRupiah } from "@/lib/utils";
 import { useAdminPaymentsQuery } from "@/hooks/usePayment";

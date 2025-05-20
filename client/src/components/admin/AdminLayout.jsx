@@ -2,11 +2,11 @@ import {
   SidebarInset,
   SidebarTrigger,
   SidebarProvider,
-} from "@/components/ui/sidebar";
+} from "@/components/ui/Sidebar";
 import { MenuIcon } from "lucide-react";
 import AdminSidebar from "./AdminSidebar";
 import { Outlet } from "react-router-dom";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@/components/ui/Separator";
 
 const AdminLayout = () => {
   return (

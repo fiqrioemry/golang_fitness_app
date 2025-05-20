@@ -5,16 +5,16 @@ import {
   TableHead,
   TableRow,
   TableHeader,
-} from "@/components/ui/table";
+} from "@/components/ui/Table";
 import VoucherAdd from "./VouchersAdd";
 import { useEffect } from "react";
 import { CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { useVouchersQuery } from "@/hooks/useVouchers";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/Card";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { VoucherUpdate } from "@/components/admin/vouchers/VoucherUpdate";
 import { VoucherDelete } from "@/components/admin/vouchers/VoucherDelete";

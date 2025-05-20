@@ -1,5 +1,5 @@
 import { Star } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useInstructorsQuery } from "@/hooks/useInstructor";
 import { SectionTitle } from "@/components/header/SectionTitle";

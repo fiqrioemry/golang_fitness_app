@@ -11,8 +11,8 @@ import {
   CardHeader,
   CardContent,
   CardDescription,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 import { format, differenceInDays, isBefore } from "date-fns";
 
 export const PackageCard = ({ pkgs }) => {

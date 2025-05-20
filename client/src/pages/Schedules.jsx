@@ -2,14 +2,14 @@ import {
   Carousel,
   CarouselItem,
   CarouselContent,
-} from "@/components/ui/carousel";
+} from "@/components/ui/Carousel";
 import {
   useSchedulesQuery,
   useSchedulesWithStatusQuery,
 } from "@/hooks/useSchedules";
 import { Link } from "react-router-dom";
 import { scheduleTitle } from "@/lib/constant";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useState, useMemo, useRef } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { format, isSameDay, addDays } from "date-fns";

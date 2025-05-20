@@ -1,5 +1,5 @@
 import { Pencil } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { createReviewSchema } from "@/lib/schema";
 import { useCreateReviewMutation } from "@/hooks/useReview";
 import { FormAddDialog } from "@/components/form/FormAddDialog";

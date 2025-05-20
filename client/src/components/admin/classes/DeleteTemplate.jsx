@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { FormDelete } from "@/components/form/FormDelete";
 import { useScheduleTemplateMutation } from "@/hooks/useSchedules";
 

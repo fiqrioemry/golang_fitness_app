@@ -1,6 +1,6 @@
 import { DeleteClassSchedule } from "./DeleteClassSchedule";
 import { UpdateClassSchedule } from "./UpdateClassSchedule";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/Dialog";
 
 const ClassScheduleDetail = ({ open, onClose, event }) => {
   if (!event) return null;

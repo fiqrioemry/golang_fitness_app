@@ -1,5 +1,5 @@
 import { FcGoogle } from "react-icons/fc";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 export const GoogleOAuth = ({ buttonText }) => {
   const handleGoogleAuth = () => {

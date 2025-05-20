@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 const NoAttendance = ({ type = "upcoming" }) => {
   const isUpcoming = type === "upcoming";

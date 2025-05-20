@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useSelectOptions } from "@/hooks/useSelectOptions";
 
 const FilterSelection = ({ paramKey, label, data }) => {

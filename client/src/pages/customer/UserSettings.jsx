@@ -2,7 +2,7 @@ import {
   useNotificationSettingsQuery,
   useUpdateNotificationSetting,
 } from "@/hooks/useNotification";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@/components/ui/Switch";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { SectionSkeleton } from "@/components/loading/SectionSkeleton";

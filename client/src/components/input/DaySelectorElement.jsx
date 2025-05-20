@@ -7,7 +7,7 @@ const dayOptions = [
   { label: "Fri", value: 5 },
   { label: "Sat", value: 6 },
 ];
-import { FormLabel } from "@/components/ui/form";
+import { FormLabel } from "@/components/ui/Form";
 import { useFormContext, Controller } from "react-hook-form";
 
 export const DaySelectorElement = ({ name, label }) => {

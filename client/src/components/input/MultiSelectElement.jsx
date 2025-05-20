@@ -3,12 +3,12 @@ import {
   CommandGroup,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from "@/components/ui/Command";
 import { X } from "lucide-react";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/Input";
+import { Badge } from "@/components/ui/Badge";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useSelectOptions } from "@/hooks/useSelectOptions";
 import { Controller, useFormContext } from "react-hook-form";
 

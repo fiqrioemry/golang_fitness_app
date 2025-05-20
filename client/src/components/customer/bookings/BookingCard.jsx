@@ -14,11 +14,11 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import { buildDateTime, getTimeLeft, isAttendanceWindow } from "@/lib/utils";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/Dialog";
 
 export const BookingCard = ({ booking }) => {
   const [showQR, setShowQR] = useState(false);

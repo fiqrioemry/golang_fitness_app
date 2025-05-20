@@ -1,5 +1,5 @@
 import { Pencil } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { updateTemplateSchema } from "@/lib/schema";
 import { SelectElement } from "@/components/input/SelectElement";
 import { operationHours, operationMinutes } from "@/lib/constant";

@@ -4,10 +4,10 @@ import {
   CardTitle,
   CardContent,
   CardDescription,
-} from "@/components/ui/card";
+} from "@/components/ui/Card";
 import { Link } from "react-router-dom";
 import { aboutTitle } from "@/lib/constant";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useInstructorsQuery } from "@/hooks/useInstructor";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";

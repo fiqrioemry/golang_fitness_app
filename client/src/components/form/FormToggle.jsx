@@ -5,9 +5,9 @@ import {
   DialogContent,
   DialogTrigger,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from "@/components/ui/Dialog";
 import { Play, StopCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 
 export const FormToggle = ({

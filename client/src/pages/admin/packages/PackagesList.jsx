@@ -5,14 +5,14 @@ import {
   TableHead,
   TableRow,
   TableHeader,
-} from "@/components/ui/table";
+} from "@/components/ui/Table";
 import { useEffect } from "react";
 import { CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { usePackagesQuery } from "@/hooks/usePackage";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/Card";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { PackageDelete } from "@/components/admin/packages/PackageDelete";

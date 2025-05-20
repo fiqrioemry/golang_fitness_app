@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { formatDateTime } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Dialog } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
 import { useParams, useNavigate } from "react-router-dom";
 import { useScheduleDetailQuery } from "@/hooks/useSchedules";
 import { BookingDialog } from "@/components/schedule/BookingDialog";
@@ -12,12 +12,7 @@ const ScheduleDetail = () => {
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
 
-  const {
-    data: schedule,
-    isLoading,
-    isError,
-    refetch,
-  } = useScheduleDetailQuery(id);
+  const { data: schedule, isLoading, isError } = useScheduleDetailQuery(id);
 
   useEffect(() => {
     if (schedule?.isBooked) {

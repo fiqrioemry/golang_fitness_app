@@ -4,7 +4,7 @@ import { useAttendancesQuery } from "@/hooks/useAttendance";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { NoAttendance } from "@/components/customer/attendances/NoAttendance";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { AttendanceCard } from "@/components/customer/attendances/AttendanceCard";
 import { PastAttendanceCard } from "@/components/customer/attendances/PastAttendanceCard";
 

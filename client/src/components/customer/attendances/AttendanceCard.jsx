@@ -6,8 +6,8 @@ import {
   CheckCircleIcon,
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/Badge";
+import { Card, CardTitle } from "@/components/ui/Card";
 
 export const AttendanceCard = ({ attendance }) => {
   const formattedDate = format(parseISO(attendance.date), "EEEE, dd MMM yyyy");

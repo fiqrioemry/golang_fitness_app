@@ -5,16 +5,16 @@ import {
   SheetContent,
   SheetTrigger,
   SheetDescription,
-} from "@/components/ui/sheet";
+} from "@/components/ui/Sheet";
 import { Pencil } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/ScrollArea";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { Dialog, DialogTitle, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogTitle, DialogContent } from "@/components/ui/Dialog";
 
 export function FormUpdateSheet({
   title,

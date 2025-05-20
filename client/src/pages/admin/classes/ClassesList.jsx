@@ -5,23 +5,23 @@ import {
   TableHead,
   TableRow,
   TableHeader,
-} from "@/components/ui/table";
+} from "@/components/ui/Table";
 import {
   Select,
   SelectItem,
   SelectValue,
   SelectTrigger,
   SelectContent,
-} from "@/components/ui/select";
+} from "@/components/ui/Select";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/Input";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useClassesQuery } from "@/hooks/useClass";
 import { Loading } from "@/components/ui/Loading";
 import { Pagination } from "@/components/ui/Pagination";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/Card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { DeleteClass } from "@/components/admin/classes/DeleteClass";

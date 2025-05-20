@@ -2,10 +2,10 @@ import {
   DialogTitle,
   DialogHeader,
   DialogContent,
-} from "@/components/ui/dialog";
+} from "@/components/ui/Dialog";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { formatDateTime, formatRupiah } from "@/lib/utils";
 import { useCreateBookingMutation } from "@/hooks/useBooking";
 import { useUserClassPackagesQuery } from "@/hooks/useProfile";

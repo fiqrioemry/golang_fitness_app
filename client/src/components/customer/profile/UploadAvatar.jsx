@@ -1,6 +1,6 @@
 import { Camera } from "lucide-react";
 import { avatarSchema } from "@/lib/schema";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useProfileMutation } from "@/hooks/useProfile";
 import { FormAddDialog } from "@/components/form/FormAddDialog";
 import { InputFileElement } from "@/components/input/InputFileElement";

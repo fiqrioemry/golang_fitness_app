@@ -4,11 +4,11 @@ import {
   SheetTitle,
   SheetContent,
   SheetDescription,
-} from "@/components/ui/sheet";
+} from "@/components/ui/Sheet";
 import { useEffect, useCallback } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/ScrollArea";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { SubmitLoading } from "@/components/ui/SubmitLoading";
 

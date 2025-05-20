@@ -1,7 +1,7 @@
 import { ReviewClass } from "./ReviewClass";
 import { format, parseISO } from "date-fns";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/Badge";
+import { Card, CardTitle } from "@/components/ui/Card";
 import { CalendarIcon, ClockIcon, UserIcon } from "lucide-react";
 
 export const PastAttendanceCard = ({ attendance }) => {

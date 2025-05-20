@@ -5,7 +5,7 @@ import {
   DialogFooter,
   DialogContent,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from "@/components/ui/Dialog";
 
 import { Button } from "./button";
 import { useState, useEffect } from "react";

@@ -4,9 +4,9 @@ import {
   CardTitle,
   CardFooter,
   CardDescription,
-} from "@/components/ui/card";
+} from "@/components/ui/Card";
 import { classesTitle } from "@/lib/constant";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useClassesQuery } from "@/hooks/useClass";
 import { Link, useSearchParams } from "react-router-dom";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";

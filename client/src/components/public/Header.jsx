@@ -1,11 +1,11 @@
 import { Menu } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { WebLogo } from "@/components/ui/WebLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { UserDropdown } from "@/components/header/UserDropdown";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/Sheet";
 
 const Header = () => {
   const { user } = useAuthStore();

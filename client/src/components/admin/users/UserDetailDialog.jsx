@@ -6,11 +6,11 @@ import {
   DialogTitle,
   DialogClose,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from "@/components/ui/Dialog";
 import { formatDateTime } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useUserDetailQuery } from "@/hooks/useUsers";
 
 const UserDetailDialog = ({ userId, trigger }) => {

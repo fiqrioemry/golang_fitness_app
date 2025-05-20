@@ -1,7 +1,7 @@
 import { PencilIcon } from "lucide-react";
 import { profileSchema } from "@/lib/schema";
 import { genderOptions } from "@/lib/constant";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useProfileMutation } from "@/hooks/useProfile";
 import { FormAddDialog } from "@/components/form/FormAddDialog";
 import { SelectElement } from "@/components/input/SelectElement";
