@@ -28,10 +28,10 @@ func main() {
 	seeders.ResetDatabase(db)
 
 	r := gin.Default()
-	// err := r.SetTrustedProxies(config.GetTrustedProxies())
-	// if err != nil {
-	// 	log.Fatalf("Failed to set trusted proxies: %v", err)
-	// }
+	err := r.SetTrustedProxies(config.GetTrustedProxies())
+	if err != nil {
+		log.Fatalf("Failed to set trusted proxies: %v", err)
+	}
 	// middleware config ======================
 	r.Use(
 		middleware.Logger(),

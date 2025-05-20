@@ -598,6 +598,7 @@ type CreateReviewRequest struct {
 
 type ReviewResponse struct {
 	ID        string `json:"id"`
+	Avatar    string `json:"avatar"`
 	UserName  string `json:"userName"`
 	ClassName string `json:"className"`
 	Rating    int    `json:"rating"`
