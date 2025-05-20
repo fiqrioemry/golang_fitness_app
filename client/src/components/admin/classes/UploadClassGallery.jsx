@@ -1,5 +1,5 @@
 import { CirclePlus } from "lucide-react";
-import { Button } from "@/components//ui/button";
+import { Button } from "@/components//ui/Button";
 import { uploadGallerySchema } from "@/lib/schema";
 import { useClassMutation } from "@/hooks/useClass";
 import { FormAddDialog } from "@/components/form/FormAddDialog";
