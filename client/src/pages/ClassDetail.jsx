@@ -5,7 +5,7 @@ import { useClassDetailQuery } from "@/hooks/useClass";
 import { Card, CardContent } from "@/components/ui/card";
 import { useClassReviewsQuery } from "@/hooks/useReview";
 import { useNavigate, useParams } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import { ClassDetailSkeleton } from "@/components/loading/ClassDetailSkeleton";
 
 const ClassDetail = () => {
