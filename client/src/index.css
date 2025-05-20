@@ -1,10 +1,10 @@
+@import "sonner";
+
 @tailwind base;
 
 @tailwind components;
 
 @tailwind utilities;
-
-@import "sonner";
 
 @layer base {
   :root {
