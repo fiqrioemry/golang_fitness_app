@@ -26,7 +26,7 @@ func (h *ReviewHandler) CreateReview(c *gin.Context) {
 	userID := utils.MustGetUserID(c)
 
 	if err := h.service.CreateReview(userID, req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create review", "error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error(), "error": err.Error()})
 		return
 	}
 

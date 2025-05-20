@@ -566,9 +566,9 @@ type MarkAttendanceRequest struct {
 
 type AttendanceResponse struct {
 	ID             string `json:"id"`
+	ScheduleID     string `json:"scheduleId"`
 	ClassName      string `json:"class"`
 	ClassImage     string `json:"classImage"`
-	Duration       string `json:"duration"`
 	InstructorID   string `json:"instructorId"`
 	InstructorName string `json:"instructorName"`
 	Date           string `json:"date"`
@@ -591,9 +591,9 @@ type AttendanceDetailResponse struct {
 
 // REVIEWS ==========================
 type CreateReviewRequest struct {
-	ClassScheduleID string `json:"classScheduleID" binding:"required"`
-	Rating          int    `json:"rating" binding:"required,min=1,max=5"`
-	Comment         string `json:"comment" binding:"omitempty"`
+	ScheduleID string `json:"scheduleId" binding:"required"`
+	Rating     int    `json:"rating" binding:"required,min=1,max=5"`
+	Comment    string `json:"comment" binding:"omitempty"`
 }
 
 type ReviewResponse struct {

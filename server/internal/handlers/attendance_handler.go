@@ -53,8 +53,8 @@ func (h *AttendanceHandler) CheckinAttendance(c *gin.Context) {
 	response := dto.QRCodeAttendanceResponse{
 		QR:             qr,
 		ClassName:      booking.ClassSchedule.ClassName,
-		Date:           booking.ClassSchedule.Date.Format("2006-01-02"),
 		InstructorName: booking.ClassSchedule.InstructorName,
+		Date:           booking.ClassSchedule.Date.Format("2006-01-02"),
 		StartTime:      fmt.Sprintf("%02d:%02d", booking.ClassSchedule.StartHour, booking.ClassSchedule.StartMinute),
 	}
 

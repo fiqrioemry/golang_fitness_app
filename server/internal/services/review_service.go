@@ -26,7 +26,7 @@ func NewReviewService(repo repositories.ReviewRepository, scheduleRepo repositor
 
 func (s *reviewService) CreateReview(userID string, req dto.CreateReviewRequest) error {
 
-	schedule, err := s.scheduleRepo.GetClassScheduleByID(req.ClassScheduleID)
+	schedule, err := s.scheduleRepo.GetClassScheduleByID(req.ScheduleID)
 	if err != nil {
 		return err
 	}

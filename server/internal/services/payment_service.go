@@ -103,7 +103,9 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 			GrossAmt: int64(total),
 		},
 		CustomerDetail: &midtrans.CustomerDetails{
+			FName: user.Profile.Fullname,
 			Email: user.Email,
+			Phone: user.Profile.Phone,
 		},
 	}
 

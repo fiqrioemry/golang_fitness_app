@@ -19,8 +19,6 @@ type AttendanceService interface {
 	CheckinAttendance(userID string, bookingID string) (string, error)
 	GetQRCode(userID, bookingID string) (string, *models.Booking, error)
 	GetAttendanceDetail(scheduleID string) ([]dto.AttendanceDetailResponse, error)
-
-	//
 	MarkAbsentBookings() error
 }
 
@@ -61,6 +59,7 @@ func (s *attendanceService) GetAllAttendances(userID string) ([]dto.AttendanceRe
 		}
 		result = append(result, dto.AttendanceResponse{
 			ID:             a.ID.String(),
+			ScheduleID:     a.ClassSchedule.ID.String(),
 			ClassName:      a.ClassSchedule.ClassName,
 			ClassImage:     a.ClassSchedule.ClassImage,
 			InstructorID:   a.ClassSchedule.InstructorID.String(),
@@ -86,20 +85,19 @@ func (s *attendanceService) CheckinAttendance(userID, bookingID string) (string,
 		return "", errors.New("unauthorized access")
 	}
 
-	// ! Uncomment kalau sudah deployment. hanya untuk pengujian di comment
-	// schedule := booking.ClassSchedule
+	schedule := booking.ClassSchedule
 
-	// loc, _ := time.LoadLocation("Asia/Jakarta")
-	// now := time.Now().In(loc)
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+	now := time.Now().In(loc)
 
-	// startTime := time.Date(
-	// 	schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
-	// 	schedule.StartHour, schedule.StartMinute, 0, 0, loc,
-	// )
+	startTime := time.Date(
+		schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
+		schedule.StartHour, schedule.StartMinute, 0, 0, loc,
+	)
 
-	// if now.Before(startTime.Add(-15*time.Minute)) || now.After(startTime.Add(30*time.Minute)) {
-	// 	return "", errors.New("attendance window closed")
-	// }
+	if now.Before(startTime.Add(-15*time.Minute)) || now.After(startTime.Add(30*time.Minute)) {
+		return "", errors.New("attendance window closed")
+	}
 
 	attendance, err := s.attendanceRepo.MarkAsAttendance(userID, bookingID)
 	if err != nil {
@@ -179,6 +177,7 @@ func (s *attendanceService) ValidateQRCodeData(qr string) (*dto.AttendanceRespon
 
 	return &dto.AttendanceResponse{
 		ID:             attendance.ID.String(),
+		ScheduleID:     attendance.ClassSchedule.ID.String(),
 		ClassName:      attendance.ClassSchedule.ClassName,
 		ClassImage:     attendance.ClassSchedule.ClassImage,
 		InstructorID:   attendance.ClassSchedule.InstructorID.String(),

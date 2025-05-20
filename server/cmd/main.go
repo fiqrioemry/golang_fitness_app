@@ -24,11 +24,15 @@ func main() {
 	config.InitMidtrans()
 
 	db := config.DB
-	// ========== Seeder ==========
+	//  Seeder ================================
 	seeders.ResetDatabase(db)
 
-	// middleware config
 	r := gin.Default()
+	err := r.SetTrustedProxies(config.GetTrustedProxies())
+	if err != nil {
+		log.Fatalf("Failed to set trusted proxies: %v", err)
+	}
+	// middleware config ======================
 	r.Use(
 		middleware.Logger(),
 		middleware.Recovery(),
@@ -38,17 +42,17 @@ func main() {
 		middleware.APIKeyGateway([]string{"/api/payments", "/api/auth/google", "/api/auth/google/callback"}),
 	)
 
-	// ========== layer ==========
+	// layer ==================================
 	repo := bootstrap.InitRepositories(db)
 	s := bootstrap.InitServices(repo)
 	h := bootstrap.InitHandlers(s)
 
-	// ========== Cron Job ==========
+	// Cron Job ===============================
 	cronManager := cron.NewCronManager(s.PaymentService, s.ScheduleTemplateService, s.NotificationService, s.AttendanceService)
 	cronManager.RegisterJobs()
 	cronManager.Start()
 
-	// ========== Route Binding ==========
+	// Route Binding ==========================
 	routes.DashboardRoutes(r, h.DashboardHandler)
 	routes.AuthRoutes(r, h.AuthHandler)
 	routes.UserRoutes(r, h.UserHandler)
@@ -70,7 +74,7 @@ func main() {
 	routes.ClassScheduleRoutes(r, h.ClassScheduleHandler)
 	routes.ScheduleTemplateRoutes(r, h.ScheduleTemplateHandler)
 
-	// ========== Start Server ==========
+	// Start Server ===========================
 	port := os.Getenv("PORT")
 	log.Println("server running on port:", port)
 	log.Fatal(r.Run(":" + port))
