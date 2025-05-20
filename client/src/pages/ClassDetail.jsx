@@ -1,11 +1,11 @@
 import { useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import { ArrowLeft, Star } from "lucide-react";
 import { useClassDetailQuery } from "@/hooks/useClass";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/Card";
 import { useClassReviewsQuery } from "@/hooks/useReview";
 import { useNavigate, useParams } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import { ClassDetailSkeleton } from "@/components/loading/ClassDetailSkeleton";
 
 const ClassDetail = () => {
