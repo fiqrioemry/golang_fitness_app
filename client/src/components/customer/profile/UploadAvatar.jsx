@@ -1,4 +1,3 @@
-import React from "react";
 import { Camera } from "lucide-react";
 import { avatarSchema } from "@/lib/schema";
 import { Button } from "@/components/ui/button";

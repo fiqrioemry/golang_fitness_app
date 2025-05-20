@@ -5,8 +5,8 @@ import {
   CalendarIcon,
   CheckCircleIcon,
 } from "lucide-react";
+import { format, parseISO } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { format, parseISO, isBefore } from "date-fns";
 import { Card, CardTitle } from "@/components/ui/card";
 
 export const AttendanceCard = ({ attendance }) => {

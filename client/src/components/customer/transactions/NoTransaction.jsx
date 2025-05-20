@@ -1,5 +1,3 @@
-import React from "react";
-
 export const NoTransaction = () => {
   return (
     <div className="border border-dashed border-border bg-muted/40 rounded-xl p-10 text-center space-y-4">

@@ -22,7 +22,7 @@ import { useUsersQuery } from "@/hooks/useUsers";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Loading } from "@/components/ui/Loading";
 import { Eye, ArrowDown, ArrowUp } from "lucide-react";
-import { Pagination } from "@/components/ui/Pagination";
+import { Pagination } from "@/components/ui/pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { SectionTitle } from "@/components/header/SectionTitle";

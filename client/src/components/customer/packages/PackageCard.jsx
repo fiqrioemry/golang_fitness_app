@@ -12,7 +12,6 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/card";
-import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { format, differenceInDays, isBefore } from "date-fns";
 
