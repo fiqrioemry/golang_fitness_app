@@ -111,10 +111,13 @@ const ClassDetail = () => {
                           ))}
                         </div>
                       </div>
-                      <p className="text-sm mt-1">{review.comment}</p>
-                      <p className="text-xs text-muted-foreground mt-1 italic">
-                        {new Date(review.createdAt).toLocaleDateString()}
-                      </p>
+                      <div className="text-start w-full">
+                        <p className="text-sm mt-1">{review.comment}</p>
+                        <p className="text-xs text-muted-foreground mt-1 italic">
+                          Date :{" "}
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
