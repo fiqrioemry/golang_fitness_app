@@ -50,7 +50,6 @@ const ClassSchedule = () => {
   }, [schedules]);
 
   if (isLoading) return <SectionSkeleton />;
-  if (!isLoading) return <SectionSkeleton />;
 
   return (
     <section>

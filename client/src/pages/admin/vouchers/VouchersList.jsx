@@ -6,7 +6,6 @@ import {
   TableRow,
   TableHeader,
 } from "@/components/ui/Table";
-import VoucherAdd from "./VouchersAdd";
 import { useEffect } from "react";
 import { CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
