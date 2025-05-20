@@ -1,10 +1,11 @@
 import { useEffect } from "react";
-import { Badge } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Star } from "lucide-react";
 import { useClassDetailQuery } from "@/hooks/useClass";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useClassReviewsQuery } from "@/hooks/useReview";
 import { useNavigate, useParams } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ClassDetailSkeleton } from "@/components/loading/ClassDetailSkeleton";
 
 const ClassDetail = () => {
@@ -92,7 +93,7 @@ const ClassDetail = () => {
               <Card key={review.id}>
                 <CardContent className="p-4">
                   <div className="flex items-start gap-4 mb-2 w-full">
-                    {/* <Avatar>
+                    <Avatar>
                       <AvatarImage
                         src={review.userAvatar || ""}
                         alt={review.userName}
@@ -100,7 +101,7 @@ const ClassDetail = () => {
                       <AvatarFallback>
                         {review.userName?.charAt(0).toUpperCase()}
                       </AvatarFallback>
-                    </Avatar> */}
+                    </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{review.userName}</p>
