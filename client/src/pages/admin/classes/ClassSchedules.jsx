@@ -1,6 +1,6 @@
-import { Loading } from "@/components/ui/Loading";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSchedulesQuery } from "@/hooks/useSchedules";
+import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { AddClassSchedule } from "@/components/admin/classes/AddClassSchedule";
 import { ClassScheduleDetail } from "@/components/admin/classes/ClassScheduleDetail";
 import { ClassScheduleCalendar } from "@/components/admin/classes/ClassScheduleCalendar";
@@ -49,7 +49,8 @@ const ClassSchedule = () => {
     setEvents(mapped);
   }, [schedules]);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <SectionSkeleton />;
+  if (!isLoading) return <SectionSkeleton />;
 
   return (
     <section>

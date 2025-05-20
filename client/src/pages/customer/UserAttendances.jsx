@@ -1,8 +1,8 @@
 import { isBefore, parseISO } from "date-fns";
-import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useAttendancesQuery } from "@/hooks/useAttendance";
 import { SectionTitle } from "@/components/header/SectionTitle";
+import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { NoAttendance } from "@/components/customer/attendances/NoAttendance";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AttendanceCard } from "@/components/customer/attendances/AttendanceCard";
@@ -11,7 +11,8 @@ import { PastAttendanceCard } from "@/components/customer/attendances/PastAttend
 const UserAttendances = () => {
   const { data, isError, refetch, isLoading } = useAttendancesQuery();
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <SectionSkeleton />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const now = new Date();

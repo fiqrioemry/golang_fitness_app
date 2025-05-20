@@ -1,14 +1,14 @@
 import { formatDate } from "@/lib/utils";
-import { Loading } from "@/components/ui/Loading";
 import { useProfileQuery } from "@/hooks/useProfile";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { UploadAvatar } from "@/components/customer/profile/UploadAvatar";
 import { UpdateProfile } from "@/components/customer/profile/UpdateProfile";
 
 const UserProfile = () => {
   const { data, isError, refetch, isLoading } = useProfileQuery();
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <SectionSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 

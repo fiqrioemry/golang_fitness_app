@@ -252,7 +252,7 @@ export const updateTemplateSchema = z.object({
 });
 
 export const createReviewSchema = z.object({
-  classScheduleId: z.string().min(1, "Class is required"),
+  scheduleId: z.string().min(1, "Class is required"),
   rating: z
     .number({
       required_error: "Rating is required",

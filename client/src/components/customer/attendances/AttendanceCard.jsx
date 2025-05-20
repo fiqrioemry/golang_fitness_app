@@ -5,7 +5,6 @@ import {
   CalendarIcon,
   CheckCircleIcon,
 } from "lucide-react";
-import { ReviewClass } from "./ReviewClass";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, isBefore } from "date-fns";
 import { Card, CardTitle } from "@/components/ui/card";
@@ -23,9 +22,6 @@ export const AttendanceCard = ({ attendance }) => {
   const classEndTime = new Date(parseISO(attendance.date));
   classEndTime.setHours(attendance.startHour + 1, attendance.startMinute);
 
-  const showReviewButton =
-    isBefore(classEndTime, new Date()) && !attendance.reviewed;
-
   return (
     <Card className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 shadow-sm border border-border bg-card">
       {/* Kiri: Gambar */}
@@ -40,9 +36,6 @@ export const AttendanceCard = ({ attendance }) => {
         <CardTitle className="text-lg font-semibold">
           {attendance.className}
         </CardTitle>
-        <div className="text-sm text-muted-foreground">
-          {attendance.duration} min
-        </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarIcon className="w-4 h-4" />
           <span>{formattedDate}</span>

@@ -1,14 +1,14 @@
-import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useUserPackagesQuery } from "@/hooks/useProfile";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { NoPackage } from "@/components/customer/packages/NoPackage";
+import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { PackageCard } from "@/components/customer/packages/PackageCard";
 
 const UserPackages = () => {
   const { data, isError, refetch, isLoading } = useUserPackagesQuery();
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <SectionSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 

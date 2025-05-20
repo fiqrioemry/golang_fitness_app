@@ -16,13 +16,13 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Loading } from "@/components/ui/Loading";
 import { Card, CardContent } from "@/components/ui/card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { formatDateTime, formatRupiah } from "@/lib/utils";
 import { useAdminPaymentsQuery } from "@/hooks/usePayment";
 import { SummaryCard } from "@/components/admin/dashboard/SummaryCard";
 import { RevenueChart } from "@/components/admin/dashboard/RevenueChart";
+import { DashboardSkeleton } from "@/components/loading/DashboardSkeleton";
 import { useDashboardSummary, useRevenueStats } from "@/hooks/useDashboard";
 
 const Dashboard = () => {
@@ -31,7 +31,7 @@ const Dashboard = () => {
   const { data: response } = useAdminPaymentsQuery();
   const { data: summary, isLoading, isError, refetch } = useDashboardSummary();
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <DashboardSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 

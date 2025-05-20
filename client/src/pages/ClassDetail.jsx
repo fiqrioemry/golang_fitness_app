@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Star } from "lucide-react";
-import { Loading } from "@/components/ui/Loading";
 import { useClassDetailQuery } from "@/hooks/useClass";
 import { Card, CardContent } from "@/components/ui/card";
 import { useClassReviewsQuery } from "@/hooks/useReview";
 import { useNavigate, useParams } from "react-router-dom";
+import { ClassDetailSkeleton } from "@/components/loading/ClassDetailSkeleton";
 
 const ClassDetail = () => {
   const { id } = useParams();
@@ -22,7 +22,7 @@ const ClassDetail = () => {
     }
   }, [isLoading, isError, cls, navigate]);
 
-  if (isLoading || !cls?.id) return <Loading />;
+  if (isLoading || !cls?.id) return <ClassDetailSkeleton />;
 
   return (
     <section className="section py-24 text-foreground">

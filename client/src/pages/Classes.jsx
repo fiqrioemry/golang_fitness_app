@@ -8,11 +8,11 @@ import {
 import { classesTitle } from "@/lib/constant";
 import { Button } from "@/components/ui/button";
 import { useClassesQuery } from "@/hooks/useClass";
-import { Loading } from "@/components/ui/Loading";
 import { Link, useSearchParams } from "react-router-dom";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import FilterSelection from "@/components/input/FilterSelection";
+import { ClassesSkeleton } from "@/components/loading/ClassesSkeleton";
 
 const Classes = () => {
   useDocumentTitle(classesTitle);
@@ -34,7 +34,8 @@ const Classes = () => {
     refetch,
   } = useClassesQuery(filters);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <ClassesSkeleton />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const { classes = [] } = response;

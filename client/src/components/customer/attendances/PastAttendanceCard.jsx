@@ -22,38 +22,43 @@ export const PastAttendanceCard = ({ attendance }) => {
         className="w-full sm:w-48 h-32 object-cover rounded-xl"
       />
 
-      <div className="flex-1 space-y-1">
-        <CardTitle className="text-lg font-semibold">
-          {attendance.className}
-        </CardTitle>
-        <div className="text-sm text-muted-foreground">
-          {attendance.duration} min
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <CalendarIcon className="w-4 h-4" />
-          <span>{formattedDate}</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <ClockIcon className="w-4 h-4" />
-          <span>{formattedTime}</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <UserIcon className="w-4 h-4" />
-          <span>{attendance.instructorName}</span>
-        </div>
+      <div className="flex-1">
+        <div className=" flex justify-between">
+          <div>
+            <CardTitle className="text-lg font-semibold">
+              {attendance.className}
+            </CardTitle>
 
-        {!attendance.reviewed && <ReviewClass attendance={attendance} />}
-      </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <CalendarIcon className="w-4 h-4" />
+              <span>{formattedDate}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <ClockIcon className="w-4 h-4" />
+              <span>{formattedTime}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <UserIcon className="w-4 h-4" />
+              <span>{attendance.instructorName}</span>
+            </div>
+          </div>
 
-      <div className="flex flex-col gap-1 items-end w-full sm:w-48">
-        <Badge
-          variant={attendance.status === "attended" ? "success" : "destructive"}
-          className="w-fit"
-        >
-          {attendance.status.toUpperCase()}
-        </Badge>
-        <div className="text-xs text-muted-foreground">
-          Checked at: <span className="font-medium">{checkedTime}</span>
+          <div className="flex flex-col gap-1 items-end w-full sm:w-48">
+            <Badge
+              variant={
+                attendance.status === "attended" ? "success" : "destructive"
+              }
+              className="w-fit"
+            >
+              {attendance.status.toUpperCase()}
+            </Badge>
+            <div className="text-xs text-muted-foreground">
+              Checked at: <span className="font-medium">{checkedTime}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end mt-4">
+          {!attendance.reviewed && <ReviewClass attendance={attendance} />}
         </div>
       </div>
     </Card>

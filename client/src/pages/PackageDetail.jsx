@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useVoucherMutation } from "@/hooks/useVouchers";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePackageDetailQuery } from "@/hooks/usePackage";
 import { usePackageTransaction } from "@/hooks/usePackageTransaction";
 import { MidtransScriptLoader } from "@/components/midtrans/MidtransScriptLoader";
+import { PackageDetailSkeleton } from "@/components/loading/PackageDetailSkeleton";
 
 const PackageDetail = () => {
   const { id } = useParams();
@@ -32,7 +32,7 @@ const PackageDetail = () => {
     }
   }, [isLoading, isError, pkg, navigate]);
 
-  if (isLoading || !pkg?.id) return <Loading />;
+  if (isLoading || !pkg?.id) return <PackageDetailSkeleton />;
 
   const discountedPrice =
     pkg.Discount > 0 ? pkg.price * (1 - pkg.Discount / 100) : pkg.price;

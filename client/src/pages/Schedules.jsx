@@ -10,12 +10,12 @@ import {
 import { Link } from "react-router-dom";
 import { scheduleTitle } from "@/lib/constant";
 import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/ui/Loading";
 import { useState, useMemo, useRef } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { format, isSameDay, addDays } from "date-fns";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { SchedulesSkeleton } from "@/components/loading/ScheduleSkeleton";
 
 const Schedules = () => {
   const { user } = useAuthStore();
@@ -46,7 +46,7 @@ const Schedules = () => {
       .filter((item) => isSameDay(item.startTime, selectedDate));
   }, [data, selectedDate]);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <SchedulesSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 

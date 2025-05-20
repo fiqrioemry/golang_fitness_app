@@ -8,8 +8,9 @@ import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
 const ReviewClass = ({ attendance }) => {
   const { mutate: createReview, isPending } = useCreateReviewMutation();
+  console.log(attendance);
   const initialState = {
-    classScheduleId: attendance.id,
+    scheduleId: attendance.scheduleId,
     comment: "",
     rating: 0,
   };
@@ -20,7 +21,7 @@ const ReviewClass = ({ attendance }) => {
       state={initialState}
       schema={createReviewSchema}
       title="Create a comment"
-      buttonText={
+      buttonElement={
         <Button variant="outline">
           <Pencil />
           <span>Review Class</span>

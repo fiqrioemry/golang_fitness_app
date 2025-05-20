@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Loading } from "@/components/ui/loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useSelectOptions } from "@/hooks/useSelectOptions";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { AddOptions } from "@/components/admin/classes/AddOptions";
+import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { UpdateOptions } from "@/components/admin/classes/UpdateOptions";
 import { DeleteOptions } from "@/components/admin/classes/DeleteOptions";
 
@@ -24,7 +24,7 @@ const ClassOptions = () => {
     refetch,
   } = useSelectOptions(activeTab);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <SectionSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 

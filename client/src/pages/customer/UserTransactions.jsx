@@ -1,14 +1,14 @@
-import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useUserTransactionsQuery } from "@/hooks/useProfile";
 import { SectionTitle } from "@/components/header/SectionTitle";
+import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { NoTransaction } from "@/components/customer/transactions/NoTransaction";
 import { TransactionCard } from "@/components/customer/transactions/TransactionCard";
 
 const UserTransactions = () => {
   const { data, isLoading, isError, refetch } = useUserTransactionsQuery();
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <SectionSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 

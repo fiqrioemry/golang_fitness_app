@@ -5,10 +5,10 @@ import {
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
-import { Loading } from "@/components/ui/Loading";
 import { CheckCheck, MailWarning } from "lucide-react";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { SectionTitle } from "@/components/header/SectionTitle";
+import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const UserNotifications = () => {
@@ -28,7 +28,7 @@ const UserNotifications = () => {
     }
   }, [tab, unread.length, hasMarkedRead, markAllAsRead]);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <SectionSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 

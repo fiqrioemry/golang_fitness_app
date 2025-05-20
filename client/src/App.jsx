@@ -45,7 +45,7 @@ import { ScrollToTop } from "./hooks/useScrollToTop";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AdminRoute, AuthRoute, NonAuthRoute, PublicRoute } from "./middleware";
 
-// pages layout
+// layout pages
 import AdminLayout from "./components/admin/AdminLayout";
 import PublicLayout from "./components/public/PublicLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
@@ -94,6 +94,8 @@ function App() {
           <Route path="classes" element={<Classes />} />
           <Route path="packages" element={<Packages />} />
           <Route path="schedules" element={<Schedules />} />
+          <Route path="classes/:id" element={<ClassDetail />} />
+          <Route path="packages/:id" element={<PackageDetail />} />
           <Route
             path="schedules/:id"
             element={
@@ -102,8 +104,6 @@ function App() {
               </AuthRoute>
             }
           />
-          <Route path="classes/:id" element={<ClassDetail />} />
-          <Route path="packages/:id" element={<PackageDetail />} />
         </Route>
 
         {/* customer */}

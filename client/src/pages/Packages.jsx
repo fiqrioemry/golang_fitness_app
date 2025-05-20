@@ -10,17 +10,17 @@ import { CheckCircle2 } from "lucide-react";
 import { packagesTitle } from "@/lib/constant";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/ui/Loading";
 import { usePackagesQuery } from "@/hooks/usePackage";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { PackagesSkeleton } from "@/components/loading/PackagesSkeleton";
 
 const Packages = () => {
   useDocumentTitle(packagesTitle);
   const navigate = useNavigate();
   const { data, isLoading, isError, refetch } = usePackagesQuery();
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <PackagesSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 

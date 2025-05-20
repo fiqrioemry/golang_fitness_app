@@ -2,11 +2,10 @@ import { useState, useEffect } from "react";
 import { formatDateTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { Loading } from "@/components/ui/Loading";
-import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useParams, useNavigate } from "react-router-dom";
 import { useScheduleDetailQuery } from "@/hooks/useSchedules";
 import { BookingDialog } from "@/components/schedule/BookingDialog";
+import { ScheduleDetailSkeleton } from "@/components/loading/ScheduleDetailSkeleton";
 
 const ScheduleDetail = () => {
   const { id } = useParams();
@@ -26,9 +25,13 @@ const ScheduleDetail = () => {
     }
   }, [schedule, navigate]);
 
-  if (isLoading) return <Loading />;
+  useEffect(() => {
+    if (!isLoading && (isError || !schedule?.id)) {
+      navigate("/not-found", { replace: true });
+    }
+  }, [isLoading, isError, schedule, navigate]);
 
-  if (isError) return <ErrorDialog onRetry={refetch} />;
+  if (isLoading || !schedule?.id) return <ScheduleDetailSkeleton />;
 
   return (
     <section className="section py-24 text-foreground">

@@ -8,11 +8,11 @@ import {
 import { Link } from "react-router-dom";
 import { aboutTitle } from "@/lib/constant";
 import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/ui/Loading";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useInstructorsQuery } from "@/hooks/useInstructor";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { HeartPulse, CalendarClock, Users } from "lucide-react";
+import { AboutSkeleton } from "@/components/loading/AboutSkeleton";
 
 const About = () => {
   useDocumentTitle(aboutTitle);
@@ -23,7 +23,8 @@ const About = () => {
     refetch,
   } = useInstructorsQuery();
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <AboutSkeleton />;
+
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   return (

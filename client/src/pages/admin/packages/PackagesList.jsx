@@ -10,11 +10,11 @@ import { useEffect } from "react";
 import { CirclePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/ui/Loading";
 import { usePackagesQuery } from "@/hooks/usePackage";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { SectionTitle } from "@/components/header/SectionTitle";
+import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { PackageDelete } from "@/components/admin/packages/PackageDelete";
 import { PackageUpdate } from "@/components/admin/packages/PackageUpdate";
 
@@ -31,7 +31,7 @@ const PackagesList = () => {
     refetch();
   }, []);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <SectionSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
