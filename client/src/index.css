@@ -53,53 +53,6 @@
 
     --radius: 1rem;
   }
-
-  .light {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
-
-    --card: 0 0% 98%;
-    --card-foreground: 0 0% 12%;
-
-    --popover: 0 0% 99%;
-    --popover-foreground: 0 0% 15%;
-
-    --primary: 72 100% 42%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 0 0% 95%;
-    --secondary-foreground: 0 0% 25%;
-
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-
-    --accent: 72 100% 40%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 55%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 0 0% 85%;
-    --input: 0 0% 92%;
-    --ring: 72 100% 42%;
-
-    --chart-1: 72 100% 42%;
-    --chart-2: 0 0% 20%;
-    --chart-3: 0 0% 50%;
-    --chart-4: 144 50% 35%;
-    --chart-5: 300 60% 55%;
-
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 10%;
-    --sidebar-primary: 72 100% 42%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 95%;
-    --sidebar-accent-foreground: 0 0% 25%;
-    --sidebar-border: 0 0% 85%;
-    --sidebar-ring: 72 100% 42%;
-
-    --radius: 1rem;
-  }
 }
 
 @layer base {
