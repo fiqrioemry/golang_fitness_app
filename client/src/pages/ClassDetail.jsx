@@ -91,19 +91,30 @@ const ClassDetail = () => {
             {reviews.map((review) => (
               <Card key={review.id}>
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-4 mb-1 w-full">
-                    <p className="font-medium">{review.userName}</p>
-                    <div className="flex gap-1 text-yellow-500">
-                      {[...Array(review.rating)].map((_, i) => (
-                        <Star key={i} size={16} fill="currentColor" />
-                      ))}
+                  <div className="flex items-start gap-4 mb-2 w-full">
+                    <Avatar>
+                      <AvatarImage
+                        src={review.userAvatar || ""}
+                        alt={review.userName}
+                      />
+                      <AvatarFallback>
+                        {review.userName?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{review.userName}</p>
+                        <div className="flex gap-1 text-yellow-500">
+                          {[...Array(review.rating)].map((_, i) => (
+                            <Star key={i} size={16} fill="currentColor" />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-sm mt-1">{review.comment}</p>
+                      <p className="text-xs text-muted-foreground mt-1 italic">
+                        {new Date(review.createdAt).toLocaleDateString()}
+                      </p>
                     </div>
-                  </div>
-                  <div className="text-start w-full">
-                    <p className="text-sm">{review.comment}</p>
-                    <p className="text-xs text-muted-foreground mt-1 italic">
-                      {new Date(review.createdAt).toLocaleDateString()}
-                    </p>
                   </div>
                 </CardContent>
               </Card>

@@ -11,7 +11,6 @@ import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
 export const UpdateProfile = ({ profile }) => {
   const { updateProfile } = useProfileMutation();
-  console.log(profile);
 
   return (
     <FormAddDialog
