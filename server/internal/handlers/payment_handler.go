@@ -18,12 +18,12 @@ func NewPaymentHandler(paymentService services.PaymentService) *PaymentHandler {
 }
 
 func (h *PaymentHandler) CreatePayment(c *gin.Context) {
+	userID := utils.MustGetUserID(c)
+
 	var req dto.CreatePaymentRequest
 	if !utils.BindAndValidateJSON(c, &req) {
 		return
 	}
-
-	userID := utils.MustGetUserID(c)
 
 	response, err := h.paymentService.CreatePayment(userID, req)
 	if err != nil {
@@ -49,17 +49,27 @@ func (h *PaymentHandler) HandlePaymentNotification(c *gin.Context) {
 }
 
 func (h *PaymentHandler) GetAllUserPayments(c *gin.Context) {
-	var q dto.PaymentQueryParam
-	if err := c.ShouldBindQuery(&q); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid query params", "error": err.Error()})
+	var params dto.PaymentQueryParam
+	if !utils.BindAndValidateForm(c, &params) {
 		return
 	}
 
-	resp, err := h.paymentService.GetAllUserPayments(q.Q, q.Page, q.Limit)
+	if params.Page == 0 {
+		params.Page = 1
+	}
+	if params.Limit == 0 {
+		params.Limit = 10
+	}
+
+	payments, pagination, err := h.paymentService.GetAllUserPayments(params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch payments", "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, resp)
+	c.JSON(http.StatusOK, gin.H{
+		"data":       payments,
+		"pagination": pagination,
+	})
+
 }

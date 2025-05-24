@@ -64,12 +64,12 @@ func (s *attendanceService) GetAllAttendances(userID string) ([]dto.AttendanceRe
 			ClassImage:     a.ClassSchedule.ClassImage,
 			InstructorID:   a.ClassSchedule.InstructorID.String(),
 			InstructorName: a.ClassSchedule.InstructorName,
-			Date:           a.ClassSchedule.Date.Format(time.RFC3339),
 			StartHour:      a.ClassSchedule.StartHour,
 			StartMinute:    a.ClassSchedule.StartMinute,
 			Status:         a.Status,
 			Reviewed:       reviewed,
 			CheckedAt:      checkedAt,
+			Date:           a.ClassSchedule.Date.Format("2006-01-02"),
 		})
 	}
 	return result, nil
@@ -182,12 +182,12 @@ func (s *attendanceService) ValidateQRCodeData(qr string) (*dto.AttendanceRespon
 		ClassImage:     attendance.ClassSchedule.ClassImage,
 		InstructorID:   attendance.ClassSchedule.InstructorID.String(),
 		InstructorName: attendance.ClassSchedule.InstructorName,
-		Date:           attendance.ClassSchedule.Date.Format(time.RFC1123),
 		StartHour:      attendance.ClassSchedule.StartHour,
 		StartMinute:    attendance.ClassSchedule.StartMinute,
 		Status:         attendance.Status,
 		Verified:       attendance.Verified,
 		CheckedAt:      attendance.CheckedAt.Format(time.RFC1123),
+		Date:           attendance.ClassSchedule.Date.Format("2006-01-02"),
 	}, nil
 
 }

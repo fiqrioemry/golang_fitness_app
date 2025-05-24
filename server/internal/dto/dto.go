@@ -44,6 +44,20 @@ type AuthMeResponse struct {
 // AUTHENTICATION  =============
 
 // CLASS  ======================
+
+type ClassQueryParam struct {
+	Q             string `form:"q"`
+	Status        string `form:"status"`
+	Sort          string `form:"sort"`
+	Page          int    `form:"page"`
+	Limit         int    `form:"limit"`
+	TypeID        string `form:"typeId"`
+	CategoryID    string `form:"categoryId"`
+	SubcategoryID string `form:"subcategoryId"`
+	LevelID       string `form:"levelId"`
+	LocationID    string `form:"locationId"`
+}
+
 type CreateClassRequest struct {
 	Title         string                  `form:"title" binding:"required"`
 	Duration      int                     `form:"duration" binding:"required,min=15"`
@@ -74,18 +88,6 @@ type UpdateClassRequest struct {
 	SubcategoryID string                `form:"subcategoryId"`
 	Image         *multipart.FileHeader `form:"image"`
 	ImageURL      string                `form:"-"`
-}
-
-type ClassQueryParam struct {
-	Q          string `form:"q"`
-	TypeID     string `form:"typeId"`
-	LevelID    string `form:"levelId"`
-	LocationID string `form:"locationId"`
-	CategoryID string `form:"categoryId"`
-	IsActive   string `form:"isActive"`
-	Page       int    `form:"page,default=1"`
-	Limit      int    `form:"limit,default=10"`
-	Sort       string `form:"sort,default=latest"`
 }
 
 type ClassDetailResponse struct {
@@ -220,6 +222,15 @@ type LocationResponse struct {
 // LOCATION =========================
 
 // PACKAGE ==========================
+
+type PackageQueryParam struct {
+	Q      string `form:"q"`
+	Status string `form:"status"`
+	Sort   string `form:"sort"`
+	Page   int    `form:"page"`
+	Limit  int    `form:"limit"`
+}
+
 type CreatePackageRequest struct {
 	Name        string                `form:"name" binding:"required,min=6"`
 	Description string                `form:"description" binding:"required"`
@@ -227,9 +238,9 @@ type CreatePackageRequest struct {
 	Credit      int                   `form:"credit" binding:"required,gt=0"`
 	Expired     int                   `form:"expired" binding:"required,gt=0"`
 	Discount    float64               `form:"discount"`
-	Additional  []string              `form:"additional[]"`
+	Additional  []string              `form:"additional"`
 	IsActive    bool                  `form:"isActive"`
-	ClassIDs    []string              `form:"classIds[]" binding:"required"`
+	ClassIDs    []string              `form:"classIds" binding:"required"`
 	Image       *multipart.FileHeader `form:"image" binding:"required"`
 	ImageURL    string                `form:"-"`
 }
@@ -241,14 +252,14 @@ type UpdatePackageRequest struct {
 	Credit      int                   `form:"credit" binding:"required,gt=0"`
 	Expired     int                   `form:"expired" binding:"required,gt=0"`
 	Discount    float64               `form:"discount"`
-	Additional  []string              `form:"additional[]"`
+	Additional  []string              `form:"additional"`
 	IsActive    bool                  `form:"isActive"`
-	ClassIDs    []string              `form:"classIds[]" binding:"required"`
+	ClassIDs    []string              `form:"classIds" binding:"required"`
 	Image       *multipart.FileHeader `form:"image" binding:"required"`
 	ImageURL    string                `form:"-"`
 }
 
-type PackageResponse struct {
+type PackageListResponse struct {
 	ID          string                 `json:"id"`
 	Name        string                 `json:"name"`
 	Description string                 `json:"description"`
@@ -288,7 +299,7 @@ type ClassSummaryResponse struct {
 // INSTRUCTOR ==========================
 type CreateInstructorRequest struct {
 	UserID         string `json:"userId" binding:"required,uuid"`
-	Experience     int    `json:"experience" binding:"required,min=0"`
+	Experience     int    `json:"experience"`
 	Specialties    string `json:"specialties" binding:"required"`
 	Certifications string `json:"certifications"`
 }
@@ -316,7 +327,7 @@ type InstructorResponse struct {
 // PAYMENT ================================
 type CreatePaymentRequest struct {
 	PackageID   string  `json:"packageId" binding:"required"`
-	VoucherCode *string `json:"voucherCode"` // Optional
+	VoucherCode *string `json:"voucherCode"`
 }
 
 type CreatePaymentResponse struct {
@@ -344,12 +355,16 @@ type PaymentResponse struct {
 }
 
 type PaymentQueryParam struct {
-	Q     string `form:"q"`
-	Page  int    `form:"page,default=1"`
-	Limit int    `form:"limit,default=10"`
+	Q         string `form:"q"`
+	Status    string `form:"status"`
+	Sort      string `form:"sort"`
+	Page      int    `form:"page"`
+	Limit     int    `form:"limit"`
+	StartDate string `form:"startDate"`
+	EndDate   string `form:"endDate"`
 }
 
-type AdminPaymentResponse struct {
+type PaymentListResponse struct {
 	ID            string  `json:"id"`
 	UserID        string  `json:"userId"`
 	UserEmail     string  `json:"userEmail"`
@@ -360,13 +375,6 @@ type AdminPaymentResponse struct {
 	PaymentMethod string  `json:"paymentMethod"`
 	Status        string  `json:"status"`
 	PaidAt        string  `json:"paidAt"`
-}
-
-type AdminPaymentListResponse struct {
-	Payments []AdminPaymentResponse `json:"payments"`
-	Total    int64                  `json:"total"`
-	Page     int                    `json:"page"`
-	Limit    int                    `json:"limit"`
 }
 
 // NOTIFICATIONS
@@ -472,7 +480,7 @@ type InstructorBrief struct {
 
 type ClassScheduleDetailResponse struct {
 	ClassScheduleResponse
-	Packages []PackageResponse `json:"packages"`
+	Packages []PackageListResponse `json:"packages"`
 }
 
 type ClassScheduleQueryParam struct {
@@ -510,13 +518,13 @@ type CreateScheduleTemplateRequest struct {
 }
 
 type UpdateScheduleTemplateRequest struct {
-	ClassID      string    `json:"classId" binding:"required"`
-	InstructorID string    `json:"instructorId" binding:"required"`
-	DayOfWeeks   []int     `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
-	StartHour    int       `json:"startHour" validate:"required,min=8,max=17"`
-	StartMinute  int       `json:"startMinute" validate:"required,oneof=0 15 30 45"`
-	Capacity     int       `json:"capacity" binding:"required,gt=0"`
-	EndDate      time.Time `json:"endDate" binding:"required"`
+	ClassID      string     `json:"classId" binding:"required"`
+	InstructorID string     `json:"instructorId" binding:"required"`
+	DayOfWeeks   []int      `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
+	StartHour    int        `json:"startHour" validate:"required,min=8,max=17"`
+	StartMinute  int        `json:"startMinute" validate:"required,oneof=0 15 30 45"`
+	Capacity     int        `json:"capacity" binding:"required,gt=0"`
+	EndDate      *time.Time `json:"endDate" binding:"required"`
 }
 
 // CLASS-SCHEDULE =====================
@@ -618,27 +626,26 @@ type UserQueryParam struct {
 }
 
 type UserListResponse struct {
-	ID        string `json:"id"`
-	Email     string `json:"email"`
-	Role      string `json:"role"`
-	Fullname  string `json:"fullname"`
-	Phone     string `json:"phone"`
-	Avatar    string `json:"avatar"`
-	CreatedAt string `json:"createdAt"`
+	ID       string `json:"id"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
+	Fullname string `json:"fullname"`
+	Phone    string `json:"phone"`
+	Avatar   string `json:"avatar"`
+	JoinedAt string `json:"joinedAt"`
 }
 
 type UserDetailResponse struct {
-	ID        string `json:"id"`
-	Email     string `json:"email"`
-	Role      string `json:"role"`
-	Fullname  string `json:"fullname"`
-	Phone     string `json:"phone"`
-	Avatar    string `json:"avatar"`
-	Gender    string `json:"gender"`
-	Birthday  string `json:"birthday,omitempty"`
-	Bio       string `json:"bio"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	ID       string `json:"id"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
+	Fullname string `json:"fullname"`
+	Phone    string `json:"phone"`
+	Avatar   string `json:"avatar"`
+	Gender   string `json:"gender"`
+	Birthday string `json:"birthday,omitempty"`
+	Bio      string `json:"bio"`
+	JoinedAt string `json:"joinedAt"`
 }
 
 type UserStatsResponse struct {
@@ -652,15 +659,15 @@ type UserStatsResponse struct {
 // USER-LIST ==========================
 
 type ProfileResponse struct {
-	ID        string    `json:"id"`
-	Email     string    `json:"email"`
-	Fullname  string    `json:"fullname"`
-	Avatar    string    `json:"avatar"`
-	Gender    string    `json:"gender"`
-	Birthday  string    `json:"birthday"`
-	Bio       string    `json:"bio"`
-	Phone     string    `json:"phone"`
-	UpdatedAt time.Time `json:"joinedAt"`
+	ID       string `json:"id"`
+	Email    string `json:"email"`
+	Fullname string `json:"fullname"`
+	Avatar   string `json:"avatar"`
+	Gender   string `json:"gender"`
+	Birthday string `json:"birthday"`
+	Bio      string `json:"bio"`
+	Phone    string `json:"phone"`
+	JoinedAt string `json:"joinedAt"`
 }
 
 type UpdateProfileRequest struct {
@@ -716,24 +723,24 @@ type BookingListResponse struct {
 
 // VOUCHER
 type CreateVoucherRequest struct {
-	Code         string   `json:"code" binding:"required"`
-	Description  string   `json:"description" binding:"required"`
-	DiscountType string   `json:"discountType" binding:"required,oneof=fixed percentage"`
-	Discount     float64  `json:"discount" binding:"required,gt=0"`
-	MaxDiscount  *float64 `json:"maxDiscount,omitempty"`
-	IsReusable   bool     `json:"isReusable"`
-	Quota        int      `json:"quota" binding:"required,gt=0"`
-	ExpiredAt    string   `json:"expiredAt" binding:"required,datetime=2006-01-02"`
+	Code         string    `json:"code" binding:"required"`
+	Description  string    `json:"description" binding:"required"`
+	DiscountType string    `json:"discountType" binding:"required,oneof=fixed percentage"`
+	Discount     float64   `json:"discount" binding:"required,gt=0"`
+	MaxDiscount  *float64  `json:"maxDiscount,omitempty"`
+	Quota        int       `json:"quota" binding:"required,gt=0"`
+	IsReusable   bool      `json:"isReusable"`
+	ExpiredAt    time.Time `json:"expiredAt" binding:"required"`
 }
 
 type UpdateVoucherRequest struct {
-	Description  string   `json:"description" binding:"required"`
-	DiscountType string   `json:"discountType" binding:"required,oneof=fixed percentage"`
-	Discount     float64  `json:"discount" binding:"required,gt=0"`
-	MaxDiscount  *float64 `json:"maxDiscount,omitempty"`
-	Quota        int      `json:"quota" binding:"required,gt=0"`
-	IsReusable   bool     `json:"isReusable"`
-	ExpiredAt    string   `json:"expiredAt" binding:"required,datetime=2006-01-02"`
+	Description  string    `json:"description" binding:"required"`
+	DiscountType string    `json:"discountType" binding:"required,oneof=fixed percentage"`
+	Discount     float64   `json:"discount" binding:"required,gt=0"`
+	MaxDiscount  *float64  `json:"maxDiscount,omitempty"`
+	Quota        int       `json:"quota" binding:"required,gt=0"`
+	IsReusable   bool      `json:"isReusable"`
+	ExpiredAt    time.Time `json:"expiredAt" binding:"required"`
 }
 
 type VoucherResponse struct {
@@ -793,4 +800,11 @@ type RevenueStatsResponse struct {
 	Range         string        `json:"range"`
 	TotalRevenue  float64       `json:"totalRevenue"`
 	RevenueSeries []RevenueStat `json:"revenueSeries"`
+}
+
+type PaginationResponse struct {
+	Page       int `json:"page"`
+	Limit      int `json:"limit"`
+	TotalRows  int `json:"totalRows"`
+	TotalPages int `json:"totalPages"`
 }

@@ -20,7 +20,7 @@ export const BookingDialog = ({ schedule, openDialog, setOpenDialog }) => {
   const { data: userPackages = [], isLoading } = useUserClassPackagesQuery(
     schedule?.classId,
     {
-      enabled: !!schedule?.classI && openDialog,
+      enabled: !!schedule?.classId && openDialog,
     }
   );
 

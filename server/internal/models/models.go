@@ -39,7 +39,7 @@ type Profile struct {
 	ID        uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
 	UserID    uuid.UUID  `gorm:"type:char(36);uniqueIndex;not null" json:"userId"`
 	Fullname  string     `gorm:"type:varchar(255);not null" json:"fullname"`
-	Birthday  *time.Time `json:"birthday,omitempty"`
+	Birthday  *time.Time `gorm:"birthday,omitempty"`
 	Phone     string     `gorm:"type:varchar(20)" json:"phone"`
 	Gender    string     `gorm:"type:varchar(10)" json:"gender"`
 	Avatar    string     `gorm:"type:varchar(255)" json:"avatar"`
@@ -72,9 +72,10 @@ type Class struct {
 	Category    Category        `gorm:"foreignKey:CategoryID"`
 	Subcategory Subcategory     `gorm:"foreignKey:SubcategoryID"`
 	Location    Location        `gorm:"foreignKey:LocationID"`
-	Packages    []Package       `gorm:"many2many:package_classes;" json:"packages,omitempty"`
 	Galleries   []*ClassGallery `gorm:"foreignKey:ClassID;constraint:OnDelete:CASCADE;" json:"galleries,omitempty"`
 	Reviews     []Review        `gorm:"foreignKey:ClassID;constraint:OnDelete:CASCADE;" json:"reviews,omitempty"`
+	// many to many (1 class can be in many packages and 1 package can have many classes)
+	Packages []Package `gorm:"many2many:package_classes;" json:"packages,omitempty"`
 }
 
 type ClassGallery struct {
@@ -137,8 +138,7 @@ type Payment struct {
 	VoucherCode     *string   `gorm:"type:varchar(100)" json:"voucherCode,omitempty"`
 	VoucherDiscount float64   `gorm:"default:0" json:"voucherDiscount"`
 
-	Package Package `gorm:"foreignKey:PackageID" json:"package"`
-	User    User    `gorm:"foreignKey:UserID" json:"user"`
+	User User `gorm:"foreignKey:UserID" json:"user"`
 }
 
 type ClassSchedule struct {
@@ -164,21 +164,22 @@ type ClassSchedule struct {
 }
 
 type ScheduleTemplate struct {
-	ID             uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
-	ClassID        uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
-	ClassImage     string         `gorm:"type:varchar(255);not null" json:"classImage"`
-	ClassName      string         `gorm:"type:varchar(255);not null" json:"className"`
-	InstructorID   uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
-	InstructorName string         `gorm:"type:varchar(255);not null" json:"instructorName"`
-	DayOfWeeks     datatypes.JSON `gorm:"type:json" json:"dayOfWeeks"`
-	StartHour      int            `gorm:"not null" json:"startHour"`
-	StartMinute    int            `gorm:"not null" json:"startMinute"`
-	Capacity       int            `gorm:"not null" json:"capacity"`
-	IsActive       bool           `gorm:"default:true" json:"isActive"`
-	Color          string         `gorm:"type:varchar(20)" json:"color"`
-	EndDate        time.Time      `gorm:"not null" json:"endDate"`
-	CreatedAt      time.Time      `gorm:"autoCreateTime"`
-	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
+	ID              uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
+	ClassID         uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
+	ClassImage      string         `gorm:"type:varchar(255);not null" json:"classImage"`
+	ClassName       string         `gorm:"type:varchar(255);not null" json:"className"`
+	InstructorID    uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
+	InstructorName  string         `gorm:"type:varchar(255);not null" json:"instructorName"`
+	DayOfWeeks      datatypes.JSON `gorm:"type:json" json:"dayOfWeeks"`
+	StartHour       int            `gorm:"not null" json:"startHour"`
+	StartMinute     int            `gorm:"not null" json:"startMinute"`
+	Capacity        int            `gorm:"not null" json:"capacity"`
+	IsActive        bool           `gorm:"default:true" json:"isActive"`
+	Color           string         `gorm:"type:varchar(20)" json:"color"`
+	LastGeneratedAt *time.Time     `gorm:"column:last_generated_at" json:"lastGeneratedAt"`
+	EndDate         time.Time      `gorm:"not null" json:"endDate"`
+	CreatedAt       time.Time      `gorm:"autoCreateTime"`
+	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Class      Class      `gorm:"foreignKey:ClassID" json:"class"`
 	Instructor Instructor `gorm:"foreignKey:InstructorID" json:"instructor"`
@@ -238,7 +239,7 @@ type Voucher struct {
 	Description  string         `gorm:"type:text" json:"description"`
 	DiscountType string         `gorm:"type:varchar(20);not null" json:"discountType"`
 	Discount     float64        `gorm:"not null" json:"discount"`
-	MaxDiscount  *float64       `json:"maxDiscount,omitempty"`
+	MaxDiscount  *float64       `gorm:"maxDiscount,omitempty"`
 	Quota        int            `gorm:"not null" json:"quota"`
 	IsReusable   bool           `gorm:"default:false" json:"isReusable"`
 	ExpiredAt    time.Time      `gorm:"not null" json:"expiredAt"`

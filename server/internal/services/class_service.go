@@ -7,18 +7,19 @@ import (
 	"server/internal/utils"
 	"time"
 
+	"slices"
+
 	"github.com/google/uuid"
 )
 
 type ClassService interface {
-	CreateClass(req dto.CreateClassRequest) error
-	UpdateClass(id string, req dto.UpdateClassRequest) error
 	DeleteClass(id string) error
-	GetClassByID(id string) (*dto.ClassDetailResponse, error)
-	GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassResponse, int64, error)
-	GetActiveClasses() ([]dto.ClassResponse, error)
+	CreateClass(req dto.CreateClassRequest) error
 	AddClassGallery(galleries []models.ClassGallery) error
+	UpdateClass(id string, req dto.UpdateClassRequest) error
+	GetClassByID(id string) (*dto.ClassDetailResponse, error)
 	UpdateClassGallery(classID uuid.UUID, keepImages []string, newImageURLs []string) error
+	GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassResponse, *dto.PaginationResponse, error)
 }
 
 type classService struct {
@@ -185,83 +186,29 @@ func (s *classService) GetClassByID(id string) (*dto.ClassDetailResponse, error)
 		Category:    class.Category.Name,
 		Subcategory: class.Subcategory.Name,
 		Galleries:   galleries,
-		CreatedAt:   class.CreatedAt.Format(time.RFC3339),
+		CreatedAt:   class.CreatedAt.Format("2006-01-02"),
 	}, nil
 
 }
-
-func (s *classService) GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassResponse, int64, error) {
-	filter := map[string]interface{}{}
-	if params.TypeID != "" {
-		filter["type_id"] = params.TypeID
-	}
-	if params.LevelID != "" {
-		filter["level_id"] = params.LevelID
-	}
-	if params.LocationID != "" {
-		filter["location_id"] = params.LocationID
-	}
-	if params.CategoryID != "" {
-		filter["category_id"] = params.CategoryID
-	}
-	if params.IsActive != "" {
-		if params.IsActive == "true" {
-			filter["is_active"] = true
-		} else if params.IsActive == "false" {
-			filter["is_active"] = false
-		}
-	}
-
-	offset := (params.Page - 1) * params.Limit
-
-	classes, total, err := s.repo.GetAllClasses(filter, params.Q, params.Sort, params.Limit, offset)
+func (s *classService) GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassResponse, *dto.PaginationResponse, error) {
+	classes, total, err := s.repo.GetAllClasses(params)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, err
 	}
 
 	var result []dto.ClassResponse
 	for _, c := range classes {
-		var galleries []string
-		for _, g := range c.Galleries {
-			galleries = append(galleries, g.URL)
+		galleries := make([]string, len(c.Galleries))
+		for i, g := range c.Galleries {
+			galleries[i] = g.URL
 		}
-
 		result = append(result, dto.ClassResponse{
 			ID:            c.ID.String(),
 			Title:         c.Title,
 			Image:         c.Image,
 			IsActive:      c.IsActive,
 			Duration:      c.Duration,
-			Description:   c.Description,
-			Additional:    c.AdditionalList,
-			TypeID:        c.TypeID.String(),
-			LevelID:       c.LevelID.String(),
-			LocationID:    c.LocationID.String(),
-			CategoryID:    c.CategoryID.String(),
-			SubcategoryID: c.SubcategoryID.String(),
-			CreatedAt:     c.CreatedAt.Format(time.RFC3339),
 			Galleries:     galleries,
-		})
-
-	}
-
-	return result, total, nil
-}
-
-func (s *classService) GetActiveClasses() ([]dto.ClassResponse, error) {
-	classes, err := s.repo.GetActiveClasses()
-	if err != nil {
-		return nil, err
-	}
-
-	var result []dto.ClassResponse
-	for _, c := range classes {
-		result = append(result, dto.ClassResponse{
-			ID:            c.ID.String(),
-			Title:         c.Title,
-			Image:         c.Image,
-			IsActive:      c.IsActive,
-			Duration:      c.Duration,
 			Description:   c.Description,
 			Additional:    c.AdditionalList,
 			TypeID:        c.TypeID.String(),
@@ -269,11 +216,19 @@ func (s *classService) GetActiveClasses() ([]dto.ClassResponse, error) {
 			LocationID:    c.LocationID.String(),
 			CategoryID:    c.CategoryID.String(),
 			SubcategoryID: c.SubcategoryID.String(),
-			CreatedAt:     c.CreatedAt.String(),
+			CreatedAt:     c.CreatedAt.Format("2006-01-02"),
 		})
 	}
 
-	return result, nil
+	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
+	pagination := &dto.PaginationResponse{
+		Page:       params.Page,
+		Limit:      params.Limit,
+		TotalRows:  int(total),
+		TotalPages: totalPages,
+	}
+
+	return result, pagination, nil
 }
 
 func (s *classService) UpdateClassGallery(classID uuid.UUID, keepImages []string, newImageURLs []string) error {
@@ -282,15 +237,8 @@ func (s *classService) UpdateClassGallery(classID uuid.UUID, keepImages []string
 		return err
 	}
 
-	// Step 1: Hapus gambar lama yang tidak termasuk dalam keepImages
 	for _, gallery := range oldGalleries {
-		isKept := false
-		for _, keep := range keepImages {
-			if gallery.URL == keep {
-				isKept = true
-				break
-			}
-		}
+		isKept := slices.Contains(keepImages, gallery.URL)
 		if !isKept {
 			_ = utils.DeleteFromCloudinary(gallery.URL)
 			_ = s.repo.DeleteClassGalleryByID(gallery.ID.String())

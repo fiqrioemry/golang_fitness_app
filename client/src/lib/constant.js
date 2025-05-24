@@ -150,6 +150,7 @@ export const createVoucherState = {
   expiredAt: "",
   maxDiscount: null,
   discountType: "fixed",
+  isReusable: true,
 };
 export const notificationState = {
   title: "",

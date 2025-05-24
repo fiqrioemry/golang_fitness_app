@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"server/internal/dto"
 	"server/internal/models"
 	"time"
 
@@ -8,7 +9,7 @@ import (
 )
 
 type UserRepository interface {
-	FindAllUsers(q, role, sort string, limit, offset int) ([]models.User, int64, error)
+	FindAllUsers(params dto.UserQueryParam) ([]models.User, int64, error)
 	FindUserByID(id string) (*models.User, error)
 	GetUserStats() (total, customers, instructors, admins, newThisMonth int64, err error)
 }
@@ -21,22 +22,28 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{db}
 }
 
-func (r *userRepository) FindAllUsers(q, role, sort string, limit, offset int) ([]models.User, int64, error) {
+func (r *userRepository) FindAllUsers(params dto.UserQueryParam) ([]models.User, int64, error) {
 	var users []models.User
 	var count int64
 
 	db := r.db.Model(&models.User{}).Joins("JOIN profiles ON users.id = profiles.user_id").Preload("Profile")
 
-	if q != "" {
-		db = db.Where("users.email LIKE ? OR profiles.fullname LIKE ?", "%"+q+"%", "%"+q+"%")
+	if params.Q != "" {
+		db = db.Where("users.email LIKE ? OR profiles.fullname LIKE ?", "%"+params.Q+"%", "%"+params.Q+"%")
 	}
-	if role != "" {
-		db = db.Where("users.role = ?", role)
+	if params.Role != "" && params.Role != "all" {
+		db = db.Where("users.role = ?", params.Role)
 	}
 
-	switch sort {
-	case "oldest":
+	switch params.Sort {
+	case "joined_asc":
 		db = db.Order("users.created_at asc")
+	case "joined_desc":
+		db = db.Order("users.created_at desc")
+	case "email_asc":
+		db = db.Order("users.email asc")
+	case "email_desc":
+		db = db.Order("users.email desc")
 	case "name_asc":
 		db = db.Order("profiles.fullname asc")
 	case "name_desc":
@@ -45,8 +52,19 @@ func (r *userRepository) FindAllUsers(q, role, sort string, limit, offset int) (
 		db = db.Order("users.created_at desc")
 	}
 
+	page := params.Page
+	if page <= 0 {
+		page = 1
+	}
+	limit := params.Limit
+	if limit <= 0 {
+		limit = 10
+	}
+
+	offset := (page - 1) * limit
+
 	db.Count(&count)
-	if err := db.Limit(limit).Offset(offset).Find(&users).Error; err != nil {
+	if err := db.Limit(params.Limit).Offset(offset).Find(&users).Error; err != nil {
 		return nil, 0, err
 	}
 	return users, count, nil

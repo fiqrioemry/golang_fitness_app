@@ -13,12 +13,12 @@ import (
 )
 
 type PackageService interface {
+	DeletePackage(id string) error
 	CreatePackage(req dto.CreatePackageRequest) error
 	UpdatePackage(id string, req dto.UpdatePackageRequest) error
-	DeletePackage(id string) error
-	GetAllPackages() ([]dto.PackageResponse, error)
 	GetPackageByID(id string) (*dto.PackageDetailResponse, error)
-	GetRelatedPackages(classID string) ([]dto.PackageResponse, error)
+	GetRelatedPackages(classID string) ([]dto.PackageListResponse, error)
+	GetAllPackages(params dto.PackageQueryParam) ([]dto.PackageListResponse, *dto.PaginationResponse, error)
 }
 
 type packageService struct {
@@ -107,13 +107,13 @@ func (s *packageService) UpdatePackage(id string, req dto.UpdatePackageRequest) 
 	return s.repo.UpdatePackage(pkg)
 }
 
-func (s *packageService) GetAllPackages() ([]dto.PackageResponse, error) {
-	packages, err := s.repo.GetAllPackages()
+func (s *packageService) GetAllPackages(params dto.PackageQueryParam) ([]dto.PackageListResponse, *dto.PaginationResponse, error) {
+	packages, total, err := s.repo.GetAllPackages(params)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var result []dto.PackageResponse
+	var results []dto.PackageListResponse
 	for _, p := range packages {
 		var classes []dto.ClassSummaryResponse
 		for _, c := range p.Classes {
@@ -125,7 +125,7 @@ func (s *packageService) GetAllPackages() ([]dto.PackageResponse, error) {
 			})
 		}
 
-		result = append(result, dto.PackageResponse{
+		results = append(results, dto.PackageListResponse{
 			ID:          p.ID.String(),
 			Name:        p.Name,
 			Description: p.Description,
@@ -139,7 +139,16 @@ func (s *packageService) GetAllPackages() ([]dto.PackageResponse, error) {
 			Classes:     classes,
 		})
 	}
-	return result, nil
+	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
+
+	pagination := &dto.PaginationResponse{
+		Page:       params.Page,
+		Limit:      params.Limit,
+		TotalRows:  int(total),
+		TotalPages: totalPages,
+	}
+
+	return results, pagination, nil
 }
 
 func (s *packageService) GetPackageByID(id string) (*dto.PackageDetailResponse, error) {
@@ -173,18 +182,18 @@ func (s *packageService) GetPackageByID(id string) (*dto.PackageDetailResponse, 
 	}, nil
 }
 
-func (s *packageService) GetRelatedPackages(classID string) ([]dto.PackageResponse, error) {
+func (s *packageService) GetRelatedPackages(classID string) ([]dto.PackageListResponse, error) {
 	packages, err := s.repo.GetPackagesByClassID(classID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return []dto.PackageResponse{}, nil
+			return []dto.PackageListResponse{}, nil
 		}
 		return nil, err
 	}
 
-	var res []dto.PackageResponse
+	var res []dto.PackageListResponse
 	for _, pkg := range packages {
-		res = append(res, dto.PackageResponse{
+		res = append(res, dto.PackageListResponse{
 			ID:          pkg.ID.String(),
 			Name:        pkg.Name,
 			Description: pkg.Description,

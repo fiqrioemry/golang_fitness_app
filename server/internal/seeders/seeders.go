@@ -18,52 +18,52 @@ func SeedUsers(db *gorm.DB) {
 
 	adminUser := models.User{
 		ID:       uuid.New(),
-		Email:    "admin@example.com",
+		Email:    "admin@fitness.com",
 		Password: string(password),
 		Role:     "admin",
 		Profile: models.Profile{
-			Fullname: "Admin User",
-			Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Admin",
+			Fullname: "Fitness Booking Admin",
+			Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=admin",
 		},
 	}
 
 	customerUsers := []models.User{
 		{
 			ID:       uuid.New(),
-			Email:    "customer@example.com",
+			Email:    "customer1@fitness.com",
 			Password: string(password),
 			Role:     "customer",
 			Profile: models.Profile{
-				Fullname: "Customer User",
-				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Customer",
+				Fullname: "Helena Mourise",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=helena",
 				Gender:   "female",
 			},
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "customer01@example.com",
+			Email:    "customer2@fitness.com",
 			Password: string(password),
 			Role:     "customer",
 			Profile: models.Profile{
-				Fullname: "Customer User 01",
-				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Customer",
+				Fullname: "David Van der googs",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=david",
+				Gender:   "male",
+			},
+		},
+		{
+			ID:       uuid.New(),
+			Email:    "customer3@fitness.com",
+			Password: string(password),
+			Role:     "customer",
+			Profile: models.Profile{
+				Fullname: "Alexandre Joshephine",
+				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=joshephine",
 				Gender:   "female",
 			},
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "customer02@example.com",
-			Password: string(password),
-			Role:     "customer",
-			Profile: models.Profile{
-				Fullname: "Customer User 02",
-				Avatar:   "https://api.dicebear.com/6.x/initials/svg?seed=Customer",
-				Gender:   "female",
-			},
-		},
-		{
-			ID:       uuid.New(),
-			Email:    "elena.morris@example.com",
+			Email:    "elena.morris@fitness.com",
 			Password: string(password),
 			Role:     "customer",
 			Profile: models.Profile{
@@ -74,7 +74,7 @@ func SeedUsers(db *gorm.DB) {
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "brandon.tan@example.com",
+			Email:    "brandon.tan@fitness.com",
 			Password: string(password),
 			Role:     "customer",
 			Profile: models.Profile{
@@ -85,7 +85,7 @@ func SeedUsers(db *gorm.DB) {
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "yuki.sato@example.com",
+			Email:    "yuki.sato@fitness.com",
 			Password: string(password),
 			Role:     "customer",
 			Profile: models.Profile{
@@ -96,7 +96,7 @@ func SeedUsers(db *gorm.DB) {
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "elena.morrisaga@example.com",
+			Email:    "elena.morrisaga@fitness.com",
 			Password: string(password),
 			Role:     "customer",
 			Profile: models.Profile{
@@ -107,7 +107,7 @@ func SeedUsers(db *gorm.DB) {
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "elvis.presley@example.com",
+			Email:    "elvis.presley@fitness.com",
 			Password: string(password),
 			Role:     "customer",
 			Profile: models.Profile{
@@ -118,7 +118,7 @@ func SeedUsers(db *gorm.DB) {
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "david.jovovich@example.com",
+			Email:    "david.jovovich@fitness.com",
 			Password: string(password),
 			Role:     "customer",
 			Profile: models.Profile{
@@ -132,7 +132,7 @@ func SeedUsers(db *gorm.DB) {
 	instructorUsers := []models.User{
 		{
 			ID:       uuid.New(),
-			Email:    "instructor1@example.com",
+			Email:    "instructor1@fitness.com",
 			Password: string(password),
 			Role:     "instructor",
 			Profile: models.Profile{
@@ -142,7 +142,7 @@ func SeedUsers(db *gorm.DB) {
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "instructor2@example.com",
+			Email:    "instructor2@fitness.com",
 			Password: string(password),
 			Role:     "instructor",
 			Profile: models.Profile{
@@ -152,7 +152,7 @@ func SeedUsers(db *gorm.DB) {
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "instructor3@example.com",
+			Email:    "instructor3@fitness.com",
 			Password: string(password),
 			Role:     "instructor",
 			Profile: models.Profile{
@@ -162,7 +162,7 @@ func SeedUsers(db *gorm.DB) {
 		},
 		{
 			ID:       uuid.New(),
-			Email:    "instructor4@example.com",
+			Email:    "instructor4@fitness.com",
 			Password: string(password),
 			Role:     "instructor",
 			Profile: models.Profile{
@@ -414,7 +414,7 @@ func SeedClasses(db *gorm.DB) {
 		},
 		{
 			ID: uuid.New(), Title: "Zumba Dance Energy",
-			Image: "https://placehold.co/400x400", Duration: 60,
+			Image: "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1746879399/fitness_booking_app/b9xvyghagg2jcyvixntj.webp", Duration: 60,
 			Description:    "Zumba Dance Energy is a fun and high-energy workout that blends Latin rhythms with easy-to-follow dance routines. It’s a full-body cardio session that feels more like a dance party than a workout.Perfect for all levels, this class improves endurance, burns calories, and boosts your mood. No dance experience is required—just come ready to move and enjoy the beat!",
 			AdditionalList: []string{"Zumba", "Cardio"},
 			TypeID:         types[0].ID, LevelID: levels[2].ID, LocationID: locations[0].ID,
@@ -552,7 +552,7 @@ func SeedPackages(db *gorm.DB) {
 			Discount:       20,
 			Expired:        14,
 			AdditionalList: []string{"Valid for 14 days after first booking."},
-			Image:          "https://placehold.co/400x400/green/white",
+			Image:          "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1748043621/yoga-wellness_ueqi65.webp",
 			IsActive:       true,
 			CreatedAt:      time.Now(),
 		},
@@ -565,7 +565,7 @@ func SeedPackages(db *gorm.DB) {
 			Discount:       10,
 			Expired:        60,
 			AdditionalList: []string{"Valid for 2 months", "Non-refundable"},
-			Image:          "https://placehold.co/400x400/blue/white",
+			Image:          "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1748043619/pilates-core_reeqdu.webp",
 			IsActive:       true,
 			CreatedAt:      time.Now(),
 		},
@@ -578,7 +578,7 @@ func SeedPackages(db *gorm.DB) {
 			Discount:       15,
 			Expired:        120,
 			AdditionalList: []string{"Valid for 4 months", "Non-refundable"},
-			Image:          "https://placehold.co/400x400/orange/white",
+			Image:          "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1748043620/cardio-burner_fi0nhe.webp",
 			IsActive:       true,
 			CreatedAt:      time.Now(),
 		},
@@ -591,7 +591,7 @@ func SeedPackages(db *gorm.DB) {
 			Discount:       0,
 			Expired:        14,
 			AdditionalList: []string{"Valid for 14 days after booking."},
-			Image:          "https://placehold.co/400x400/red/white",
+			Image:          "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1748043620/combat-starter_wdrrxk.webp",
 			IsActive:       true,
 			CreatedAt:      time.Now(),
 		},
@@ -604,7 +604,7 @@ func SeedPackages(db *gorm.DB) {
 			Discount:       5,
 			Expired:        60,
 			AdditionalList: []string{"Valid for 2 months", "No refunds after activation."},
-			Image:          "https://placehold.co/400x400/black/white",
+			Image:          "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1748043619/warior-pack_dmpnoa.webp",
 			IsActive:       true,
 			CreatedAt:      time.Now(),
 		},
@@ -695,12 +695,12 @@ func SeedPayments(db *gorm.DB) {
 	}
 
 	var customer1, customer2 models.User
-	if err := db.Where("email = ?", "customer01@example.com").First(&customer1).Error; err != nil {
-		log.Println("Failed to find customer01@example.com:", err)
+	if err := db.Where("email = ?", "customer1@fitness.com").First(&customer1).Error; err != nil {
+		log.Println("Failed to find customer1@fitness.com:", err)
 		return
 	}
-	if err := db.Where("email = ?", "customer02@example.com").First(&customer2).Error; err != nil {
-		log.Println("Failed to find customer02@example.com:", err)
+	if err := db.Where("email = ?", "customer2@fitness.com").First(&customer2).Error; err != nil {
+		log.Println("Failed to find customer2@fitness.com:", err)
 		return
 	}
 
@@ -808,12 +808,12 @@ func SeedUserPackages(db *gorm.DB) {
 	}
 
 	var customer1, customer2 models.User
-	if err := db.Where("email = ?", "customer01@example.com").First(&customer1).Error; err != nil {
-		log.Println("Failed to find customer01@example.com")
+	if err := db.Where("email = ?", "customer1@fitness.com").First(&customer1).Error; err != nil {
+		log.Println("Failed to find customer1@fitness.com")
 		return
 	}
-	if err := db.Where("email = ?", "customer02@example.com").First(&customer2).Error; err != nil {
-		log.Println("Failed to find customer02@example.com")
+	if err := db.Where("email = ?", "customer2@fitness.com").First(&customer2).Error; err != nil {
+		log.Println("Failed to find customer2@fitness.com")
 		return
 	}
 
@@ -855,7 +855,7 @@ func SeedUserPackages(db *gorm.DB) {
 	if err := db.Create(&userPackages).Error; err != nil {
 		log.Printf("Failed seeding user packages: %v", err)
 	} else {
-		log.Println("Seeded 6 user packages: 1 for customer01 with reduced credit, 5 for customer02")
+		log.Println("Seeded 6 user packages: 1 for customer1 with reduced credit, 5 for customer02")
 	}
 }
 
@@ -865,8 +865,8 @@ func getExpiredDays(pkg models.Package) int {
 
 func SeedClassSchedules(db *gorm.DB) {
 	var user models.User
-	if err := db.Where("email = ?", "customer01@example.com").First(&user).Error; err != nil {
-		log.Println("User customer01@example.com not found")
+	if err := db.Where("email = ?", "customer1@fitness.com").First(&user).Error; err != nil {
+		log.Println("User customer1@fitness.com not found")
 		return
 	}
 
@@ -974,7 +974,7 @@ func SeedClassSchedules(db *gorm.DB) {
 		log.Println("Failed to create today attendance:", err)
 	}
 
-	log.Println("Seeded ClassSchedules, Bookings, and Attendances (3 hari lalu & hari ini) for customer01@example.com")
+	log.Println("Seeded ClassSchedules, Bookings, and Attendances (3 hari lalu & hari ini) for customer01@fitness.com")
 }
 
 func SeedReviews(db *gorm.DB) {
@@ -1058,8 +1058,8 @@ func generateNotificationSettingsForUser(db *gorm.DB, user models.User) {
 
 func SeedDummyNotifications(db *gorm.DB) {
 	var user models.User
-	if err := db.Where("email = ?", "customer01@example.com").First(&user).Error; err != nil {
-		log.Println("customer01@example.com not found")
+	if err := db.Where("email = ?", "customer1@fitness.com").First(&user).Error; err != nil {
+		log.Println("customer1@fitness.com not found")
 		return
 	}
 
@@ -1087,7 +1087,7 @@ func SeedDummyNotifications(db *gorm.DB) {
 	if err := db.Create(&notifications).Error; err != nil {
 		log.Printf("Failed to seed dummy notifications: %v", err)
 	} else {
-		log.Println("Dummy notifications for customer01@example.com seeded!")
+		log.Println("Dummy notifications for customer1@fitness.com seeded!")
 	}
 }
 func SeedVouchers(db *gorm.DB) {

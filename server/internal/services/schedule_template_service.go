@@ -198,7 +198,6 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 
 	instructorID := uuid.MustParse(req.InstructorID)
 
-	// 🔍 Cek konflik dengan jadwal aktual
 	existingSchedules, err := s.classScheduleRepo.GetClassSchedules()
 	if err != nil {
 		return err
@@ -214,7 +213,6 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 				continue
 			}
 
-			// skip jika itu adalah jadwal yang sama (sudah berasal dari template ini)
 			if schedule.ClassID == template.ClassID &&
 				schedule.InstructorID == template.InstructorID &&
 				schedule.StartHour == template.StartHour &&
@@ -281,7 +279,7 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 	template.StartHour = req.StartHour
 	template.StartMinute = req.StartMinute
 	template.Capacity = req.Capacity
-	template.EndDate = req.EndDate
+	template.EndDate = *req.EndDate
 
 	if err := s.templateRepo.UpdateTemplate(template); err != nil {
 		return err
@@ -305,19 +303,26 @@ func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 	}
 
 	today := time.Now().Truncate(24 * time.Hour)
-	oneMonthAhead := today.AddDate(0, 1, 0)
-
 	var anySuccess bool
 	var errs []string
 
 	for _, template := range templates {
+		if template.LastGeneratedAt != nil {
+			if today.Sub(template.LastGeneratedAt.Truncate(24*time.Hour)) < 30*24*time.Hour {
+				continue
+			}
+		}
+
 		var days []int
 		if err := json.Unmarshal(template.DayOfWeeks, &days); err != nil {
 			errs = append(errs, fmt.Sprintf("template %s: failed to unmarshal days", template.ID))
 			continue
 		}
 
-		for d := today; !d.After(oneMonthAhead); d = d.AddDate(0, 0, 1) {
+		// generate dari hari ini sampai 30 hari ke depan
+		end := today.AddDate(0, 0, 30)
+
+		for d := today; !d.After(end); d = d.AddDate(0, 0, 1) {
 			if !utils.IsDayMatched(int(d.Weekday()), days) {
 				continue
 			}
@@ -344,12 +349,18 @@ func (s *scheduleTemplateService) AutoGenerateSchedules() error {
 
 			anySuccess = true
 		}
+
+		// ✅ Update last_generated_at
+		now := time.Now()
+		template.LastGeneratedAt = &now
+		if err := s.templateRepo.UpdateTemplate(&template); err != nil {
+			errs = append(errs, fmt.Sprintf("template %s: failed to update lastGeneratedAt", template.ID))
+		}
 	}
 
 	if len(errs) > 0 && !anySuccess {
 		return fmt.Errorf("no schedules generated: %v", errs)
 	}
-
 	if len(errs) > 0 {
 		return fmt.Errorf("some schedules generated, with errors: %v", errs)
 	}
@@ -418,6 +429,13 @@ func (s *scheduleTemplateService) GenerateScheduleByTemplateID(templateID string
 
 	if !hasSuccess {
 		return fmt.Errorf("failed to generate any schedule: %v", errors)
+	}
+
+	// ✅ Update LastGeneratedAt jika sukses
+	now := time.Now()
+	template.LastGeneratedAt = &now
+	if err := s.templateRepo.UpdateTemplate(template); err != nil {
+		return fmt.Errorf("schedule generated, but failed to update LastGeneratedAt: %w", err)
 	}
 
 	if len(errors) > 0 {

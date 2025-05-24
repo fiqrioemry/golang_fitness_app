@@ -244,9 +244,9 @@ func (s *classScheduleService) GetClassScheduleByID(scheduleID, userID string) (
 		return nil, err
 	}
 
-	var pkgResponses []dto.PackageResponse
+	var pkgResponses []dto.PackageListResponse
 	for _, p := range packages {
-		pkgResponses = append(pkgResponses, dto.PackageResponse{
+		pkgResponses = append(pkgResponses, dto.PackageListResponse{
 			ID:    p.ID.String(),
 			Name:  p.Name,
 			Price: p.Price,

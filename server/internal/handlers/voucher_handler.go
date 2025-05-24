@@ -31,6 +31,22 @@ func (h *VoucherHandler) CreateVoucher(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Voucher created"})
 }
 
+func (h *VoucherHandler) UpdateVoucher(c *gin.Context) {
+	id := c.Param("id")
+
+	var req dto.UpdateVoucherRequest
+	if !utils.BindAndValidateJSON(c, &req) {
+		return
+	}
+
+	if err := h.service.UpdateVoucher(id, req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Voucher updated"})
+}
+
 func (h *VoucherHandler) GetAllVouchers(c *gin.Context) {
 	vouchers, err := h.service.GetAllVouchers()
 	if err != nil {
@@ -52,22 +68,6 @@ func (h *VoucherHandler) ApplyVoucher(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, res)
-}
-
-func (h *VoucherHandler) UpdateVoucher(c *gin.Context) {
-	id := c.Param("id")
-
-	var req dto.UpdateVoucherRequest
-	if !utils.BindAndValidateJSON(c, &req) {
-		return
-	}
-
-	if err := h.service.UpdateVoucher(id, req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Voucher updated"})
 }
 
 func (h *VoucherHandler) DeleteVoucher(c *gin.Context) {

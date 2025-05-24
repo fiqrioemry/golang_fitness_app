@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"server/internal/dto"
 	"server/internal/models"
 	"time"
 
@@ -13,7 +14,7 @@ type PaymentRepository interface {
 	UpdatePayment(payment *models.Payment) error
 	GetPaymentByID(id string) (*models.Payment, error)
 	GetPaymentByOrderID(orderID string) (*models.Payment, error)
-	GetAllUserPayments(query string, limit, offset int) ([]models.Payment, int64, error)
+	GetAllUserPayments(params dto.PaymentQueryParam) ([]models.Payment, int64, error)
 }
 
 type paymentRepository struct {
@@ -48,26 +49,65 @@ func (r *paymentRepository) UpdatePayment(payment *models.Payment) error {
 	return r.db.Save(payment).Error
 }
 
-func (r *paymentRepository) GetAllUserPayments(query string, limit, offset int) ([]models.Payment, int64, error) {
+func (r *paymentRepository) GetAllUserPayments(params dto.PaymentQueryParam) ([]models.Payment, int64, error) {
 	var payments []models.Payment
 	var count int64
 
 	db := r.db.Model(&models.Payment{}).
-		Preload("Package", func(db *gorm.DB) *gorm.DB {
-			return db.Unscoped()
-		}).
-		Preload("User.Profile")
+		Preload("User.Profile").
+		Joins("JOIN users ON users.id = payments.user_id").
+		Joins("JOIN profiles ON users.id = profiles.user_id")
 
-	if query != "" {
-		db = db.Joins("JOIN users ON users.id = payments.user_id").
-			Where("users.email LIKE ? OR users.id LIKE ?", "%"+query+"%", "%"+query+"%")
+	// search
+	if params.Q != "" {
+		likeQuery := "%" + params.Q + "%"
+		db = db.Where("users.email LIKE ? OR profiles.fullname LIKE ?", likeQuery, likeQuery)
 	}
+
+	// status filter
+	if params.Status != "" && params.Status != "all" {
+		db = db.Where("payments.status = ?", params.Status)
+	}
+
+	// date range filter
+	if params.StartDate != "" && params.EndDate != "" {
+		db = db.Where("paid_at BETWEEN ? AND ?", params.StartDate, params.EndDate)
+	}
+
+	// sorting
+	switch params.Sort {
+	case "paid_at_asc":
+		db = db.Order("paid_at asc")
+	case "paid_at_desc":
+		db = db.Order("paid_at desc")
+	case "name_asc":
+		db = db.Order("profiles.fullname asc")
+	case "name_desc":
+		db = db.Order("profiles.fullname desc")
+	case "email_asc":
+		db = db.Order("users.email asc")
+	case "email_desc":
+		db = db.Order("users.email desc")
+	default:
+		db = db.Order("paid_at desc")
+	}
+
+	// pagination
+	page := params.Page
+	if page <= 0 {
+		page = 1
+	}
+	// limit per page
+	limit := params.Limit
+	if limit <= 0 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
 
 	if err := db.Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
-
-	if err := db.Order("paid_at DESC").Limit(limit).Offset(offset).Find(&payments).Error; err != nil {
+	if err := db.Limit(limit).Offset(offset).Find(&payments).Error; err != nil {
 		return nil, 0, err
 	}
 

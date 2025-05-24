@@ -12,7 +12,6 @@ func ClassRoutes(r *gin.Engine, handler *handlers.ClassHandler) {
 
 	// Public
 	class.GET("", handler.GetAllClasses)
-	class.GET("/active", handler.GetActiveClasses)
 	class.GET("/:id", handler.GetClassByID)
 
 	// Admin Only

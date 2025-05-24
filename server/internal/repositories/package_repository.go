@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"server/internal/dto"
 	"server/internal/models"
 
 	"gorm.io/gorm"
@@ -10,9 +11,9 @@ type PackageRepository interface {
 	CreatePackage(pkg *models.Package) error
 	UpdatePackage(pkg *models.Package) error
 	DeletePackage(id string) error
-	GetAllPackages() ([]models.Package, error)
 	GetPackageByID(id string) (*models.Package, error)
 	GetPackagesByClassID(classID string) ([]models.Package, error)
+	GetAllPackages(params dto.PackageQueryParam) ([]models.Package, int64, error)
 	GetUserPackagesWithRemainingCredit(packageID string) ([]models.UserPackage, error)
 }
 
@@ -36,12 +37,61 @@ func (r *packageRepository) DeletePackage(id string) error {
 	return r.db.Delete(&models.Package{}, "id = ?", id).Error
 }
 
-func (r *packageRepository) GetAllPackages() ([]models.Package, error) {
+func (r *packageRepository) GetAllPackages(params dto.PackageQueryParam) ([]models.Package, int64, error) {
 	var packages []models.Package
-	if err := r.db.Preload("Classes").Order("created_at desc").Find(&packages).Error; err != nil {
-		return nil, err
+	var count int64
+
+	db := r.db.Model(&models.Package{}).Preload("Classes")
+
+	// search by name or description
+	if params.Q != "" {
+		like := "%" + params.Q + "%"
+		db = db.Where("packages.name LIKE ? OR packages.description LIKE ?", like, like)
 	}
-	return packages, nil
+
+	// status filter
+	if params.Status != "" && params.Status != "all" {
+		if params.Status == "active" {
+			db = db.Where("packages.is_active = ?", true)
+		} else if params.Status == "inactive" {
+			db = db.Where("packages.is_active = ?", false)
+		}
+	}
+
+	// sort
+	switch params.Sort {
+	case "name_asc":
+		db = db.Order("packages.name asc")
+	case "name_desc":
+		db = db.Order("packages.name desc")
+	case "price_asc":
+		db = db.Order("packages.price asc")
+	case "price_desc":
+		db = db.Order("packages.price desc")
+	default:
+		db = db.Order("packages.created_at desc")
+	}
+
+	// pagination
+	page := params.Page
+	if page <= 0 {
+		page = 1
+	}
+	limit := params.Limit
+	if limit <= 0 {
+		limit = 10
+	}
+	offset := (page - 1) * limit
+
+	// count + query
+	if err := db.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+	if err := db.Limit(limit).Offset(offset).Find(&packages).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return packages, count, nil
 }
 
 func (r *packageRepository) GetPackageByID(id string) (*models.Package, error) {

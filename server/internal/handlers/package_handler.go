@@ -19,16 +19,10 @@ func NewPackageHandler(packageService services.PackageService) *PackageHandler {
 
 func (h *PackageHandler) CreatePackage(c *gin.Context) {
 	var req dto.CreatePackageRequest
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input", "error": err.Error()})
+	if !utils.BindAndValidateForm(c, &req) {
 		return
 	}
-	parsedBool, err := utils.ParseBoolFormField(c, "isActive")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid value for isActive", "error": err.Error()})
-		return
-	}
-	req.IsActive = parsedBool
+	req.IsActive, _ = utils.ParseBoolFormField(c, "isActive")
 
 	imageURL, err := utils.UploadImageWithValidation(req.Image)
 	if err != nil {
@@ -50,18 +44,11 @@ func (h *PackageHandler) CreatePackage(c *gin.Context) {
 func (h *PackageHandler) UpdatePackage(c *gin.Context) {
 	id := c.Param("id")
 	var req dto.UpdatePackageRequest
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input", "error": err.Error()})
+	if !utils.BindAndValidateForm(c, &req) {
 		return
 	}
 
-	parsedBool, err := utils.ParseBoolFormField(c, "isActive")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid value for isActive", "error": err.Error()})
-		return
-	}
-
-	req.IsActive = parsedBool
+	req.IsActive, _ = utils.ParseBoolFormField(c, "isActive")
 
 	if req.Image != nil && req.Image.Filename != "" {
 		imageURL, err := utils.UploadImageWithValidation(req.Image)
@@ -82,17 +69,28 @@ func (h *PackageHandler) UpdatePackage(c *gin.Context) {
 }
 
 func (h *PackageHandler) GetAllPackages(c *gin.Context) {
-	packages, err := h.packageService.GetAllPackages()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch packages", "error": err.Error()})
+	var params dto.PackageQueryParam
+	if !utils.BindAndValidateForm(c, &params) {
 		return
 	}
 
-	if packages == nil {
-		packages = []dto.PackageResponse{}
+	if params.Page == 0 {
+		params.Page = 1
+	}
+	if params.Limit == 0 {
+		params.Limit = 10
 	}
 
-	c.JSON(http.StatusOK, packages)
+	packages, pagination, err := h.packageService.GetAllPackages(params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch payments", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":       packages,
+		"pagination": pagination,
+	})
 }
 
 func (h *PackageHandler) GetPackagesByClassID(c *gin.Context) {

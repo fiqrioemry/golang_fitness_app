@@ -97,7 +97,7 @@ const ClassAdd = () => {
             <InputTagsElement
               name="additional"
               label="Additional Information"
-              placeholder="Press Enter to add info"
+              placeholder="Enter info, press enter to add"
             />
             <InputFileElement
               name="images"

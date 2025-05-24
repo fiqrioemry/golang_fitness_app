@@ -44,6 +44,16 @@ func BindAndValidateJSON[T any](c *gin.Context, req *T) bool {
 	}
 	return true
 }
+func BindAndValidateForm[T any](c *gin.Context, req *T) bool {
+	if err := c.ShouldBind(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid form-data request",
+			"error":   err.Error(),
+		})
+		return false
+	}
+	return true
+}
 
 func GetQueryInt(c *gin.Context, key string, defaultValue int) int {
 	valStr := c.Query(key)

@@ -5,10 +5,8 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
-	"strings"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
 
@@ -32,10 +30,6 @@ func NewVoucherService(repo repositories.VoucherRepository) VoucherService {
 }
 
 func (s *voucherService) CreateVoucher(req dto.CreateVoucherRequest) error {
-	expiredAt, err := time.Parse("2006-01-02", req.ExpiredAt)
-	if err != nil {
-		return err
-	}
 
 	voucher := models.Voucher{
 		Code:         req.Code,
@@ -45,22 +39,39 @@ func (s *voucherService) CreateVoucher(req dto.CreateVoucherRequest) error {
 		MaxDiscount:  req.MaxDiscount,
 		IsReusable:   req.IsReusable,
 		Quota:        req.Quota,
-		ExpiredAt:    expiredAt,
+		ExpiredAt:    req.ExpiredAt,
 		CreatedAt:    time.Now(),
 	}
 
-	err = s.repo.Create(&voucher)
+	err := s.repo.Create(&voucher)
 	if err != nil {
-		var mysqlErr *mysql.MySQLError
-		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 && strings.Contains(mysqlErr.Message, "code") {
-			return errors.New("voucher code must be unique")
-		}
 		return err
 	}
 
 	return nil
 }
 
+func (s *voucherService) UpdateVoucher(id string, req dto.UpdateVoucherRequest) error {
+	voucherID, err := uuid.Parse(id)
+	if err != nil {
+		return errors.New("invalid voucher ID")
+	}
+
+	voucher, err := s.repo.GetByID(voucherID)
+	if err != nil {
+		return errors.New("voucher not found")
+	}
+
+	voucher.Description = req.Description
+	voucher.DiscountType = req.DiscountType
+	voucher.Discount = req.Discount
+	voucher.MaxDiscount = req.MaxDiscount
+	voucher.Quota = req.Quota
+	voucher.IsReusable = req.IsReusable
+	voucher.ExpiredAt = req.ExpiredAt
+
+	return s.repo.UpdateVoucher(voucher)
+}
 func (s *voucherService) GetAllVouchers() ([]dto.VoucherResponse, error) {
 	vouchers, err := s.repo.GetAll()
 	if err != nil {
@@ -148,33 +159,6 @@ func (s *voucherService) DecreaseQuota(userID uuid.UUID, code string) error {
 		return s.repo.UpdateVoucher(voucher)
 	}
 	return nil
-}
-
-func (s *voucherService) UpdateVoucher(id string, req dto.UpdateVoucherRequest) error {
-	voucherID, err := uuid.Parse(id)
-	if err != nil {
-		return errors.New("invalid voucher ID")
-	}
-
-	voucher, err := s.repo.GetByID(voucherID)
-	if err != nil {
-		return errors.New("voucher not found")
-	}
-
-	expiredAt, err := time.Parse("2006-01-02", req.ExpiredAt)
-	if err != nil {
-		return err
-	}
-
-	voucher.Description = req.Description
-	voucher.DiscountType = req.DiscountType
-	voucher.Discount = req.Discount
-	voucher.MaxDiscount = req.MaxDiscount
-	voucher.Quota = req.Quota
-	voucher.IsReusable = req.IsReusable
-	voucher.ExpiredAt = expiredAt
-
-	return s.repo.UpdateVoucher(voucher)
 }
 
 func (s *voucherService) DeleteVoucher(id string) error {

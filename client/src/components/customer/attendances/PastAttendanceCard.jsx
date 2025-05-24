@@ -13,6 +13,8 @@ export const PastAttendanceCard = ({ attendance }) => {
     ? formatHour(attendance.checkedAt)
     : "-";
   const formattedDate = formatDate(attendance.checkedAt);
+
+  console.log(attendance);
   return (
     <Card className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 shadow-sm border border-border bg-muted/20">
       <img

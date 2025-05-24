@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"server/internal/dto"
 	"server/internal/services"
+	"server/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,20 +20,26 @@ func NewUserHandler(userService services.UserService) *UserHandler {
 
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	var params dto.UserQueryParam
-	if err := c.ShouldBindQuery(&params); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid query params"})
+	if !utils.BindAndValidateForm(c, &params) {
 		return
 	}
 
-	users, total, err := h.userService.GetAllUsers(params)
+	if params.Page == 0 {
+		params.Page = 1
+	}
+	if params.Limit == 0 {
+		params.Limit = 10
+	}
+
+	users, pagination, err := h.userService.GetAllUsers(params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch users"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data":  users,
-		"total": total,
+		"data":       users,
+		"pagination": pagination,
 	})
 }
 

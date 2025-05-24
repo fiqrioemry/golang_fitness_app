@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { formatHour, formatDate, formatTime } from "@/lib/utils";
+import { parseISO } from "date-fns";
 
 export const AttendanceCard = ({ attendance }) => {
   const formattedDate = formatDate(attendance.date);

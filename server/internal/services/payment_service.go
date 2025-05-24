@@ -19,7 +19,7 @@ import (
 type PaymentService interface {
 	ExpireOldPendingPayments() error
 	HandlePaymentNotification(req dto.MidtransNotificationRequest) error
-	GetAllUserPayments(query string, page, limit int) (*dto.AdminPaymentListResponse, error)
+	GetAllUserPayments(params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error)
 	CreatePayment(userID string, req dto.CreatePaymentRequest) (*dto.CreatePaymentResponse, error)
 }
 type paymentService struct {
@@ -49,12 +49,12 @@ func NewPaymentService(
 func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentRequest) (*dto.CreatePaymentResponse, error) {
 	pkg, err := s.packageRepo.GetPackageByID(req.PackageID)
 	if err != nil {
-		return nil, errors.New("package not found")
+		return nil, fmt.Errorf("package not found: %w", err)
 	}
 
 	user, err := s.authRepo.GetUserByID(userID)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, fmt.Errorf("user not found: %w", err)
 	}
 
 	taxRate := utils.GetTaxRate()
@@ -74,10 +74,11 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 			voucherDiscount = apply.DiscountValue
 		}
 	}
+
 	tax := base * taxRate
 	total := base + tax
-
 	paymentID := uuid.New()
+
 	payment := models.Payment{
 		ID:              paymentID,
 		PackageID:       pkg.ID,
@@ -85,7 +86,6 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 		UserID:          uuid.MustParse(userID),
 		PaymentMethod:   "-",
 		Status:          "pending",
-		PaidAt:          time.Now(),
 		BasePrice:       base,
 		Tax:             tax,
 		Total:           total,
@@ -94,7 +94,7 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 	}
 
 	if err := s.paymentRepo.CreatePayment(&payment); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create payment: %w", err)
 	}
 
 	snapReq := &snap.Request{
@@ -125,7 +125,7 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 	}
 
 	if payment.Status == "success" {
-		return nil
+		payment.PaidAt = time.Now()
 	}
 
 	payment.PaymentMethod = req.PaymentType
@@ -195,16 +195,16 @@ func (s *paymentService) HandlePaymentNotification(req dto.MidtransNotificationR
 	return nil
 }
 
-func (s *paymentService) GetAllUserPayments(query string, page, limit int) (*dto.AdminPaymentListResponse, error) {
-	offset := (page - 1) * limit
-	payments, total, err := s.paymentRepo.GetAllUserPayments(query, limit, offset)
+func (s *paymentService) GetAllUserPayments(params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error) {
+
+	payments, total, err := s.paymentRepo.GetAllUserPayments(params)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var results []dto.AdminPaymentResponse
+	var results []dto.PaymentListResponse
 	for _, p := range payments {
-		results = append(results, dto.AdminPaymentResponse{
+		results = append(results, dto.PaymentListResponse{
 			ID:            p.ID.String(),
 			UserID:        p.UserID.String(),
 			UserEmail:     p.User.Email,
@@ -214,16 +214,18 @@ func (s *paymentService) GetAllUserPayments(query string, page, limit int) (*dto
 			Price:         p.Total,
 			PaymentMethod: p.PaymentMethod,
 			Status:        p.Status,
-			PaidAt:        p.PaidAt.Format("2006-01-02 15:04:05"),
+			PaidAt:        p.PaidAt.Format("2006-01-02"),
 		})
 	}
+	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
 
-	return &dto.AdminPaymentListResponse{
-		Payments: results,
-		Total:    total,
-		Page:     page,
-		Limit:    limit,
-	}, nil
+	pagination := &dto.PaginationResponse{
+		Page:       params.Page,
+		Limit:      params.Limit,
+		TotalRows:  int(total),
+		TotalPages: totalPages,
+	}
+	return results, pagination, nil
 }
 
 // ** khusus cron job update status to failed

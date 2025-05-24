@@ -12,7 +12,7 @@ import (
 type ProfileService interface {
 	GetUserByID(userID string) (*models.User, error)
 	UpdateProfile(userID string, req dto.UpdateProfileRequest) error
-	UpdateAvatar(userID string, file *multipart.FileHeader) (string, error)
+	UpdateAvatar(userID string, file *multipart.FileHeader) error
 	GetUserTransactions(userID string, page, limit int) (*dto.TransactionListResponse, error)
 	GetUserPackages(userID string, page, limit int) (*dto.UserPackageListResponse, error)
 	GetUserPackagesByClassID(userID, classID string) ([]dto.UserPackageResponse, error)
@@ -50,29 +50,29 @@ func (s *profileService) UpdateProfile(userID string, req dto.UpdateProfileReque
 	return s.repo.UpdateUser(user)
 }
 
-func (s *profileService) UpdateAvatar(userID string, file *multipart.FileHeader) (string, error) {
+func (s *profileService) UpdateAvatar(userID string, file *multipart.FileHeader) error {
 	user, err := s.repo.GetUserByID(userID)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	if file == nil {
-		return "", nil
+		return nil
 	}
 
 	if err := utils.ValidateImageFile(file); err != nil {
-		return "", err
+		return err
 	}
 
 	src, err := file.Open()
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer src.Close()
 
 	newAvatarURL, err := utils.UploadToCloudinary(src)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	if user.Profile.Avatar != "" && user.Profile.Avatar != newAvatarURL && !isDiceBear(user.Profile.Avatar) {
@@ -81,7 +81,7 @@ func (s *profileService) UpdateAvatar(userID string, file *multipart.FileHeader)
 
 	user.Profile.Avatar = newAvatarURL
 	err = s.repo.UpdateUser(user)
-	return newAvatarURL, err
+	return err
 }
 
 func isDiceBear(url string) bool {
@@ -106,7 +106,7 @@ func (s *profileService) GetUserTransactions(userID string, page, limit int) (*d
 		transactions = append(transactions, dto.TransactionResponse{
 			ID:            p.ID.String(),
 			PackageID:     p.PackageID.String(),
-			PackageName:   p.Package.Name,
+			PackageName:   p.PackageName,
 			PaymentMethod: p.PaymentMethod,
 			Status:        p.Status,
 			BasePrice:     p.BasePrice,

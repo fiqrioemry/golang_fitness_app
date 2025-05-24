@@ -76,7 +76,7 @@ func (r *dashboardRepository) CountAttendanceByStatus(status string) (int, error
 	return int(count), err
 }
 
-func (r *dashboardRepository) GetRevenueStatsByRange(rangeType string) ([]dto.RevenueStat, float64, error) {
+func (r *dashboardRepository) GetRevenueStatsByRange(status string) ([]dto.RevenueStat, float64, error) {
 	var stats []dto.RevenueStat
 	var total float64
 
@@ -86,7 +86,7 @@ func (r *dashboardRepository) GetRevenueStatsByRange(rangeType string) ([]dto.Re
 	groupClause := ""
 	orderClause := ""
 
-	switch rangeType {
+	switch status {
 	case "daily":
 		selectClause = "DATE(paid_at) as date"
 		groupClause = "DATE(paid_at)"

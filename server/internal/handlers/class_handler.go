@@ -21,17 +21,11 @@ func NewClassHandler(classService services.ClassService) *ClassHandler {
 func (h *ClassHandler) CreateClass(c *gin.Context) {
 	var req dto.CreateClassRequest
 
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input", "error": err.Error()})
+	if !utils.BindAndValidateForm(c, &req) {
 		return
 	}
 
-	parsedBool, err := utils.ParseBoolFormField(c, "isActive")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid value for isActive", "error": err.Error()})
-		return
-	}
-	req.IsActive = parsedBool
+	req.IsActive, _ = utils.ParseBoolFormField(c, "isActive")
 
 	form, err := c.MultipartForm()
 	if err != nil {
@@ -73,17 +67,11 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 func (h *ClassHandler) UpdateClass(c *gin.Context) {
 	id := c.Param("id")
 	var req dto.UpdateClassRequest
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input", "error": err.Error()})
+	if !utils.BindAndValidateForm(c, &req) {
 		return
 	}
 
-	parsedBool, err := utils.ParseBoolFormField(c, "isActive")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid value for isActive", "error": err.Error()})
-		return
-	}
-	req.IsActive = parsedBool
+	req.IsActive, _ = utils.ParseBoolFormField(c, "isActive")
 
 	if req.Image != nil && req.Image.Filename != "" {
 		imageURL, err := utils.UploadImageWithValidation(req.Image)
@@ -126,38 +114,28 @@ func (h *ClassHandler) GetClassByID(c *gin.Context) {
 }
 
 func (h *ClassHandler) GetAllClasses(c *gin.Context) {
-	var query dto.ClassQueryParam
-	if err := c.ShouldBindQuery(&query); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid query parameters", "error": err.Error()})
+	var params dto.ClassQueryParam
+	if !utils.BindAndValidateForm(c, &params) {
 		return
 	}
 
-	classes, total, err := h.classService.GetAllClasses(query)
+	if params.Page == 0 {
+		params.Page = 1
+	}
+	if params.Limit == 0 {
+		params.Limit = 10
+	}
+
+	classes, pagination, err := h.classService.GetAllClasses(params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch classes", "error": err.Error()})
 		return
 	}
 
-	if classes == nil {
-		classes = []dto.ClassResponse{}
-	}
-
 	c.JSON(http.StatusOK, gin.H{
-		"classes": classes,
-		"total":   total,
-		"page":    query.Page,
-		"limit":   query.Limit,
+		"classes":    classes,
+		"pagination": pagination,
 	})
-}
-
-func (h *ClassHandler) GetActiveClasses(c *gin.Context) {
-	classes, err := h.classService.GetActiveClasses()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch active classes", "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, classes)
 }
 
 func (h *ClassHandler) UploadClassGallery(c *gin.Context) {

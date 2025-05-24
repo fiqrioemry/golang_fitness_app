@@ -13,6 +13,7 @@ const UserBookings = () => {
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
   const bookings = data || [];
+  console.log(bookings);
 
   return (
     <section className="section p-8 space-y-6">

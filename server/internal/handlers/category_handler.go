@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"server/internal/dto"
 	"server/internal/services"
+	"server/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,8 +19,7 @@ func NewCategoryHandler(categoryService services.CategoryService) *CategoryHandl
 
 func (h *CategoryHandler) CreateCategory(c *gin.Context) {
 	var req dto.CreateCategoryRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input", "error": err.Error()})
+	if !utils.BindAndValidateJSON(c, &req) {
 		return
 	}
 
@@ -35,8 +35,7 @@ func (h *CategoryHandler) UpdateCategory(c *gin.Context) {
 	id := c.Param("id")
 
 	var req dto.UpdateCategoryRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input", "error": err.Error()})
+	if !utils.BindAndValidateJSON(c, &req) {
 		return
 	}
 

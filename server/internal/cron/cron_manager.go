@@ -43,7 +43,7 @@ func (cm *CronManager) RegisterJobs() {
 	})
 
 	// Generate recurring class schedule (setiap hari 12:00)
-	cm.c.AddFunc("0 0 12 * * *", func() {
+	cm.c.AddFunc("0 12 * * *", func() {
 		log.Println("Cron: Auto-generating class schedules...")
 		if err := cm.scheduleService.AutoGenerateSchedules(); err != nil {
 			log.Println("Schedule generation failed:", err)

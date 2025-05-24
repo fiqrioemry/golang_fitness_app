@@ -45,8 +45,7 @@ func (h *NotificationHandler) UpdateNotificationSetting(c *gin.Context) {
 	userID := utils.MustGetUserID(c)
 
 	var req dto.UpdateNotificationSettingRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload"})
+	if !utils.BindAndValidateJSON(c, &req) {
 		return
 	}
 
@@ -71,8 +70,7 @@ func (h *NotificationHandler) MarkAllNotificationsAsRead(c *gin.Context) {
 
 func (h *NotificationHandler) SendNewNotificatioon(c *gin.Context) {
 	var req dto.SendNotificationRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload"})
+	if !utils.BindAndValidateJSON(c, &req) {
 		return
 	}
 

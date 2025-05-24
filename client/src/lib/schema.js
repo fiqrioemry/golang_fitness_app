@@ -166,6 +166,7 @@ export const classSchema = z.object({
   image: imageItemSchema.refine((val) => !!val, {
     message: "Image is required",
   }),
+  images: z.array(imageItemSchema).optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -275,6 +276,7 @@ export const createVoucherSchema = z
       required_error: "Discount type is required",
       invalid_type_error: "Please select a valid discount type",
     }),
+    isReusable: z.boolean().optional(),
     discount: z
       .number({ invalid_type_error: "Discount must be a number" })
       .gt(0, "Discount must be greater than 0"),

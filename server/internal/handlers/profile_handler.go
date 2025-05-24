@@ -27,15 +27,15 @@ func (h *ProfileHandler) GetProfile(c *gin.Context) {
 	}
 
 	resp := dto.ProfileResponse{
-		ID:        user.ID.String(),
-		Email:     user.Email,
-		Fullname:  user.Profile.Fullname,
-		Avatar:    user.Profile.Avatar,
-		Gender:    user.Profile.Gender,
-		Birthday:  "",
-		Bio:       user.Profile.Bio,
-		Phone:     user.Profile.Phone,
-		UpdatedAt: user.UpdatedAt,
+		ID:       user.ID.String(),
+		Email:    user.Email,
+		Fullname: user.Profile.Fullname,
+		Avatar:   user.Profile.Avatar,
+		Gender:   user.Profile.Gender,
+		Birthday: "",
+		Bio:      user.Profile.Bio,
+		Phone:    user.Profile.Phone,
+		JoinedAt: user.CreatedAt.Format("2006-01-02"),
 	}
 
 	if user.Profile.Birthday != nil {
@@ -49,8 +49,7 @@ func (h *ProfileHandler) UpdateProfile(c *gin.Context) {
 	userID := utils.MustGetUserID(c)
 
 	var req dto.UpdateProfileRequest
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input", "error": err.Error()})
+	if !utils.BindAndValidateJSON(c, &req) {
 		return
 	}
 
@@ -71,13 +70,12 @@ func (h *ProfileHandler) UpdateAvatar(c *gin.Context) {
 		return
 	}
 
-	url, err := h.profileService.UpdateAvatar(userID, file)
-	if err != nil {
+	if err := h.profileService.UpdateAvatar(userID, file); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update avatar", "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Avatar updated successfully", "avatarUrl": url})
+	c.JSON(http.StatusOK, gin.H{"message": "Avatar updated successfully"})
 }
 
 func (h *ProfileHandler) GetUserTransactions(c *gin.Context) {
