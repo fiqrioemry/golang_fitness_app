@@ -26,12 +26,14 @@ export const getClassScheduleDetail = async (id) => {
 
 // POST /api/schedules
 export const createClassSchedule = async (data) => {
+  console.log(data);
   const res = await authInstance.post("/schedules", data);
   return res.data;
 };
 
 // PUT /api/schedules/:id
 export const updateClassSchedule = async (id, data) => {
+  console.log(data);
   const res = await authInstance.put(`/schedules/${id}`, data);
   return res.data;
 };

@@ -5,18 +5,18 @@ import {
   CalendarIcon,
   CheckCircleIcon,
 } from "lucide-react";
-import { format, parseISO } from "date-fns";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
+import { formatHour, formatDate, formatTime } from "@/lib/utils";
 
 export const AttendanceCard = ({ attendance }) => {
-  const formattedDate = format(parseISO(attendance.date), "EEEE, dd MMM yyyy");
-  const formattedTime = `${String(attendance.startHour).padStart(
-    2,
-    "0"
-  )}:${String(attendance.startMinute).padStart(2, "0")}`;
+  const formattedDate = formatDate(attendance.date);
+  const formattedTime = formatTime(
+    attendance.startHour,
+    attendance.startMinute
+  );
   const checkedTime = attendance.checkedAt
-    ? format(parseISO(attendance.checkedAt), "HH:mm")
+    ? formatHour(attendance.checkedAt)
     : "-";
 
   const classEndTime = new Date(parseISO(attendance.date));

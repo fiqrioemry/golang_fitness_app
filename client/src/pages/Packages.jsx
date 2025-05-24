@@ -11,6 +11,8 @@ import { packagesTitle } from "@/lib/constant";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { usePackagesQuery } from "@/hooks/usePackage";
+import { useQueryStore } from "@/store/useQueryStore";
+import { Pagination } from "@/components/ui/Pagination";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { PackagesSkeleton } from "@/components/loading/PackagesSkeleton";
@@ -18,13 +20,18 @@ import { PackagesSkeleton } from "@/components/loading/PackagesSkeleton";
 const Packages = () => {
   useDocumentTitle(packagesTitle);
   const navigate = useNavigate();
-  const { data, isLoading, isError, refetch } = usePackagesQuery();
-
+  const { page, limit, setPage } = useQueryStore();
+  const { data, isLoading, isError, refetch } = usePackagesQuery({
+    page,
+    limit,
+  });
   if (isLoading) return <PackagesSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
-  const packages = data || [];
+  const packages = data?.data || [];
+
+  const pagination = data?.pagination;
 
   return (
     <section className="section py-24 text-foreground">
@@ -119,6 +126,16 @@ const Packages = () => {
             </Card>
           );
         })}
+        <div>
+          {pagination && pagination.totalRows > 10 && (
+            <Pagination
+              page={pagination.page}
+              onPageChange={setPage}
+              limit={pagination.limit}
+              total={pagination.totalRows}
+            />
+          )}
+        </div>
       </div>
     </section>
   );

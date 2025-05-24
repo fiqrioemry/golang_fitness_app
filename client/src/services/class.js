@@ -1,15 +1,11 @@
-// src/services/class.js
+import qs from "qs";
 import { buildFormData } from "@/lib/utils";
 import { publicInstance, authInstance } from ".";
 
 export const getAllClasses = async (params) => {
-  const res = await publicInstance.get("/classes", { params });
-  return res.data;
-};
-
-// GET /api/classes/active
-export const getActiveClasses = async () => {
-  const res = await publicInstance.get("/classes/active");
+  const queryString = qs.stringify(params, { skipNulls: true });
+  console.log(queryString);
+  const res = await publicInstance.get(`/classes?${queryString}`);
   return res.data;
 };
 

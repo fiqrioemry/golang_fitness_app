@@ -1,8 +1,10 @@
+import qs from "qs";
 import { publicInstance, authInstance } from ".";
 
-// GET /api/payments?q=&page=&limit=
+// GET /api/payments?q=&page=&limit=&status=&sort=
 export const getAllUserPayments = async (params) => {
-  const res = await authInstance.get("/payments", { params });
+  const queryString = qs.stringify(params, { skipNulls: true });
+  const res = await authInstance.get(`/payments?${queryString}`);
   return res.data;
 };
 

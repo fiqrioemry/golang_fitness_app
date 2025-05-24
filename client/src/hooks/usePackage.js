@@ -2,11 +2,12 @@ import { toast } from "sonner";
 import * as packageService from "@/services/package";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const usePackagesQuery = () =>
+export const usePackagesQuery = (params) =>
   useQuery({
-    queryKey: ["packages"],
-    queryFn: packageService.getAllPackages,
+    queryKey: ["packages", params],
+    queryFn: () => packageService.getAllPackages(params),
     keepPreviousData: true,
+    staleTime: 1000 * 60 * 15,
   });
 
 export const usePackageDetailQuery = (id) =>
@@ -45,9 +46,7 @@ export const usePackageMutation = () => {
 
     updatePackage: useMutation({
       mutationFn: ({ id, data }) => packageService.updatePackage(id, data),
-      ...mutationOpts("Package updated successfully", ({ id }) => {
-        qc.invalidateQueries({ queryKey: ["packages"] });
-      }),
+      ...mutationOpts("Package updated successfully"),
     }),
 
     deletePackage: useMutation({

@@ -27,7 +27,6 @@ const AddOptions = ({ activeTab }) => {
 
   return (
     <FormAddDialog
-      update={false}
       state={state}
       schema={schema}
       title={`Add New ${activeTab}`}

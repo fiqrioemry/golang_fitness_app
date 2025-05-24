@@ -17,7 +17,12 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { buildDateTime, getTimeLeft, isAttendanceWindow } from "@/lib/utils";
+import {
+  formatHour,
+  getTimeLeft,
+  buildDateTime,
+  isAttendanceWindow,
+} from "@/lib/utils";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/Dialog";
 
 export const BookingCard = ({ booking }) => {
@@ -106,7 +111,7 @@ export const BookingCard = ({ booking }) => {
               <div className="flex items-center gap-2">
                 <ClockIcon className="w-4 h-4" />
                 <span>
-                  {format(startTime, "HH:mm")} - {format(endTime, "HH:mm")}
+                  {formatHour(startTime)} - {formatHour(endTime)}
                 </span>
               </div>
             </div>

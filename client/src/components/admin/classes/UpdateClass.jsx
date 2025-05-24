@@ -42,7 +42,7 @@ const UpdateClass = ({ classes }) => {
           />
 
           <InputTextareaElement
-            maxLength={200}
+            maxLength={500}
             name="description"
             label="Class Description"
             placeholder="Enter class description (min. 20 characters)"

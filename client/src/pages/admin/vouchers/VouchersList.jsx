@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/Table";
 import { useEffect } from "react";
 import { CirclePlus } from "lucide-react";
+import { formatRupiah } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
@@ -55,61 +56,40 @@ const VouchersList = () => {
           <div className="hidden md:block max-w-8xl w-full">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/40">
-                  <TableHead className="whitespace-nowrap">Code</TableHead>
-                  <TableHead className="whitespace-nowrap">
-                    Description
-                  </TableHead>
-                  <TableHead className="whitespace-nowrap">Type</TableHead>
-                  <TableHead className="whitespace-nowrap">Discount</TableHead>
-                  <TableHead className="whitespace-nowrap">
-                    Max Discount
-                  </TableHead>
-                  <TableHead className="whitespace-nowrap">Quota</TableHead>
-                  <TableHead className="whitespace-nowrap">
-                    Expired At
-                  </TableHead>
-                  <TableHead className="text-center whitespace-nowrap">
-                    Actions
-                  </TableHead>
+                <TableRow>
+                  <TableHead>Code</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Discount</TableHead>
+                  <TableHead>Max Discount</TableHead>
+                  <TableHead>Quota</TableHead>
+                  <TableHead>Expired At</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {vouchers.map((voucher) => (
-                  <TableRow key={voucher.id} className="hover:bg-muted">
-                    <TableCell className="text-sm font-medium whitespace-nowrap">
-                      {voucher.code}
-                    </TableCell>
-                    <TableCell
-                      className="text-sm text-muted-foreground max-w-xs truncate"
-                      title={voucher.description}
-                    >
+                  <TableRow key={voucher.id}>
+                    <TableCell>{voucher.code}</TableCell>
+                    <TableCell title={voucher.description}>
                       {voucher.description}
                     </TableCell>
-                    <TableCell className="text-sm capitalize whitespace-nowrap">
-                      {voucher.discountType}
-                    </TableCell>
-                    <TableCell className="text-sm whitespace-nowrap">
+                    <TableCell>{voucher.discountType}</TableCell>
+                    <TableCell>
                       {voucher.discountType === "percentage"
                         ? `${voucher.discount}%`
-                        : `Rp ${voucher.discount.toLocaleString("id-ID")}`}
+                        : `${formatRupiah(voucher.discount)}`}
                     </TableCell>
-                    <TableCell className="text-sm whitespace-nowrap">
+                    <TableCell>
                       {voucher.maxDiscount
-                        ? `Rp ${voucher.maxDiscount.toLocaleString("id-ID")}`
+                        ? `${formatRupiah(voucher.maxDiscount)}`
                         : "-"}
                     </TableCell>
-                    <TableCell className="text-sm whitespace-nowrap">
-                      {voucher.quota}
-                    </TableCell>
-                    <TableCell className="text-sm whitespace-nowrap">
-                      {new Date(voucher.expiredAt).toLocaleDateString("id-ID")}
-                    </TableCell>
-                    <TableCell className="text-center whitespace-nowrap">
-                      <div className="flex justify-center gap-2">
-                        <VoucherDelete voucher={voucher} />
-                        <VoucherUpdate voucher={voucher} />
-                      </div>
+                    <TableCell>{voucher.quota}</TableCell>
+                    <TableCell>{voucher.expiredAt}</TableCell>
+                    <TableCell className="space-x-2">
+                      <VoucherDelete voucher={voucher} />
+                      <VoucherUpdate voucher={voucher} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -162,7 +142,7 @@ const VouchersList = () => {
                     <span className="font-medium text-foreground">
                       Expired:
                     </span>{" "}
-                    {new Date(voucher.expiredAt).toLocaleDateString("id-ID")}
+                    {voucher.expiredAt}
                   </p>
                 </div>
 

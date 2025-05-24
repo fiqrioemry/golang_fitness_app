@@ -1,9 +1,10 @@
-// src/services/user.js
+import qs from "qs";
 import { authInstance } from ".";
 
 //   GET /api/admin/users
 export const getAllUsers = async (params) => {
-  const res = await authInstance.get("/admin/users", { params });
+  const queryString = qs.stringify(params, { skipNulls: true });
+  const res = await authInstance.get(`/admin/users?${queryString}`);
   return res.data;
 };
 

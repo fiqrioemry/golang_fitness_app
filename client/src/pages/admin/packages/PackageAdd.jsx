@@ -1,5 +1,6 @@
 import { packageSchema } from "@/lib/schema";
 import { packageState } from "@/lib/constant";
+import { useNavigate } from "react-router-dom";
 import { usePackageMutation } from "@/hooks/usePackage";
 import { FormInput } from "@/components/form/FormInput";
 import { SectionTitle } from "@/components/header/SectionTitle";
@@ -11,7 +12,17 @@ import { MultiSelectElement } from "@/components/input/MultiSelectElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
 const PackageAdd = () => {
+  const navigate = useNavigate();
   const { createPackage } = usePackageMutation();
+
+  const handleCreatePackage = async (data) => {
+    try {
+      await createPackage.mutateAsync(data);
+      navigate("/admin/packages");
+    } catch (error) {
+      console.error("Failed to create package:", error);
+    }
+  };
 
   return (
     <section className="section">
@@ -26,7 +37,7 @@ const PackageAdd = () => {
           schema={packageSchema}
           text={"Add New Package"}
           isLoading={createPackage.isPending}
-          action={createPackage.mutateAsync}
+          action={handleCreatePackage}
         >
           {/* Main Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -78,7 +89,7 @@ const PackageAdd = () => {
               />
             </div>
 
-            <div>
+            <div className="space-y-4">
               <InputFileElement
                 isSingle
                 name="image"

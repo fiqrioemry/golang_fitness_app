@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent } from "@/components/ui/Card";
-import { formatRupiah, formatDateTime } from "@/lib/utils";
+import { formatRupiah, formatDate } from "@/lib/utils";
 
 export const TransactionCard = ({ transactions }) => {
   return (
@@ -17,7 +17,7 @@ export const TransactionCard = ({ transactions }) => {
               </div>
 
               <div className="text-sm text-muted-foreground whitespace-nowrap">
-                {formatDateTime(tx.paidAt)}
+                {formatDate(tx.paidAt)}
               </div>
 
               <div className="text-sm text-muted-foreground whitespace-nowrap uppercase">

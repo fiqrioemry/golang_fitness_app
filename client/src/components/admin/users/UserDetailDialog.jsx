@@ -1,24 +1,25 @@
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
   DialogDescription,
+  DialogClose,
 } from "@/components/ui/Dialog";
-import { formatDateTime } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useUserDetailQuery } from "@/hooks/useUsers";
+import { useNavigate, useParams } from "react-router-dom";
 
-const UserDetailDialog = ({ userId, trigger }) => {
-  const { data, isLoading, isError } = useUserDetailQuery(userId);
+export const UserDetailDialog = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { data, isLoading } = useUserDetailQuery(id);
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+    <Dialog open={true} onOpenChange={() => navigate(-1)}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>User Details</DialogTitle>
@@ -33,43 +34,38 @@ const UserDetailDialog = ({ userId, trigger }) => {
             <Skeleton className="w-full h-6" />
             <Skeleton className="w-full h-6" />
           </div>
-        ) : isError ? (
-          <div className="text-red-500 text-sm">
-            Failed to load user details.
-          </div>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <img
-                src={data.avatar}
-                alt={data.fullname}
+                src={data?.avatar}
+                alt={data?.fullname}
                 className="w-16 h-16 rounded-full object-cover border"
               />
               <div>
-                <h3 className="text-lg font-semibold">{data.fullname}</h3>
-                <p className="text-sm text-muted-foreground">{data.email}</p>
-                <Badge variant="outline">{data.role}</Badge>
+                <h3 className="text-lg font-semibold">{data?.fullname}</h3>
+                <p className="text-sm text-muted-foreground">{data?.email}</p>
+                <Badge variant="outline">{data?.role}</Badge>
               </div>
             </div>
-
             <div className="text-sm space-y-2">
               <p>
-                <span className="font-medium">Phone:</span> {data.phone || "-"}
+                <span className="font-medium">Phone:</span> {data?.phone || "-"}
               </p>
               <p>
                 <span className="font-medium">Gender:</span>{" "}
-                {data.gender || "-"}
+                {data?.gender || "-"}
               </p>
               <p>
-                <span className="font-medium">Bio:</span> {data.bio || "-"}
+                <span className="font-medium">Birthday:</span>{" "}
+                {data?.birthday || "-"}
               </p>
               <p>
-                <span className="font-medium">Created:</span>{" "}
-                {formatDateTime(data.createdAt)}
+                <span className="font-medium">Bio:</span> {data?.bio || "-"}
               </p>
               <p>
-                <span className="font-medium">Updated:</span>{" "}
-                {formatDateTime(data.updatedAt)}
+                <span className="font-medium">Joined Since:</span>{" "}
+                {formatDate(data?.joinedAt)}
               </p>
             </div>
           </div>
@@ -84,5 +80,3 @@ const UserDetailDialog = ({ userId, trigger }) => {
     </Dialog>
   );
 };
-
-export { UserDetailDialog };

@@ -157,6 +157,25 @@ export const notificationState = {
   typeCode: "",
 };
 
+export const paymentStatusOptions = [
+  { value: "all", label: "All" },
+  { value: "success", label: "Success" },
+  { value: "pending", label: "Pending" },
+  { value: "failed", label: "Failed" },
+];
+
+export const statusOptions = [
+  { value: "all", label: "All" },
+  { value: "active", label: "active" },
+  { value: "inactive", label: "inactive" },
+];
+
+export const roleOptions = [
+  { value: "all", label: "All" },
+  { value: "admin", label: "admin" },
+  { value: "customer", label: "customer" },
+  { value: "instructor", label: "instructor" },
+];
 export const operationMinutes = [0, 15, 30, 45];
 
 export const operationHours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];

@@ -1,6 +1,6 @@
 import { operationHours } from "@/lib/constant";
 import { operationMinutes } from "@/lib/constant";
-import { updateTemplateSchema } from "@/lib/schema";
+import { updateScheduleSchema } from "@/lib/schema";
 import { useScheduleMutation } from "@/hooks/useSchedules";
 import { SelectElement } from "@/components/input/SelectElement";
 import { FormUpdateSheet } from "@/components/form/FormUpdateSheet";
@@ -23,11 +23,11 @@ const UpdateClassSchedule = ({ schedule, onClose }) => {
       state={schedule}
       loading={isPending}
       title="Update Schedule"
-      schema={updateTemplateSchema}
+      schema={updateScheduleSchema}
       action={handleUpdateSchedule}
     >
       <SelectCalendarElement name="date" label="Event Date" />
-      <ColorPickerElement name="colorCode" label="Cardboard Color" />
+      <ColorPickerElement name="color" label="Cardboard Color" />
       <SelectOptionsElement
         data="class"
         name="classId"

@@ -26,7 +26,7 @@ const ClassDetail = () => {
   if (isLoading || !cls?.id) return <ClassDetailSkeleton />;
 
   return (
-    <section className="section py-24 text-foreground">
+    <section className="section min-h-[80vh] py-24 text-foreground">
       <div className="mb-6">
         <button
           onClick={() => navigate(-1)}
@@ -36,7 +36,6 @@ const ClassDetail = () => {
           Back to Classes
         </button>
       </div>
-
       {/* Header */}
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         <img
@@ -55,19 +54,18 @@ const ClassDetail = () => {
             ))}
           </div>
           <div className="text-sm text-muted-foreground space-y-1">
-            <p>⏱ Duration: {cls.duration} minutes</p>
-            <p>📍 Location: {cls.location}</p>
+            <p>◉ Duration: {cls.duration} minutes</p>
+            <p>◉ Location: {cls.location}</p>
             <p>
-              📌 Type: {cls.type} | Level: {cls.level}
+              ◉ Type: {cls.type} | Level: {cls.level}
             </p>
             <p>
-              🏷 Category: {cls.category} - {cls.subcategory}
+              ◉ Category: {cls.category} - {cls.subcategory}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Gallery */}
       {cls.galleries?.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl font-semibold mb-4">Gallery</h3>
@@ -83,7 +81,6 @@ const ClassDetail = () => {
           </div>
         </div>
       )}
-
       {/* Reviews */}
       {reviews?.length > 0 && (
         <div className="mt-8">

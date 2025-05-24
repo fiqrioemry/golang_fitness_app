@@ -22,7 +22,7 @@ export const UploadAvatar = ({ profile }) => {
         schema={avatarSchema}
         loading={updateAvatar.isPending}
         action={updateAvatar.mutateAsync}
-        buttonText={
+        buttonElement={
           <Button className="w-full" type="button">
             <Camera className="w-4 h-4" />
             <span>Change Avatar</span>

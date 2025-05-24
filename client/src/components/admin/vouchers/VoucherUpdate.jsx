@@ -14,15 +14,23 @@ const discountTypeOptions = [
 ];
 
 const VoucherUpdate = ({ voucher }) => {
-  const { createVoucher } = useVoucherMutation();
+  const { updateVoucher } = useVoucherMutation();
+
+  const handleUpdateVoucher = ({ id, data }) => {
+    const payload = {
+      ...data,
+      expiredAt: data.expiredAt ? new Date(data.expiredAt).toISOString() : null,
+    };
+    updateVoucher.mutateAsync({ id, data: payload });
+  };
 
   return (
     <FormUpdateDialog
       state={voucher}
       title="Update Voucher"
       schema={createVoucherSchema}
-      loading={createVoucher.isPending}
-      action={({ id, ...data }) => createVoucher.mutateAsync({ id, data })}
+      action={handleUpdateVoucher}
+      loading={updateVoucher.isPending}
     >
       <InputTextElement
         name="code"
@@ -60,7 +68,7 @@ const VoucherUpdate = ({ voucher }) => {
         label="Expiration Date"
         placeholder="YYYY-MM-DD"
       />
-      <SwitchElement name="isReusable" label="Allow multiple usage ?" />
+      <SwitchElement name="isReusable" label="Allow multiple usage?" />
     </FormUpdateDialog>
   );
 };

@@ -14,11 +14,12 @@ const Notifications = () => {
     <section className="section">
       <SectionTitle
         title="Send New Message"
-        description="Send a notification through all your users with just on click."
+        description="Send a notification through all your users with just one click."
       />
 
       <div className="bg-background  rounded-xl shadow-sm border p-6">
         <FormInput
+          shouldReset
           className="w-full md:w-72"
           state={notificationState}
           schema={notificationSchema}

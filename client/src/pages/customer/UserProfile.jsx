@@ -47,15 +47,15 @@ const UserProfile = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center text-muted-foreground">
                 <div>
                   <span className="font-medium text-foreground">Birthday:</span>{" "}
-                  {birthday || "Not set"}
+                  {formatDate(joinedAt) || ""}
                 </div>
                 <UpdateProfile profile={data} edit="birthday" />
               </div>
 
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center text-muted-foreground">
                 <div>
                   <span className="font-medium text-foreground">Gender:</span>{" "}
                   {gender || "Not set"}
@@ -63,7 +63,7 @@ const UserProfile = () => {
                 <UpdateProfile profile={data} edit="gender" />
               </div>
 
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center text-muted-foreground">
                 <div>
                   <span className="font-medium text-foreground">Phone:</span>{" "}
                   {phone || "Not set"}

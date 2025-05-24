@@ -22,12 +22,13 @@ const ClassAdd = () => {
 
       <div className="bg-background border shadow-sm rounded-xl p-6">
         <FormInput
-          text="Add New Class"
+          shouldReset
           className="w-72"
           state={classState}
+          text="Add New Class"
           schema={classSchema}
-          isLoading={createClass.isPending}
           action={createClass.mutateAsync}
+          isLoading={createClass.isPending}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>

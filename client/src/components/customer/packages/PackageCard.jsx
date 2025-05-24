@@ -12,8 +12,9 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/Card";
+import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
-import { format, differenceInDays, isBefore } from "date-fns";
+import { differenceInDays, isBefore } from "date-fns";
 
 export const PackageCard = ({ pkgs }) => {
   const today = new Date();
@@ -42,8 +43,7 @@ export const PackageCard = ({ pkgs }) => {
                     {item.packageName}
                   </CardTitle>
                   <CardDescription>
-                    Purchased on{" "}
-                    {format(new Date(item.purchasedAt), "dd MMM yyyy")}
+                    Purchased on :{formatDate(item.purchasedAt)}
                   </CardDescription>
                 </div>
 
@@ -81,7 +81,7 @@ export const PackageCard = ({ pkgs }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-muted-foreground">
                 <p className="flex items-center gap-2">
                   <CalendarCheck className="w-4 h-4" />
-                  Expires on: {format(expiredDate, "dd MMM yyyy")}
+                  Expires on: {formatDate(expiredDate)}
                 </p>
                 <p className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />

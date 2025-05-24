@@ -2,17 +2,12 @@ import { toast } from "sonner";
 import * as classService from "@/services/class";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const useClassesQuery = (params = {}) =>
+export const useClassesQuery = (params) =>
   useQuery({
     queryKey: ["classes", params],
     queryFn: () => classService.getAllClasses(params),
     keepPreviousData: true,
-  });
-
-export const useActiveClassesQuery = () =>
-  useQuery({
-    queryKey: ["classes", "active"],
-    queryFn: classService.getActiveClasses,
+    staleTime: 1000 * 60 * 15,
   });
 
 export const useClassDetailQuery = (id) =>

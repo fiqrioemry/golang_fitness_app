@@ -25,7 +25,7 @@ export const formatRupiah = (number) => {
 
 export const formatDateTime = (dateStr) => {
   const date = new Date(dateStr);
-  return date.toLocaleString("en-GB", {
+  return date.toLocaleString("id-ID", {
     year: "numeric",
     month: "short",
     day: "2-digit",
@@ -36,10 +36,23 @@ export const formatDateTime = (dateStr) => {
 
 export const formatDate = (dateStr) => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString("en-GB", {
+  return date.toLocaleDateString("id-ID", {
     year: "numeric",
     month: "short",
     day: "2-digit",
+  });
+};
+
+export function formatTime(hour, minute) {
+  const h = String(hour).padStart(2, "0");
+  const m = String(minute).padStart(2, "0");
+  return `${h}:${m}`;
+}
+export const formatHour = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
@@ -103,4 +116,8 @@ export const buildDateTime = (dateStr, hour, minute) => {
   date.setMinutes(minute);
   date.setSeconds(0);
   return date;
+};
+
+export const truncateText = (text, maxLength) => {
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };

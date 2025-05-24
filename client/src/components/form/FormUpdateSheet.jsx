@@ -63,12 +63,7 @@ export function FormUpdateSheet({
 
   const handleSave = useCallback(
     async (data) => {
-      const payload = {
-        ...data,
-        date: data.date ? new Date(data.date).toISOString() : null,
-        endDate: data.endDate ? new Date(data.endDate).toISOString() : null,
-      };
-      await action({ id: state.id, data: payload });
+      await action({ id: state.id, data });
       if (formState.isValid && shouldReset) reset();
       setOpen(false);
     },

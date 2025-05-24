@@ -1,47 +1,44 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { useClassesQuery } from "@/hooks/useClass";
-import { OurClassSkeleton } from "@/components/loading/OurClassSkeleton";
+import { Button } from "@/components/ui/Button";
+import { usePackagesQuery } from "@/hooks/usePackage";
+import { OurPackageSkeleton } from "@/components/loading/OurPackageSkeleton";
 
-export const OurClasses = () => {
-  const { data: response, isLoading } = useClassesQuery({ limit: 3 });
+export const OurPackages = () => {
+  const { data, isLoading } = usePackagesQuery({ limit: 3 });
 
-  const classes = response?.classes || [];
+  const packages = data?.data || [];
 
   return (
-    <section className="py-20 px-4 bg-muted">
+    <section className="py-20 px-4 max-w-7xl mx-auto">
       <h2 className="text-4xl font-bold text-center mb-4 font-heading">
-        Our Classes
+        Our Packages
       </h2>
       <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto text-base">
         From relaxing yoga sessions to high-intensity workouts, choose the class
         that suits your fitness goals.
       </p>
       {isLoading ? (
-        <OurClassSkeleton />
+        <OurPackageSkeleton />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {classes.map((classItem) => (
+          {packages.map((pkg) => (
             <div
-              key={classItem.id}
+              key={pkg.id}
               className="bg-card text-foreground border border-border rounded-xl shadow hover:shadow-xl transition overflow-hidden"
             >
               <img
-                src={classItem.image}
-                alt={classItem.title}
+                src={pkg.image}
+                alt={pkg.name}
                 className="w-full h-56 object-cover"
               />
               <div className="p-6 space-y-3">
-                <h4 className="text-lg font-bold">{classItem.title}</h4>
+                <h4 className="text-lg font-bold">{pkg.name}</h4>
                 <p className="text-sm text-muted-foreground line-clamp-2">
-                  {classItem.description}
+                  {pkg.description}
                 </p>
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-sm font-medium text-primary">
-                    {classItem.duration} min
-                  </span>
-                  <Link to="/schedules">
-                    <Button size="sm">Book Now</Button>
+                <div className="flex justify-end     items-center pt-2">
+                  <Link to="/packages">
+                    <Button size="sm">Get it now</Button>
                   </Link>
                 </div>
               </div>

@@ -1,39 +1,36 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableHeader,
-} from "@/components/ui/Table";
-import { useEffect } from "react";
 import { CirclePlus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { statusOptions } from "@/lib/constant";
 import { Button } from "@/components/ui/Button";
+import { useDebounce } from "@/hooks/useDebounce";
+import { Loading } from "@/components/ui/Loading";
+import { useQueryStore } from "@/store/useQueryStore";
 import { usePackagesQuery } from "@/hooks/usePackage";
-import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { Pagination } from "@/components/ui/Pagination";
 import { Card, CardContent } from "@/components/ui/Card";
+import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { SearchInput } from "@/components/ui/SearchInput";
+import { SearchNotFound } from "@/components/ui/SearchNotFound";
 import { SectionTitle } from "@/components/header/SectionTitle";
-import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
-import { PackageDelete } from "@/components/admin/packages/PackageDelete";
-import { PackageUpdate } from "@/components/admin/packages/PackageUpdate";
+import { FilterSelection } from "@/components/ui/FilterSelecction";
+import { PackageCard } from "@/components/admin/packages/PackageCard";
+import { Link } from "react-router-dom";
 
 const PackagesList = () => {
-  const {
-    data: packages = [],
-    isLoading,
-    isError,
-    refetch,
-  } = usePackagesQuery();
-  const navigate = useNavigate();
+  const { page, limit, q, sort, status, setPage, setQ, setSort, setStatus } =
+    useQueryStore();
 
-  useEffect(() => {
-    refetch();
-  }, []);
+  const debouncedQ = useDebounce(q, 500);
+  const { data, isLoading, isError, refetch } = usePackagesQuery({
+    q: debouncedQ,
+    status,
+    sort,
+    page,
+    limit,
+  });
 
-  if (isLoading) return <SectionSkeleton />;
+  const packages = data?.data || [];
 
-  if (isError) return <ErrorDialog onRetry={refetch} />;
+  const pagination = data?.pagination;
 
   return (
     <section className="section">
@@ -42,134 +39,51 @@ const PackagesList = () => {
         description="View, add, and manage training packages available for purchase by
           users."
       />
-      <div className="flex justify-end mt-4">
-        <Button size="nav" onClick={() => navigate("/admin/packages/add")}>
-          <CirclePlus className="w-4 h-4 mr-2" />
-          Add Package
-        </Button>
+
+      <div className="flex flex-col md:flex-row justify-between gap-4">
+        <SearchInput
+          q={q}
+          setQ={setQ}
+          setPage={setPage}
+          placeholder={"search by name or descriptions"}
+        />
+
+        <div className="flex justify-end items-center  gap-4">
+          <FilterSelection
+            value={status}
+            className="w-32 h-12"
+            onChange={setStatus}
+            options={statusOptions}
+          />
+          <Link to="/admin/packages/add">
+            <Button className="h-12">
+              <CirclePlus className="w-4 h-4 mr-2" />
+              Add Package
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <Card className="border shadow-sm">
         <CardContent className="overflow-x-auto p-0">
-          <div className="hidden md:block max-w-8xl w-full">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/40">
-                  <TableHead>Thumbnail</TableHead>
-                  <TableHead>Package Name</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Credit</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-center">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="h-12">
-                {packages.map((pkg) => (
-                  <TableRow
-                    key={pkg.id}
-                    className="border-t border-border hover:bg-muted transition"
-                  >
-                    <TableCell>
-                      <img
-                        src={pkg.image}
-                        alt={pkg.name}
-                        className="w-14 h-14 rounded-md object-cover border"
-                      />
-                    </TableCell>
-                    <TableCell className="font-medium text-foreground">
-                      {pkg.name}
-                    </TableCell>
-                    <TableCell
-                      className="max-w-xs truncate text-muted-foreground"
-                      title={pkg.description}
-                    >
-                      {pkg.description}
-                    </TableCell>
-                    <TableCell className="text-primary font-semibold">
-                      Rp {pkg.price.toLocaleString("id-ID")}
-                    </TableCell>
-                    <TableCell>{pkg.credit} sessions</TableCell>
-                    <TableCell>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          pkg.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {pkg.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex justify-center gap-2">
-                        <PackageUpdate pkg={pkg} />
-                        <PackageDelete pkg={pkg} />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          {isLoading ? (
+            <Loading />
+          ) : isError ? (
+            <ErrorDialog onRetry={refetch} />
+          ) : packages.length === 0 ? (
+            <SearchNotFound title="No Packages found" q={q} />
+          ) : (
+            <PackageCard packages={packages} sort={sort} setSort={setSort} />
+          )}
 
-          {/* Mobile View */}
-          <div className="md:hidden w-full space-y-4 p-4">
-            {packages.map((pkg) => (
-              <div
-                key={pkg.id}
-                className="border border-border rounded-lg p-4 shadow-sm bg-background"
-              >
-                <div className="flex items-center gap-4 mb-3">
-                  <img
-                    src={pkg.image}
-                    alt={pkg.name}
-                    className="w-16 h-16 rounded-md object-cover border"
-                  />
-                  <div className="flex-1">
-                    <h3 className="text-base text-start font-semibold text-foreground">
-                      {pkg.name}
-                    </h3>
-                    <p className="text-xs text-start text-muted-foreground">
-                      {pkg.description}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="text-sm text-start text-muted-foreground space-y-1 mb-3">
-                  <p>
-                    <span className="font-medium text-foreground">Price :</span>{" "}
-                    Rp {pkg.price.toLocaleString("id-ID")}
-                  </p>
-                  <p>
-                    <span className="font-medium text-foreground">
-                      Credit :
-                    </span>{" "}
-                    {pkg.credit} sessions
-                  </p>
-                  <p>
-                    <span className="font-medium text-foreground">
-                      Status :
-                    </span>{" "}
-                    <span
-                      className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                        pkg.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {pkg.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </p>
-                </div>
-
-                <div className="flex justify-end gap-2">
-                  <PackageUpdate pkg={pkg} />
-                  <PackageDelete pkg={pkg} />
-                </div>
-              </div>
-            ))}
-          </div>
+          {pagination && (
+            <Pagination
+              page={pagination.page}
+              onPageChange={setPage}
+              limit={pagination.limit}
+              total={pagination.totalRows}
+            />
+          )}
         </CardContent>
       </Card>
     </section>

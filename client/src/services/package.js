@@ -1,8 +1,10 @@
+import qs from "qs";
 import { buildFormData } from "@/lib/utils";
 import { publicInstance, authInstance } from ".";
 
-export const getAllPackages = async () => {
-  const res = await publicInstance.get("/packages");
+export const getAllPackages = async (params) => {
+  const queryString = qs.stringify(params, { skipNulls: true });
+  const res = await publicInstance.get(`/packages?${queryString}`);
   return res.data;
 };
 

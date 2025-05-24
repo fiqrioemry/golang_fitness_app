@@ -1,33 +1,51 @@
-import { optionSchema, locationSchema } from "@/lib/schema";
 import { useMutationOptions } from "@/hooks/useSelectOptions";
 import { FormUpdateDialog } from "@/components/form/FormUpdateDialog";
 import { InputTextElement } from "@/components/input/InputTextElement";
+import { locationSchema, subcategorySchema, optionSchema } from "@/lib/schema";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
+import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
 
-const UpdateOptions = ({ option, activeTab }) => {
+export const UpdateOptions = ({ option, activeTab }) => {
+  const schema =
+    activeTab === "location"
+      ? locationSchema
+      : activeTab === "subcategory"
+      ? subcategorySchema
+      : optionSchema;
+
   const { updateOptions } = useMutationOptions(activeTab);
-  const schema = activeTab === "location" ? locationSchema : optionSchema;
 
   return (
     <FormUpdateDialog
       state={option}
       schema={schema}
-      title={`Update ${activeTab}`}
+      title={`Add New ${activeTab}`}
+      buttonText={`New ${activeTab}`}
       loading={updateOptions.isPending}
       action={updateOptions.mutateAsync}
     >
       <InputTextElement
         name="name"
-        label="Name"
-        placeholder={`Enter the name for ${activeTab}`}
+        label={`Name of ${activeTab}`}
+        placeholder={`Enter ${activeTab} name`}
       />
-
       {activeTab === "location" && <LocationInputElement />}
+      {activeTab === "subcategory" && <CategoryInputElement />}
     </FormUpdateDialog>
   );
 };
 
-export { UpdateOptions };
+const CategoryInputElement = () => {
+  return (
+    <div>
+      <SelectOptionsElement
+        name="categoryId"
+        label="Category"
+        placeholder="Select Category options"
+      />
+    </div>
+  );
+};
 
 const LocationInputElement = () => {
   return (

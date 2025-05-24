@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { createVoucherSchema } from "@/lib/schema";
 import { createVoucherState } from "@/lib/constant";
 import { FormInput } from "@/components/form/FormInput";
@@ -16,7 +17,23 @@ const discountTypeOptions = [
 ];
 
 const VoucherAdd = () => {
+  const navigate = useNavigate();
   const { createVoucher } = useVoucherMutation();
+
+  const handleCreateVoucher = async (data) => {
+    try {
+      const payload = {
+        ...data,
+        expiredAt: data.expiredAt
+          ? new Date(data.expiredAt).toISOString()
+          : null,
+      };
+      await createVoucher.mutateAsync(payload);
+      navigate("/admin/vouchers");
+    } catch (error) {
+      console.error("Failed to create voucher:", error);
+    }
+  };
 
   return (
     <section className="section">
@@ -31,8 +48,8 @@ const VoucherAdd = () => {
           className="w-72"
           state={createVoucherState}
           schema={createVoucherSchema}
+          action={handleCreateVoucher}
           isLoading={createVoucher.isPending}
-          action={createVoucher.mutate}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputTextElement

@@ -87,6 +87,9 @@ export const packageSchema = z.object({
     .min(0, "Discount cannot be negative")
     .max(100, "Discount cannot exceed 100")
     .optional(),
+  classIds: z
+    .array(z.string().uuid("Invalid class ID"))
+    .min(1, "At least one class must be selected"),
   expired: z.number().min(1, "Expiry duration is required"),
   additional: z.array(z.string()).optional(),
   image: imageItemSchema.refine((val) => !!val, {
@@ -112,9 +115,9 @@ export const locationSchema = z.object({
 
 export const instructorSchema = z.object({
   userId: z.string().min(1, "User is required"),
-  experience: z.number().optional(),
-  specialties: z.string().optional(),
-  certifications: z.string().optional(),
+  experience: z.number().min(0, "experience is required"),
+  specialties: z.string().min(1, "User is required"),
+  certifications: z.string().min(1, "User is required"),
 });
 
 export const midtransNotificationSchema = z.object({
@@ -225,6 +228,7 @@ export const scheduleSchema = z
 export const updateScheduleSchema = z.object({
   classId: z.string().min(1, "Class is required"),
   instructorId: z.string().min(1, "Instructor is required"),
+  color: z.string().optional(),
   date: z
     .string()
     .optional()

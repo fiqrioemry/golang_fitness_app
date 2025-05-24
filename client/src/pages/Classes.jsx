@@ -8,23 +8,26 @@ import {
 import { classesTitle } from "@/lib/constant";
 import { Button } from "@/components/ui/Button";
 import { useClassesQuery } from "@/hooks/useClass";
-import { Link, useSearchParams } from "react-router-dom";
+import { useQueryStore } from "@/store/useQueryStore";
+import { Pagination } from "@/components/ui/Pagination";
+import { useSearchParams, Link } from "react-router-dom";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import FilterSelection from "@/components/input/FilterSelection";
 import { ClassesSkeleton } from "@/components/loading/ClassesSkeleton";
+import { SearchFilterSelection } from "@/components/input/SearchFilterSelection";
 
 const Classes = () => {
   useDocumentTitle(classesTitle);
 
+  const { q, page, limit, setPage } = useQueryStore();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filters = {
-    typeId: searchParams.get("typeId"),
-    levelId: searchParams.get("levelId"),
-    categoryId: searchParams.get("categoryId"),
-    locationId: searchParams.get("locationId"),
-    subcategoryId: searchParams.get("subcategoryId"),
+    typeId: searchParams.get("typeId") || "",
+    levelId: searchParams.get("levelId") || "",
+    categoryId: searchParams.get("categoryId") || "",
+    locationId: searchParams.get("locationId") || "",
+    subcategoryId: searchParams.get("subcategoryId") || "",
   };
 
   const {
@@ -32,13 +35,21 @@ const Classes = () => {
     isLoading,
     isError,
     refetch,
-  } = useClassesQuery(filters);
+  } = useClassesQuery({
+    q,
+    page,
+    limit,
+    status: "active",
+    ...filters,
+  });
 
   if (isLoading) return <ClassesSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
 
-  const { classes = [] } = response;
+  const classes = response?.classes || [];
+
+  const pagination = response?.pagination || [];
 
   return (
     <section className="section py-24 text-foreground">
@@ -54,26 +65,31 @@ const Classes = () => {
       {/* Filter Bar */}
       <div className="sticky top-4 z-10 bg-card text-foreground border border-border shadow-sm rounded-xl p-4 mb-8">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          <FilterSelection
-            data="location"
-            label="Location"
+          <SearchFilterSelection
             paramKey="locationId"
+            label="Location"
+            data="location"
           />
-          <FilterSelection paramKey="typeId" label="Type" data="type" />
-          <FilterSelection
-            data="category"
-            label="Category"
+          <SearchFilterSelection paramKey="typeId" label="Type" data="type" />
+          <SearchFilterSelection
             paramKey="categoryId"
+            label="Category"
+            data="category"
           />
-          <FilterSelection
-            data="subcategory"
-            label="Subcategory"
+          <SearchFilterSelection
             paramKey="subcategoryId"
+            label="Subcategory"
+            data="subcategory"
           />
-          <FilterSelection paramKey="levelId" label="Level" data="level" />
+          <SearchFilterSelection
+            paramKey="levelId"
+            label="Level"
+            data="level"
+          />
         </div>
       </div>
 
+      {/* Result */}
       {classes.length === 0 ? (
         <div className="flex flex-col items-center justify-center text-center py-4 col-span-full">
           <img
@@ -131,6 +147,16 @@ const Classes = () => {
           ))}
         </div>
       )}
+      <div>
+        {pagination && pagination.totalRows > 10 && (
+          <Pagination
+            page={pagination.page}
+            onPageChange={setPage}
+            limit={pagination.limit}
+            total={pagination.totalRows}
+          />
+        )}
+      </div>
     </section>
   );
 };

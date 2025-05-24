@@ -65,14 +65,7 @@ export function FormUpdateDialog({
 
   const handleSave = useCallback(
     async (data) => {
-      console.log(data);
-      const payload = {
-        ...data,
-        date: data.date ? new Date(data.date).toISOString() : null,
-        endDate: data.endDate ? new Date(data.endDate).toISOString() : null,
-      };
-
-      await action({ id: state.id, data: payload });
+      await action({ id: state.id, data });
       setIsOpen(false);
     },
     [action, formState.isValid, reset, shouldReset]

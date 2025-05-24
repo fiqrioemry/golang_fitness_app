@@ -1,19 +1,18 @@
 import { ReviewClass } from "./ReviewClass";
-import { format, parseISO } from "date-fns";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
+import { formatHour, formatDate, formatTime } from "@/lib/utils";
 import { CalendarIcon, ClockIcon, UserIcon } from "lucide-react";
 
 export const PastAttendanceCard = ({ attendance }) => {
-  const formattedDate = format(parseISO(attendance.date), "EEEE, dd MMM yyyy");
-  const formattedTime = `${String(attendance.startHour).padStart(
-    2,
-    "0"
-  )}:${String(attendance.startMinute).padStart(2, "0")}`;
+  const formattedTime = formatTime(
+    attendance.startHour,
+    attendance.startMinute
+  );
   const checkedTime = attendance.checkedAt
-    ? format(parseISO(attendance.checkedAt), "HH:mm")
+    ? formatHour(attendance.checkedAt)
     : "-";
-
+  const formattedDate = formatDate(attendance.checkedAt);
   return (
     <Card className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 shadow-sm border border-border bg-muted/20">
       <img

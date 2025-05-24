@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useSelectOptions } from "@/hooks/useSelectOptions";
 
-const FilterSelection = ({ paramKey, label, data }) => {
+export const SearchFilterSelection = ({ paramKey, label, data }) => {
   const { data: options = [], isLoading } = useSelectOptions(data);
   const [searchParams, setSearchParams] = useSearchParams();
   const selected = searchParams.get(paramKey) || "";
@@ -42,5 +42,3 @@ const FilterSelection = ({ paramKey, label, data }) => {
     </div>
   );
 };
-
-export default FilterSelection;

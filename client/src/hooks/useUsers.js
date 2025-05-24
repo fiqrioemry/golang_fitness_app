@@ -1,27 +1,23 @@
-// src/hooks/useUsers.js
 import * as userService from "@/services/users";
 import { useQuery } from "@tanstack/react-query";
 
-// GET /api/admin/users
-export const useUsersQuery = (params = {}) =>
+export const useUsersQuery = (params) =>
   useQuery({
-    queryKey: ["admin-users", params],
+    queryKey: ["users", params],
     queryFn: () => userService.getAllUsers(params),
     keepPreviousData: true,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 2,
   });
 
-// GET /api/admin/users/:id
-export const useUserDetailQuery = (id) =>
+export const useUserDetailQuery = (userId) =>
   useQuery({
-    queryKey: ["admin-user", id],
-    queryFn: () => userService.getUserDetail(id),
-    enabled: !!id,
+    queryKey: ["user-detail", userId],
+    queryFn: () => userService.getUserDetail(userId),
+    enabled: !!userId,
   });
 
-// GET /api/admin/users/stats
 export const useUserStatsQuery = () =>
   useQuery({
-    queryKey: ["admin-user-stats"],
+    queryKey: ["users-stats"],
     queryFn: userService.getUserStats,
   });

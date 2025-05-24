@@ -1,5 +1,3 @@
-// src/components/address/UpdatePackage.jsx
-import React from "react";
 import { packageSchema } from "@/lib/schema";
 import { usePackageMutation } from "@/hooks/usePackage";
 import { SwitchElement } from "@/components/input/SwitchElement";
@@ -8,6 +6,7 @@ import { InputTextElement } from "@/components/input/InputTextElement";
 import { InputTagsElement } from "@/components/input/InputTagsElement";
 import { InputFileElement } from "@/components/input/InputFileElement";
 import { InputNumberElement } from "@/components/input/InputNumberElement";
+import { MultiSelectElement } from "@/components/input/MultiSelectElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
 const PackageUpdate = ({ pkg }) => {
@@ -15,7 +14,10 @@ const PackageUpdate = ({ pkg }) => {
 
   return (
     <FormUpdateDialog
-      state={pkg}
+      state={{
+        ...pkg,
+        classIds: pkg.classes?.map((c) => c.id) || [],
+      }}
       title="Update Package"
       schema={packageSchema}
       loading={updatePackage.isPending}
@@ -42,6 +44,7 @@ const PackageUpdate = ({ pkg }) => {
         label="Credit"
         placeholder="Total credits in unit"
       />
+      <MultiSelectElement name="classIds" label="Accessible Classes" />
       <InputNumberElement
         name="expired"
         label="Expiration Time"

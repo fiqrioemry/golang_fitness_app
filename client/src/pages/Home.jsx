@@ -1,9 +1,9 @@
 import { homeTitle } from "@/lib/constant";
 import { OurClasses } from "@/components/home/OurClasses";
-import { Membership } from "@/components/home/Membership";
 import { HeroSection } from "@/components/home/HeroSection";
 import { OurLocation } from "@/components/home/OurLocation";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { OurPackages } from "@/components/home/OurPackages";
 
 export default function Home() {
   useDocumentTitle(homeTitle);
@@ -12,11 +12,11 @@ export default function Home() {
       {/* hero section */}
       <HeroSection />
 
-      {/* popular classes */}
+      {/* our classes */}
       <OurClasses />
 
-      {/* Membership*/}
-      <Membership />
+      {/* our packages*/}
+      <OurPackages />
 
       {/* Visit Studio */}
       <OurLocation />

@@ -2,10 +2,10 @@ import { FormDelete } from "@/components/form/FormDelete";
 import { useMutationOptions } from "@/hooks/useSelectOptions";
 
 const DeleteOptions = ({ option, activeTab }) => {
-  const { deleteOption, isPending } = useMutationOptions(activeTab);
+  const { deleteOptions, isPending } = useMutationOptions(activeTab);
 
   const handleDeleteOptions = () => {
-    deleteOption.mutate(option.id);
+    deleteOptions.mutate(option.id);
   };
 
   return (

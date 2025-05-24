@@ -42,15 +42,19 @@ import { useEffect } from "react";
 import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "./store/useAuthStore";
 import { ScrollToTop } from "./hooks/useScrollToTop";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AdminRoute, AuthRoute, NonAuthRoute, PublicRoute } from "./middleware";
 
 // layout pages
 import AdminLayout from "./components/admin/AdminLayout";
 import PublicLayout from "./components/public/PublicLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
+import { UserDetailDialog } from "./components/admin/users/UserDetailDialog";
 
 function App() {
+  const location = useLocation();
+  const state = location.state;
+  const backgroundLocation = state?.backgroundLocation;
   const { checkingAuth, authMe } = useAuthStore();
 
   useEffect(() => {
@@ -63,7 +67,7 @@ function App() {
     <>
       <Toaster position="top-center" />
       <ScrollToTop />
-      <Routes>
+      <Routes location={backgroundLocation || location}>
         <Route
           path="/signin"
           element={
@@ -152,6 +156,13 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+
+      {/* background dialog */}
+      {backgroundLocation && (
+        <Routes>
+          <Route path="/admin/users/:id" element={<UserDetailDialog />} />
+        </Routes>
+      )}
     </>
   );
 }
