@@ -35,6 +35,17 @@ const Schedules = () => {
     return Array.from({ length: 14 }, (_, i) => addDays(today, i));
   }, [today]);
 
+  const filteredSchedules = useMemo(() => {
+    return data
+      .map((item) => {
+        const start = new Date(item.date);
+        start.setHours(item.startHour, item.startMinute, 0, 0);
+        const end = new Date(start.getTime() + 60 * 60 * 1000);
+        return { ...item, startTime: start, endTime: end };
+      })
+      .filter((item) => isSameDay(item.startTime, selectedDate));
+  }, [data, selectedDate]);
+
   if (isLoading) return <SchedulesSkeleton />;
 
   if (isError) return <ErrorDialog onRetry={refetch} />;
