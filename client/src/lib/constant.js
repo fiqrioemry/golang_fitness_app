@@ -177,6 +177,12 @@ export const roleOptions = [
   { value: "customer", label: "customer" },
   { value: "instructor", label: "instructor" },
 ];
+
+export const revenueRangeOptions = [
+  { value: "daily", label: "Daily" },
+  { value: "monthly", label: "monthly" },
+  { value: "yearly", label: "yearly" },
+];
 export const operationMinutes = [0, 15, 30, 45];
 
 export const operationHours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];

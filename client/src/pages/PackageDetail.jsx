@@ -8,8 +8,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useVoucherMutation } from "@/hooks/useVouchers";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePackageDetailQuery } from "@/hooks/usePackage";
-import { usePackageTransaction } from "@/hooks/usePackageTransaction";
-import { MidtransScriptLoader } from "@/components/midtrans/MidtransScriptLoader";
+import { useStripePayment } from "@/hooks/useStripePayment";
 import { PackageDetailSkeleton } from "@/components/loading/PackageDetailSkeleton";
 
 const PackageDetail = () => {
@@ -21,10 +20,7 @@ const PackageDetail = () => {
 
   const { applyVoucher } = useVoucherMutation();
   const { data: pkg, isLoading, isError } = usePackageDetailQuery(id);
-  const { handleBuyNow, isPending: buying } = usePackageTransaction(
-    id,
-    voucherInfo?.code
-  );
+  const { handleBuyNow, isPending } = useStripePayment(id, voucherCode);
 
   useEffect(() => {
     if (!isLoading && (isError || !pkg?.id)) {
@@ -59,7 +55,6 @@ const PackageDetail = () => {
 
   return (
     <>
-      <MidtransScriptLoader />
       <section className="section py-24 text-foreground">
         <div className="mb-6">
           <button
@@ -158,11 +153,11 @@ const PackageDetail = () => {
 
             <Button
               size="lg"
-              disabled={buying}
+              disabled={isPending}
               className="w-full mt-2"
               onClick={handleBuyNow}
             >
-              {buying ? "Processing..." : "Buy Now"}
+              {isPending ? "Processing..." : "Buy Now"}
             </Button>
           </div>
         </div>

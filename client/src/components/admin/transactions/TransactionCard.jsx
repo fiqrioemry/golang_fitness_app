@@ -19,6 +19,7 @@ export const TransactionCard = ({ transactions, sort, setSort }) => {
     return null;
   };
 
+  console.log(transactions);
   return (
     <>
       <div className="hidden md:block w-full">
@@ -38,10 +39,10 @@ export const TransactionCard = ({ transactions, sort, setSort }) => {
                 Email
                 {renderSortIcon("email")}
               </TableHead>
-              <TableHead>Package</TableHead>
-              <TableHead>Price</TableHead>
+              <TableHead>Invoice Number</TableHead>
               <TableHead>Method</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Total</TableHead>
               <TableHead
                 className="cursor-pointer"
                 onClick={() => setSort("paid_at")}
@@ -53,32 +54,33 @@ export const TransactionCard = ({ transactions, sort, setSort }) => {
           </TableHeader>
           <TableBody className="h-12">
             {transactions.map((tx) => (
-              <TableRow
-                key={tx.id}
-                className="border-t border-border hover:bg-muted transition"
-              >
-                <TableCell>{tx.fullname}</TableCell>
-                <TableCell>{tx.userEmail}</TableCell>
-                <TableCell>{tx.packageName}</TableCell>
-                <TableCell>{formatRupiah(tx.price)}</TableCell>
-                <TableCell>{tx.paymentMethod?.toUpperCase() || "-"}</TableCell>
+              <TableRow key={tx.id}>
                 <TableCell>
-                  <Badge
-                    variant={
-                      tx.status === "success"
-                        ? "default"
-                        : tx.status === "failed"
-                        ? "destructive"
-                        : "secondary"
-                    }
-                  >
-                    {tx.status}
-                  </Badge>
+                  <div>
+                    {tx.fullname.length > 20
+                      ? tx.fullname.slice(0, 20) + "..."
+                      : tx.fullname}
+                  </div>
                 </TableCell>
+
+                <TableCell>{tx.email || ""}</TableCell>
+
+                <TableCell>{tx.invoiceNumber || ""}</TableCell>
+
+                <TableCell>{tx.paymentMethod || ""}</TableCell>
+
                 <TableCell>
-                  {" "}
-                  {tx.status === "success" ? tx.paidAt : "-"}
+                  {tx.status === "success" ? (
+                    <Badge> success</Badge>
+                  ) : "failed" ? (
+                    <Badge variant="destructive">failed</Badge>
+                  ) : (
+                    <Badge variant="secondary">failed</Badge>
+                  )}
                 </TableCell>
+
+                <TableCell>{formatRupiah(tx.total)}</TableCell>
+                <TableCell>{tx.paidAt ? formatDate(tx.paidAt) : "-"}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -99,10 +101,10 @@ export const TransactionCard = ({ transactions, sort, setSort }) => {
             <div className="text-sm space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <p>
-                  <strong>{tx.packageName}</strong>
+                  <strong>{tx.invoiceNumber}</strong>
                 </p>
-                <p>{formatRupiah(tx.price)}</p>
-                <p>{tx.paymentMethod?.toUpperCase() || "-"}</p>
+                <p>{formatRupiah(tx.total)}</p>
+                <p>{tx.method?.toUpperCase() || "-"}</p>
                 <p>
                   <Badge
                     variant={
@@ -118,10 +120,9 @@ export const TransactionCard = ({ transactions, sort, setSort }) => {
                 </p>
               </div>
               <div className="space-x-4">
-                {" "}
                 <span className="text-muted-foreground">Paid At</span>
                 <span className="text-right whitespace-nowrap">
-                  {tx.status === "success" ? formatDate(tx.paidAt) : "-"}
+                  {tx.paidAt ? formatDate(tx.paidAt) : "-"}
                 </span>
               </div>
             </div>

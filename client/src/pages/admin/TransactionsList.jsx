@@ -9,11 +9,13 @@ import { SearchInput } from "@/components/ui/SearchInput";
 import { useAdminPaymentsQuery } from "@/hooks/usePayment";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { SearchNotFound } from "@/components/ui/SearchNotFound";
-import { FilterSelection } from "@/components/ui/FilterSelecction";
+import { FilterSelection } from "@/components/ui/FilterSelection";
 import { TransactionCard } from "@/components/admin/transactions/TransactionCard";
+import { useState } from "react";
 
 const TransactionsList = () => {
-  const { page, limit, q, sort, setPage, status, setQ, setSort, setStatus } =
+  const [q, setQ] = useState("");
+  const { page, limit, sort, setPage, status, setSort, setStatus } =
     useQueryStore();
 
   const debouncedQ = useDebounce(q, 500);
@@ -50,8 +52,8 @@ const TransactionsList = () => {
         />
       </div>
 
-      <Card className="border shadow-sm">
-        <CardContent className="overflow-x-auto p-0">
+      <Card>
+        <CardContent className="p-0">
           {isLoading ? (
             <Loading />
           ) : isError ? (

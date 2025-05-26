@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { CirclePlus } from "lucide-react";
 import { statusOptions } from "@/lib/constant";
 import { Button } from "@/components/ui/Button";
@@ -11,12 +13,12 @@ import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { SearchNotFound } from "@/components/ui/SearchNotFound";
 import { SectionTitle } from "@/components/header/SectionTitle";
-import { FilterSelection } from "@/components/ui/FilterSelecction";
+import { FilterSelection } from "@/components/ui/FilterSelection";
 import { PackageCard } from "@/components/admin/packages/PackageCard";
-import { Link } from "react-router-dom";
 
 const PackagesList = () => {
-  const { page, limit, q, sort, status, setPage, setQ, setSort, setStatus } =
+  const [q, setQ] = useState("");
+  const { page, limit, sort, status, setPage, setSort, setStatus } =
     useQueryStore();
 
   const debouncedQ = useDebounce(q, 500);
@@ -56,7 +58,7 @@ const PackagesList = () => {
             options={statusOptions}
           />
           <Link to="/admin/packages/add">
-            <Button className="h-12">
+            <Button>
               <CirclePlus className="w-4 h-4 mr-2" />
               Add Package
             </Button>
@@ -64,8 +66,8 @@ const PackagesList = () => {
         </div>
       </div>
 
-      <Card className="border shadow-sm">
-        <CardContent className="overflow-x-auto p-0">
+      <Card>
+        <CardContent className="p-0">
           {isLoading ? (
             <Loading />
           ) : isError ? (

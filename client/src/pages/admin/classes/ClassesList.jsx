@@ -13,11 +13,13 @@ import { SearchInput } from "@/components/ui/SearchInput";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { SearchNotFound } from "@/components/ui/SearchNotFound";
 import { ClassCard } from "@/components/admin/classes/ClassCard";
-import { FilterSelection } from "@/components/ui/FilterSelecction";
+import { FilterSelection } from "@/components/ui/FilterSelection";
+import { useState } from "react";
 
 const ClassesList = () => {
+  const [q, setQ] = useState("");
   const navigate = useNavigate();
-  const { page, limit, q, sort, status, setPage, setQ, setSort, setStatus } =
+  const { page, limit, sort, status, setPage, setSort, setStatus } =
     useQueryStore();
 
   const debouncedQ = useDebounce(q, 500);
@@ -53,8 +55,8 @@ const ClassesList = () => {
           <FilterSelection
             value={status}
             onChange={setStatus}
-            options={statusOptions}
             className="w-32 h-12"
+            options={statusOptions}
           />
           <Button size="nav" onClick={() => navigate("/admin/classes/add")}>
             <CirclePlus className="w-4 h-4 mr-2" />
@@ -63,8 +65,8 @@ const ClassesList = () => {
         </div>
       </div>
 
-      <Card className="border shadow-sm">
-        <CardContent className="overflow-x-auto p-0">
+      <Card className="shadow-sm">
+        <CardContent className="p-0">
           {isLoading ? (
             <Loading />
           ) : isError ? (

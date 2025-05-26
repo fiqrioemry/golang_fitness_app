@@ -4,6 +4,7 @@ import { genderOptions } from "@/lib/constant";
 import { useProfileMutation } from "@/hooks/useProfile";
 import { FormAddDialog } from "@/components/form/FormAddDialog";
 import { SelectElement } from "@/components/input/SelectElement";
+import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 import { InputDateElement } from "@/components/input/InputDateElement";
 import { InputTextElement } from "@/components/input/InputTextElement";
 
@@ -22,7 +23,6 @@ export const UpdateProfile = ({ profile, edit = "" }) => {
       {edit === "fullname" && (
         <InputTextElement name="fullname" label="Full Name" />
       )}
-
       {edit === "birthday" && (
         <InputDateElement name="birthday" label="Date of Birth" />
       )}
@@ -33,6 +33,15 @@ export const UpdateProfile = ({ profile, edit = "" }) => {
           options={genderOptions}
           placeholder="Select gender"
           rules={{ required: false }}
+        />
+      )}
+      {edit === "bio" && (
+        <InputTextareaElement
+          name="bio"
+          label="Your bio"
+          maxLength={200}
+          rules={{ required: false }}
+          placeholder="Enter your bio"
         />
       )}
       {edit === "phone" && (

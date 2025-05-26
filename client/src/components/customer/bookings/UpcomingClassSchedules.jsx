@@ -7,12 +7,13 @@ import {
   CalendarIcon,
   AlertCircleIcon,
 } from "lucide-react";
-import {
-  useRegenerateQRCode,
-  useAttendanceMutation,
-} from "@/hooks/useAttendance";
+
 import { toast } from "sonner";
 import { format } from "date-fns";
+import {
+  useRegenerateQRMutation,
+  useCheckinBookedClassMutation,
+} from "@/hooks/useBooking";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -25,20 +26,22 @@ import {
 } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/Dialog";
 
-export const BookingCard = ({ booking }) => {
+export const UpcomingClassSchedules = ({ schedule }) => {
   const [showQR, setShowQR] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
   const [canAttend, setCanAttend] = useState(false);
-  const [isClassOver, setIsClassOver] = useState(false);
 
   const startTime = buildDateTime(
-    booking.date,
-    booking.startHour,
-    booking.startMinute
+    schedule.date,
+    schedule.startHour,
+    schedule.startMinute
   );
   const endTime = startTime
-    ? new Date(startTime.getTime() + Number(booking.duration || 0) * 60000)
+    ? new Date(startTime.getTime() + Number(schedule.duration || 0) * 60000)
     : null;
+
+  const isClassOngoing =
+    startTime && endTime && new Date() >= startTime && new Date() <= endTime;
 
   useEffect(() => {
     if (!startTime || !endTime) return;
@@ -46,22 +49,20 @@ export const BookingCard = ({ booking }) => {
     const updateStatus = () => {
       setTimeLeft(getTimeLeft(startTime));
       setCanAttend(
-        isAttendanceWindow(startTime, Number(booking.duration || 0))
+        isAttendanceWindow(startTime, Number(schedule.duration || 0))
       );
-      setIsClassOver(endTime < new Date());
     };
 
     updateStatus();
     const timer = setInterval(updateStatus, 1000);
     return () => clearInterval(timer);
-  }, [startTime, endTime, booking.duration]);
-
-  const { checkin } = useAttendanceMutation();
-  const qrCodeQuery = useRegenerateQRCode(showQR ? booking.id : null);
+  }, [startTime, endTime, schedule.duration]);
+  const checkinClass = useCheckinBookedClassMutation();
+  const qrCodeQuery = useRegenerateQRMutation(showQR ? schedule.id : null);
 
   const handleAttend = async () => {
     try {
-      await checkin.mutateAsync(booking.id);
+      await checkinClass.mutateAsync(schedule.id);
       setShowQR(true);
     } catch (error) {
       toast.error(error?.response?.data?.error || "Failed to check in");
@@ -82,8 +83,8 @@ export const BookingCard = ({ booking }) => {
     <Card className="overflow-hidden border border-border bg-card shadow-md hover:shadow-xl transition">
       <div className="grid grid-cols-1 sm:grid-cols-[215px_1fr]">
         <img
-          src={booking.classImage}
-          alt={booking.className}
+          src={schedule.classImage}
+          alt={schedule.className}
           className="w-full h-48 sm:h-full object-cover"
         />
 
@@ -91,14 +92,14 @@ export const BookingCard = ({ booking }) => {
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-bold text-foreground">
-                {booking.className}
+                {schedule.className}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {booking.instructorName} • {booking.duration} mins
+                {schedule.instructorName} • {schedule.duration} mins
               </p>
             </div>
             <Badge className="text-xs" variant="outline">
-              {booking.status}
+              {schedule.bookingStatus}
             </Badge>
           </div>
 
@@ -118,33 +119,35 @@ export const BookingCard = ({ booking }) => {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <MapPinIcon className="w-4 h-4" />
-                <span>{booking.location}</span>
+                <span>{schedule.location}</span>
               </div>
               <div className="flex items-center gap-2">
                 <UserIcon className="w-4 h-4" />
-                <span>{booking.participant} Participant</span>
+                <span>{schedule.participant} Participant</span>
               </div>
             </div>
           </div>
 
-          {booking.status !== "checked_in" && (
+          {schedule.bookingStatus === "booked" && !isClassOngoing && (
             <div className="text-sm font-medium text-primary">
               Starts in: {timeLeft} ⏳
             </div>
           )}
 
-          {booking.status !== "checked_in" && (
-            <div className="flex items-center text-sm text-muted-foreground gap-2">
-              <AlertCircleIcon className="w-4 h-4 text-yellow-500" />
-              Attend button will be enabled 15 minutes before class.
-            </div>
-          )}
-
-          {isClassOver && (
-            <div className="flex items-center text-sm text-red-500 gap-2">
-              <AlertCircleIcon className="w-4 h-4" />
-              This class has already ended. You can no longer attend.
-            </div>
+          {schedule.bookingStatus === "booked" && (
+            <>
+              {isClassOngoing ? (
+                <div className="flex items-center text-sm text-green-600 gap-2">
+                  <AlertCircleIcon className="w-4 h-4 text-green-600" />
+                  This class is currently in session.
+                </div>
+              ) : (
+                <div className="flex items-center text-sm text-muted-foreground gap-2">
+                  <AlertCircleIcon className="w-4 h-4 text-yellow-500" />
+                  Attend button will be enabled 15 minutes before class.
+                </div>
+              )}
+            </>
           )}
 
           <div className="pt-2">
@@ -154,16 +157,13 @@ export const BookingCard = ({ booking }) => {
                   type="button"
                   className="w-full py-4"
                   onClick={
-                    booking.status === "checked_in"
+                    schedule.bookingStatus === "checked_in"
                       ? handleShowQR
                       : handleAttend
                   }
-                  disabled={
-                    booking.status === "checked_in" &&
-                    (!canAttend || isClassOver)
-                  }
+                  disabled={schedule.bookingStatus === "booked" && !canAttend}
                 >
-                  {booking.status === "checked_in" ? (
+                  {schedule.bookingStatus === "checked_in" ? (
                     <>
                       <QrCodeIcon className="w-4 h-4 mr-2" /> Show QR Code
                     </>
@@ -189,8 +189,8 @@ export const BookingCard = ({ booking }) => {
                   <div>
                     <img
                       alt="QR Code"
-                      src={`data:image/png;base64,${qrCodeQuery.data}`}
                       className="mx-auto w-60 h-60"
+                      src={`data:image/png;base64,${qrCodeQuery.data}`}
                     />
                   </div>
                 )}
@@ -199,7 +199,8 @@ export const BookingCard = ({ booking }) => {
           </div>
 
           <p className="text-xs text-muted-foreground text-right">
-            Booked at {format(new Date(booking.bookedAt), "dd MMM yyyy, HH:mm")}
+            Booked at{" "}
+            {format(new Date(schedule.bookedAt), "dd MMM yyyy, HH:mm")}
           </p>
         </CardContent>
       </div>

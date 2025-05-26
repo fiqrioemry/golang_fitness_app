@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { roleOptions } from "@/lib/constant";
 import { useUsersQuery } from "@/hooks/useUsers";
 import { Loading } from "@/components/ui/Loading";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -5,15 +7,17 @@ import { useQueryStore } from "@/store/useQueryStore";
 import { Pagination } from "@/components/ui/Pagination";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
+import { SearchInput } from "@/components/ui/SearchInput";
 import { UsersCard } from "@/components/admin/users/UsersCard";
 import { SectionTitle } from "@/components/header/SectionTitle";
-import { SearchInput } from "@/components/ui/SearchInput";
-import { FilterSelection } from "@/components/ui/FilterSelecction";
-import { roleOptions } from "@/lib/constant";
+import { SearchNotFound } from "@/components/ui/SearchNotFound";
+import { FilterSelection } from "@/components/ui/FilterSelection";
 
 const UsersList = () => {
-  const { page, limit, q, sort, role, setPage, setQ, setSort, setRole } =
+  const [q, setQ] = useState("");
+  const { page, limit, sort, role, setPage, setSort, setRole } =
     useQueryStore();
+
   const debouncedQ = useDebounce(q, 500);
   const { data, isLoading, isError, refetch } = useUsersQuery({
     q: debouncedQ,
@@ -24,6 +28,7 @@ const UsersList = () => {
   });
 
   const users = data?.data || [];
+
   const pagination = data?.pagination;
 
   return (
@@ -47,16 +52,14 @@ const UsersList = () => {
         />
       </div>
 
-      <Card className="border shadow-sm">
-        <CardContent className="overflow-x-auto p-0">
+      <Card>
+        <CardContent className="p-0">
           {isLoading ? (
             <Loading />
           ) : isError ? (
             <ErrorDialog onRetry={refetch} />
           ) : users?.length === 0 ? (
-            <div className="py-12 text-center text-muted-foreground text-sm">
-              No users found{q && ` for “${q}”`}
-            </div>
+            <SearchNotFound title="User not found" q={q} />
           ) : (
             <UsersCard users={users} sort={sort} setSort={setSort} />
           )}

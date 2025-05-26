@@ -32,7 +32,6 @@ import UserProfile from "./pages/customer/UserProfile";
 import UserBookings from "./pages/customer/UserBookings";
 import UserPackages from "./pages/customer/UserPackages";
 import UserSettings from "./pages/customer/UserSettings";
-import UserAttendances from "./pages/customer/UserAttendances";
 import UserTransactions from "./pages/customer/UserTransactions";
 import UserNotifications from "./pages/customer/UserNotifications";
 
@@ -123,7 +122,6 @@ function App() {
           <Route path="packages" element={<UserPackages />} />
           <Route path="bookings" element={<UserBookings />} />
           <Route path="settings" element={<UserSettings />} />
-          <Route path="attendances" element={<UserAttendances />} />
           <Route path="transactions" element={<UserTransactions />} />
           <Route path="notifications" element={<UserNotifications />} />
         </Route>

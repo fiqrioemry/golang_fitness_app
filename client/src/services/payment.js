@@ -1,5 +1,5 @@
 import qs from "qs";
-import { publicInstance, authInstance } from ".";
+import { authInstance } from ".";
 
 // GET /api/payments?q=&page=&limit=&status=&sort=
 export const getAllUserPayments = async (params) => {
@@ -11,11 +11,5 @@ export const getAllUserPayments = async (params) => {
 // POST /api/payments
 export const createPayment = async (data) => {
   const res = await authInstance.post("/payments", data);
-  return res.data;
-};
-
-// POST /api/payments/notification (webhook - public)
-export const handlePaymentNotification = async (data) => {
-  const res = await publicInstance.post("/payments/notification", data);
   return res.data;
 };

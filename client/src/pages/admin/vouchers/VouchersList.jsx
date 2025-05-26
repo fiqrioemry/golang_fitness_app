@@ -18,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { VoucherUpdate } from "@/components/admin/vouchers/VoucherUpdate";
 import { VoucherDelete } from "@/components/admin/vouchers/VoucherDelete";
+import { truncateText } from "../../../lib/utils";
 
 const VouchersList = () => {
   const {
@@ -71,8 +72,10 @@ const VouchersList = () => {
                 {vouchers.map((voucher) => (
                   <TableRow key={voucher.id}>
                     <TableCell>{voucher.code}</TableCell>
-                    <TableCell title={voucher.description}>
-                      {voucher.description}
+                    <TableCell>
+                      <p className="text-sm text-muted-foreground">
+                        {truncateText(voucher.description, 20)}
+                      </p>
                     </TableCell>
                     <TableCell>{voucher.discountType}</TableCell>
                     <TableCell>
@@ -109,7 +112,7 @@ const VouchersList = () => {
                     {voucher.code}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {voucher.description}
+                    {truncateText(voucher.description, 10)}
                   </p>
                 </div>
 

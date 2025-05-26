@@ -1,15 +1,10 @@
-import {
-  Select,
-  SelectItem,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-} from "@/components/ui/Select";
-import { useState } from "react";
 import { formatRupiah } from "@/lib/utils";
+import { revenueRangeOptions } from "@/lib/constant";
+import { useQueryStore } from "@/store/useQueryStore";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { useAdminPaymentsQuery } from "@/hooks/usePayment";
+import { FilterSelection } from "@/components/ui/FilterSelection";
 import { SummaryCard } from "@/components/admin/dashboard/SummaryCard";
 import { RevenueChart } from "@/components/admin/dashboard/RevenueChart";
 import { DashboardSkeleton } from "@/components/loading/DashboardSkeleton";
@@ -17,7 +12,7 @@ import { useDashboardSummary, useRevenueStats } from "@/hooks/useDashboard";
 import { TransactionCard } from "@/components/admin/transactions/TransactionCard";
 
 const Dashboard = () => {
-  const [range, setRange] = useState("daily");
+  const { range, setRange } = useQueryStore();
   const { data: revenue } = useRevenueStats(range);
   const { data: response } = useAdminPaymentsQuery({ limit: 5 });
 
@@ -38,7 +33,7 @@ const Dashboard = () => {
           <SummaryCard title="Active Classes" value={summary?.totalClasses} />
           <SummaryCard title="Total Bookings" value={summary?.totalBookings} />
           <SummaryCard
-            title="Total Renue"
+            title="Total Revenue"
             value={formatRupiah(summary?.totalRevenue)}
           />
         </div>
@@ -46,19 +41,15 @@ const Dashboard = () => {
 
       <div>
         <h3 className="mb-4">Transaction Volume</h3>
-        <div className="bg-background rounded-xl shadow p-6">
+        <div className="bg-background rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Revenue</h2>
-            <Select value={range} onValueChange={setRange}>
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="yearly">Yearly</SelectItem>
-              </SelectContent>
-            </Select>
+            <h2>Revenue</h2>
+
+            <FilterSelection
+              value={range}
+              onChange={setRange}
+              options={revenueRangeOptions}
+            />
           </div>
 
           <RevenueChart data={revenue?.revenueSeries} range={revenue?.range} />
@@ -68,7 +59,7 @@ const Dashboard = () => {
       <div>
         <h3 className="mb-4">Recent transaction</h3>
         <Card className="border">
-          <CardContent className=" p-0">
+          <CardContent className="p-0">
             <TransactionCard transactions={transactions} />
           </CardContent>
         </Card>
