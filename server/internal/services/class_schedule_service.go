@@ -5,6 +5,7 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
+	"server/internal/utils"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,6 +19,12 @@ type ClassScheduleService interface {
 	GetClassScheduleByID(scheduleID, userID string) (*dto.ClassScheduleDetailResponse, error)
 	GetSchedulesByFilter(filter dto.ClassScheduleQueryParam) ([]dto.ClassScheduleResponse, error)
 	GetSchedulesWithBookingStatus(userID string) ([]dto.ClassScheduleResponse, error)
+
+	// instructor only
+	CloseClassSchedule(id string) (string, error)
+	OpenClassSchedule(id string, req dto.OpenClassScheduleRequest) error
+	GetScheduleAttendances(scheduleID string) (dto.InstructorScheduleDetail, error)
+	GetSchedulesByInstructor(userID string, filter dto.InstructorScheduleQueryParam) ([]dto.ClassScheduleResponse, error)
 }
 
 type classScheduleService struct {
@@ -339,4 +346,96 @@ func (s *classScheduleService) GetSchedulesWithBookingStatus(userID string) ([]d
 	}
 
 	return result, nil
+}
+
+func (s *classScheduleService) GetSchedulesByInstructor(userID string, filter dto.InstructorScheduleQueryParam) ([]dto.ClassScheduleResponse, error) {
+	instructorID := uuid.MustParse(userID)
+
+	schedules, err := s.repo.GetSchedulesByInstructorID(instructorID, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.ClassScheduleResponse
+	for _, schedule := range schedules {
+		result = append(result, dto.ClassScheduleResponse{
+			ID:             schedule.ID.String(),
+			ClassID:        schedule.ClassID.String(),
+			ClassName:      schedule.ClassName,
+			ClassImage:     schedule.ClassImage,
+			InstructorID:   schedule.InstructorID.String(),
+			InstructorName: schedule.InstructorName,
+			Location:       schedule.Location,
+			Date:           schedule.Date,
+			StartHour:      schedule.StartHour,
+			StartMinute:    schedule.StartMinute,
+			Capacity:       schedule.Capacity,
+			Duration:       schedule.Duration,
+			BookedCount:    schedule.Booked,
+			Color:          schedule.Color,
+		})
+	}
+	return result, nil
+}
+
+func (s *classScheduleService) OpenClassSchedule(id string, req dto.OpenClassScheduleRequest) error {
+	schedule, err := s.repo.GetClassScheduleByID(id)
+	if err != nil {
+		return fmt.Errorf("schedule not found")
+	}
+	if schedule.IsOpened {
+		return fmt.Errorf("schedule already opened")
+	}
+	if req.IsOnline && (req.ZoomLink == "" || req.ZoomLink == "null") {
+		return fmt.Errorf("zoom link is required for online class")
+	}
+	var zoomPtr *string
+	if req.IsOnline {
+		zoomPtr = &req.ZoomLink
+	}
+	return s.repo.OpenSchedule(schedule.ID, req.IsOnline, zoomPtr)
+}
+
+func (s *classScheduleService) CloseClassSchedule(id string) (string, error) {
+	schedule, err := s.repo.GetClassScheduleByID(id)
+	if err != nil {
+		return "", fmt.Errorf("schedule not found")
+	}
+	if schedule.IsClosed {
+		return "", fmt.Errorf("schedule already closed")
+	}
+
+	code := utils.GenerateVerificationCode(6) // misal 6 karakter acak
+
+	err = s.repo.CloseScheduleWithCode(schedule.ID, code)
+	if err != nil {
+		return "", fmt.Errorf("failed to close schedule: %w", err)
+	}
+
+	return code, nil
+}
+
+func (s *classScheduleService) GetScheduleAttendances(scheduleID string) (dto.InstructorScheduleDetail, error) {
+	id := uuid.MustParse(scheduleID)
+
+	attendances, err := s.repo.GetAttendancesByScheduleID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var results dto.InstructorScheduleDetail
+	for _, a := range attendances {
+		results = append(results, dto.InstructorScheduleDetail{
+			ID:          a.ID.String(),
+			ScheduleID:  scheduleID,
+			ClassName:   a.Booking.ClassSchedule.ClassName,
+			ClassImage:  a.Booking.ClassSchedule.ClassImage,
+			Date:        a.Booking.ClassSchedule.Date.Format("2006-01-02"),
+			StartHour:   a.Booking.ClassSchedule.StartHour,
+			StartMinute: a.Booking.ClassSchedule.StartMinute,
+			Status:      a.Status,
+			Verified:    a.Verified,
+		})
+	}
+	return results, nil
 }

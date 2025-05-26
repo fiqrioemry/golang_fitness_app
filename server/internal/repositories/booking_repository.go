@@ -3,7 +3,6 @@ package repositories
 import (
 	"server/internal/dto"
 	"server/internal/models"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -11,16 +10,16 @@ import (
 
 type BookingRepository interface {
 	CreateBooking(booking *models.Booking) error
-	GetBookingByID(id string) (*models.Booking, error)
+	GetBookingByID(userID, bookingID string) (*models.Booking, error)
 	CountBookingBySchedule(scheduleID string) (int64, error)
 	UpdateBookingStatus(bookingID uuid.UUID, status string) error
 	IsUserBookedSchedule(userID, scheduleID string) (bool, error)
 	FindByUserAndSchedule(userID, scheduleID string) (*models.Booking, error)
-	MarkAsAttendance(userID, bookingID string) error
 	CheckAttendanceExists(bookingID uuid.UUID) (bool, error)
 	CreateAttendance(attendance *models.Attendance) error
+	UpdateAttendanceStatus(bookingID, status string) error
 	GetBookingsByUserID(userID string, params dto.BookingQueryParam) ([]models.Booking, int64, error)
-
+	GetAttendanceByBookingID(bookingID uuid.UUID) (*models.Attendance, error)
 	// ** cron job
 	GetAllBookedWithScheduleAndClass() ([]models.Booking, error)
 }
@@ -45,7 +44,6 @@ func (r *bookingRepository) GetBookingsByUserID(userID string, params dto.Bookin
 
 	db := r.db.Model(&models.Booking{}).
 		Preload("ClassSchedule").
-		Preload("Attendance").
 		Where("user_id = ?", userID).
 		Joins("JOIN class_schedules ON class_schedules.id = bookings.class_schedule_id")
 
@@ -87,9 +85,9 @@ func (r *bookingRepository) CreateBooking(booking *models.Booking) error {
 	return r.db.Create(booking).Error
 }
 
-func (r *bookingRepository) GetBookingByID(id string) (*models.Booking, error) {
+func (r *bookingRepository) GetBookingByID(userID, bookingID string) (*models.Booking, error) {
 	var booking models.Booking
-	if err := r.db.Preload("ClassSchedule").Preload("Attendance").First(&booking, "id = ?", id).Error; err != nil {
+	if err := r.db.Preload("ClassSchedule").Where("user_id = ?", userID).First(&booking, "id = ?", bookingID).Error; err != nil {
 		return nil, err
 	}
 	return &booking, nil
@@ -132,29 +130,6 @@ func (r *bookingRepository) GetAllBookedWithScheduleAndClass() ([]models.Booking
 	return bookings, err
 }
 
-func (r *bookingRepository) MarkAsAttendance(userID, bookingID string) error {
-	return r.db.Transaction(func(tx *gorm.DB) error {
-		var booking models.Booking
-		if err := tx.First(&booking, "id = ? AND user_id = ?", bookingID, userID).Error; err != nil {
-			return err
-		}
-
-		booking.Status = "checked_in"
-		if err := tx.Save(&booking).Error; err != nil {
-			return err
-		}
-
-		now := time.Now()
-		attendance := models.Attendance{
-			BookingID: booking.ID,
-			Status:    "attended",
-			CheckedAt: &now,
-		}
-
-		return tx.Create(&attendance).Error
-	})
-}
-
 func (r *bookingRepository) CheckAttendanceExists(bookingID uuid.UUID) (bool, error) {
 	var count int64
 	err := r.db.
@@ -170,4 +145,21 @@ func (r *bookingRepository) CheckAttendanceExists(bookingID uuid.UUID) (bool, er
 
 func (r bookingRepository) CreateAttendance(attendance *models.Attendance) error {
 	return r.db.Create(attendance).Error
+}
+
+func (r bookingRepository) UpdateAttendanceStatus(bookingID, status string) error {
+	return r.db.Model(&models.Attendance{}).
+		Where("booking_id = ?", bookingID).
+		Update("status", status).Error
+}
+
+func (r *bookingRepository) GetAttendanceByBookingID(bookingID uuid.UUID) (*models.Attendance, error) {
+	var attendance models.Attendance
+	err := r.db.
+		Preload("Booking.ClassSchedule").
+		First(&attendance, "booking_id = ?", bookingID).Error
+	if err != nil {
+		return nil, err
+	}
+	return &attendance, nil
 }

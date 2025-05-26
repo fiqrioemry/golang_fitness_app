@@ -20,6 +20,11 @@ type ClassScheduleRepository interface {
 	GetClassScheduleByID(id string) (*models.ClassSchedule, error)
 	GetInstructorWithProfileByID(id uuid.UUID) (*models.Instructor, error)
 	GetClassSchedulesWithFilter(filter dto.ClassScheduleQueryParam) ([]models.ClassSchedule, error)
+
+	CloseScheduleWithCode(scheduleID uuid.UUID, code string) error
+	OpenSchedule(scheduleID uuid.UUID, isOnline bool, zoomLink *string) error
+	GetAttendancesByScheduleID(scheduleID uuid.UUID) ([]models.Attendance, error)
+	GetSchedulesByInstructorID(instructorID uuid.UUID, filter dto.InstructorScheduleQueryParam) ([]models.ClassSchedule, error)
 }
 
 type classScheduleRepository struct {
@@ -120,4 +125,58 @@ func (r *classScheduleRepository) GetInstructorWithProfileByID(id uuid.UUID) (*m
 		return nil, err
 	}
 	return &instructor, nil
+}
+
+func (r *classScheduleRepository) GetSchedulesByInstructorID(instructorID uuid.UUID, filter dto.InstructorScheduleQueryParam) ([]models.ClassSchedule, error) {
+	var schedules []models.ClassSchedule
+	db := r.db.
+		Where("instructor_id = ? AND booked > 0", instructorID).
+		Order("date asc").Order("start_hour asc").Order("start_minute asc")
+
+	if filter.StartDate != "" {
+		if start, err := time.Parse("2006-01-02", filter.StartDate); err == nil {
+			db = db.Where("date >= ?", start)
+		}
+	}
+	if filter.EndDate != "" {
+		if end, err := time.Parse("2006-01-02", filter.EndDate); err == nil {
+			db = db.Where("date <= ?", end)
+		}
+	}
+
+	if err := db.Find(&schedules).Error; err != nil {
+		return nil, err
+	}
+	return schedules, nil
+}
+
+func (r *classScheduleRepository) OpenSchedule(scheduleID uuid.UUID, isOnline bool, zoomLink *string) error {
+	updates := map[string]interface{}{
+		"is_opened": true,
+		"is_online": isOnline,
+	}
+	if isOnline && zoomLink != nil {
+		updates["zoom_link"] = *zoomLink
+	}
+	return r.db.Model(&models.ClassSchedule{}).
+		Where("id = ?", scheduleID).
+		Updates(updates).Error
+}
+
+func (r *classScheduleRepository) CloseScheduleWithCode(scheduleID uuid.UUID, code string) error {
+	return r.db.Model(&models.ClassSchedule{}).
+		Where("id = ?", scheduleID).
+		Updates(map[string]interface{}{
+			"is_closed":         true,
+			"verification_code": code,
+		}).Error
+}
+
+func (r *classScheduleRepository) GetAttendancesByScheduleID(scheduleID uuid.UUID) ([]models.Attendance, error) {
+	var attendances []models.Attendance
+	err := r.db.Preload("Booking.ClassSchedule").
+		Joins("JOIN bookings ON bookings.id = attendances.booking_id").
+		Where("bookings.class_schedule_id = ?", scheduleID).
+		Find(&attendances).Error
+	return attendances, err
 }

@@ -7,7 +7,6 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
-	"server/internal/utils"
 	"time"
 
 	"github.com/google/uuid"
@@ -16,8 +15,10 @@ import (
 type BookingService interface {
 	CreateBooking(userID, packageID, scheduleID string) error
 	MarkAbsentBookings() error
-	EnterClassSchedule(userID, bookingID string) (*dto.QRCodeAttendanceResponse, error)
+	CheckedInClassSchedule(userID, bookingID string) (*dto.AccessAttendanceResponse, error)
+	CheckoutClassSchedule(userID, bookingID string, req dto.ValidateCheckoutRequest) error
 	GetBookingByUser(userID string, params dto.BookingQueryParam) ([]dto.BookingResponse, *dto.PaginationResponse, error)
+	GetBookingByID(userID string, params dto.BookingQueryParam) ([]dto.BookingResponse, *dto.PaginationResponse, error)
 }
 
 type bookingService struct {
@@ -111,28 +112,23 @@ func (s *bookingService) GetBookingByUser(userID string, params dto.BookingQuery
 	var result []dto.BookingResponse
 	for _, b := range bookings {
 		schedule := b.ClassSchedule
-		attendanceStatus := ""
-		if b.Attendance.ID != uuid.Nil {
-			attendanceStatus = b.Attendance.Status
-		}
 
 		participantCount, _ := s.bookingRepo.CountBookingBySchedule(schedule.ID.String())
 
 		result = append(result, dto.BookingResponse{
-			ID:               b.ID.String(),
-			BookingStatus:    b.Status,
-			AttendanceStatus: attendanceStatus,
-			ClassID:          schedule.ClassID.String(),
-			ClassName:        schedule.ClassName,
-			ClassImage:       schedule.ClassImage,
-			InstructorName:   schedule.InstructorName,
-			Duration:         schedule.Duration,
-			StartHour:        schedule.StartHour,
-			StartMinute:      schedule.StartMinute,
-			Location:         schedule.Location,
-			Participant:      int(participantCount),
-			Date:             schedule.Date.Format("2006-01-02"),
-			BookedAt:         b.CreatedAt.Format("2006-01-02 15:04:05"),
+			ID:             b.ID.String(),
+			BookingStatus:  b.Status,
+			ClassID:        schedule.ClassID.String(),
+			ClassName:      schedule.ClassName,
+			ClassImage:     schedule.ClassImage,
+			InstructorName: schedule.InstructorName,
+			Duration:       schedule.Duration,
+			StartHour:      schedule.StartHour,
+			StartMinute:    schedule.StartMinute,
+			Location:       schedule.Location,
+			Participant:    int(participantCount),
+			Date:           schedule.Date.Format("2006-01-02"),
+			BookedAt:       b.CreatedAt.Format("2006-01-02 15:04:05"),
 		})
 	}
 
@@ -147,85 +143,66 @@ func (s *bookingService) GetBookingByUser(userID string, params dto.BookingQuery
 	return result, pagination, nil
 }
 
-func (s *bookingService) EnterClassSchedule(userID, bookingID string) (*dto.QRCodeAttendanceResponse, error) {
-	log.Printf("📥 [EnterClass] User %s attempting to enter booking %s\n", userID, bookingID)
-
-	booking, err := s.bookingRepo.GetBookingByID(bookingID)
+func (s *bookingService) CheckedInClassSchedule(userID, bookingID string) (*dto.AccessAttendanceResponse, error) {
+	booking, err := s.bookingRepo.GetBookingByID(userID, bookingID)
 	if err != nil {
-		log.Printf("❌ [EnterClass] Booking not found: %v\n", err)
 		return nil, errors.New("booking not found")
-	}
-	log.Printf("✅ [EnterClass] Booking retrieved. Class: %s\n", booking.ClassSchedule.ClassName)
-
-	if booking.UserID.String() != userID {
-		log.Printf("⛔ [EnterClass] Unauthorized access. Booking owned by %s\n", booking.UserID.String())
-		return nil, errors.New("unauthorized access")
 	}
 
 	schedule := booking.ClassSchedule
-	loc, _ := time.LoadLocation("Asia/Jakarta")
-	now := time.Now().In(loc)
-
-	startTime := time.Date(
-		schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
-		schedule.StartHour, schedule.StartMinute, 0, 0, loc,
-	)
-
-	if now.Before(startTime.Add(-15*time.Minute)) || now.After(startTime.Add(30*time.Minute)) {
-		log.Printf("⏱️ [EnterClass] Access denied. Current time %v is outside attendance window for %s\n", now, schedule.ClassName)
-		return nil, errors.New("attendance window closed")
+	if !schedule.IsOpened {
+		return nil, errors.New("class schedule is not open for attendance")
 	}
 
-	log.Println("🟢 [EnterClass] Attendance time is valid. Marking attendance...")
-	if err := s.bookingRepo.MarkAsAttendance(userID, bookingID); err != nil {
-		log.Printf("❌ [EnterClass] Failed to mark attendance: %v\n", err)
-		return nil, errors.New("failed to mark attendance")
+	// Update status booking
+	if err := s.bookingRepo.UpdateBookingStatus(booking.ID, "checked_in"); err != nil {
+		return nil, errors.New("failed to update booking status")
 	}
 
-	booking, err = s.bookingRepo.GetBookingByID(bookingID)
+	exists, err := s.bookingRepo.CheckAttendanceExists(booking.ID)
 	if err != nil {
-		log.Printf("❌ [EnterClass] Failed to fetch updated booking: %v\n", err)
-		return nil, errors.New("failed to fetch updated booking")
+		return nil, errors.New("failed to check attendance")
+	}
+	if !exists {
+		now := time.Now()
+		attendance := &models.Attendance{
+			BookingID: booking.ID,
+			Status:    "entered",
+			CheckedAt: &now,
+		}
+		if err := s.bookingRepo.CreateAttendance(attendance); err != nil {
+			return nil, errors.New("failed to create attendance")
+		}
 	}
 
-	if booking.Attendance.ID == uuid.Nil {
-		log.Println("❌ [EnterClass] Attendance not created")
-		return nil, errors.New("attendance not created")
-	}
-	log.Printf("✅ [EnterClass] Attendance created successfully: %s\n", booking.Attendance.ID)
+	start := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
+		schedule.StartHour, schedule.StartMinute, 0, 0, time.Local)
 
-	qr := utils.GenerateBase64QR(booking.Attendance.ID.String())
-	log.Printf("🔐 [EnterClass] QR code generated for attendance ID: %s\n", booking.Attendance.ID)
-
-	response := dto.QRCodeAttendanceResponse{
-		QR:             qr,
-		ClassName:      booking.ClassSchedule.ClassName,
-		InstructorName: booking.ClassSchedule.InstructorName,
-		Date:           booking.ClassSchedule.Date.Format("2006-01-02"),
-		StartTime:      fmt.Sprintf("%02d:%02d", booking.ClassSchedule.StartHour, booking.ClassSchedule.StartMinute),
+	resp := &dto.AccessAttendanceResponse{
+		ClassName:      schedule.ClassName,
+		InstructorName: schedule.InstructorName,
+		Date:           schedule.Date.Format("2006-01-02"),
+		StartTime:      start.Format("15:04"),
 	}
 
-	log.Printf("📤 [EnterClass] Returning QR attendance response for user %s\n", userID)
-	return &response, nil
+	if schedule.IsOnline && schedule.ZoomLink != nil {
+		resp.Link = *schedule.ZoomLink
+	}
+
+	return resp, nil
 }
 
-func (s *bookingService) GetQRCode(userID, bookingID string) (*dto.QRCodeAttendanceResponse, error) {
-	booking, err := s.bookingRepo.GetBookingByID(bookingID)
+func (s *bookingService) CheckoutClassSchedule(userID, bookingID string, req dto.ValidateCheckoutRequest) error {
+	booking, err := s.bookingRepo.GetBookingByID(userID, bookingID)
 	if err != nil {
-		return nil, errors.New("failed to fetch updated booking")
+		return errors.New("booking not found")
 	}
 
-	qr := utils.GenerateBase64QR(booking.Attendance.ID.String())
-
-	response := dto.QRCodeAttendanceResponse{
-		QR:             qr,
-		ClassName:      booking.ClassSchedule.ClassName,
-		InstructorName: booking.ClassSchedule.InstructorName,
-		Date:           booking.ClassSchedule.Date.Format("2006-01-02"),
-		StartTime:      fmt.Sprintf("%02d:%02d", booking.ClassSchedule.StartHour, booking.ClassSchedule.StartMinute),
+	if booking.ClassSchedule.VerificationCode == nil || *booking.ClassSchedule.VerificationCode != req.VerificationCode {
+		return errors.New("invalid verification code")
 	}
 
-	return &response, nil
+	return s.bookingRepo.UpdateAttendanceStatus(bookingID, "attended")
 }
 
 // ** buat cron job

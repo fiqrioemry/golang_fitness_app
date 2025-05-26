@@ -12,7 +12,10 @@ func BookingRoutes(r *gin.Engine, handler *handlers.BookingHandler) {
 	booking.Use(middleware.AuthRequired())
 	booking.POST("", handler.CreateBooking)
 	booking.GET("", handler.GetMyBookings)
-	booking.POST("/:id", handler.CheckinBookedClass)
-	booking.GET("/:id/qr-code", handler.RegenerateQRCode)
+	booking.POST("/:id/check-in", handler.CheckinBookedClass)
+	booking.POST("/:id/check-out", handler.CheckinBookedClass)
 
 }
+
+// TODO : Add booking routes for customer to cancel out their booking
+// booking.DELETE("/:id", handler.CancelBooking

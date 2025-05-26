@@ -62,6 +62,17 @@ func GenerateBase64QR(data string) string {
 	return base64.StdEncoding.EncodeToString(png)
 }
 
+const charset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+
+func GenerateVerificationCode(length int) string {
+	rand.Seed(time.Now().UnixNano())
+	code := make([]byte, length)
+	for i := range code {
+		code[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(code)
+}
+
 type QRPayload struct {
 	UserID     string `json:"userId"`
 	BookingID  string `json:"bookingId"`

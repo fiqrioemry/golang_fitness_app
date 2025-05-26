@@ -545,6 +545,22 @@ type CreateBookingRequest struct {
 }
 
 type BookingResponse struct {
+	ID             string `json:"id"`
+	BookingStatus  string `json:"bookingStatus"`
+	ClassID        string `json:"classId"`
+	ClassName      string `json:"className"`
+	ClassImage     string `json:"classImage"`
+	Duration       int    `json:"duration"`
+	Date           string `json:"date"`
+	StartHour      int    `json:"startHour"`
+	StartMinute    int    `json:"startMinute"`
+	Location       string `json:"location"`
+	InstructorName string `json:"instructorName"`
+	Participant    int    `json:"participant"`
+	BookedAt       string `json:"bookedAt"`
+}
+
+type BookingDetailResponse struct {
 	ID               string `json:"id"`
 	BookingStatus    string `json:"bookingStatus"`
 	AttendanceStatus string `json:"attendanceStatus,omitempty"`
@@ -557,20 +573,21 @@ type BookingResponse struct {
 	StartMinute      int    `json:"startMinute"`
 	Location         string `json:"location"`
 	InstructorName   string `json:"instructorName"`
+	IsOpened         bool   `json:"isOpened"`
+	IsClosed         bool   `json:"isClosed"`
 	Participant      int    `json:"participant"`
-	BookedAt         string `json:"bookedAt"`
 }
 
-type QRCodeAttendanceResponse struct {
-	QR             string `json:"qr"`
+type AccessAttendanceResponse struct {
+	Link           string `json:"link"`
 	ClassName      string `json:"className"`
 	InstructorName string `json:"instructorName"`
 	Date           string `json:"date"`
 	StartTime      string `json:"startTime"`
 }
 
-type ValidateQRRequest struct {
-	QRCode string `json:"qrCode"`
+type ValidateCheckoutRequest struct {
+	VerificationCode string `json:"verificationCode" binding:"required"`
 }
 
 type MarkAttendanceRequest struct {
@@ -815,4 +832,15 @@ type PaginationResponse struct {
 	Limit      int `json:"limit"`
 	TotalRows  int `json:"totalRows"`
 	TotalPages int `json:"totalPages"`
+}
+
+// INSTRUCTOR SCHEDULE MANAGEMENT
+type InstructorScheduleQueryParam struct {
+	StartDate string `form:"startDate"`
+	EndDate   string `form:"endDate"`
+}
+
+type OpenClassScheduleRequest struct {
+	IsOnline bool   `json:"isOnline"`
+	ZoomLink string `json:"zoomLink"`
 }

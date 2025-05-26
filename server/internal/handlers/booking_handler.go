@@ -60,11 +60,24 @@ func (h *BookingHandler) GetMyBookings(c *gin.Context) {
 	})
 }
 
+func (h *BookingHandler) GetBookingDetail(c *gin.Context) {
+	bookingID := c.Param("id")
+	userID := utils.MustGetUserID(c)
+
+	response, err := h.bookingService.GetBookingByID(userID, bookingID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch bookings", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{response})
+}
+
 func (h *BookingHandler) CheckinBookedClass(c *gin.Context) {
 	bookingID := c.Param("id")
 	userID := utils.MustGetUserID(c)
 
-	response, err := h.bookingService.EnterClassSchedule(userID, bookingID)
+	response, err := h.bookingService.CheckedInClassSchedule(userID, bookingID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -73,15 +86,19 @@ func (h *BookingHandler) CheckinBookedClass(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *BookingHandler) RegenerateQRCode(c *gin.Context) {
+func (h *BookingHandler) CheckoutBookedClass(c *gin.Context) {
 	bookingID := c.Param("id")
 	userID := utils.MustGetUserID(c)
 
-	response, err := h.bookingService.EnterClassSchedule(userID, bookingID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req dto.ValidateCheckoutRequest
+	if !utils.BindAndValidateJSON(c, &req) {
 		return
 	}
 
-	c.JSON(http.StatusOK, response)
+	if err := h.bookingService.CheckoutClassSchedule(userID, bookingID, req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Attendance verified successfully"})
 }
