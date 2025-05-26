@@ -20,7 +20,6 @@ type ServiceContainer struct {
 	SubcategoryService      services.SubcategoryService
 	NotificationService     services.NotificationService
 	InstructorService       services.InstructorService
-	AttendanceService       services.AttendanceService
 	PaymentService          services.PaymentService
 	BookingService          services.BookingService
 	ScheduleTemplateService services.ScheduleTemplateService
@@ -28,7 +27,8 @@ type ServiceContainer struct {
 }
 
 func InitServices(repo *RepositoryContainer) *ServiceContainer {
-	voucherSvc := services.NewVoucherService(repo.VoucherRepo)
+	voucherService := services.NewVoucherService(repo.VoucherRepo)
+	notificationService := services.NewNotificationService(repo.NotificationRepo)
 
 	return &ServiceContainer{
 		DashboardService:        services.NewDashboardService(repo.DashboardRepo),
@@ -42,13 +42,12 @@ func InitServices(repo *RepositoryContainer) *ServiceContainer {
 		PackageService:          services.NewPackageService(repo.PackageRepo),
 		LocationService:         services.NewLocationService(repo.LocationRepo),
 		CategoryService:         services.NewCategoryService(repo.CategoryRepo),
-		VoucherService:          voucherSvc,
+		VoucherService:          voucherService,
 		SubcategoryService:      services.NewSubcategoryService(repo.SubcategoryRepo),
-		NotificationService:     services.NewNotificationService(repo.NotificationRepo),
+		NotificationService:     notificationService,
 		InstructorService:       services.NewInstructorService(repo.InstructorRepo, repo.AuthRepo),
-		AttendanceService:       services.NewAttendanceService(repo.AttendanceRepo, repo.BookingRepo, repo.ReviewRepo),
-		PaymentService:          services.NewPaymentService(repo.PaymentRepo, repo.PackageRepo, repo.UserPackageRepo, repo.AuthRepo, voucherSvc),
-		BookingService:          services.NewBookingService(repo.BookingRepo, repo.ClassScheduleRepo, repo.UserPackageRepo, repo.PackageRepo),
+		PaymentService:          services.NewPaymentService(repo.PaymentRepo, repo.PackageRepo, repo.UserPackageRepo, repo.AuthRepo, voucherService, notificationService),
+		BookingService:          services.NewBookingService(repo.BookingRepo, repo.ClassScheduleRepo, repo.UserPackageRepo, repo.PackageRepo, notificationService),
 		ScheduleTemplateService: services.NewScheduleTemplateService(repo.ScheduleTemplateRepo, repo.ClassRepo, repo.ClassScheduleRepo),
 		ClassScheduleService:    services.NewClassScheduleService(repo.ClassScheduleRepo, repo.ClassRepo, repo.PackageRepo, repo.UserPackageRepo, repo.BookingRepo),
 	}

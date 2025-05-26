@@ -18,30 +18,25 @@ func NewClassHandler(classService services.ClassService) *ClassHandler {
 	return &ClassHandler{classService}
 }
 
+func extractUploadedImages(c *gin.Context) ([]string, error) {
+	form, err := c.MultipartForm()
+	if err != nil || form == nil {
+		return nil, err
+	}
+	files := form.File["images"]
+	if len(files) == 0 {
+		return nil, nil
+	}
+	return utils.UploadMultipleImagesWithValidation(files)
+}
+
 func (h *ClassHandler) CreateClass(c *gin.Context) {
 	var req dto.CreateClassRequest
 
 	if !utils.BindAndValidateForm(c, &req) {
 		return
 	}
-
 	req.IsActive, _ = utils.ParseBoolFormField(c, "isActive")
-
-	form, err := c.MultipartForm()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid multipart form"})
-		return
-	}
-
-	if form != nil && len(form.File["images"]) > 0 {
-		files := form.File["images"]
-		uploadedImageURLs, err := utils.UploadMultipleImagesWithValidation(files)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "Gallery images upload failed", "error": err.Error()})
-			return
-		}
-		req.ImageURLs = uploadedImageURLs
-	}
 
 	if req.Image != nil {
 		singleImageURL, err := utils.UploadImageWithValidation(req.Image)
@@ -54,9 +49,14 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Image is required"})
 		return
 	}
+	uploadedURLs, err := extractUploadedImages(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid image upload", "error": err.Error()})
+		return
+	}
+	req.ImageURLs = uploadedURLs
 
 	if err := h.classService.CreateClass(req); err != nil {
-		utils.CleanupImageOnError(req.ImageURL)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create class", "error": err.Error()})
 		return
 	}

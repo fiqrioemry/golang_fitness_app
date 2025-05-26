@@ -6,7 +6,6 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
-	"server/internal/utils"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,10 +14,11 @@ import (
 type NotificationService interface {
 	SendClassReminder() error
 	MarkAllAsRead(userID string) error
+	SendToUser(req dto.NotificationEvent) error
 	SendNotificationByType(req dto.SendNotificationRequest) error
 	GetAllNotifications(userID string) ([]dto.NotificationResponse, error)
-	UpdateSetting(userID string, req dto.UpdateNotificationSettingRequest) error
 	GetSettingsByUser(userID string) ([]dto.NotificationSettingResponse, error)
+	UpdateSetting(userID string, req dto.UpdateNotificationSettingRequest) error
 }
 
 type notificationService struct {
@@ -106,14 +106,14 @@ func (s *notificationService) SendNotificationByType(req dto.SendNotificationReq
 			Message:  req.Message,
 			Channel:  setting.Channel,
 		})
-
-		if setting.Channel == "email" && setting.User.Email != "" {
-			go func(email, title, msg string) {
-				if err := utils.SendNotificationEmail(email, title, msg); err != nil {
-					fmt.Printf("failed to send email to %s: %v\n", email, err)
-				}
-			}(setting.User.Email, req.Title, req.Message)
-		}
+		// ! Non aktifin sementara di development biar ga spam email ke dummy email
+		// if setting.Channel == "email" && setting.User.Email != "" {
+		// 	go func(email, title, msg string) {
+		// 		if err := utils.SendNotificationEmail(email, title, msg); err != nil {
+		// 			fmt.Printf("failed to send email to %s: %v\n", email, err)
+		// 		}
+		// 	}(setting.User.Email, req.Title, req.Message)
+		// }
 	}
 
 	return s.repo.InsertNotifications(notifs)
@@ -141,27 +141,62 @@ func (s *notificationService) SendClassReminder() error {
 	}
 
 	for _, booking := range bookings {
-		user := booking.User
-		class := booking.ClassSchedule.Class
+		userID := booking.UserID
+		schedule := booking.ClassSchedule
 
-		setting, err := s.repo.FindSetting(user.ID, notifType.ID, "email")
+		setting, err := s.repo.FindSetting(userID, notifType.ID, "email")
 		if err != nil || !setting.Enabled {
 			continue
 		}
 
 		message := fmt.Sprintf("Reminder: You have a class '%s' at %02d:%02d today.",
-			class.Title, booking.ClassSchedule.StartHour, booking.ClassSchedule.StartMinute)
-
-		go utils.SendNotificationEmail(user.Email, "Class Reminder", message)
+			schedule.ClassName, schedule.StartHour, schedule.StartMinute)
 
 		notif := models.Notification{
-			UserID:   user.ID,
+			UserID:   booking.UserID,
 			TypeCode: "class_reminder",
 			Title:    "Class Reminder",
 			Message:  message,
-			Channel:  "email",
+			Channel:  "browser",
 		}
 		_ = s.repo.CreateNotification(&notif)
+	}
+
+	return nil
+}
+
+func (s *notificationService) SendToUser(req dto.NotificationEvent) error {
+	uid := uuid.MustParse(req.UserID)
+
+	ntype, err := s.repo.GetTypeByCode(req.Type)
+	if err != nil {
+		return err
+	}
+
+	for _, channel := range []string{"browser"} {
+		setting, err := s.repo.FindSetting(uid, ntype.ID, channel)
+		if err != nil || !setting.Enabled {
+			continue
+		}
+
+		notif := models.Notification{
+			ID:       uuid.New(),
+			UserID:   uid,
+			TypeCode: req.Type,
+			Title:    req.Title,
+			Message:  req.Message,
+			Channel:  channel,
+		}
+		if err := s.repo.CreateNotification(&notif); err != nil {
+			return err
+		}
+
+		// ! Non aktifin sementara di development biar ga spam email ke dummy email
+		// if channel == "email" && setting.User.Email != "" {
+		// 	go func(email, title, msg string) {
+		// 		_ = utils.SendNotificationEmail(email, title, msg)
+		// 	}(setting.User.Email, req.Title, req.Message)
+		// }
 	}
 
 	return nil

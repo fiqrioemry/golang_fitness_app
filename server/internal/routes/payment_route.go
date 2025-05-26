@@ -10,7 +10,7 @@ import (
 func PaymentRoutes(r *gin.Engine, handler *handlers.PaymentHandler) {
 	p := r.Group("/api/payments")
 	p.POST("", middleware.AuthRequired(), handler.CreatePayment)
-	p.POST("/midtrans/notification", handler.HandlePaymentNotification)
+	p.POST("/stripe/notifications", handler.HandlePaymentNotifications)
 
 	admin := p.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
 	admin.GET("", handler.GetAllUserPayments)

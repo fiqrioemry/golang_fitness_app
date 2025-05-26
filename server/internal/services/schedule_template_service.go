@@ -164,6 +164,7 @@ func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleT
 		ClassName:      class.Title,
 		ClassImage:     class.Image,
 		InstructorID:   instructor.ID,
+		Location:       class.Location.Name,
 		InstructorName: instructor.User.Profile.Fullname,
 		DayOfWeeks:     utils.IntSliceToJSON(req.DayOfWeeks),
 		StartHour:      req.StartHour,
@@ -384,7 +385,7 @@ func (s *scheduleTemplateService) GenerateScheduleByTemplateID(templateID string
 	}
 
 	today := time.Now().Truncate(24 * time.Hour)
-	end := today.AddDate(0, 1, 0) // generate untuk 1 bulan ke depan
+	end := today.AddDate(0, 1, 0)
 
 	var hasSuccess bool
 	var errors []string
@@ -394,7 +395,6 @@ func (s *scheduleTemplateService) GenerateScheduleByTemplateID(templateID string
 			continue
 		}
 
-		// Cek konflik dengan jadwal yang sudah ada
 		conflict, err := s.checkInstructorConflict(d, template.InstructorID, template.StartHour, template.StartMinute)
 		if err != nil {
 			return err
@@ -411,6 +411,7 @@ func (s *scheduleTemplateService) GenerateScheduleByTemplateID(templateID string
 			ClassImage:     template.ClassImage,
 			InstructorID:   template.InstructorID,
 			InstructorName: template.InstructorName,
+			Location:       template.Location,
 			Capacity:       template.Capacity,
 			IsActive:       true,
 			Color:          template.Color,

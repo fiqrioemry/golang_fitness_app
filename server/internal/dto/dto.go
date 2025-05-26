@@ -62,7 +62,7 @@ type CreateClassRequest struct {
 	Title         string                  `form:"title" binding:"required"`
 	Duration      int                     `form:"duration" binding:"required,min=15"`
 	Description   string                  `form:"description" binding:"required"`
-	Additional    []string                `form:"additional[]"`
+	Additional    []string                `form:"additional"`
 	IsActive      bool                    `form:"isActive"`
 	TypeID        string                  `form:"typeId" binding:"required"`
 	LevelID       string                  `form:"levelId" binding:"required"`
@@ -80,7 +80,7 @@ type UpdateClassRequest struct {
 	Duration      int                   `form:"duration"`
 	IsActive      bool                  `form:"isActive"`
 	Description   string                `form:"description"`
-	Additional    []string              `form:"additional[]"`
+	Additional    []string              `form:"additional"`
 	TypeID        string                `form:"typeId"`
 	LevelID       string                `form:"levelId"`
 	LocationID    string                `form:"locationId"`
@@ -332,15 +332,15 @@ type CreatePaymentRequest struct {
 
 type CreatePaymentResponse struct {
 	PaymentID string `json:"paymentId"`
-	SnapToken string `json:"snapToken"`
+	SessionID string `json:"sessionId"`
 	SnapURL   string `json:"snapUrl"`
 }
 
-type MidtransNotificationRequest struct {
-	TransactionStatus string `json:"transaction_status"`
-	OrderID           string `json:"order_id"`
-	PaymentType       string `json:"payment_type"`
-	FraudStatus       string `json:"fraud_status"`
+type NotificationEvent struct {
+	UserID  string `json:"userId"`
+	Type    string `json:"type"`
+	Title   string `json:"title"`
+	Message string `json:"message"`
 }
 
 type PaymentResponse struct {
@@ -355,7 +355,7 @@ type PaymentResponse struct {
 }
 
 type PaymentQueryParam struct {
-	Q         string `form:"q"`
+	Search    string `form:"q"`
 	Status    string `form:"status"`
 	Sort      string `form:"sort"`
 	Page      int    `form:"page"`
@@ -367,11 +367,12 @@ type PaymentQueryParam struct {
 type PaymentListResponse struct {
 	ID            string  `json:"id"`
 	UserID        string  `json:"userId"`
-	UserEmail     string  `json:"userEmail"`
+	InvoiceNumber string  `json:"invoiceNumber"`
+	Email         string  `json:"email"`
 	Fullname      string  `json:"fullname"`
 	PackageID     string  `json:"packageId"`
 	PackageName   string  `json:"packageName"`
-	Price         float64 `json:"price"`
+	Total         float64 `json:"total"`
 	PaymentMethod string  `json:"paymentMethod"`
 	Status        string  `json:"status"`
 	PaidAt        string  `json:"paidAt"`
@@ -461,7 +462,7 @@ type ClassScheduleResponse struct {
 	ClassImage     string    `json:"classImage"`
 	InstructorID   string    `json:"instructorId"`
 	InstructorName string    `json:"instructorName"`
-	Category       string    `json:"category"`
+	Location       string    `json:"location"`
 	Date           time.Time `json:"date"`
 	StartHour      int       `json:"startHour"`
 	StartMinute    int       `json:"startMinute"`
@@ -484,9 +485,8 @@ type ClassScheduleDetailResponse struct {
 }
 
 type ClassScheduleQueryParam struct {
-	StartDate  string `form:"startDate"`
-	EndDate    string `form:"endDate"`
-	CategoryID string `form:"categoryId"`
+	StartDate string `form:"startDate"`
+	EndDate   string `form:"endDate"`
 }
 
 type ScheduleTemplateResponse struct {
@@ -529,30 +529,38 @@ type UpdateScheduleTemplateRequest struct {
 
 // CLASS-SCHEDULE =====================
 
-// BOOKINGS ===========================
+// BOOKINGS & ATTENDANCE ===========================
+
+type BookingQueryParam struct {
+	Q      string `form:"q"`      // search class name
+	Status string `form:"status"` // filter by booking status
+	Sort   string `form:"sort"`   // sort by date/class
+	Page   int    `form:"page" binding:"omitempty,min=1"`
+	Limit  int    `form:"limit" binding:"omitempty,min=1"`
+}
+
 type CreateBookingRequest struct {
 	PackageID       string `json:"packageId" binding:"required,uuid"`
 	ClassScheduleID string `json:"scheduleId" binding:"required,uuid"`
 }
 
 type BookingResponse struct {
-	ID       string `json:"id"`
-	Status   string `json:"status"`
-	BookedAt string `json:"bookedAt"`
-
-	ClassID    string `json:"classId"`
-	ClassName  string `json:"className"`
-	ClassImage string `json:"classImage"`
-	Duration   int    `json:"duration"`
-
-	Date        string `json:"date"`
-	StartHour   int    `json:"startHour"`
-	StartMinute int    `json:"startMinute"`
-	Location    string `json:"location"`
-
-	InstructorName string `json:"instructorName"`
-	Participant    int    `json:"participant"`
+	ID               string `json:"id"`
+	BookingStatus    string `json:"bookingStatus"`
+	AttendanceStatus string `json:"attendanceStatus,omitempty"`
+	ClassID          string `json:"classId"`
+	ClassName        string `json:"className"`
+	ClassImage       string `json:"classImage"`
+	Duration         int    `json:"duration"`
+	Date             string `json:"date"`
+	StartHour        int    `json:"startHour"`
+	StartMinute      int    `json:"startMinute"`
+	Location         string `json:"location"`
+	InstructorName   string `json:"instructorName"`
+	Participant      int    `json:"participant"`
+	BookedAt         string `json:"bookedAt"`
 }
+
 type QRCodeAttendanceResponse struct {
 	QR             string `json:"qr"`
 	ClassName      string `json:"className"`
@@ -560,8 +568,6 @@ type QRCodeAttendanceResponse struct {
 	Date           string `json:"date"`
 	StartTime      string `json:"startTime"`
 }
-
-// ATTENDANCE ==========================
 
 type ValidateQRRequest struct {
 	QRCode string `json:"qrCode"`
@@ -575,7 +581,7 @@ type MarkAttendanceRequest struct {
 type AttendanceResponse struct {
 	ID             string `json:"id"`
 	ScheduleID     string `json:"scheduleId"`
-	ClassName      string `json:"class"`
+	ClassName      string `json:"className"`
 	ClassImage     string `json:"classImage"`
 	InstructorID   string `json:"instructorId"`
 	InstructorName string `json:"instructorName"`
@@ -683,6 +689,7 @@ type TransactionResponse struct {
 	PackageID     string  `json:"packageId"`
 	PackageName   string  `json:"packageName"`
 	PaymentMethod string  `json:"paymentMethod"`
+	PaymentLink   string  `json:"PaymentLink"`
 	Status        string  `json:"status"`
 	BasePrice     float64 `json:"basePrice"`
 	Tax           float64 `json:"taxRate"`
@@ -751,6 +758,7 @@ type VoucherResponse struct {
 	Discount     float64  `json:"discount"`
 	MaxDiscount  *float64 `json:"maxDiscount,omitempty"`
 	Quota        int      `json:"quota"`
+	IsReusable   bool     `json:"isReusable"`
 	ExpiredAt    string   `json:"expiredAt"`
 	CreatedAt    string   `json:"createdAt"`
 }

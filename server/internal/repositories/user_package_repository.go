@@ -11,10 +11,10 @@ import (
 type UserPackageRepository interface {
 	CreateUserPackage(userPackage *models.UserPackage) error
 	UpdateUserPackage(userPackage *models.UserPackage) error
-	GetActiveUserPackage(userID string) (*models.UserPackage, error)
+
 	GetUserPackagesByUserID(userID string) ([]models.UserPackage, error)
 	GetUserPackagesByPackageIDs(packageIDs []uuid.UUID) ([]models.UserPackage, error)
-	FindActiveByUserAndPackage(userID, packageID string, result *models.UserPackage) error
+	GetActiveUserPackages(userID, packageID string, result *models.UserPackage) error
 }
 
 type userPackageRepository struct {
@@ -37,17 +37,6 @@ func (r *userPackageRepository) GetUserPackagesByUserID(userID string) ([]models
 	return userPackages, nil
 }
 
-func (r *userPackageRepository) GetActiveUserPackage(userID string) (*models.UserPackage, error) {
-	var userPackage models.UserPackage
-	if err := r.db.
-		Where("user_id = ? AND remaining_credit > 0", userID).
-		Order("purchased_at desc").
-		First(&userPackage).Error; err != nil {
-		return nil, err
-	}
-	return &userPackage, nil
-}
-
 func (r *userPackageRepository) UpdateUserPackage(userPackage *models.UserPackage) error {
 	return r.db.Save(userPackage).Error
 }
@@ -57,7 +46,7 @@ func (r *userPackageRepository) GetUserPackagesByPackageIDs(packageIDs []uuid.UU
 	return userPackages, err
 }
 
-func (r *userPackageRepository) FindActiveByUserAndPackage(userID, packageID string, result *models.UserPackage) error {
+func (r *userPackageRepository) GetActiveUserPackages(userID, packageID string, result *models.UserPackage) error {
 	return r.db.
 		Where("user_id = ? AND package_id = ? AND expired_at > ?", userID, packageID, time.Now()).
 		Order("purchased_at desc").

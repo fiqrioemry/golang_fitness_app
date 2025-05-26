@@ -53,15 +53,11 @@ func (r *paymentRepository) GetAllUserPayments(params dto.PaymentQueryParam) ([]
 	var payments []models.Payment
 	var count int64
 
-	db := r.db.Model(&models.Payment{}).
-		Preload("User.Profile").
-		Joins("JOIN users ON users.id = payments.user_id").
-		Joins("JOIN profiles ON users.id = profiles.user_id")
-
+	db := r.db.Model(&models.Payment{})
 	// search
-	if params.Q != "" {
-		likeQuery := "%" + params.Q + "%"
-		db = db.Where("users.email LIKE ? OR profiles.fullname LIKE ?", likeQuery, likeQuery)
+	if params.Search != "" {
+		likeQuery := "%" + params.Search + "%"
+		db = db.Where("email LIKE ? OR fullname LIKE ?", likeQuery, likeQuery)
 	}
 
 	// status filter
@@ -81,13 +77,13 @@ func (r *paymentRepository) GetAllUserPayments(params dto.PaymentQueryParam) ([]
 	case "paid_at_desc":
 		db = db.Order("paid_at desc")
 	case "name_asc":
-		db = db.Order("profiles.fullname asc")
+		db = db.Order("fullname asc")
 	case "name_desc":
-		db = db.Order("profiles.fullname desc")
+		db = db.Order("fullname desc")
 	case "email_asc":
-		db = db.Order("users.email asc")
+		db = db.Order("email asc")
 	case "email_desc":
-		db = db.Order("users.email desc")
+		db = db.Order("email desc")
 	default:
 		db = db.Order("paid_at desc")
 	}

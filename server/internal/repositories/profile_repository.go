@@ -9,10 +9,11 @@ import (
 type ProfileRepository interface {
 	GetUserByID(userID string) (*models.User, error)
 	UpdateUser(user *models.User) error
+	GetUserBookings(userID string, limit, offset int) ([]models.Booking, int64, error)
 	GetUserTransactions(userID string, limit, offset int) ([]models.Payment, int64, error)
 	GetUserPackages(userID string, limit, offset int) ([]models.UserPackage, int64, error)
+
 	GetUserPackagesByClassID(userID, classID string) ([]models.UserPackage, error)
-	GetUserBookings(userID string, limit, offset int) ([]models.Booking, int64, error)
 }
 
 type profileRepository struct {
@@ -41,7 +42,6 @@ func (r *profileRepository) GetUserTransactions(userID string, limit, offset int
 
 	query := r.db.
 		Model(&models.Payment{}).
-		Preload("Package").
 		Where("user_id = ?", userID)
 
 	if err := query.Count(&count).Error; err != nil {
@@ -59,7 +59,6 @@ func (r *profileRepository) GetUserPackages(userID string, limit, offset int) ([
 	var count int64
 
 	query := r.db.Model(&models.UserPackage{}).
-		Preload("Package").
 		Where("user_id = ?", userID)
 
 	if err := query.Count(&count).Error; err != nil {
@@ -76,8 +75,7 @@ func (r *profileRepository) GetUserBookings(userID string, limit, offset int) ([
 	var count int64
 
 	query := r.db.Model(&models.Booking{}).
-		Preload("ClassSchedule.Class.Location").
-		Preload("ClassSchedule.Instructor.User.Profile").
+		Preload("ClassSchedule").
 		Where("user_id = ?", userID)
 
 	if err := query.Count(&count).Error; err != nil {

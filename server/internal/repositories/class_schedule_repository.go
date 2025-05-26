@@ -44,9 +44,7 @@ func (r *classScheduleRepository) DeleteClassSchedule(id string) error {
 
 func (r *classScheduleRepository) GetClassScheduleByID(id string) (*models.ClassSchedule, error) {
 	var schedule models.ClassSchedule
-	if err := r.db.Preload("Class", func(db *gorm.DB) *gorm.DB {
-		return db.Unscoped()
-	}).
+	if err := r.db.
 		First(&schedule, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
@@ -56,9 +54,6 @@ func (r *classScheduleRepository) GetClassScheduleByID(id string) (*models.Class
 func (r *classScheduleRepository) GetClassSchedules() ([]models.ClassSchedule, error) {
 	var schedules []models.ClassSchedule
 	if err := r.db.
-		Preload("Class", func(db *gorm.DB) *gorm.DB {
-			return db.Unscoped()
-		}).
 		Order("date asc").
 		Order("start_hour asc").
 		Order("start_minute asc").
@@ -71,9 +66,6 @@ func (r *classScheduleRepository) GetClassSchedules() ([]models.ClassSchedule, e
 func (r *classScheduleRepository) GetClassSchedulesWithFilter(filter dto.ClassScheduleQueryParam) ([]models.ClassSchedule, error) {
 	var schedules []models.ClassSchedule
 	db := r.db.
-		Preload("Class", func(db *gorm.DB) *gorm.DB {
-			return db.Unscoped()
-		}).
 		Order("start_hour asc").
 		Order("start_minute asc")
 
@@ -86,10 +78,6 @@ func (r *classScheduleRepository) GetClassSchedulesWithFilter(filter dto.ClassSc
 		if end, err := time.Parse("2006-01-02", filter.EndDate); err == nil {
 			db = db.Where("date <= ?", end)
 		}
-	}
-	if filter.CategoryID != "" {
-		db = db.Joins("JOIN classes ON classes.id = class_schedules.class_id").
-			Where("classes.category_id = ?", filter.CategoryID)
 	}
 
 	if err := db.Find(&schedules).Error; err != nil {
@@ -116,7 +104,7 @@ func (r *classScheduleRepository) HasActiveBooking(scheduleID uuid.UUID) (bool, 
 
 func (r *classScheduleRepository) GetClassByID(id uuid.UUID) (*models.Class, error) {
 	var class models.Class
-	if err := r.db.Unscoped().First(&class, "id = ?", id).Error; err != nil {
+	if err := r.db.Unscoped().Preload("Location").First(&class, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &class, nil

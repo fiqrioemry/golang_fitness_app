@@ -11,5 +11,8 @@ func BookingRoutes(r *gin.Engine, handler *handlers.BookingHandler) {
 	booking := r.Group("/api/bookings")
 	booking.Use(middleware.AuthRequired())
 	booking.POST("", handler.CreateBooking)
-	booking.GET("", handler.GetUserBookings)
+	booking.GET("", handler.GetMyBookings)
+	booking.POST("/:id", handler.CheckinBookedClass)
+	booking.GET("/:id/qr-code", handler.RegenerateQRCode)
+
 }

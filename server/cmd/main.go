@@ -8,7 +8,6 @@ import (
 	"server/internal/cron"
 	"server/internal/middleware"
 	"server/internal/routes"
-	"server/internal/seeders"
 	"server/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -21,11 +20,11 @@ func main() {
 	config.InitDatabase()
 	config.InitCloudinary()
 	config.InitGoogleOAuthConfig()
-	config.InitMidtrans()
+	config.InitStripe()
 
 	db := config.DB
 	//  Seeder ================================
-	seeders.ResetDatabase(db)
+	// seeders.ResetDatabase(db)
 
 	r := gin.Default()
 	err := r.SetTrustedProxies(config.GetTrustedProxies())
@@ -48,7 +47,7 @@ func main() {
 	h := bootstrap.InitHandlers(s)
 
 	// Cron Job ===============================
-	cronManager := cron.NewCronManager(s.PaymentService, s.ScheduleTemplateService, s.NotificationService, s.AttendanceService)
+	cronManager := cron.NewCronManager(s.PaymentService, s.ScheduleTemplateService, s.NotificationService, s.BookingService)
 	cronManager.RegisterJobs()
 	cronManager.Start()
 
@@ -68,7 +67,6 @@ func main() {
 	routes.CategoryRoutes(r, h.CategoryHandler)
 	routes.LocationRoutes(r, h.LocationHandler)
 	routes.InstructorRoutes(r, h.InstructorHandler)
-	routes.AttendanceRoutes(r, h.AttendanceHandler)
 	routes.SubcategoryRoutes(r, h.SubcategoryHandler)
 	routes.NotificationRoutes(r, h.NotificationHandler)
 	routes.ClassScheduleRoutes(r, h.ClassScheduleHandler)

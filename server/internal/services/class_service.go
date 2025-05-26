@@ -67,8 +67,8 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 		CreatedAt:      time.Now(),
 	}
 
-	err = s.repo.CreateClass(&class)
-	if err != nil {
+	if err := s.repo.CreateClass(&class); err != nil {
+		utils.CleanupImageOnError(req.ImageURL)
 		return err
 	}
 
@@ -84,9 +84,12 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 		}
 
 		if err := s.repo.SaveClassGalleries(galleries); err != nil {
+			for _, img := range req.ImageURLs {
+				utils.CleanupImageOnError(img)
+			}
+			utils.CleanupImageOnError(req.ImageURL)
 			return err
 		}
-
 	}
 
 	return nil
@@ -112,6 +115,7 @@ func (s *classService) UpdateClass(id string, req dto.UpdateClassRequest) error 
 	if len(req.Additional) > 0 {
 		class.AdditionalList = req.Additional
 	}
+
 	if req.TypeID != "" {
 		typeID, _ := uuid.Parse(req.TypeID)
 		class.TypeID = typeID

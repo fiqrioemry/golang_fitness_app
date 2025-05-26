@@ -1,6 +1,7 @@
 package seeders
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -531,7 +532,6 @@ func SeedPackages(db *gorm.DB) {
 		return
 	}
 
-	// Load semua class dan kelompokkan berdasarkan category
 	var classes []models.Class
 	if err := db.Preload("Category").Find(&classes).Error; err != nil {
 		log.Fatalf("Failed fetching classes: %v", err)
@@ -685,7 +685,6 @@ func SeedInstructors(db *gorm.DB) {
 		log.Println("Successfully seeded instructors!")
 	}
 }
-
 func SeedPayments(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Payment{}).Count(&count)
@@ -694,19 +693,21 @@ func SeedPayments(db *gorm.DB) {
 		return
 	}
 
+	// Get sample users
 	var customer1, customer2 models.User
-	if err := db.Where("email = ?", "customer1@fitness.com").First(&customer1).Error; err != nil {
-		log.Println("Failed to find customer1@fitness.com:", err)
+	if err := db.Preload("Profile").Where("email = ?", "customer1@fitness.com").First(&customer1).Error; err != nil {
+		log.Println("❌ Failed to find customer1@fitness.com:", err)
 		return
 	}
-	if err := db.Where("email = ?", "customer2@fitness.com").First(&customer2).Error; err != nil {
-		log.Println("Failed to find customer2@fitness.com:", err)
+	if err := db.Preload("Profile").Where("email = ?", "customer2@fitness.com").First(&customer2).Error; err != nil {
+		log.Println("❌ Failed to find customer2@fitness.com:", err)
 		return
 	}
 
+	// Get package
 	var pkg models.Package
 	if err := db.First(&pkg).Error; err != nil {
-		log.Println("Failed to find package:", err)
+		log.Println("❌ Failed to find package:", err)
 		return
 	}
 
@@ -716,86 +717,39 @@ func SeedPayments(db *gorm.DB) {
 	tax := base * taxRate
 	total := base + tax
 
+	// Seed payments
 	payments := []models.Payment{
-		{
-			ID:            uuid.New(),
-			UserID:        customer1.ID,
-			PackageID:     pkg.ID,
-			PackageName:   pkg.Name,
-			PaymentMethod: "bank_transfer",
-			BasePrice:     base,
-			Tax:           tax,
-			Total:         total,
-			Status:        "success",
-			PaidAt:        now.AddDate(0, 0, -3),
-		},
-
-		{
-			ID:            uuid.New(),
-			UserID:        customer2.ID,
-			PackageID:     pkg.ID,
-			PackageName:   pkg.Name,
-			PaymentMethod: "bank_transfer",
-			BasePrice:     base,
-			Tax:           tax,
-			Total:         total,
-			Status:        "success",
-			PaidAt:        now,
-		},
-		{
-			ID:            uuid.New(),
-			UserID:        customer2.ID,
-			PackageID:     pkg.ID,
-			PackageName:   pkg.Name,
-			PaymentMethod: "bank_transfer",
-			BasePrice:     base,
-			Tax:           tax,
-			Total:         total,
-			Status:        "success",
-			PaidAt:        now,
-		},
-		{
-			ID:            uuid.New(),
-			UserID:        customer2.ID,
-			PackageID:     pkg.ID,
-			PackageName:   pkg.Name,
-			PaymentMethod: "bank_transfer",
-			BasePrice:     base,
-			Tax:           tax,
-			Total:         total,
-			Status:        "success",
-			PaidAt:        now.AddDate(0, 0, -1),
-		},
-		{
-			ID:            uuid.New(),
-			UserID:        customer2.ID,
-			PackageID:     pkg.ID,
-			PackageName:   pkg.Name,
-			PaymentMethod: "bank_transfer",
-			BasePrice:     base,
-			Tax:           tax,
-			Total:         total,
-			Status:        "success",
-			PaidAt:        now.AddDate(0, 0, -2),
-		},
-		{
-			ID:            uuid.New(),
-			UserID:        customer2.ID,
-			PackageID:     pkg.ID,
-			PackageName:   pkg.Name,
-			PaymentMethod: "bank_transfer",
-			BasePrice:     base,
-			Tax:           tax,
-			Total:         total,
-			Status:        "failed",
-			PaidAt:        now.AddDate(0, 0, -2),
-		},
+		createPayment(customer1, pkg, base, tax, total, now.AddDate(0, 0, -3), "success"),
+		createPayment(customer2, pkg, base, tax, total, now, "success"),
+		createPayment(customer2, pkg, base, tax, total, now, "success"),
+		createPayment(customer2, pkg, base, tax, total, now.AddDate(0, 0, -1), "success"),
+		createPayment(customer2, pkg, base, tax, total, now.AddDate(0, 0, -2), "success"),
+		createPayment(customer2, pkg, base, tax, total, now.AddDate(0, 0, -2), "failed"),
 	}
 
 	if err := db.Create(&payments).Error; err != nil {
-		log.Printf("Failed seeding payments: %v", err)
+		log.Printf("❌ Failed seeding payments: %v", err)
 	} else {
-		log.Println("Seeded 6 payments: 1 for customer01, 5 for customer02")
+		log.Println("✅ Seeded 6 payments: 1 for customer01, 5 for customer02")
+	}
+}
+
+func createPayment(user models.User, pkg models.Package, base, tax, total float64, paidAt time.Time, status string) models.Payment {
+	id := uuid.New()
+	return models.Payment{
+		ID:            id,
+		UserID:        user.ID,
+		Email:         user.Email,
+		Fullname:      user.Profile.Fullname,
+		PackageID:     pkg.ID,
+		PackageName:   pkg.Name,
+		PaymentMethod: "bank_transfer",
+		BasePrice:     base,
+		Tax:           tax,
+		Total:         total,
+		Status:        status,
+		PaidAt:        paidAt,
+		InvoiceNumber: utils.GenerateInvoiceNumber(id),
 	}
 }
 
@@ -872,7 +826,7 @@ func SeedClassSchedules(db *gorm.DB) {
 
 	var class models.Class
 	var instructor models.Instructor
-	if err := db.First(&class).Error; err != nil {
+	if err := db.Preload("Location").First(&class).Error; err != nil {
 		log.Println("No class found")
 		return
 	}
@@ -884,11 +838,13 @@ func SeedClassSchedules(db *gorm.DB) {
 	now := time.Now().Truncate(time.Minute)
 	threeDaysAgo := now.AddDate(0, 0, -3)
 
+	// Jadwal 3 hari lalu
 	schedulePast := models.ClassSchedule{
 		ID:             uuid.New(),
 		ClassID:        class.ID,
 		ClassName:      class.Title,
 		ClassImage:     class.Image,
+		Location:       class.Location.Name,
 		InstructorID:   instructor.ID,
 		InstructorName: instructor.User.Profile.Fullname,
 		Date:           threeDaysAgo,
@@ -900,25 +856,12 @@ func SeedClassSchedules(db *gorm.DB) {
 		IsActive:       true,
 		Color:          "#f59e0b",
 	}
-
-	bookingPast := models.Booking{
-		ID:              uuid.New(),
-		UserID:          user.ID,
-		ClassScheduleID: schedulePast.ID,
-		Status:          "checked_in",
-		CreatedAt:       threeDaysAgo,
+	if err := db.Create(&schedulePast).Error; err != nil {
+		log.Println("Failed to create past schedule:", err)
+		return
 	}
 
-	attendancePast := models.Attendance{
-		ID:              uuid.New(),
-		UserID:          user.ID,
-		ClassScheduleID: schedulePast.ID,
-		Status:          "attended",
-		CheckedAt:       &threeDaysAgo,
-		Verified:        true,
-		CreatedAt:       threeDaysAgo,
-	}
-
+	// Jadwal hari ini
 	scheduleToday := models.ClassSchedule{
 		ID:             uuid.New(),
 		ClassID:        class.ID,
@@ -926,6 +869,7 @@ func SeedClassSchedules(db *gorm.DB) {
 		ClassImage:     class.Image,
 		InstructorID:   instructor.ID,
 		InstructorName: instructor.User.Profile.Fullname,
+		Location:       class.Location.Name,
 		Date:           now,
 		StartHour:      now.Hour(),
 		StartMinute:    now.Minute(),
@@ -935,46 +879,20 @@ func SeedClassSchedules(db *gorm.DB) {
 		IsActive:       true,
 		Color:          "#10b981",
 	}
-
-	bookingToday := models.Booking{
-		ID:              uuid.New(),
-		UserID:          user.ID,
-		ClassScheduleID: scheduleToday.ID,
-		Status:          "booked",
-		CreatedAt:       now,
-	}
-
-	attendanceToday := models.Attendance{
-		ID:              uuid.New(),
-		UserID:          user.ID,
-		ClassScheduleID: scheduleToday.ID,
-		Status:          "attended",
-		CheckedAt:       &now,
-		Verified:        true,
-		CreatedAt:       now,
-	}
-
-	if err := db.Create(&schedulePast).Error; err != nil {
-		log.Println("Failed to create past schedule:", err)
-	}
-	if err := db.Create(&bookingPast).Error; err != nil {
-		log.Println("Failed to create past booking:", err)
-	}
-	if err := db.Create(&attendancePast).Error; err != nil {
-		log.Println("Failed to create past attendance:", err)
-	}
-
 	if err := db.Create(&scheduleToday).Error; err != nil {
 		log.Println("Failed to create today schedule:", err)
-	}
-	if err := db.Create(&bookingToday).Error; err != nil {
-		log.Println("Failed to create today booking:", err)
-	}
-	if err := db.Create(&attendanceToday).Error; err != nil {
-		log.Println("Failed to create today attendance:", err)
+		return
 	}
 
-	log.Println("Seeded ClassSchedules, Bookings, and Attendances (3 hari lalu & hari ini) for customer01@fitness.com")
+	// Booking + attendance
+	if err := CreateBookingWithAttendance(db, user, schedulePast, true, threeDaysAgo); err != nil {
+		log.Println("Failed to seed past booking+attendance:", err)
+	}
+	if err := CreateBookingWithAttendance(db, user, scheduleToday, true, now); err != nil {
+		log.Println("Failed to seed today booking+attendance:", err)
+	}
+
+	log.Println("✅ Seeded ClassSchedules + Bookings + Attendance (past & today) safely.")
 }
 
 func SeedReviews(db *gorm.DB) {
@@ -1137,4 +1055,110 @@ func SeedVouchers(db *gorm.DB) {
 
 	log.Println("Vouchers seeding completed!")
 
+}
+
+func CreateBookingWithAttendance(db *gorm.DB, user models.User, schedule models.ClassSchedule, attended bool, createdAt time.Time) error {
+	var existing models.Booking
+	if err := db.Where("user_id = ? AND class_schedule_id = ?", user.ID, schedule.ID).First(&existing).Error; err == nil {
+		log.Println("Booking already exists for this user & schedule:", user.Email)
+		return nil
+	}
+
+	booking := models.Booking{
+		ID:              uuid.New(),
+		UserID:          user.ID,
+		ClassScheduleID: schedule.ID,
+		Status:          "booked",
+		CreatedAt:       createdAt,
+	}
+	if attended {
+		booking.Status = "checked_in"
+	}
+
+	if err := db.Create(&booking).Error; err != nil {
+		return fmt.Errorf("failed to create booking: %w", err)
+	}
+
+	if attended {
+		var existAtt models.Attendance
+		if err := db.Where("booking_id = ?", booking.ID).First(&existAtt).Error; err == nil {
+			log.Println("Attendance already exists for this booking:", booking.ID)
+			return nil
+		}
+
+		attendance := models.Attendance{
+			ID:        uuid.New(),
+			BookingID: booking.ID,
+			Status:    "attended",
+			CheckedAt: &createdAt,
+			Verified:  true,
+			CreatedAt: createdAt,
+		}
+		if err := db.Create(&attendance).Error; err != nil {
+			return fmt.Errorf("failed to create attendance: %w", err)
+		}
+	}
+	return nil
+}
+
+func SeedFutureBookingForCustomer1(db *gorm.DB) {
+	// Get user
+	var user models.User
+	if err := db.Where("email = ?", "customer1@fitness.com").First(&user).Error; err != nil {
+		log.Println("User customer1@fitness.com not found")
+		return
+	}
+
+	var class models.Class
+	var instructor models.Instructor
+	if err := db.Preload("Location").First(&class).Error; err != nil {
+		log.Println("No class found")
+		return
+	}
+	if err := db.Preload("User.Profile").First(&instructor).Error; err != nil {
+		log.Println("No instructor found")
+		return
+	}
+
+	scheduleDate := time.Now().AddDate(0, 0, 3).Truncate(time.Minute)
+
+	schedule := models.ClassSchedule{
+		ID:             uuid.New(),
+		ClassID:        class.ID,
+		ClassName:      class.Title,
+		ClassImage:     class.Image,
+		Location:       class.Location.Name,
+		InstructorID:   instructor.ID,
+		InstructorName: instructor.User.Profile.Fullname,
+		Date:           scheduleDate,
+		StartHour:      8,
+		StartMinute:    30,
+		Duration:       class.Duration,
+		Capacity:       10,
+		Booked:         1,
+		IsActive:       true,
+		Color:          "#3b82f6",
+	}
+	if err := db.Create(&schedule).Error; err != nil {
+		log.Println("Failed to create future class schedule:", err)
+		return
+	}
+	if err := db.Where("user_id = ? AND class_schedule_id = ?", user.ID, schedule.ID).First(&models.Booking{}).Error; err == nil {
+		log.Println("Booking already exists for future schedule.")
+		return
+	}
+
+	booking := models.Booking{
+		ID:              uuid.New(),
+		UserID:          user.ID,
+		ClassScheduleID: schedule.ID,
+		Status:          "booked",
+		CreatedAt:       time.Now(),
+	}
+	if err := db.Create(&booking).Error; err != nil {
+		log.Println("Failed to create future booking:", err)
+		return
+	}
+
+	log.Println("✅ Seeded future schedule (3 hari lagi) & booking tanpa attendance untuk customer1.")
 }

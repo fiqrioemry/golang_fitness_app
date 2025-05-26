@@ -13,21 +13,21 @@ type CronManager struct {
 	paymentService      services.PaymentService
 	scheduleService     services.ScheduleTemplateService
 	notificationService services.NotificationService
-	attendanceService   services.AttendanceService
+	bookingService      services.BookingService
 }
 
 func NewCronManager(
 	payment services.PaymentService,
 	schedule services.ScheduleTemplateService,
 	notification services.NotificationService,
-	attendance services.AttendanceService,
+	attendance services.BookingService,
 ) *CronManager {
 	return &CronManager{
 		c:                   cron.New(cron.WithSeconds()),
 		paymentService:      payment,
 		scheduleService:     schedule,
 		notificationService: notification,
-		attendanceService:   attendance,
+		bookingService:      attendance,
 	}
 }
 
@@ -62,7 +62,7 @@ func (cm *CronManager) RegisterJobs() {
 		}
 
 		log.Println("Cron: Marking absents for missed bookings...")
-		if err := cm.attendanceService.MarkAbsentBookings(); err != nil {
+		if err := cm.bookingService.MarkAbsentBookings(); err != nil {
 			log.Println(" Marking absents failed:", err)
 		} else {
 			log.Println("Marked absent attendees")

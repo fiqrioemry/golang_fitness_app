@@ -20,7 +20,6 @@ type HandlerContainer struct {
 	SubcategoryHandler      *handlers.SubcategoryHandler
 	NotificationHandler     *handlers.NotificationHandler
 	InstructorHandler       *handlers.InstructorHandler
-	AttendanceHandler       *handlers.AttendanceHandler
 	PaymentHandler          *handlers.PaymentHandler
 	BookingHandler          *handlers.BookingHandler
 	ScheduleTemplateHandler *handlers.ScheduleTemplateHandler
@@ -44,7 +43,6 @@ func InitHandlers(svc *ServiceContainer) *HandlerContainer {
 		SubcategoryHandler:      handlers.NewSubcategoryHandler(svc.SubcategoryService),
 		NotificationHandler:     handlers.NewNotificationHandler(svc.NotificationService),
 		InstructorHandler:       handlers.NewInstructorHandler(svc.InstructorService),
-		AttendanceHandler:       handlers.NewAttendanceHandler(svc.AttendanceService),
 		PaymentHandler:          handlers.NewPaymentHandler(svc.PaymentService),
 		BookingHandler:          handlers.NewBookingHandler(svc.BookingService),
 		ScheduleTemplateHandler: handlers.NewScheduleTemplateHandler(svc.ScheduleTemplateService),

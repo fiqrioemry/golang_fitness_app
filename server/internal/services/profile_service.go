@@ -13,10 +13,11 @@ type ProfileService interface {
 	GetUserByID(userID string) (*models.User, error)
 	UpdateProfile(userID string, req dto.UpdateProfileRequest) error
 	UpdateAvatar(userID string, file *multipart.FileHeader) error
-	GetUserTransactions(userID string, page, limit int) (*dto.TransactionListResponse, error)
-	GetUserPackages(userID string, page, limit int) (*dto.UserPackageListResponse, error)
-	GetUserPackagesByClassID(userID, classID string) ([]dto.UserPackageResponse, error)
 	GetUserBookings(userID string, page, limit int) (*dto.BookingListResponse, error)
+	GetUserPackages(userID string, page, limit int) (*dto.UserPackageListResponse, error)
+	GetUserTransactions(userID string, page, limit int) (*dto.TransactionListResponse, error)
+
+	GetUserPackagesByClassID(userID, classID string) ([]dto.UserPackageResponse, error)
 }
 
 type profileService struct {
@@ -107,6 +108,7 @@ func (s *profileService) GetUserTransactions(userID string, page, limit int) (*d
 			ID:            p.ID.String(),
 			PackageID:     p.PackageID.String(),
 			PackageName:   p.PackageName,
+			PaymentLink:   p.PaymentLink,
 			PaymentMethod: p.PaymentMethod,
 			Status:        p.Status,
 			BasePrice:     p.BasePrice,
@@ -143,7 +145,7 @@ func (s *profileService) GetUserPackages(userID string, page, limit int) (*dto.U
 		}
 		responses = append(responses, dto.UserPackageResponse{
 			ID:              p.ID.String(),
-			PackageName:     p.Package.Name,
+			PackageName:     p.PackageName,
 			RemainingCredit: p.RemainingCredit,
 			ExpiredAt:       expired,
 			PurchasedAt:     p.PurchasedAt.Format("2006-01-02"),
@@ -152,6 +154,46 @@ func (s *profileService) GetUserPackages(userID string, page, limit int) (*dto.U
 
 	return &dto.UserPackageListResponse{
 		Packages: responses,
+		Total:    total,
+		Page:     page,
+		Limit:    limit,
+	}, nil
+}
+
+func (s *profileService) GetUserBookings(userID string, page, limit int) (*dto.BookingListResponse, error) {
+	offset := (page - 1) * limit
+	bookings, total, err := s.repo.GetUserBookings(userID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(bookings) == 0 {
+		bookings = make([]models.Booking, 0)
+	}
+
+	var responses []dto.BookingResponse
+	for _, b := range bookings {
+		schedule := b.ClassSchedule
+
+		responses = append(responses, dto.BookingResponse{
+			ID:             b.ID.String(),
+			BookingStatus:  b.Status,
+			BookedAt:       b.CreatedAt.Format("2006-01-02 15:04:05"),
+			ClassID:        schedule.ClassID.String(),
+			ClassName:      schedule.ClassName,
+			ClassImage:     schedule.ClassImage,
+			Duration:       schedule.Duration,
+			Date:           schedule.Date.Format("2006-01-02"),
+			StartHour:      schedule.StartHour,
+			StartMinute:    schedule.StartMinute,
+			Location:       schedule.Location,
+			InstructorName: schedule.InstructorName,
+			Participant:    schedule.Booked,
+		})
+	}
+
+	return &dto.BookingListResponse{
+		Bookings: responses,
 		Total:    total,
 		Page:     page,
 		Limit:    limit,
@@ -188,47 +230,4 @@ func (s *profileService) GetUserPackagesByClassID(userID, classID string) ([]dto
 	}
 
 	return result, nil
-}
-
-func (s *profileService) GetUserBookings(userID string, page, limit int) (*dto.BookingListResponse, error) {
-	offset := (page - 1) * limit
-	bookings, total, err := s.repo.GetUserBookings(userID, limit, offset)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(bookings) == 0 {
-		bookings = make([]models.Booking, 0)
-	}
-
-	var responses []dto.BookingResponse
-	for _, b := range bookings {
-		cs := b.ClassSchedule
-		c := cs.Class
-		loc := cs.Class.Location
-		instructor := cs.Instructor.User.Profile
-
-		responses = append(responses, dto.BookingResponse{
-			ID:             b.ID.String(),
-			Status:         b.Status,
-			BookedAt:       b.CreatedAt.Format("2006-01-02 15:04:05"),
-			ClassID:        c.ID.String(),
-			ClassName:      c.Title,
-			ClassImage:     c.Image,
-			Duration:       c.Duration,
-			Date:           cs.Date.Format("2006-01-02"),
-			StartHour:      cs.StartHour,
-			StartMinute:    cs.StartMinute,
-			Location:       loc.Name,
-			InstructorName: instructor.Fullname,
-			Participant:    cs.Booked,
-		})
-	}
-
-	return &dto.BookingListResponse{
-		Bookings: responses,
-		Total:    total,
-		Page:     page,
-		Limit:    limit,
-	}, nil
 }

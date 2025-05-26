@@ -17,18 +17,6 @@ func NewBookingHandler(bookingService services.BookingService) *BookingHandler {
 	return &BookingHandler{bookingService}
 }
 
-func (h *BookingHandler) GetUserBookings(c *gin.Context) {
-	userID := utils.MustGetUserID(c)
-
-	bookings, err := h.bookingService.GetUserBookings(userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch bookings", "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, bookings)
-}
-
 func (h *BookingHandler) CreateBooking(c *gin.Context) {
 	var req dto.CreateBookingRequest
 	if !utils.BindAndValidateJSON(c, &req) {
@@ -44,4 +32,56 @@ func (h *BookingHandler) CreateBooking(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Booking successful"})
+}
+
+func (h *BookingHandler) GetMyBookings(c *gin.Context) {
+	userID := utils.MustGetUserID(c)
+
+	var params dto.BookingQueryParam
+	if !utils.BindAndValidateForm(c, &params) {
+		return
+	}
+	if params.Page == 0 {
+		params.Page = 1
+	}
+	if params.Limit == 0 {
+		params.Limit = 10
+	}
+
+	data, pagination, err := h.bookingService.GetBookingByUser(userID, params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch bookings", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":       data,
+		"pagination": pagination,
+	})
+}
+
+func (h *BookingHandler) CheckinBookedClass(c *gin.Context) {
+	bookingID := c.Param("id")
+	userID := utils.MustGetUserID(c)
+
+	response, err := h.bookingService.EnterClassSchedule(userID, bookingID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *BookingHandler) RegenerateQRCode(c *gin.Context) {
+	bookingID := c.Param("id")
+	userID := utils.MustGetUserID(c)
+
+	response, err := h.bookingService.EnterClassSchedule(userID, bookingID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
 }

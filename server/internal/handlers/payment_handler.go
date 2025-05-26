@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 	"server/internal/dto"
 	"server/internal/services"
 	"server/internal/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/stripe/stripe-go/v75/webhook"
 )
 
 type PaymentHandler struct {
@@ -34,31 +36,39 @@ func (h *PaymentHandler) CreatePayment(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
-func (h *PaymentHandler) HandlePaymentNotification(c *gin.Context) {
-	var notif dto.MidtransNotificationRequest
-	if !utils.BindAndValidateJSON(c, &notif) {
+func (h *PaymentHandler) HandlePaymentNotifications(c *gin.Context) {
+	const MaxBodyBytes = int64(65536)
+
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, MaxBodyBytes)
+
+	body, err := c.GetRawData()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to read request body"})
 		return
 	}
 
-	if err := h.paymentService.HandlePaymentNotification(notif); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to process payment notification", "error": err.Error()})
+	sigHeader := c.GetHeader("Stripe-Signature")
+
+	event, err := webhook.ConstructEventWithOptions(body, sigHeader, os.Getenv("STRIPE_WEBHOOK_SECRET"), webhook.ConstructEventOptions{
+		IgnoreAPIVersionMismatch: true,
+	})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid signature"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Payment succesfully"})
+	if err := h.paymentService.StripeWebhookNotification(event); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Payment received successfully"})
 }
 
 func (h *PaymentHandler) GetAllUserPayments(c *gin.Context) {
 	var params dto.PaymentQueryParam
 	if !utils.BindAndValidateForm(c, &params) {
 		return
-	}
-
-	if params.Page == 0 {
-		params.Page = 1
-	}
-	if params.Limit == 0 {
-		params.Limit = 10
 	}
 
 	payments, pagination, err := h.paymentService.GetAllUserPayments(params)

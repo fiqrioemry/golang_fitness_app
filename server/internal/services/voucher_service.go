@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"log"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
@@ -31,6 +32,7 @@ func NewVoucherService(repo repositories.VoucherRepository) VoucherService {
 
 func (s *voucherService) CreateVoucher(req dto.CreateVoucherRequest) error {
 
+	log.Printf("HASIL REUSABLE OR NOT", req.IsReusable)
 	voucher := models.Voucher{
 		Code:         req.Code,
 		Description:  req.Description,
@@ -86,6 +88,7 @@ func (s *voucherService) GetAllVouchers() ([]dto.VoucherResponse, error) {
 			Description:  v.Description,
 			DiscountType: v.DiscountType,
 			Discount:     v.Discount,
+			IsReusable:   v.IsReusable,
 			MaxDiscount:  v.MaxDiscount,
 			Quota:        v.Quota,
 			ExpiredAt:    v.ExpiredAt.Format("2006-01-02"),

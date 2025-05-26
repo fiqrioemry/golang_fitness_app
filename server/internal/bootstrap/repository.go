@@ -22,7 +22,6 @@ type RepositoryContainer struct {
 	CategoryRepo         repositories.CategoryRepository
 	LocationRepo         repositories.LocationRepository
 	InstructorRepo       repositories.InstructorRepository
-	AttendanceRepo       repositories.AttendanceRepository
 	SubcategoryRepo      repositories.SubcategoryRepository
 	UserPackageRepo      repositories.UserPackageRepository
 	NotificationRepo     repositories.NotificationRepository
@@ -47,7 +46,6 @@ func InitRepositories(db *gorm.DB) *RepositoryContainer {
 		CategoryRepo:         repositories.NewCategoryRepository(db),
 		LocationRepo:         repositories.NewLocationRepository(db),
 		InstructorRepo:       repositories.NewInstructorRepository(db),
-		AttendanceRepo:       repositories.NewAttendanceRepository(db),
 		SubcategoryRepo:      repositories.NewSubcategoryRepository(db),
 		UserPackageRepo:      repositories.NewUserPackageRepository(db),
 		NotificationRepo:     repositories.NewNotificationRepository(db),
