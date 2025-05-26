@@ -61,16 +61,6 @@ func (h *BookingHandler) GetMyBookings(c *gin.Context) {
 }
 
 func (h *BookingHandler) GetBookingDetail(c *gin.Context) {
-	bookingID := c.Param("id")
-	userID := utils.MustGetUserID(c)
-
-	response, err := h.bookingService.GetBookingByID(userID, bookingID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch bookings", "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{response})
 }
 
 func (h *BookingHandler) CheckinBookedClass(c *gin.Context) {

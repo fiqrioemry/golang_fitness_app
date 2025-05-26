@@ -12,11 +12,9 @@ func ClassScheduleRoutes(r *gin.Engine, h *handlers.ClassScheduleHandler) {
 
 	// Public
 	schedule.GET("", h.GetAllClassSchedules)
-
-	// authenticate customer
 	customer := schedule.Use(middleware.AuthRequired())
+	customer.GET("/status", h.GetSchedulesWithStatus)
 	customer.GET("/:id", h.GetScheduleByID)
-	customer.GET("/status", h.GetSchedulesWithBookingStatus)
 
 	// Admin Only
 	admin := schedule.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
@@ -27,7 +25,8 @@ func ClassScheduleRoutes(r *gin.Engine, h *handlers.ClassScheduleHandler) {
 	// instructor only
 	instructor := schedule.Use(middleware.AuthRequired(), middleware.RoleOnly("instructor"))
 	instructor.GET("/instructor", h.GetInstructorSchedules)
-	instructor.GET("/instructor/:id", h.GetScheduleDetail)
+	instructor.GET("/:id/detail", h.GetInstructorSchedules)
+	instructor.GET("/:id/attendance", h.GetClassAttendances)
 
 	instructor.PATCH("/:id/open", h.OpenClassSchedule)
 	instructor.PATCH("/:id/close", h.CloseClassSchedule)

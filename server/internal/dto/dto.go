@@ -473,6 +473,16 @@ type ClassScheduleResponse struct {
 	IsBooked       bool      `json:"isBooked"`
 }
 
+type ClassAttendanceStruct struct {
+	ID         string `json:"id"`
+	UserID     string `json:"userId"`
+	Fullname   string `json:"fullname"`
+	Status     string `json:"status"`
+	Verified   bool   `json:"verified"`
+	CheckinAt  string `json:"checkinAt"`
+	CheckoutAt string `json:"checkoutAt"`
+}
+
 type InstructorBrief struct {
 	ID       string  `json:"id"`
 	Fullname string  `json:"fullname"`

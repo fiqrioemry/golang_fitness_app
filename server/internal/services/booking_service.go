@@ -18,7 +18,6 @@ type BookingService interface {
 	CheckedInClassSchedule(userID, bookingID string) (*dto.AccessAttendanceResponse, error)
 	CheckoutClassSchedule(userID, bookingID string, req dto.ValidateCheckoutRequest) error
 	GetBookingByUser(userID string, params dto.BookingQueryParam) ([]dto.BookingResponse, *dto.PaginationResponse, error)
-	GetBookingByID(userID string, params dto.BookingQueryParam) ([]dto.BookingResponse, *dto.PaginationResponse, error)
 }
 
 type bookingService struct {
@@ -241,7 +240,6 @@ func (s *bookingService) MarkAbsentBookings() error {
 					ID:        uuid.New(),
 					BookingID: b.ID,
 					Status:    "absent",
-					CreatedAt: now,
 				}
 
 				if err := s.bookingRepo.CreateAttendance(attendance); err != nil {

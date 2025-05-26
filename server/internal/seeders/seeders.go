@@ -1092,7 +1092,6 @@ func CreateBookingWithAttendance(db *gorm.DB, user models.User, schedule models.
 			Status:    "attended",
 			CheckedAt: &createdAt,
 			Verified:  true,
-			CreatedAt: createdAt,
 		}
 		if err := db.Create(&attendance).Error; err != nil {
 			return fmt.Errorf("failed to create attendance: %w", err)

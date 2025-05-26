@@ -13,7 +13,6 @@ import (
 
 type ClassScheduleService interface {
 	DeleteClassSchedule(id string) error
-	GetAllClassSchedules() ([]dto.ClassScheduleResponse, error)
 	CreateClassSchedule(req dto.CreateClassScheduleRequest) error
 	UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error
 	GetClassScheduleByID(scheduleID, userID string) (*dto.ClassScheduleDetailResponse, error)
@@ -23,7 +22,7 @@ type ClassScheduleService interface {
 	// instructor only
 	CloseClassSchedule(id string) (string, error)
 	OpenClassSchedule(id string, req dto.OpenClassScheduleRequest) error
-	GetScheduleAttendances(scheduleID string) (dto.InstructorScheduleDetail, error)
+	GetClassScheduleAttendances(scheduleID string) ([]dto.ClassAttendanceStruct, error)
 	GetSchedulesByInstructor(userID string, filter dto.InstructorScheduleQueryParam) ([]dto.ClassScheduleResponse, error)
 }
 
@@ -212,35 +211,6 @@ func (s *classScheduleService) DeleteClassSchedule(id string) error {
 	return s.repo.DeleteClassSchedule(id)
 }
 
-func (s *classScheduleService) GetAllClassSchedules() ([]dto.ClassScheduleResponse, error) {
-	schedules, err := s.repo.GetClassSchedules()
-	if err != nil {
-		return nil, err
-	}
-
-	var result []dto.ClassScheduleResponse
-	for _, schedule := range schedules {
-		result = append(result, dto.ClassScheduleResponse{
-			ID:             schedule.ID.String(),
-			ClassID:        schedule.ClassID.String(),
-			ClassName:      schedule.ClassName,
-			ClassImage:     schedule.ClassImage,
-			InstructorID:   schedule.InstructorID.String(),
-			InstructorName: schedule.InstructorName,
-			Date:           schedule.Date,
-			StartHour:      schedule.StartHour,
-			StartMinute:    schedule.StartMinute,
-			Capacity:       schedule.Capacity,
-			BookedCount:    schedule.Booked,
-			Color:          schedule.Color,
-			Duration:       schedule.Duration,
-			IsBooked:       false,
-		})
-	}
-
-	return result, nil
-}
-
 func (s *classScheduleService) GetClassScheduleByID(scheduleID, userID string) (*dto.ClassScheduleDetailResponse, error) {
 	schedule, err := s.repo.GetClassScheduleByID(scheduleID)
 	if err != nil {
@@ -415,7 +385,7 @@ func (s *classScheduleService) CloseClassSchedule(id string) (string, error) {
 	return code, nil
 }
 
-func (s *classScheduleService) GetScheduleAttendances(scheduleID string) (dto.InstructorScheduleDetail, error) {
+func (s *classScheduleService) GetClassScheduleAttendances(scheduleID string) ([]dto.ClassAttendanceStruct, error) {
 	id := uuid.MustParse(scheduleID)
 
 	attendances, err := s.repo.GetAttendancesByScheduleID(id)
@@ -423,18 +393,15 @@ func (s *classScheduleService) GetScheduleAttendances(scheduleID string) (dto.In
 		return nil, err
 	}
 
-	var results dto.InstructorScheduleDetail
+	var results []dto.ClassAttendanceStruct
 	for _, a := range attendances {
-		results = append(results, dto.InstructorScheduleDetail{
-			ID:          a.ID.String(),
-			ScheduleID:  scheduleID,
-			ClassName:   a.Booking.ClassSchedule.ClassName,
-			ClassImage:  a.Booking.ClassSchedule.ClassImage,
-			Date:        a.Booking.ClassSchedule.Date.Format("2006-01-02"),
-			StartHour:   a.Booking.ClassSchedule.StartHour,
-			StartMinute: a.Booking.ClassSchedule.StartMinute,
-			Status:      a.Status,
-			Verified:    a.Verified,
+		results = append(results, dto.ClassAttendanceStruct{
+			ID:         a.ID.String(),
+			UserID:     a.Booking.UserID.String(),
+			Status:     a.Status,
+			Verified:   a.Verified,
+			CheckinAt:  a.CheckedAt.Format("2006-01-02 15:04:05"),
+			CheckoutAt: a.VerifiedAt.Format("2006-01-02 15:04:05"),
 		})
 	}
 	return results, nil

@@ -98,6 +98,7 @@ func (h *ClassScheduleHandler) DeleteClassSchedule(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Class schedule deleted successfully"})
 }
 
+// public
 func (h *ClassScheduleHandler) GetAllClassSchedules(c *gin.Context) {
 	var param dto.ClassScheduleQueryParam
 	if !utils.BindAndValidateForm(c, &param) {
@@ -113,7 +114,8 @@ func (h *ClassScheduleHandler) GetAllClassSchedules(c *gin.Context) {
 	c.JSON(http.StatusOK, schedules)
 }
 
-func (h *ClassScheduleHandler) GetSchedulesWithBookingStatus(c *gin.Context) {
+// authenticated user
+func (h *ClassScheduleHandler) GetSchedulesWithStatus(c *gin.Context) {
 	userID := utils.MustGetUserID(c)
 
 	schedules, err := h.scheduleService.GetSchedulesWithBookingStatus(userID)
@@ -138,6 +140,8 @@ func (h *ClassScheduleHandler) GetScheduleByID(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+// for instructor only
+
 func (h *ClassScheduleHandler) GetInstructorSchedules(c *gin.Context) {
 	userID := utils.MustGetUserID(c)
 	var param dto.InstructorScheduleQueryParam
@@ -152,6 +156,18 @@ func (h *ClassScheduleHandler) GetInstructorSchedules(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, schedules)
+}
+
+func (h *ClassScheduleHandler) GetClassAttendances(c *gin.Context) {
+	scheduleID := c.Param("id")
+
+	result, err := h.scheduleService.GetClassScheduleAttendances(scheduleID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
 }
 
 func (h *ClassScheduleHandler) OpenClassSchedule(c *gin.Context) {
@@ -183,16 +199,4 @@ func (h *ClassScheduleHandler) CloseClassSchedule(c *gin.Context) {
 		"message":          "Class schedule closed successfully",
 		"verificationCode": code,
 	})
-}
-
-func (h *ClassScheduleHandler) GetScheduleAttendances(c *gin.Context) {
-	id := c.Param("id")
-
-	result, err := h.scheduleService.GetScheduleAttendances(id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, result)
 }
