@@ -10,6 +10,7 @@ import (
 	"server/internal/routes"
 	"server/internal/seeders"
 	"server/internal/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +23,9 @@ func main() {
 	config.InitCloudinary()
 	config.InitGoogleOAuthConfig()
 	config.InitStripe()
+
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+	time.Local = loc
 
 	db := config.DB
 	//  Seeder ================================

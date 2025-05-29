@@ -144,7 +144,7 @@ func (r *classScheduleRepository) GetSchedulesByInstructorID(instructorID uuid.U
 	db := r.db.Model(&models.ClassSchedule{}).
 		Where("instructor_id = ? AND booked > 0", instructorID)
 
-	now := time.Now().In(time.Local).Format("2006-01-02 15:04:05")
+	nowUTC := time.Now().UTC().Format("2006-01-02 15:04:05")
 
 	// Filter status upcoming / past
 	if params.Status == "upcoming" {
@@ -156,7 +156,7 @@ func (r *classScheduleRepository) GetSchedulesByInstructorID(instructorID uuid.U
 				), '%Y-%m-%d %H:%i'),
 				SEC_TO_TIME(duration * 60)
 			) > ?
-		`, now)
+		`, nowUTC)
 	} else if params.Status == "past" {
 		db = db.Where(`
 			ADDTIME(
@@ -166,7 +166,7 @@ func (r *classScheduleRepository) GetSchedulesByInstructorID(instructorID uuid.U
 				), '%Y-%m-%d %H:%i'),
 				SEC_TO_TIME(duration * 60)
 			) <= ?
-		`, now)
+		`, nowUTC)
 	}
 
 	// Sorting
