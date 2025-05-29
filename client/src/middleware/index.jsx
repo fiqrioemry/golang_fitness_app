@@ -1,63 +1,52 @@
-import { Fragment, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 
-export const AuthRoute = ({ children }) => {
+const RoleRoute = ({ children, allow, redirect = "/" }) => {
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+
+  const isAllowed = allow.includes(user?.role);
+
+  useEffect(() => {
+    if (!isAllowed) navigate(redirect);
+  }, [isAllowed, navigate, redirect]);
+
+  return isAllowed ? children : null;
+};
+
+const PublicRoute = ({ children }) => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
   useEffect(() => {
-    if (!user || user.role !== "customer") {
-      navigate("/");
-    }
+    if (user?.role === "admin") navigate("/admin/dashboard");
+    else if (user?.role === "instructor") navigate("/instructor");
   }, [user, navigate]);
 
-  if (!user || user.role !== "customer") return null;
-
-  return <Fragment>{children}</Fragment>;
+  return user?.role === "admin" || user?.role === "instructor"
+    ? null
+    : children;
 };
 
-export const AdminRoute = ({ children }) => {
+const NonAuthRoute = ({ children }) => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
   useEffect(() => {
-    if (!user || user.role !== "admin") {
-      navigate("/");
-    }
+    if (user) navigate("/");
   }, [user, navigate]);
 
-  if (!user || user.role !== "admin") return null;
-
-  return <Fragment>{children}</Fragment>;
+  return user ? null : children;
 };
 
-export const PublicRoute = ({ children }) => {
-  const navigate = useNavigate();
-  const { user } = useAuthStore();
-
-  useEffect(() => {
-    if (user && user.role === "admin") {
-      navigate("/admin/dashboard");
-    }
-  }, [user, navigate]);
-
-  if (user && user.role === "admin") return null;
-
-  return <Fragment>{children}</Fragment>;
-};
-
-export const NonAuthRoute = ({ children }) => {
-  const navigate = useNavigate();
-  const { user } = useAuthStore();
-
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
-
-  if (user) return null;
-
-  return <Fragment>{children}</Fragment>;
-};
+export const AuthRoute = ({ children }) => (
+  <RoleRoute allow={["customer"]}>{children}</RoleRoute>
+);
+export const AdminRoute = ({ children }) => (
+  <RoleRoute allow={["admin"]}>{children}</RoleRoute>
+);
+export const InstructorRoute = ({ children }) => (
+  <RoleRoute allow={["instructor"]}>{children}</RoleRoute>
+);
+export { PublicRoute, NonAuthRoute };

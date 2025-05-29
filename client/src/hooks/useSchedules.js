@@ -99,7 +99,33 @@ export const useScheduleTemplateMutation = () => {
   };
 };
 
-// createRecurring: useMutation({
-//   mutationFn: scheduleService.createScheduleTemplates,
-//   ...mutationOpts("Template created Successfully"),
-// }),
+// GET /api/schedules/instructor
+export const useInstructorSchedulesQuery = (params) =>
+  useQuery({
+    queryKey: ["instructor-schedules", params],
+    queryFn: () => scheduleService.getInstructorSchedules(params),
+    staleTime: 1000 * 60 * 45,
+  });
+
+// GET /api/schedules/:id/attendance
+export const useScheduleAttendanceQuery = (id) =>
+  useQuery({
+    queryKey: ["schedule", id, "attendance"],
+    queryFn: () => scheduleService.getClassAttendances(id),
+    enabled: !!id,
+  });
+
+// PATCH /api/schedules/:id/open
+export const useOpenScheduleMutation = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: scheduleService.openClassSchedule,
+    onSuccess: () => {
+      toast.success("Schedule opened successfully");
+      qc.invalidateQueries({ queryKey: ["instructor-schedules"] });
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || "Failed to open schedule");
+    },
+  });
+};

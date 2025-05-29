@@ -56,32 +56,6 @@ export const formatHour = (dateStr) => {
   });
 };
 
-export const buildFormData = (data) => {
-  const formData = new FormData();
-
-  Object.entries(data).forEach(([key, value]) => {
-    if (value === undefined || value === null) return;
-
-    if (Array.isArray(value)) {
-      if (value.length > 0 && value[0] instanceof File) {
-        value.forEach((file) => {
-          formData.append(key, file);
-        });
-      } else {
-        value.forEach((item) => {
-          formData.append(`${key}`, item);
-        });
-      }
-    } else if (value instanceof File) {
-      formData.append(key, value);
-    } else {
-      formData.append(key, value);
-    }
-  });
-
-  return formData;
-};
-
 export const localizer = dateFnsLocalizer({
   format,
   parse,
@@ -111,13 +85,36 @@ export const isAttendanceWindow = (startTime) => {
 export const buildDateTime = (dateStr, hour, minute) => {
   if (!dateStr || hour === undefined || minute === undefined) return null;
 
-  const date = new Date(dateStr);
-  date.setHours(hour);
-  date.setMinutes(minute);
-  date.setSeconds(0);
-  return date;
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day, hour, minute, 0);
 };
 
 export const truncateText = (text, maxLength) => {
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
+
+export const buildFormData = (data) => {
+  const formData = new FormData();
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+
+    if (Array.isArray(value)) {
+      if (value.length > 0 && value[0] instanceof File) {
+        value.forEach((file) => {
+          formData.append(key, file);
+        });
+      } else {
+        value.forEach((item) => {
+          formData.append(`${key}`, item);
+        });
+      }
+    } else if (value instanceof File) {
+      formData.append(key, value);
+    } else {
+      formData.append(key, value);
+    }
+  });
+
+  return formData;
 };

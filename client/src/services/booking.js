@@ -14,13 +14,21 @@ export const getMyBookings = async (params) => {
   return res.data;
 };
 
-export const checkinBookedClass = async (bookingId) => {
-  console.log("CHECKIN CLASS", bookingId);
-  const res = await authInstance.post(`/bookings/${bookingId}`);
-  return res.data.qr;
+// GET /api/bookings/:id
+export const getBookingDetail = async (id) => {
+  console.log(id);
+  const res = await authInstance.get(`/bookings/${id}`);
+  return res.data;
 };
 
-export const regenerateQRCode = async (bookingId) => {
-  const res = await authInstance.get(`/bookings/${bookingId}/qr-code`);
-  return res.data.qr;
+// POST /api/bookings/:id/check-in
+export const checkinBooking = async (id) => {
+  const res = await authInstance.post(`/bookings/${id}/check-in`);
+  return res.data;
+};
+
+// POST /api/bookings/:id/check-out
+export const checkoutBooking = async ({ id, code }) => {
+  const res = await authInstance.post(`/bookings/${id}/check-out`, { code });
+  return res.data;
 };

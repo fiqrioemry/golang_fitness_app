@@ -42,13 +42,23 @@ import { Loading } from "@/components/ui/Loading";
 import { useAuthStore } from "./store/useAuthStore";
 import { ScrollToTop } from "./hooks/useScrollToTop";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { AdminRoute, AuthRoute, NonAuthRoute, PublicRoute } from "./middleware";
+import {
+  AdminRoute,
+  AuthRoute,
+  InstructorRoute,
+  NonAuthRoute,
+  PublicRoute,
+} from "./middleware";
 
 // layout pages
 import AdminLayout from "./components/admin/AdminLayout";
 import PublicLayout from "./components/public/PublicLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
 import { UserDetailDialog } from "./components/admin/users/UserDetailDialog";
+import { BookedScheduleDetail } from "./components/customer/bookings/BookedScheduleDetail";
+import InstructorLayout from "./components/instructor/InstructorLayout";
+import InstructorSchedules from "./pages/instructor/InstructorSchedules";
+import { InstructorProfile } from "./pages/instructor/InstructorProfile";
 
 function App() {
   const location = useLocation();
@@ -152,6 +162,19 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 
+        {/* instructor */}
+        <Route
+          path="/instructor"
+          element={
+            <InstructorRoute>
+              <InstructorLayout />
+            </InstructorRoute>
+          }
+        >
+          <Route index element={<InstructorProfile />} />
+          <Route path="schedules" element={<InstructorSchedules />} />
+        </Route>
+
         <Route path="*" element={<NotFound />} />
       </Routes>
 
@@ -159,6 +182,10 @@ function App() {
       {backgroundLocation && (
         <Routes>
           <Route path="/admin/users/:id" element={<UserDetailDialog />} />
+          <Route
+            path="/profile/bookings/:id"
+            element={<BookedScheduleDetail />}
+          />
         </Routes>
       )}
     </>

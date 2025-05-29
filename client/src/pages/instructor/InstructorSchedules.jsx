@@ -1,18 +1,18 @@
 import { Pagination } from "@/components/ui/Pagination";
-import { useMyBookingsQuery } from "@/hooks/useBooking";
 import { useBookingStore } from "@/store/useBookingStore";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { NoBookedSchedule } from "@/components/customer/bookings/NoBookedSchedule";
-import { PastBookedSchedules } from "@/components/customer/bookings/PastBookedSchedules";
-import { UpcomingBookedSchedules } from "@/components/customer/bookings/UpcomingBookedSchedules";
+import { NoClassSchedule } from "@/components/instructor/schedules/NoClassSchedule";
+import { PastClassSchedules } from "@/components/instructor/schedules/PastClassSchedules";
+import { UpcomingClassSchedules } from "@/components/instructor/schedules/UpcomingClassSchedules";
+import { useInstructorSchedulesQuery } from "@/hooks/useSchedules";
 
-const UserBookings = () => {
+const InstructorSchedule = () => {
   const { page, limit, sort, status, setStatus, setPage } = useBookingStore();
 
-  const { data, isError, refetch, isLoading } = useMyBookingsQuery({
+  const { data, isError, refetch, isLoading } = useInstructorSchedulesQuery({
     status,
     sort,
     page,
@@ -24,12 +24,12 @@ const UserBookings = () => {
 
   const isPast = status === "past";
   const isUpcoming = status === "upcoming";
-  console.log(data);
+
   return (
     <section className="section p-8 space-y-6">
       <SectionTitle
-        title="My Bookings"
-        description="View and manage your upcoming and past class bookings."
+        title="My Class Schedules"
+        description="View and manage your upcoming and past class schedules as instructors."
       />
 
       <Tabs defaultValue="upcoming" className="w-full">
@@ -50,12 +50,12 @@ const UserBookings = () => {
           <>
             <TabsContent value="upcoming">
               {isUpcoming && bookings.length === 0 ? (
-                <NoBookedSchedule type="upcoming" />
+                <NoClassSchedule type="upcoming" />
               ) : (
                 <div className="grid gap-6">
                   {isUpcoming &&
                     bookings.map((schedule) => (
-                      <UpcomingBookedSchedules
+                      <UpcomingClassSchedules
                         key={schedule.id}
                         schedule={schedule}
                       />
@@ -66,12 +66,12 @@ const UserBookings = () => {
 
             <TabsContent value="past">
               {isPast && bookings.length === 0 ? (
-                <NoBookedSchedule type="past" />
+                <NoClassSchedule type="past" />
               ) : (
                 <div className="grid gap-6">
                   {isPast &&
                     bookings.map((schedule) => (
-                      <PastBookedSchedules
+                      <PastClassSchedules
                         key={schedule.id}
                         schedule={schedule}
                       />
@@ -95,4 +95,4 @@ const UserBookings = () => {
   );
 };
 
-export default UserBookings;
+export default InstructorSchedule;
