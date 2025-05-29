@@ -473,14 +473,14 @@ type ClassScheduleResponse struct {
 	IsBooked       bool      `json:"isBooked"`
 }
 
-type ClassAttendanceStruct struct {
-	ID         string `json:"id"`
-	UserID     string `json:"userId"`
-	Fullname   string `json:"fullname"`
+type AttendanceWithUserResponse struct {
+	UserName   string `json:"userName"`
+	Email      string `json:"email"`
 	Status     string `json:"status"`
-	Verified   bool   `json:"verified"`
-	CheckinAt  string `json:"checkinAt"`
-	CheckoutAt string `json:"checkoutAt"`
+	CheckedIn  bool   `json:"checkedIn"`
+	CheckedOut bool   `json:"checkedOut"`
+	CheckedAt  string `json:"checkedAt,omitempty"`
+	VerifiedAt string `json:"verifiedAt,omitempty"`
 }
 
 type InstructorBrief struct {
@@ -542,9 +542,8 @@ type UpdateScheduleTemplateRequest struct {
 // BOOKINGS & ATTENDANCE ===========================
 
 type BookingQueryParam struct {
-	Q      string `form:"q"`      // search class name
-	Status string `form:"status"` // filter by booking status
-	Sort   string `form:"sort"`   // sort by date/class
+	Status string `form:"status"`
+	Sort   string `form:"sort"`
 	Page   int    `form:"page" binding:"omitempty,min=1"`
 	Limit  int    `form:"limit" binding:"omitempty,min=1"`
 }
@@ -560,40 +559,33 @@ type BookingResponse struct {
 	ClassID        string `json:"classId"`
 	ClassName      string `json:"className"`
 	ClassImage     string `json:"classImage"`
+	InstructorName string `json:"instructorName"`
 	Duration       int    `json:"duration"`
 	Date           string `json:"date"`
 	StartHour      int    `json:"startHour"`
 	StartMinute    int    `json:"startMinute"`
 	Location       string `json:"location"`
-	InstructorName string `json:"instructorName"`
-	Participant    int    `json:"participant"`
 	BookedAt       string `json:"bookedAt"`
 }
 
 type BookingDetailResponse struct {
 	ID               string `json:"id"`
-	BookingStatus    string `json:"bookingStatus"`
-	AttendanceStatus string `json:"attendanceStatus,omitempty"`
 	ClassID          string `json:"classId"`
 	ClassName        string `json:"className"`
 	ClassImage       string `json:"classImage"`
-	Duration         int    `json:"duration"`
+	InstructorName   string `json:"instructorName"`
 	Date             string `json:"date"`
 	StartHour        int    `json:"startHour"`
 	StartMinute      int    `json:"startMinute"`
-	Location         string `json:"location"`
-	InstructorName   string `json:"instructorName"`
-	IsOpened         bool   `json:"isOpened"`
-	IsClosed         bool   `json:"isClosed"`
-	Participant      int    `json:"participant"`
-}
-
-type AccessAttendanceResponse struct {
-	Link           string `json:"link"`
-	ClassName      string `json:"className"`
-	InstructorName string `json:"instructorName"`
-	Date           string `json:"date"`
-	StartTime      string `json:"startTime"`
+	Duration         int    `json:"duration"`
+	CheckedIn        bool   `json:"checkedIn"`
+	CheckedOut       bool   `json:"checkedOut"`
+	ZoomLink         string `json:"zoomLink"`
+	AttendanceStatus string `json:"attendanceStatus"`
+	IsReviewed       bool   `json:"isReviewed"`
+	IsOpened         bool   `json:"isOpen"`
+	CheckedAt        string `json:"checkedAt"`
+	VerifiedAt       string `json:"verifiedAt,omitempty"`
 }
 
 type ValidateCheckoutRequest struct {
@@ -845,12 +837,31 @@ type PaginationResponse struct {
 }
 
 // INSTRUCTOR SCHEDULE MANAGEMENT
+
 type InstructorScheduleQueryParam struct {
-	StartDate string `form:"startDate"`
-	EndDate   string `form:"endDate"`
+	Status string `form:"status"`
+	Sort   string `form:"sort"`
+	Page   int    `form:"page" binding:"omitempty,min=1"`
+	Limit  int    `form:"limit" binding:"omitempty,min=1"`
 }
 
 type OpenClassScheduleRequest struct {
-	IsOnline bool   `json:"isOnline"`
 	ZoomLink string `json:"zoomLink"`
+}
+
+type InstructorScheduleResponse struct {
+	ID             string    `json:"id"`
+	ClassID        string    `json:"classId"`
+	ClassName      string    `json:"className"`
+	ClassImage     string    `json:"classImage"`
+	InstructorID   string    `json:"instructorId"`
+	InstructorName string    `json:"instructorName"`
+	Location       string    `json:"location"`
+	Date           time.Time `json:"date"`
+	StartHour      int       `json:"startHour"`
+	StartMinute    int       `json:"startMinute"`
+	Capacity       int       `json:"capacity"`
+	BookedCount    int       `json:"bookedCount"`
+	Duration       int       `json:"duration"`
+	IsOpened       bool      `json:"isOpen"`
 }

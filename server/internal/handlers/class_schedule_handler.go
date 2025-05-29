@@ -149,19 +149,28 @@ func (h *ClassScheduleHandler) GetInstructorSchedules(c *gin.Context) {
 		return
 	}
 
-	schedules, err := h.scheduleService.GetSchedulesByInstructor(userID, param)
+	if param.Page == 0 {
+		param.Page = 1
+	}
+	if param.Limit == 0 {
+		param.Limit = 10
+	}
+
+	data, pagination, err := h.scheduleService.GetSchedulesByInstructor(userID, param)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch instructor schedules", "error": err.Error()})
 		return
 	}
-
-	c.JSON(http.StatusOK, schedules)
+	c.JSON(http.StatusOK, gin.H{
+		"data":       data,
+		"pagination": pagination,
+	})
 }
 
 func (h *ClassScheduleHandler) GetClassAttendances(c *gin.Context) {
 	scheduleID := c.Param("id")
 
-	result, err := h.scheduleService.GetClassScheduleAttendances(scheduleID)
+	result, err := h.scheduleService.GetAttendancesForSchedule(scheduleID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
@@ -184,19 +193,4 @@ func (h *ClassScheduleHandler) OpenClassSchedule(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Class schedule opened successfully"})
-}
-
-func (h *ClassScheduleHandler) CloseClassSchedule(c *gin.Context) {
-	id := c.Param("id")
-
-	code, err := h.scheduleService.CloseClassSchedule(id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message":          "Class schedule closed successfully",
-		"verificationCode": code,
-	})
 }

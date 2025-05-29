@@ -15,8 +15,10 @@ import (
 type BookingService interface {
 	CreateBooking(userID, packageID, scheduleID string) error
 	MarkAbsentBookings() error
-	CheckedInClassSchedule(userID, bookingID string) (*dto.AccessAttendanceResponse, error)
+	CheckedInClassSchedule(userID, bookingID string) error
 	CheckoutClassSchedule(userID, bookingID string, req dto.ValidateCheckoutRequest) error
+	GetBookingDetail(userID, bookingID string) (*dto.BookingDetailResponse, error)
+
 	GetBookingByUser(userID string, params dto.BookingQueryParam) ([]dto.BookingResponse, *dto.PaginationResponse, error)
 }
 
@@ -71,6 +73,16 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 		return err
 	}
 
+	attendance := models.Attendance{
+		ID:        uuid.New(),
+		BookingID: booking.ID,
+		Status:    "none",
+	}
+
+	if err := s.bookingRepo.CreateAttendance(&attendance); err != nil {
+		return fmt.Errorf("failed to create attendance record: %v", err)
+	}
+
 	userPackage.RemainingCredit -= 1
 	if err := s.userPackageRepo.UpdateUserPackage(&userPackage); err != nil {
 		return err
@@ -80,7 +92,7 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 		return err
 	}
 
-	// TODO: Use RabbitMQ to emit "payment_success" event for async email delivery (only in production with EDA)
+	// TODO: Use RabbitMQ to emit "booking_success" event for async email delivery (only in production with EDA)
 	payload := dto.NotificationEvent{
 		UserID: booking.UserID.String(),
 		Type:   "system_message",
@@ -112,8 +124,6 @@ func (s *bookingService) GetBookingByUser(userID string, params dto.BookingQuery
 	for _, b := range bookings {
 		schedule := b.ClassSchedule
 
-		participantCount, _ := s.bookingRepo.CountBookingBySchedule(schedule.ID.String())
-
 		result = append(result, dto.BookingResponse{
 			ID:             b.ID.String(),
 			BookingStatus:  b.Status,
@@ -121,12 +131,11 @@ func (s *bookingService) GetBookingByUser(userID string, params dto.BookingQuery
 			ClassName:      schedule.ClassName,
 			ClassImage:     schedule.ClassImage,
 			InstructorName: schedule.InstructorName,
-			Duration:       schedule.Duration,
+			Date:           schedule.Date.Format("2006-01-02"),
 			StartHour:      schedule.StartHour,
 			StartMinute:    schedule.StartMinute,
+			Duration:       schedule.Duration,
 			Location:       schedule.Location,
-			Participant:    int(participantCount),
-			Date:           schedule.Date.Format("2006-01-02"),
 			BookedAt:       b.CreatedAt.Format("2006-01-02 15:04:05"),
 		})
 	}
@@ -142,53 +151,70 @@ func (s *bookingService) GetBookingByUser(userID string, params dto.BookingQuery
 	return result, pagination, nil
 }
 
-func (s *bookingService) CheckedInClassSchedule(userID, bookingID string) (*dto.AccessAttendanceResponse, error) {
+func (s *bookingService) GetBookingDetail(userID, bookingID string) (*dto.BookingDetailResponse, error) {
 	booking, err := s.bookingRepo.GetBookingByID(userID, bookingID)
 	if err != nil {
 		return nil, errors.New("booking not found")
 	}
 
+	attendance := booking.Attendance
 	schedule := booking.ClassSchedule
-	if !schedule.IsOpened {
-		return nil, errors.New("class schedule is not open for attendance")
+
+	res := &dto.BookingDetailResponse{
+		ID:               booking.ID.String(),
+		ClassID:          schedule.ClassID.String(),
+		ClassName:        schedule.ClassName,
+		ClassImage:       schedule.ClassImage,
+		InstructorName:   schedule.InstructorName,
+		Date:             schedule.Date.Format("2006-01-02"),
+		StartHour:        schedule.StartHour,
+		StartMinute:      schedule.StartMinute,
+		Duration:         schedule.Duration,
+		CheckedIn:        attendance.CheckedIn,
+		CheckedOut:       attendance.CheckedOut,
+		IsOpened:         schedule.IsOpened,
+		IsReviewed:       attendance.IsReviewed,
+		AttendanceStatus: attendance.Status,
+		CheckedAt:        "",
+		VerifiedAt:       "",
 	}
 
-	// Update status booking
-	if err := s.bookingRepo.UpdateBookingStatus(booking.ID, "checked_in"); err != nil {
-		return nil, errors.New("failed to update booking status")
+	if schedule.ZoomLink != nil {
+		res.ZoomLink = *schedule.ZoomLink
 	}
 
-	exists, err := s.bookingRepo.CheckAttendanceExists(booking.ID)
+	if attendance.CheckedIn && attendance.CheckedAt != nil {
+		res.CheckedAt = attendance.CheckedAt.Format("2006-01-02 15:04:05")
+	}
+	if attendance.CheckedOut && attendance.VerifiedAt != nil {
+		res.VerifiedAt = attendance.VerifiedAt.Format("2006-01-02 15:04:05")
+	}
+
+	return res, nil
+}
+
+func (s *bookingService) CheckedInClassSchedule(userID, bookingID string) error {
+	booking, err := s.bookingRepo.GetBookingByID(userID, bookingID)
 	if err != nil {
-		return nil, errors.New("failed to check attendance")
-	}
-	if !exists {
-		now := time.Now()
-		attendance := &models.Attendance{
-			BookingID: booking.ID,
-			Status:    "entered",
-			CheckedAt: &now,
-		}
-		if err := s.bookingRepo.CreateAttendance(attendance); err != nil {
-			return nil, errors.New("failed to create attendance")
-		}
+		return errors.New("booking not found")
 	}
 
-	start := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
-		schedule.StartHour, schedule.StartMinute, 0, 0, time.Local)
-
-	resp := &dto.AccessAttendanceResponse{
-		ClassName:      schedule.ClassName,
-		InstructorName: schedule.InstructorName,
-		Date:           schedule.Date.Format("2006-01-02"),
-		StartTime:      start.Format("15:04"),
+	if !booking.ClassSchedule.IsOpened {
+		return errors.New("class schedule is not opened yet")
 	}
 
-	if schedule.IsOnline && schedule.ZoomLink != nil {
-		resp.Link = *schedule.ZoomLink
+	attendance := booking.Attendance
+
+	if attendance.CheckedIn {
+		return errors.New("you have already checked in to this class")
 	}
 
-	return resp, nil
+	now := time.Now()
+	attendance.CheckedIn = true
+	attendance.Status = "entered"
+	attendance.CheckedAt = &now
+
+	return s.bookingRepo.UpdateAttendance(&attendance)
 }
 
 func (s *bookingService) CheckoutClassSchedule(userID, bookingID string, req dto.ValidateCheckoutRequest) error {
@@ -196,12 +222,22 @@ func (s *bookingService) CheckoutClassSchedule(userID, bookingID string, req dto
 	if err != nil {
 		return errors.New("booking not found")
 	}
+	attendance := booking.Attendance
+
+	if attendance.CheckedOut {
+		return errors.New("you have already checkedout from this class")
+	}
 
 	if booking.ClassSchedule.VerificationCode == nil || *booking.ClassSchedule.VerificationCode != req.VerificationCode {
 		return errors.New("invalid verification code")
 	}
 
-	return s.bookingRepo.UpdateAttendanceStatus(bookingID, "attended")
+	now := time.Now()
+	attendance.CheckedOut = true
+	attendance.Status = "attended"
+	attendance.VerifiedAt = &now
+
+	return s.bookingRepo.UpdateAttendance(&attendance)
 }
 
 // ** buat cron job

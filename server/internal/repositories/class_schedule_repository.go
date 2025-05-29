@@ -21,10 +21,12 @@ type ClassScheduleRepository interface {
 	GetInstructorWithProfileByID(id uuid.UUID) (*models.Instructor, error)
 	GetClassSchedulesWithFilter(filter dto.ClassScheduleQueryParam) ([]models.ClassSchedule, error)
 
+	// instructor
+	GetInstructorByUserID(userID uuid.UUID) (*models.Instructor, error)
 	CloseScheduleWithCode(scheduleID uuid.UUID, code string) error
-	OpenSchedule(scheduleID uuid.UUID, isOnline bool, zoomLink *string) error
-	GetAttendancesByScheduleID(scheduleID uuid.UUID) ([]models.Attendance, error)
-	GetSchedulesByInstructorID(instructorID uuid.UUID, filter dto.InstructorScheduleQueryParam) ([]models.ClassSchedule, error)
+	OpenSchedule(scheduleID uuid.UUID, zoomLink string) error
+	GetAttendancesByScheduleID(scheduleID string) ([]models.Booking, error)
+	GetSchedulesByInstructorID(instructorID uuid.UUID, params dto.InstructorScheduleQueryParam) ([]models.ClassSchedule, int64, error)
 }
 
 type classScheduleRepository struct {
@@ -127,56 +129,106 @@ func (r *classScheduleRepository) GetInstructorWithProfileByID(id uuid.UUID) (*m
 	return &instructor, nil
 }
 
-func (r *classScheduleRepository) GetSchedulesByInstructorID(instructorID uuid.UUID, filter dto.InstructorScheduleQueryParam) ([]models.ClassSchedule, error) {
-	var schedules []models.ClassSchedule
-	db := r.db.
-		Where("instructor_id = ? AND booked > 0", instructorID).
-		Order("date asc").Order("start_hour asc").Order("start_minute asc")
-
-	if filter.StartDate != "" {
-		if start, err := time.Parse("2006-01-02", filter.StartDate); err == nil {
-			db = db.Where("date >= ?", start)
-		}
-	}
-	if filter.EndDate != "" {
-		if end, err := time.Parse("2006-01-02", filter.EndDate); err == nil {
-			db = db.Where("date <= ?", end)
-		}
-	}
-
-	if err := db.Find(&schedules).Error; err != nil {
+func (r *classScheduleRepository) GetInstructorByUserID(userID uuid.UUID) (*models.Instructor, error) {
+	var instructor models.Instructor
+	if err := r.db.Where("user_id = ?", userID).Find(&instructor).Error; err != nil {
 		return nil, err
 	}
-	return schedules, nil
+	return &instructor, nil
 }
 
-func (r *classScheduleRepository) OpenSchedule(scheduleID uuid.UUID, isOnline bool, zoomLink *string) error {
-	updates := map[string]interface{}{
-		"is_opened": true,
-		"is_online": isOnline,
+func (r *classScheduleRepository) GetSchedulesByInstructorID(instructorID uuid.UUID, params dto.InstructorScheduleQueryParam) ([]models.ClassSchedule, int64, error) {
+	var schedules []models.ClassSchedule
+	var count int64
+
+	db := r.db.Model(&models.ClassSchedule{}).
+		Where("instructor_id = ? AND booked > 0", instructorID)
+
+	now := time.Now().In(time.Local).Format("2006-01-02 15:04:05")
+
+	// Filter status upcoming / past
+	if params.Status == "upcoming" {
+		db = db.Where(`
+			ADDTIME(
+				STR_TO_DATE(CONCAT(date, ' ', 
+					LPAD(start_hour, 2, '0'), ':', 
+					LPAD(start_minute, 2, '0')
+				), '%Y-%m-%d %H:%i'),
+				SEC_TO_TIME(duration * 60)
+			) > ?
+		`, now)
+	} else if params.Status == "past" {
+		db = db.Where(`
+			ADDTIME(
+				STR_TO_DATE(CONCAT(date, ' ', 
+					LPAD(start_hour, 2, '0'), ':', 
+					LPAD(start_minute, 2, '0')
+				), '%Y-%m-%d %H:%i'),
+				SEC_TO_TIME(duration * 60)
+			) <= ?
+		`, now)
 	}
-	if isOnline && zoomLink != nil {
-		updates["zoom_link"] = *zoomLink
+
+	// Sorting
+	switch params.Sort {
+	case "name_asc":
+		db = db.Order("class_name ASC")
+	case "name_desc":
+		db = db.Order("class_name DESC")
+	case "date_asc":
+		db = db.Order("date ASC").Order("start_hour ASC").Order("start_minute ASC")
+	case "date_desc":
+		db = db.Order("date DESC").Order("start_hour ASC").Order("start_minute ASC")
+	default:
+		db = db.Order("date DESC").Order("start_hour ASC").Order("start_minute ASC")
 	}
+
+	// Hitung total data
+	if err := db.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Pagination fallback
+	if params.Page == 0 {
+		params.Page = 1
+	}
+	if params.Limit == 0 {
+		params.Limit = 10
+	}
+	offset := (params.Page - 1) * params.Limit
+
+	// Ambil data
+	if err := db.Limit(params.Limit).Offset(offset).Find(&schedules).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return schedules, count, nil
+}
+
+func (r *classScheduleRepository) OpenSchedule(scheduleID uuid.UUID, zoomLink string) error {
 	return r.db.Model(&models.ClassSchedule{}).
 		Where("id = ?", scheduleID).
-		Updates(updates).Error
+		Updates(map[string]any{
+			"is_opened": true,
+			"zoom_link": zoomLink,
+		}).Error
 }
 
 func (r *classScheduleRepository) CloseScheduleWithCode(scheduleID uuid.UUID, code string) error {
 	return r.db.Model(&models.ClassSchedule{}).
 		Where("id = ?", scheduleID).
-		Updates(map[string]interface{}{
-			"is_closed":         true,
-			"verification_code": code,
-		}).Error
+		Update("verification_code", code).Error
 }
 
-func (r *classScheduleRepository) GetAttendancesByScheduleID(scheduleID uuid.UUID) ([]models.Attendance, error) {
-	var attendances []models.Attendance
-	err := r.db.Preload("Booking.ClassSchedule").
-		Joins("JOIN bookings ON bookings.id = attendances.booking_id").
-		Where("bookings.class_schedule_id = ?", scheduleID).
-		Find(&attendances).Error
-	return attendances, err
+func (r *classScheduleRepository) GetAttendancesByScheduleID(scheduleID string) ([]models.Booking, error) {
+	var bookings []models.Booking
+	err := r.db.
+		Preload("User.Profile").
+		Preload("Attendance").
+		Where("class_schedule_id = ?", scheduleID).
+		Find(&bookings).Error
+	if err != nil {
+		return nil, err
+	}
+	return bookings, nil
 }

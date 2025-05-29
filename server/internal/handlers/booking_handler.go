@@ -41,12 +41,6 @@ func (h *BookingHandler) GetMyBookings(c *gin.Context) {
 	if !utils.BindAndValidateForm(c, &params) {
 		return
 	}
-	if params.Page == 0 {
-		params.Page = 1
-	}
-	if params.Limit == 0 {
-		params.Limit = 10
-	}
 
 	data, pagination, err := h.bookingService.GetBookingByUser(userID, params)
 	if err != nil {
@@ -61,19 +55,29 @@ func (h *BookingHandler) GetMyBookings(c *gin.Context) {
 }
 
 func (h *BookingHandler) GetBookingDetail(c *gin.Context) {
+	userID := utils.MustGetUserID(c)
+	bookingID := c.Param("id")
+
+	result, err := h.bookingService.GetBookingDetail(userID, bookingID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
 }
 
 func (h *BookingHandler) CheckinBookedClass(c *gin.Context) {
 	bookingID := c.Param("id")
 	userID := utils.MustGetUserID(c)
 
-	response, err := h.bookingService.CheckedInClassSchedule(userID, bookingID)
+	err := h.bookingService.CheckedInClassSchedule(userID, bookingID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, gin.H{"message": "Checkin Successfully"})
 }
 
 func (h *BookingHandler) CheckoutBookedClass(c *gin.Context) {

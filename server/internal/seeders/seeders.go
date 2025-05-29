@@ -1,7 +1,6 @@
 package seeders
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -838,30 +837,53 @@ func SeedClassSchedules(db *gorm.DB) {
 	now := time.Now().Truncate(time.Minute)
 	threeDaysAgo := now.AddDate(0, 0, -3)
 
-	// Jadwal 3 hari lalu
-	schedulePast := models.ClassSchedule{
-		ID:             uuid.New(),
-		ClassID:        class.ID,
-		ClassName:      class.Title,
-		ClassImage:     class.Image,
-		Location:       class.Location.Name,
-		InstructorID:   instructor.ID,
-		InstructorName: instructor.User.Profile.Fullname,
-		Date:           threeDaysAgo,
-		StartHour:      9,
-		StartMinute:    0,
-		Duration:       class.Duration,
-		Capacity:       10,
-		Booked:         1,
-		IsActive:       true,
-		Color:          "#f59e0b",
-	}
-	if err := db.Create(&schedulePast).Error; err != nil {
-		log.Println("Failed to create past schedule:", err)
-		return
-	}
+	zoomLink := "https://zoom.us/j/92613838319?pwd=cTlscGI5cGlTU2IwZVN1b0FuR2d2QT09"
+	verificationCode := "5443334"
 
-	// Jadwal hari ini
+	schedulePast1 := models.ClassSchedule{
+		ID:               uuid.New(),
+		ClassID:          class.ID,
+		ClassName:        class.Title,
+		ClassImage:       class.Image,
+		Location:         class.Location.Name,
+		InstructorID:     instructor.ID,
+		InstructorName:   instructor.User.Profile.Fullname,
+		Date:             threeDaysAgo,
+		StartHour:        9,
+		StartMinute:      0,
+		IsOpened:         true,
+		Duration:         class.Duration,
+		Capacity:         10,
+		Booked:           1,
+		ZoomLink:         &zoomLink,
+		VerificationCode: &verificationCode,
+		Color:            "#f59e0b",
+	}
+	db.Create(&schedulePast1)
+
+	schedulePast2 := models.ClassSchedule{
+		ID:               uuid.New(),
+		ClassID:          class.ID,
+		ClassName:        class.Title,
+		ClassImage:       class.Image,
+		Location:         class.Location.Name,
+		InstructorID:     instructor.ID,
+		InstructorName:   instructor.User.Profile.Fullname,
+		Date:             threeDaysAgo,
+		StartHour:        13,
+		StartMinute:      0,
+		IsOpened:         true,
+		Duration:         class.Duration,
+		Capacity:         10,
+		Booked:           1,
+		ZoomLink:         &zoomLink,
+		VerificationCode: &verificationCode,
+		Color:            "#f97316",
+	}
+	db.Create(&schedulePast2)
+
+	startTime := now.Add(1 * time.Hour)
+
 	scheduleToday := models.ClassSchedule{
 		ID:             uuid.New(),
 		ClassID:        class.ID,
@@ -871,28 +893,67 @@ func SeedClassSchedules(db *gorm.DB) {
 		InstructorName: instructor.User.Profile.Fullname,
 		Location:       class.Location.Name,
 		Date:           now,
-		StartHour:      now.Hour(),
-		StartMinute:    now.Minute(),
+		StartHour:      startTime.Hour(),
+		StartMinute:    startTime.Minute(),
 		Duration:       class.Duration,
 		Capacity:       10,
 		Booked:         1,
-		IsActive:       true,
 		Color:          "#10b981",
 	}
-	if err := db.Create(&scheduleToday).Error; err != nil {
-		log.Println("Failed to create today schedule:", err)
+	db.Create(&scheduleToday)
+
+	CreateBookingWithAttendance(db, user, schedulePast1, "attended", true, true)
+	CreateBookingWithAttendance(db, user, schedulePast2, "entered", true, false)
+	CreateBookingWithAttendance(db, user, scheduleToday, "none", false, false)
+
+	log.Println("✅ Seeded ClassSchedules + Bookings + Attendance (past & today) safely.")
+}
+
+func CreateBookingWithAttendance(db *gorm.DB, user models.User, schedule models.ClassSchedule, status string, attended bool, reviewed bool) {
+	startTime := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
+		schedule.StartHour, schedule.StartMinute, 0, 0, time.Local)
+	endTime := startTime.Add(time.Duration(schedule.Duration) * time.Minute)
+
+	booking := models.Booking{
+		ID:              uuid.New(),
+		UserID:          user.ID,
+		ClassScheduleID: schedule.ID,
+		Status:          "booked",
+		CreatedAt:       startTime,
+	}
+
+	if err := db.Create(&booking).Error; err != nil {
+		log.Printf("❌ Failed to create booking for schedule %s: %v", schedule.ID.String(), err)
 		return
 	}
 
-	// Booking + attendance
-	if err := CreateBookingWithAttendance(db, user, schedulePast, true, threeDaysAgo); err != nil {
-		log.Println("Failed to seed past booking+attendance:", err)
+	var checkedAt *time.Time
+	var verifiedAt *time.Time
+
+	if attended {
+		checkedAt = &startTime
 	}
-	if err := CreateBookingWithAttendance(db, user, scheduleToday, true, now); err != nil {
-		log.Println("Failed to seed today booking+attendance:", err)
+	if reviewed {
+		verifiedAt = &endTime
 	}
 
-	log.Println("✅ Seeded ClassSchedules + Bookings + Attendance (past & today) safely.")
+	attendance := models.Attendance{
+		ID:         uuid.New(),
+		BookingID:  booking.ID,
+		Status:     status,
+		CheckedIn:  attended,
+		CheckedOut: reviewed,
+		IsReviewed: reviewed,
+		CheckedAt:  checkedAt,
+		VerifiedAt: verifiedAt,
+	}
+
+	if err := db.Create(&attendance).Error; err != nil {
+		log.Printf("❌ Failed to create attendance for booking %s: %v", booking.ID.String(), err)
+		return
+	}
+
+	log.Printf("✅ Attendance created: %s", attendance.ID.String())
 }
 
 func SeedReviews(db *gorm.DB) {
@@ -1055,109 +1116,4 @@ func SeedVouchers(db *gorm.DB) {
 
 	log.Println("Vouchers seeding completed!")
 
-}
-
-func CreateBookingWithAttendance(db *gorm.DB, user models.User, schedule models.ClassSchedule, attended bool, createdAt time.Time) error {
-	var existing models.Booking
-	if err := db.Where("user_id = ? AND class_schedule_id = ?", user.ID, schedule.ID).First(&existing).Error; err == nil {
-		log.Println("Booking already exists for this user & schedule:", user.Email)
-		return nil
-	}
-
-	booking := models.Booking{
-		ID:              uuid.New(),
-		UserID:          user.ID,
-		ClassScheduleID: schedule.ID,
-		Status:          "booked",
-		CreatedAt:       createdAt,
-	}
-	if attended {
-		booking.Status = "checked_in"
-	}
-
-	if err := db.Create(&booking).Error; err != nil {
-		return fmt.Errorf("failed to create booking: %w", err)
-	}
-
-	if attended {
-		var existAtt models.Attendance
-		if err := db.Where("booking_id = ?", booking.ID).First(&existAtt).Error; err == nil {
-			log.Println("Attendance already exists for this booking:", booking.ID)
-			return nil
-		}
-
-		attendance := models.Attendance{
-			ID:        uuid.New(),
-			BookingID: booking.ID,
-			Status:    "attended",
-			CheckedAt: &createdAt,
-			Verified:  true,
-		}
-		if err := db.Create(&attendance).Error; err != nil {
-			return fmt.Errorf("failed to create attendance: %w", err)
-		}
-	}
-	return nil
-}
-
-func SeedFutureBookingForCustomer1(db *gorm.DB) {
-	// Get user
-	var user models.User
-	if err := db.Where("email = ?", "customer1@fitness.com").First(&user).Error; err != nil {
-		log.Println("User customer1@fitness.com not found")
-		return
-	}
-
-	var class models.Class
-	var instructor models.Instructor
-	if err := db.Preload("Location").First(&class).Error; err != nil {
-		log.Println("No class found")
-		return
-	}
-	if err := db.Preload("User.Profile").First(&instructor).Error; err != nil {
-		log.Println("No instructor found")
-		return
-	}
-
-	scheduleDate := time.Now().AddDate(0, 0, 3).Truncate(time.Minute)
-
-	schedule := models.ClassSchedule{
-		ID:             uuid.New(),
-		ClassID:        class.ID,
-		ClassName:      class.Title,
-		ClassImage:     class.Image,
-		Location:       class.Location.Name,
-		InstructorID:   instructor.ID,
-		InstructorName: instructor.User.Profile.Fullname,
-		Date:           scheduleDate,
-		StartHour:      8,
-		StartMinute:    30,
-		Duration:       class.Duration,
-		Capacity:       10,
-		Booked:         1,
-		IsActive:       true,
-		Color:          "#3b82f6",
-	}
-	if err := db.Create(&schedule).Error; err != nil {
-		log.Println("Failed to create future class schedule:", err)
-		return
-	}
-	if err := db.Where("user_id = ? AND class_schedule_id = ?", user.ID, schedule.ID).First(&models.Booking{}).Error; err == nil {
-		log.Println("Booking already exists for future schedule.")
-		return
-	}
-
-	booking := models.Booking{
-		ID:              uuid.New(),
-		UserID:          user.ID,
-		ClassScheduleID: schedule.ID,
-		Status:          "booked",
-		CreatedAt:       time.Now(),
-	}
-	if err := db.Create(&booking).Error; err != nil {
-		log.Println("Failed to create future booking:", err)
-		return
-	}
-
-	log.Println("✅ Seeded future schedule (3 hari lagi) & booking tanpa attendance untuk customer1.")
 }

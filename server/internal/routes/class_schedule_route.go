@@ -12,23 +12,24 @@ func ClassScheduleRoutes(r *gin.Engine, h *handlers.ClassScheduleHandler) {
 
 	// Public
 	schedule.GET("", h.GetAllClassSchedules)
-	customer := schedule.Use(middleware.AuthRequired())
+
+	// Authenticated
+	auth := schedule.Use(middleware.AuthRequired())
+
+	// Instructor
+	instructor := auth.Use(middleware.RoleOnly("instructor"))
+	instructor.GET("/instructor", h.GetInstructorSchedules)
+	instructor.PATCH("/:id/open", h.OpenClassSchedule)
+	instructor.GET("/:id/attendance", h.GetClassAttendances)
+
+	// Customer
+	customer := auth.Use(middleware.RoleOnly("customer"))
 	customer.GET("/status", h.GetSchedulesWithStatus)
 	customer.GET("/:id", h.GetScheduleByID)
 
-	// Admin Only
-	admin := schedule.Use(middleware.AuthRequired(), middleware.RoleOnly("admin"))
+	// Admin
+	admin := auth.Use(middleware.RoleOnly("admin"))
 	admin.POST("", h.CreateClassSchedule)
 	admin.PUT("/:id", h.UpdateClassSchedule)
-	admin.DELETE("/:id", middleware.RoleOnly("owner"), h.DeleteClassSchedule)
-
-	// instructor only
-	instructor := schedule.Use(middleware.AuthRequired(), middleware.RoleOnly("instructor"))
-	instructor.GET("/instructor", h.GetInstructorSchedules)
-	instructor.GET("/:id/detail", h.GetInstructorSchedules)
-	instructor.GET("/:id/attendance", h.GetClassAttendances)
-
-	instructor.PATCH("/:id/open", h.OpenClassSchedule)
-	instructor.PATCH("/:id/close", h.CloseClassSchedule)
-
+	admin.DELETE("/:id", h.DeleteClassSchedule)
 }

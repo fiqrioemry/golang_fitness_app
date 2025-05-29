@@ -7,9 +7,8 @@ import (
 )
 
 type ProfileRepository interface {
-	GetUserByID(userID string) (*models.User, error)
 	UpdateUser(user *models.User) error
-	GetUserBookings(userID string, limit, offset int) ([]models.Booking, int64, error)
+	GetUserByID(userID string) (*models.User, error)
 	GetUserTransactions(userID string, limit, offset int) ([]models.Payment, int64, error)
 	GetUserPackages(userID string, limit, offset int) ([]models.UserPackage, int64, error)
 
@@ -65,23 +64,6 @@ func (r *profileRepository) GetUserPackages(userID string, limit, offset int) ([
 		return nil, 0, err
 	}
 	if err := query.Order("purchased_at DESC").Limit(limit).Offset(offset).Find(&data).Error; err != nil {
-		return nil, 0, err
-	}
-	return data, count, nil
-}
-
-func (r *profileRepository) GetUserBookings(userID string, limit, offset int) ([]models.Booking, int64, error) {
-	var data []models.Booking
-	var count int64
-
-	query := r.db.Model(&models.Booking{}).
-		Preload("ClassSchedule").
-		Where("user_id = ?", userID)
-
-	if err := query.Count(&count).Error; err != nil {
-		return nil, 0, err
-	}
-	if err := query.Order("created_at DESC").Limit(limit).Offset(offset).Find(&data).Error; err != nil {
 		return nil, 0, err
 	}
 	return data, count, nil

@@ -1,9 +1,10 @@
+# fitness application
 services:
   server:
     build:
       context: .
       dockerfile: ./Dockerfile
-    container_name: fitness-app
+    container_name: app-fitness
     env_file:
       - .env
     ports:
@@ -13,6 +14,8 @@ services:
       - db
     volumes:
       - .:/app
+    networks:
+      - fitness_net
 
   db:
     image: mysql:8
@@ -20,17 +23,24 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: Oemry241995@
-      MYSQL_DATABASE: fitness_booking
+      MYSQL_DATABASE: fitness_app
     ports:
       - "3307:3306"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mysql-fitness-data:/var/lib/mysql
+    networks:
+      - fitness_net
 
   redis:
     image: redis:7-alpine
     container_name: redis-fitness
     ports:
       - "6380:6379"
+    networks:
+      - fitness_net
 
 volumes:
-  mysql-data:
+  mysql-fitness-data:
+
+networks:
+  fitness_net:

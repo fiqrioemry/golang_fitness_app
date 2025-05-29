@@ -2,28 +2,30 @@ package services
 
 import (
 	"fmt"
+	"log"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
-	"server/internal/utils"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type ClassScheduleService interface {
+	// admin
 	DeleteClassSchedule(id string) error
 	CreateClassSchedule(req dto.CreateClassScheduleRequest) error
 	UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error
+
+	// customer
+	GetSchedulesWithBookingStatus(userID string) ([]dto.ClassScheduleResponse, error)
 	GetClassScheduleByID(scheduleID, userID string) (*dto.ClassScheduleDetailResponse, error)
 	GetSchedulesByFilter(filter dto.ClassScheduleQueryParam) ([]dto.ClassScheduleResponse, error)
-	GetSchedulesWithBookingStatus(userID string) ([]dto.ClassScheduleResponse, error)
 
 	// instructor only
-	CloseClassSchedule(id string) (string, error)
 	OpenClassSchedule(id string, req dto.OpenClassScheduleRequest) error
-	GetClassScheduleAttendances(scheduleID string) ([]dto.ClassAttendanceStruct, error)
-	GetSchedulesByInstructor(userID string, filter dto.InstructorScheduleQueryParam) ([]dto.ClassScheduleResponse, error)
+	GetAttendancesForSchedule(scheduleID string) ([]dto.AttendanceWithUserResponse, error)
+	GetSchedulesByInstructor(userID string, params dto.InstructorScheduleQueryParam) ([]dto.InstructorScheduleResponse, *dto.PaginationResponse, error)
 }
 
 type classScheduleService struct {
@@ -97,7 +99,6 @@ func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRe
 		Location:       class.Location.Name,
 		Duration:       class.Duration,
 		Capacity:       req.Capacity,
-		IsActive:       true,
 		Color:          req.Color,
 		Date:           localDate,
 		StartHour:      req.StartHour,
@@ -318,17 +319,23 @@ func (s *classScheduleService) GetSchedulesWithBookingStatus(userID string) ([]d
 	return result, nil
 }
 
-func (s *classScheduleService) GetSchedulesByInstructor(userID string, filter dto.InstructorScheduleQueryParam) ([]dto.ClassScheduleResponse, error) {
-	instructorID := uuid.MustParse(userID)
+func (s *classScheduleService) GetSchedulesByInstructor(userID string, params dto.InstructorScheduleQueryParam) ([]dto.InstructorScheduleResponse, *dto.PaginationResponse, error) {
+	ID := uuid.MustParse(userID)
 
-	schedules, err := s.repo.GetSchedulesByInstructorID(instructorID, filter)
+	instructor, err := s.repo.GetInstructorByUserID(ID)
+	log.Printf("instructor id %s", instructor.ID)
 	if err != nil {
-		return nil, err
+		return nil, nil, fmt.Errorf("instructor not found: %w with %s", err, instructor.ID)
 	}
 
-	var result []dto.ClassScheduleResponse
+	schedules, total, err := s.repo.GetSchedulesByInstructorID(instructor.ID, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var result []dto.InstructorScheduleResponse
 	for _, schedule := range schedules {
-		result = append(result, dto.ClassScheduleResponse{
+		result = append(result, dto.InstructorScheduleResponse{
 			ID:             schedule.ID.String(),
 			ClassID:        schedule.ClassID.String(),
 			ClassName:      schedule.ClassName,
@@ -342,10 +349,18 @@ func (s *classScheduleService) GetSchedulesByInstructor(userID string, filter dt
 			Capacity:       schedule.Capacity,
 			Duration:       schedule.Duration,
 			BookedCount:    schedule.Booked,
-			Color:          schedule.Color,
+			IsOpened:       schedule.IsOpened,
 		})
 	}
-	return result, nil
+	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
+	pagination := &dto.PaginationResponse{
+		Page:       params.Page,
+		Limit:      params.Limit,
+		TotalRows:  int(total),
+		TotalPages: totalPages,
+	}
+
+	return result, pagination, nil
 }
 
 func (s *classScheduleService) OpenClassSchedule(id string, req dto.OpenClassScheduleRequest) error {
@@ -356,53 +371,37 @@ func (s *classScheduleService) OpenClassSchedule(id string, req dto.OpenClassSch
 	if schedule.IsOpened {
 		return fmt.Errorf("schedule already opened")
 	}
-	if req.IsOnline && (req.ZoomLink == "" || req.ZoomLink == "null") {
-		return fmt.Errorf("zoom link is required for online class")
-	}
-	var zoomPtr *string
-	if req.IsOnline {
-		zoomPtr = &req.ZoomLink
-	}
-	return s.repo.OpenSchedule(schedule.ID, req.IsOnline, zoomPtr)
+	return s.repo.OpenSchedule(schedule.ID, req.ZoomLink)
 }
 
-func (s *classScheduleService) CloseClassSchedule(id string) (string, error) {
-	schedule, err := s.repo.GetClassScheduleByID(id)
-	if err != nil {
-		return "", fmt.Errorf("schedule not found")
-	}
-	if schedule.IsClosed {
-		return "", fmt.Errorf("schedule already closed")
-	}
-
-	code := utils.GenerateVerificationCode(6) // misal 6 karakter acak
-
-	err = s.repo.CloseScheduleWithCode(schedule.ID, code)
-	if err != nil {
-		return "", fmt.Errorf("failed to close schedule: %w", err)
-	}
-
-	return code, nil
-}
-
-func (s *classScheduleService) GetClassScheduleAttendances(scheduleID string) ([]dto.ClassAttendanceStruct, error) {
-	id := uuid.MustParse(scheduleID)
-
-	attendances, err := s.repo.GetAttendancesByScheduleID(id)
+func (s *classScheduleService) GetAttendancesForSchedule(scheduleID string) ([]dto.AttendanceWithUserResponse, error) {
+	bookings, err := s.repo.GetAttendancesByScheduleID(scheduleID)
 	if err != nil {
 		return nil, err
 	}
 
-	var results []dto.ClassAttendanceStruct
-	for _, a := range attendances {
-		results = append(results, dto.ClassAttendanceStruct{
-			ID:         a.ID.String(),
-			UserID:     a.Booking.UserID.String(),
-			Status:     a.Status,
-			Verified:   a.Verified,
-			CheckinAt:  a.CheckedAt.Format("2006-01-02 15:04:05"),
-			CheckoutAt: a.VerifiedAt.Format("2006-01-02 15:04:05"),
-		})
+	var result []dto.AttendanceWithUserResponse
+	for _, b := range bookings {
+		attendance := b.Attendance
+		user := b.User
+
+		resp := dto.AttendanceWithUserResponse{
+			UserName:   user.Profile.Fullname,
+			Email:      user.Email,
+			Status:     attendance.Status,
+			CheckedIn:  attendance.CheckedIn,
+			CheckedOut: attendance.CheckedOut,
+		}
+
+		if !attendance.CheckedAt.IsZero() {
+			resp.CheckedAt = attendance.CheckedAt.Format("2006-01-02 15:04:05")
+		}
+		if !attendance.VerifiedAt.IsZero() {
+			resp.VerifiedAt = attendance.VerifiedAt.Format("2006-01-02 15:04:05")
+		}
+
+		result = append(result, resp)
 	}
-	return results, nil
+
+	return result, nil
 }

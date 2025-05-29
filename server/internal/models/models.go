@@ -143,48 +143,50 @@ type Payment struct {
 }
 
 type ClassSchedule struct {
-	ID               uuid.UUID      `gorm:"type:char(36);primaryKey" json:"id"`
-	ClassID          uuid.UUID      `gorm:"type:char(36);not null" json:"classId"`
-	ClassImage       string         `gorm:"type:varchar(255);not null" json:"classImage"`
-	ClassName        string         `gorm:"type:varchar(255);not null" json:"className"`
-	Location         string         `gorm:"type:varchar(255);not null" json:"location"`
-	InstructorID     uuid.UUID      `gorm:"type:char(36);not null" json:"instructorId"`
-	InstructorName   string         `gorm:"type:varchar(255);not null" json:"instructorName"`
-	Capacity         int            `gorm:"not null" json:"capacity"`
-	IsActive         bool           `gorm:"default:true" json:"isActive"`
-	Color            string         `gorm:"type:varchar(20)" json:"color"`
-	Date             time.Time      `gorm:"not null" json:"date"`
-	Booked           int            `gorm:"not null;default:0" json:"booked"`
-	StartHour        int            `gorm:"not null" json:"startHour"`
-	StartMinute      int            `gorm:"not null" json:"startMinute"`
-	Duration         int            `gorm:"not null" json:"duration"`
-	ZoomLink         *string        `gorm:"type:varchar(255)" json:"zoomLink,omitempty"`
-	IsOpened         bool           `gorm:"default:false" json:"isOpened"`
-	IsClosed         bool           `gorm:"default:false" json:"isClosed"`
-	IsOnline         bool           `gorm:"default:false" json:"isOnline"`
-	VerificationCode *string        `gorm:"type:varchar(10)" json:"verificationCode,omitempty"`
-	DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`
-}
+	ID             uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+	ClassID        uuid.UUID `gorm:"type:char(36);not null" json:"classId"`
+	ClassImage     string    `gorm:"type:varchar(255);not null" json:"classImage"`
+	ClassName      string    `gorm:"type:varchar(255);not null" json:"className"`
+	Location       string    `gorm:"type:varchar(255);not null" json:"location"`
+	InstructorID   uuid.UUID `gorm:"type:char(36);not null" json:"instructorId"`
+	InstructorName string    `gorm:"type:varchar(255);not null" json:"instructorName"`
+	Capacity       int       `gorm:"not null" json:"capacity"`
+	Color          string    `gorm:"type:varchar(20)" json:"color"`
+	Date           time.Time `gorm:"not null" json:"date"`
+	Booked         int       `gorm:"not null;default:0" json:"booked"`
 
+	StartHour   int `gorm:"not null" json:"startHour"`
+	StartMinute int `gorm:"not null" json:"startMinute"`
+	Duration    int `gorm:"not null" json:"duration"`
+
+	ZoomLink         *string `gorm:"type:varchar(255)" json:"zoomLink,omitempty"`
+	IsOpened         bool    `gorm:"default:false" json:"isOpened"`
+	VerificationCode *string `gorm:"type:varchar(10)" json:"verificationCode,omitempty"`
+
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	Bookings  []Booking      `gorm:"foreignKey:ClassScheduleID" json:"bookings"`
+}
 type Booking struct {
 	ID              uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID          uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_user_schedule"`
-	ClassScheduleID uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_user_schedule"`
-	Status          string    `gorm:"type:varchar(50);not null;default:'booked';check:status IN ('booked','checked_in','canceled')" json:"status"`
-	CreatedAt       time.Time `gorm:"autoCreateTime"`
+	UserID          uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_user_schedule" json:"userId"`
+	ClassScheduleID uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_user_schedule" json:"classScheduleId"`
+	Status          string    `gorm:"type:varchar(20);not null;default:'booked';check:status IN ('booked','canceled')" json:"status"`
+	CreatedAt       time.Time `gorm:"autoCreateTime" json:"createdAt"`
 
+	User          User          `gorm:"foreignKey:UserID" json:"user"`
 	ClassSchedule ClassSchedule `gorm:"foreignKey:ClassScheduleID" json:"classSchedule"`
+	Attendance    Attendance    `gorm:"foreignKey:BookingID" json:"attendance"`
 }
 
 type Attendance struct {
 	ID         uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
 	BookingID  uuid.UUID  `gorm:"type:char(36);not null;uniqueIndex" json:"bookingId"`
-	Status     string     `gorm:"type:varchar(20);not null;check:status IN ('entered', 'attended' 'absent')" json:"status"`
-	Verified   bool       `gorm:"default:false" json:"verified"`
-	CheckedAt  *time.Time `json:"checkedAt,omitempty"`
-	VerifiedAt *time.Time `json:"verifiedAt,omitempty"`
-
-	Booking Booking `gorm:"foreignKey:BookingID" json:"booking"`
+	Status     string     `gorm:"type:varchar(20);not null;default:'none';check:status IN ('none','entered', 'attended', 'absent')" json:"status"`
+	IsReviewed bool       `gorm:"default:false" json:"isReviewed"`
+	CheckedIn  bool       `gorm:"default:false" json:"checkedIn"`
+	CheckedOut bool       `gorm:"default:false" json:"checkedOut"`
+	CheckedAt  *time.Time `json:"checkedAt"`
+	VerifiedAt *time.Time `json:"verifiedAt"`
 }
 
 type ScheduleTemplate struct {
