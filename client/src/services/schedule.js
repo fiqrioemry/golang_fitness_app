@@ -25,10 +25,9 @@ export const getClassScheduleDetail = async (id) => {
   return res.data;
 };
 
-// POST /api/schedules
 export const createClassSchedule = async (data) => {
-  console.log(data);
-  const res = await authInstance.post("/schedules", data);
+  const url = data.isRecuring ? "/schedules/recurring" : "/schedules";
+  const res = await authInstance.post(url, data);
   return res.data;
 };
 
