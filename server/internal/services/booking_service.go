@@ -209,7 +209,7 @@ func (s *bookingService) CheckedInClassSchedule(userID, bookingID string) error 
 		return errors.New("you have already checked in to this class")
 	}
 
-	now := time.Now()
+	now := time.Now().UTC()
 	attendance.CheckedIn = true
 	attendance.Status = "entered"
 	attendance.CheckedAt = &now
@@ -232,7 +232,7 @@ func (s *bookingService) CheckoutClassSchedule(userID, bookingID string, req dto
 		return errors.New("invalid verification code")
 	}
 
-	now := time.Now()
+	now := time.Now().UTC()
 	attendance.CheckedOut = true
 	attendance.Status = "attended"
 	attendance.VerifiedAt = &now
@@ -242,8 +242,7 @@ func (s *bookingService) CheckoutClassSchedule(userID, bookingID string, req dto
 
 // ** buat cron job
 func (s *bookingService) MarkAbsentBookings() error {
-	loc, _ := time.LoadLocation("Asia/Jakarta")
-	now := time.Now().In(loc)
+	now := time.Now().UTC()
 
 	bookings, err := s.bookingRepo.GetAllBookedWithScheduleAndClass()
 	if err != nil {
@@ -260,14 +259,14 @@ func (s *bookingService) MarkAbsentBookings() error {
 
 		startTime := time.Date(
 			schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
-			schedule.StartHour, schedule.StartMinute, 0, 0, loc,
+			schedule.StartHour, schedule.StartMinute, 0, 0, time.UTC,
 		)
 		endTime := startTime.Add(time.Duration(schedule.Duration) * time.Minute)
 
 		if now.After(endTime) {
 			exists, err := s.bookingRepo.CheckAttendanceExists(b.ID)
 			if err != nil {
-				log.Printf("Failed to check attendance for booking %s: %v\n", b.ID, err)
+				log.Printf("❌ Failed to check attendance for booking %s: %v\n", b.ID, err)
 				continue
 			}
 
@@ -279,7 +278,7 @@ func (s *bookingService) MarkAbsentBookings() error {
 				}
 
 				if err := s.bookingRepo.CreateAttendance(attendance); err != nil {
-					log.Printf("Failed to create absent attendance for booking %s: %v\n", b.ID, err)
+					log.Printf("❌ Failed to create absent attendance for booking %s: %v\n", b.ID, err)
 				} else {
 					totalMarked++
 				}
@@ -287,6 +286,6 @@ func (s *bookingService) MarkAbsentBookings() error {
 		}
 	}
 
-	log.Printf("Marked %d users as absent\n", totalMarked)
+	log.Printf("✅ Marked %d users as absent\n", totalMarked)
 	return nil
 }

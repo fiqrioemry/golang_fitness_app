@@ -112,7 +112,7 @@ func (s *authService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
 	tokenModel := &models.Token{
 		UserID:    user.ID,
 		Token:     refreshToken,
-		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
+		ExpiredAt: time.Now().UTC().Add(7 * 24 * time.Hour),
 	}
 	if err := s.repo.StoreRefreshToken(tokenModel); err != nil {
 		return nil, err
@@ -161,7 +161,7 @@ func (s *authService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, err
 	tokenModel := &models.Token{
 		UserID:    user.ID,
 		Token:     refreshToken,
-		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
+		ExpiredAt: time.Now().UTC().Add(7 * 24 * time.Hour),
 	}
 	if err := s.repo.StoreRefreshToken(tokenModel); err != nil {
 		return nil, err
@@ -187,7 +187,7 @@ func (s *authService) RefreshToken(refreshToken string) (*dto.AuthResponse, erro
 		return nil, errors.New("refresh token not found")
 	}
 
-	if tokenModel.ExpiredAt.Before(time.Now()) {
+	if tokenModel.ExpiredAt.Before(time.Now().UTC()) {
 		return nil, errors.New("refresh token expired")
 	}
 
@@ -213,7 +213,7 @@ func (s *authService) RefreshToken(refreshToken string) (*dto.AuthResponse, erro
 	newToken := &models.Token{
 		UserID:    user.ID,
 		Token:     newRefreshToken,
-		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
+		ExpiredAt: time.Now().UTC().Add(7 * 24 * time.Hour),
 	}
 	if err := s.repo.StoreRefreshToken(newToken); err != nil {
 		return nil, err
@@ -290,7 +290,7 @@ func (s *authService) GoogleSignIn(idToken string) (*dto.AuthResponse, error) {
 	tokenModel := &models.Token{
 		UserID:    user.ID,
 		Token:     refreshToken,
-		ExpiredAt: time.Now().Add(7 * 24 * time.Hour),
+		ExpiredAt: time.Now().UTC().Add(7 * 24 * time.Hour),
 	}
 
 	if tokenModel.UserID == uuid.Nil {

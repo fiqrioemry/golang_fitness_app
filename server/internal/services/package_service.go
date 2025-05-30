@@ -6,7 +6,6 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -50,7 +49,6 @@ func (s *packageService) CreatePackage(req dto.CreatePackageRequest) error {
 		IsActive:       req.IsActive,
 		AdditionalList: req.Additional,
 		Classes:        classes,
-		CreatedAt:      time.Now(),
 	}
 
 	if req.Expired != 0 {

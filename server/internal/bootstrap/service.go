@@ -17,38 +17,40 @@ type ServiceContainer struct {
 	LocationService         services.LocationService
 	CategoryService         services.CategoryService
 	VoucherService          services.VoucherService
-	SubcategoryService      services.SubcategoryService
-	NotificationService     services.NotificationService
-	InstructorService       services.InstructorService
 	PaymentService          services.PaymentService
 	BookingService          services.BookingService
-	ScheduleTemplateService services.ScheduleTemplateService
+	InstructorService       services.InstructorService
+	SubcategoryService      services.SubcategoryService
+	NotificationService     services.NotificationService
 	ClassScheduleService    services.ClassScheduleService
+	ScheduleTemplateService services.ScheduleTemplateService
 }
 
 func InitServices(repo *RepositoryContainer) *ServiceContainer {
 	voucherService := services.NewVoucherService(repo.VoucherRepo)
 	notificationService := services.NewNotificationService(repo.NotificationRepo)
+	scheduleTemplateService :=
+		services.NewScheduleTemplateService(repo.ScheduleTemplateRepo, repo.ClassRepo, repo.ClassScheduleRepo)
 
 	return &ServiceContainer{
-		DashboardService:        services.NewDashboardService(repo.DashboardRepo),
-		AuthService:             services.NewAuthService(repo.AuthRepo, repo.NotificationRepo),
+		VoucherService:          voucherService,
+		NotificationService:     notificationService,
+		ScheduleTemplateService: scheduleTemplateService,
 		UserService:             services.NewUserService(repo.UserRepo),
 		TypeService:             services.NewTypeService(repo.TypeRepo),
 		ClassService:            services.NewClassService(repo.ClassRepo),
 		LevelService:            services.NewLevelService(repo.LevelRepo),
-		ReviewService:           services.NewReviewService(repo.ReviewRepo, repo.ClassScheduleRepo, repo.InstructorRepo),
 		ProfileService:          services.NewProfileService(repo.ProfileRepo),
 		PackageService:          services.NewPackageService(repo.PackageRepo),
 		LocationService:         services.NewLocationService(repo.LocationRepo),
 		CategoryService:         services.NewCategoryService(repo.CategoryRepo),
-		VoucherService:          voucherService,
+		DashboardService:        services.NewDashboardService(repo.DashboardRepo),
 		SubcategoryService:      services.NewSubcategoryService(repo.SubcategoryRepo),
-		NotificationService:     notificationService,
+		AuthService:             services.NewAuthService(repo.AuthRepo, repo.NotificationRepo),
 		InstructorService:       services.NewInstructorService(repo.InstructorRepo, repo.AuthRepo),
+		ReviewService:           services.NewReviewService(repo.ReviewRepo, repo.ClassScheduleRepo, repo.InstructorRepo),
 		PaymentService:          services.NewPaymentService(repo.PaymentRepo, repo.PackageRepo, repo.UserPackageRepo, repo.AuthRepo, voucherService, notificationService),
 		BookingService:          services.NewBookingService(repo.BookingRepo, repo.ClassScheduleRepo, repo.UserPackageRepo, repo.PackageRepo, notificationService),
-		ScheduleTemplateService: services.NewScheduleTemplateService(repo.ScheduleTemplateRepo, repo.ClassRepo, repo.ClassScheduleRepo),
-		ClassScheduleService:    services.NewClassScheduleService(repo.ClassScheduleRepo, repo.ClassRepo, repo.PackageRepo, repo.UserPackageRepo, repo.BookingRepo),
+		ClassScheduleService:    services.NewClassScheduleService(repo.ClassScheduleRepo, repo.ClassRepo, repo.PackageRepo, repo.UserPackageRepo, repo.BookingRepo, repo.ScheduleTemplateRepo, scheduleTemplateService),
 	}
 }

@@ -99,6 +99,7 @@ type UserPackage struct {
 	RemainingCredit int            `gorm:"not null;default:0" json:"remainingCredit"`
 	ExpiredAt       *time.Time     `json:"expiredAt"`
 	PurchasedAt     time.Time      `gorm:"autoCreateTime" json:"purchasedAt"`
+	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"createdAt"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 
 	Package Package `gorm:"foreignKey:PackageID" json:"package"`

@@ -4,8 +4,6 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
-
-	"github.com/google/uuid"
 )
 
 type LevelService interface {
@@ -26,7 +24,6 @@ func NewLevelService(repo repositories.LevelRepository) LevelService {
 
 func (s *levelService) CreateLevel(req dto.CreateLevelRequest) error {
 	level := models.Level{
-		ID:   uuid.New(),
 		Name: req.Name,
 	}
 	return s.repo.CreateLevel(&level)

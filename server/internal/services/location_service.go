@@ -4,8 +4,6 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
-
-	"github.com/google/uuid"
 )
 
 type LocationService interface {
@@ -26,7 +24,6 @@ func NewLocationService(repo repositories.LocationRepository) LocationService {
 
 func (s *locationService) CreateLocation(req dto.CreateLocationRequest) error {
 	location := models.Location{
-		ID:          uuid.New(),
 		Name:        req.Name,
 		Address:     req.Address,
 		GeoLocation: req.GeoLocation,
@@ -60,7 +57,6 @@ func (s *locationService) GetAllLocations() ([]dto.LocationResponse, error) {
 	var result []dto.LocationResponse
 	for _, l := range locations {
 		result = append(result, dto.LocationResponse{
-			ID:          l.ID.String(),
 			Name:        l.Name,
 			Address:     l.Address,
 			GeoLocation: l.GeoLocation,

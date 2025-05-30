@@ -32,12 +32,10 @@ func (s *reviewService) CreateReview(userID string, req dto.CreateReviewRequest)
 	}
 
 	review := models.Review{
-		ID:        uuid.New(),
-		UserID:    uuid.MustParse(userID),
-		ClassID:   schedule.ClassID,
-		Rating:    req.Rating,
-		Comment:   req.Comment,
-		CreatedAt: time.Now(),
+		UserID:  uuid.MustParse(userID),
+		ClassID: schedule.ClassID,
+		Rating:  req.Rating,
+		Comment: req.Comment,
 	}
 
 	if err := s.repo.CreateReview(&review); err != nil {

@@ -46,6 +46,6 @@ func InitHandlers(svc *ServiceContainer) *HandlerContainer {
 		PaymentHandler:          handlers.NewPaymentHandler(svc.PaymentService),
 		BookingHandler:          handlers.NewBookingHandler(svc.BookingService),
 		ScheduleTemplateHandler: handlers.NewScheduleTemplateHandler(svc.ScheduleTemplateService),
-		ClassScheduleHandler:    handlers.NewClassScheduleHandler(svc.ClassScheduleService, svc.ScheduleTemplateService),
+		ClassScheduleHandler:    handlers.NewClassScheduleHandler(svc.ClassScheduleService),
 	}
 }

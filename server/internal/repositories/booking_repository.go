@@ -51,7 +51,6 @@ func (r *bookingRepository) GetBookingsByUserID(userID string, params dto.Bookin
 		Joins("JOIN class_schedules ON class_schedules.id = bookings.class_schedule_id")
 
 	nowUTC := time.Now().UTC().Format("2006-01-02 15:04:05")
-
 	if params.Status == "upcoming" {
 		db = db.Where(`
 			ADDTIME(

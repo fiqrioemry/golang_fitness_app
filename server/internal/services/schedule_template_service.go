@@ -48,18 +48,18 @@ func (s *scheduleTemplateService) GetAllTemplates() ([]dto.ScheduleTemplateRespo
 		var days []int
 		_ = json.Unmarshal(t.DayOfWeeks, &days)
 		resp := dto.ScheduleTemplateResponse{
-			ID:             t.ID,
-			ClassID:        t.ClassID,
+			ID:             t.ID.String(),
+			ClassID:        t.ClassID.String(),
 			ClassName:      t.Class.Title,
-			InstructorID:   t.InstructorID,
+			InstructorID:   t.InstructorID.String(),
 			InstructorName: t.Instructor.User.Profile.Fullname,
 			DayOfWeeks:     days,
 			StartHour:      t.StartHour,
 			StartMinute:    t.StartMinute,
 			Capacity:       t.Capacity,
 			IsActive:       t.IsActive,
-			EndDate:        t.EndDate,
-			CreatedAt:      t.CreatedAt.Format(time.RFC3339),
+			EndDate:        t.EndDate.Format("2006-01-02"),
+			CreatedAt:      t.CreatedAt.Format("2006-01-02"),
 		}
 		result = append(result, resp)
 	}
@@ -76,9 +76,13 @@ func containsInt(list []int, target int) bool {
 }
 
 func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleTemplateRequest) (string, error) {
-	now := time.Now().In(time.Local)
+	now := time.Now().UTC()
+	endDate, err := utils.ParseDate(req.EndDate)
+	if err != nil {
+		return "", err
+	}
 
-	if req.EndDate.Before(now) {
+	if endDate.Before(now) {
 		return "", fmt.Errorf("end date must be in the future")
 	}
 
@@ -94,35 +98,30 @@ func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleT
 		return "", err
 	}
 
-	simulationEnd := req.EndDate
+	simulationEnd := endDate
 
 	for date := now; !date.After(simulationEnd); date = date.AddDate(0, 0, 1) {
 		weekday := int(date.Weekday())
-		if !containsInt(req.DayOfWeeks, weekday) {
+		if !utils.IsDayMatched(weekday, req.DayOfWeeks) {
 			continue
 		}
 
-		simulatedStart := time.Date(date.Year(), date.Month(), date.Day(),
-			req.StartHour, req.StartMinute, 0, 0, time.Local)
+		simulatedStart := time.Date(date.Year(), date.Month(), date.Day(), req.StartHour, req.StartMinute, 0, 0, time.UTC)
 		simulatedEnd := simulatedStart.Add(time.Hour)
 
 		for _, schedule := range existingSchedules {
 			if schedule.InstructorID != instructorID {
 				continue
 			}
-			if schedule.Date.Year() != date.Year() ||
-				schedule.Date.Month() != date.Month() ||
-				schedule.Date.Day() != date.Day() {
+			if schedule.Date.Year() != date.Year() || schedule.Date.Month() != date.Month() || schedule.Date.Day() != date.Day() {
 				continue
 			}
 
-			existStart := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
-				schedule.StartHour, schedule.StartMinute, 0, 0, time.Local)
+			existStart := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(), schedule.StartHour, schedule.StartMinute, 0, 0, time.UTC)
 			existEnd := existStart.Add(time.Hour)
 
 			if simulatedStart.Before(existEnd) && existStart.Before(simulatedEnd) {
-				return "", fmt.Errorf("instructor %s is already booked on %s at %02d:%02d (actual schedule)",
-					schedule.InstructorName, date.Format("2006-01-02"), req.StartHour, req.StartMinute)
+				return "", fmt.Errorf("instructor %s is already booked on %s at %02d:%02d (actual schedule)", schedule.InstructorName, date.Format("2006-01-02"), req.StartHour, req.StartMinute)
 			}
 		}
 
@@ -131,23 +130,20 @@ func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleT
 				continue
 			}
 			var tplDays []int
-			if err := json.Unmarshal(tpl.DayOfWeeks, &tplDays); err != nil {
-				continue
-			}
-			if !containsInt(tplDays, weekday) {
+			_ = json.Unmarshal(tpl.DayOfWeeks, &tplDays)
+			if !utils.IsDayMatched(weekday, tplDays) {
 				continue
 			}
 
-			tplStart := time.Date(date.Year(), date.Month(), date.Day(),
-				tpl.StartHour, tpl.StartMinute, 0, 0, time.Local)
+			tplStart := time.Date(date.Year(), date.Month(), date.Day(), tpl.StartHour, tpl.StartMinute, 0, 0, time.UTC)
 			tplEnd := tplStart.Add(time.Hour)
 
 			if simulatedStart.Before(tplEnd) && tplStart.Before(simulatedEnd) {
-				return "", fmt.Errorf("instructor %s is already booked on %s at %02d:%02d (actual schedule)",
-					tpl.InstructorName, date.Format("2006-01-02"), req.StartHour, req.StartMinute)
+				return "", fmt.Errorf("instructor %s is already booked on %s at %02d:%02d (template)", tpl.InstructorName, date.Format("2006-01-02"), req.StartHour, req.StartMinute)
 			}
 		}
 	}
+
 	class, err := s.classScheduleRepo.GetClassByID(uuid.MustParse(req.ClassID))
 	if err != nil {
 		return "", fmt.Errorf("class not found: %w", err)
@@ -172,7 +168,7 @@ func (s *scheduleTemplateService) CreateScheduleTemplate(req dto.CreateScheduleT
 		Capacity:       req.Capacity,
 		IsActive:       false,
 		Color:          req.Color,
-		EndDate:        req.EndDate,
+		EndDate:        endDate,
 	}
 
 	err = s.templateRepo.CreateTemplate(&template)
@@ -193,8 +189,8 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 		return fmt.Errorf("cannot update an active template, please stop it first")
 	}
 
-	now := time.Now().In(time.Local)
-	startTime := time.Date(now.Year(), now.Month(), now.Day(), req.StartHour, req.StartMinute, 0, 0, time.Local)
+	now := time.Now().UTC()
+	startTime := time.Date(now.Year(), now.Month(), now.Day(), req.StartHour, req.StartMinute, 0, 0, time.UTC)
 	endTime := startTime.Add(time.Hour)
 
 	instructorID := uuid.MustParse(req.InstructorID)
@@ -222,7 +218,7 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 			}
 
 			existStart := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
-				schedule.StartHour, schedule.StartMinute, 0, 0, time.Local)
+				schedule.StartHour, schedule.StartMinute, 0, 0, time.UTC)
 			existEnd := existStart.Add(time.Hour)
 
 			if startTime.Before(existEnd) && existStart.Before(endTime) {
@@ -252,7 +248,7 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 				if tplDay != day {
 					continue
 				}
-				tplStart := time.Date(now.Year(), now.Month(), now.Day(), tpl.StartHour, tpl.StartMinute, 0, 0, time.Local)
+				tplStart := time.Date(now.Year(), now.Month(), now.Day(), tpl.StartHour, tpl.StartMinute, 0, 0, time.UTC)
 				tplEnd := tplStart.Add(time.Hour)
 
 				if startTime.Before(tplEnd) && tplStart.Before(endTime) {
@@ -262,14 +258,20 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 			}
 		}
 	}
+
 	class, err := s.classScheduleRepo.GetClassByID(uuid.MustParse(req.ClassID))
 	if err != nil {
 		return fmt.Errorf("class not found: %w", err)
 	}
 
-	instructor, err := s.classScheduleRepo.GetInstructorWithProfileByID(uuid.MustParse(req.InstructorID))
+	instructor, err := s.classScheduleRepo.GetInstructorWithProfileByID(instructorID)
 	if err != nil {
 		return fmt.Errorf("instructor not found: %w", err)
+	}
+
+	endDate, err := utils.ParseDate(req.EndDate)
+	if err != nil {
+		return err
 	}
 
 	template.ClassID = class.ID
@@ -280,7 +282,7 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 	template.StartHour = req.StartHour
 	template.StartMinute = req.StartMinute
 	template.Capacity = req.Capacity
-	template.EndDate = *req.EndDate
+	template.EndDate = endDate
 
 	if err := s.templateRepo.UpdateTemplate(template); err != nil {
 		return err
@@ -291,81 +293,6 @@ func (s *scheduleTemplateService) UpdateScheduleTemplate(id string, req dto.Upda
 
 func (s *scheduleTemplateService) DeleteTemplate(id string) error {
 	return s.templateRepo.DeleteTemplate(id)
-}
-
-func (s *scheduleTemplateService) AutoGenerateSchedules() error {
-	templates, err := s.templateRepo.GetActiveTemplates()
-	if err != nil {
-		return fmt.Errorf("failed to fetch templates: %w", err)
-	}
-
-	if len(templates) == 0 {
-		return fmt.Errorf("no active schedule templates found")
-	}
-
-	today := time.Now().Truncate(24 * time.Hour)
-	var anySuccess bool
-	var errs []string
-
-	for _, template := range templates {
-		if template.LastGeneratedAt != nil {
-			if today.Sub(template.LastGeneratedAt.Truncate(24*time.Hour)) < 30*24*time.Hour {
-				continue
-			}
-		}
-
-		var days []int
-		if err := json.Unmarshal(template.DayOfWeeks, &days); err != nil {
-			errs = append(errs, fmt.Sprintf("template %s: failed to unmarshal days", template.ID))
-			continue
-		}
-
-		// generate dari hari ini sampai 30 hari ke depan
-		end := today.AddDate(0, 0, 30)
-
-		for d := today; !d.After(end); d = d.AddDate(0, 0, 1) {
-			if !utils.IsDayMatched(int(d.Weekday()), days) {
-				continue
-			}
-
-			schedule := models.ClassSchedule{
-				ID:             uuid.New(),
-				ClassID:        template.ClassID,
-				ClassName:      template.Class.Title,
-				ClassImage:     template.Class.Image,
-				InstructorID:   template.InstructorID,
-				InstructorName: template.InstructorName,
-				Capacity:       template.Capacity,
-				Date:           d,
-				Color:          template.Color,
-				StartHour:      template.StartHour,
-				StartMinute:    template.StartMinute,
-			}
-
-			if err := s.classScheduleRepo.CreateClassSchedule(&schedule); err != nil {
-				errs = append(errs, fmt.Sprintf("template %s: failed to create schedule on %s", template.ID, d.Format("2006-01-02")))
-				continue
-			}
-
-			anySuccess = true
-		}
-
-		// ✅ Update last_generated_at
-		now := time.Now()
-		template.LastGeneratedAt = &now
-		if err := s.templateRepo.UpdateTemplate(&template); err != nil {
-			errs = append(errs, fmt.Sprintf("template %s: failed to update lastGeneratedAt", template.ID))
-		}
-	}
-
-	if len(errs) > 0 && !anySuccess {
-		return fmt.Errorf("no schedules generated: %v", errs)
-	}
-	if len(errs) > 0 {
-		return fmt.Errorf("some schedules generated, with errors: %v", errs)
-	}
-
-	return nil
 }
 
 func (s *scheduleTemplateService) GenerateScheduleByTemplateID(templateID string) error {
@@ -383,7 +310,7 @@ func (s *scheduleTemplateService) GenerateScheduleByTemplateID(templateID string
 		return fmt.Errorf("failed to parse days of week: %w", err)
 	}
 
-	today := time.Now().Truncate(24 * time.Hour)
+	today := time.Now().UTC().Truncate(24 * time.Hour)
 	end := today.AddDate(0, 1, 0)
 
 	var hasSuccess bool
@@ -430,8 +357,7 @@ func (s *scheduleTemplateService) GenerateScheduleByTemplateID(templateID string
 		return fmt.Errorf("failed to generate any schedule: %v", errors)
 	}
 
-	// ✅ Update LastGeneratedAt jika sukses
-	now := time.Now()
+	now := time.Now().UTC()
 	template.LastGeneratedAt = &now
 	if err := s.templateRepo.UpdateTemplate(template); err != nil {
 		return fmt.Errorf("schedule generated, but failed to update LastGeneratedAt: %w", err)
@@ -442,6 +368,33 @@ func (s *scheduleTemplateService) GenerateScheduleByTemplateID(templateID string
 	}
 
 	return nil
+}
+
+func (s *scheduleTemplateService) checkInstructorConflict(date time.Time, instructorID uuid.UUID, hour, minute int) (bool, error) {
+	schedules, err := s.classScheduleRepo.GetClassSchedules()
+	if err != nil {
+		return false, err
+	}
+
+	newStart := time.Date(date.Year(), date.Month(), date.Day(), hour, minute, 0, 0, time.UTC)
+	newEnd := newStart.Add(time.Hour)
+
+	for _, s := range schedules {
+		if s.InstructorID != instructorID {
+			continue
+		}
+		if s.Date.Year() != date.Year() || s.Date.Month() != date.Month() || s.Date.Day() != date.Day() {
+			continue
+		}
+		existStart := time.Date(s.Date.Year(), s.Date.Month(), s.Date.Day(), s.StartHour, s.StartMinute, 0, 0, time.UTC)
+		existEnd := existStart.Add(time.Hour)
+
+		if newStart.Before(existEnd) && existStart.Before(newEnd) {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 func (s *scheduleTemplateService) RunTemplate(id string) error {
@@ -468,29 +421,76 @@ func (s *scheduleTemplateService) StopTemplate(id string) error {
 	return s.templateRepo.UpdateTemplate(template)
 }
 
-func (s *scheduleTemplateService) checkInstructorConflict(date time.Time, instructorID uuid.UUID, hour, minute int) (bool, error) {
-	schedules, err := s.classScheduleRepo.GetClassSchedules()
+// for cron job
+func (s *scheduleTemplateService) AutoGenerateSchedules() error {
+	templates, err := s.templateRepo.GetActiveTemplates()
 	if err != nil {
-		return false, err
+		return fmt.Errorf("failed to fetch templates: %w", err)
 	}
 
-	newStart := time.Date(date.Year(), date.Month(), date.Day(), hour, minute, 0, 0, time.Local)
-	newEnd := newStart.Add(time.Hour)
+	if len(templates) == 0 {
+		return fmt.Errorf("no active schedule templates found")
+	}
 
-	for _, s := range schedules {
-		if s.InstructorID != instructorID {
+	today := time.Now().Truncate(24 * time.Hour)
+	var anySuccess bool
+	var errs []string
+
+	for _, template := range templates {
+		if template.LastGeneratedAt != nil {
+			if today.Sub(template.LastGeneratedAt.Truncate(24*time.Hour)) < 30*24*time.Hour {
+				continue
+			}
+		}
+
+		var days []int
+		if err := json.Unmarshal(template.DayOfWeeks, &days); err != nil {
+			errs = append(errs, fmt.Sprintf("template %s: failed to unmarshal days", template.ID))
 			continue
 		}
-		if s.Date.Year() != date.Year() || s.Date.Month() != date.Month() || s.Date.Day() != date.Day() {
-			continue
-		}
-		existStart := time.Date(s.Date.Year(), s.Date.Month(), s.Date.Day(), s.StartHour, s.StartMinute, 0, 0, time.Local)
-		existEnd := existStart.Add(time.Hour)
 
-		if newStart.Before(existEnd) && existStart.Before(newEnd) {
-			return true, nil
+		end := today.AddDate(0, 0, 30)
+
+		for d := today; !d.After(end); d = d.AddDate(0, 0, 1) {
+			if !utils.IsDayMatched(int(d.Weekday()), days) {
+				continue
+			}
+
+			schedule := models.ClassSchedule{
+				ID:             uuid.New(),
+				ClassID:        template.ClassID,
+				ClassName:      template.Class.Title,
+				ClassImage:     template.Class.Image,
+				InstructorID:   template.InstructorID,
+				InstructorName: template.InstructorName,
+				Capacity:       template.Capacity,
+				Date:           d,
+				Color:          template.Color,
+				StartHour:      template.StartHour,
+				StartMinute:    template.StartMinute,
+			}
+
+			if err := s.classScheduleRepo.CreateClassSchedule(&schedule); err != nil {
+				errs = append(errs, fmt.Sprintf("template %s: failed to create schedule on %s", template.ID, d.Format("2006-01-02")))
+				continue
+			}
+
+			anySuccess = true
+		}
+
+		now := time.Now()
+		template.LastGeneratedAt = &now
+		if err := s.templateRepo.UpdateTemplate(&template); err != nil {
+			errs = append(errs, fmt.Sprintf("template %s: failed to update lastGeneratedAt", template.ID))
 		}
 	}
 
-	return false, nil
+	if len(errs) > 0 && !anySuccess {
+		return fmt.Errorf("no schedules generated: %v", errs)
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("some schedules generated, with errors: %v", errs)
+	}
+
+	return nil
 }

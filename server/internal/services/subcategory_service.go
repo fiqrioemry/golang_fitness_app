@@ -29,7 +29,6 @@ func (s *subcategoryService) CreateSubcategory(req dto.CreateSubcategoryRequest)
 	categoryID, _ := uuid.Parse(req.CategoryID)
 
 	subcategory := models.Subcategory{
-		ID:         uuid.New(),
 		Name:       req.Name,
 		CategoryID: categoryID,
 	}

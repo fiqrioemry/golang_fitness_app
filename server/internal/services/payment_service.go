@@ -110,7 +110,7 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 		buildLineItem(pkg.Name, base, 1),
 	}
 	if tax > 0 {
-		lineItems = append(lineItems, buildLineItem("Tax (PPN)", tax, 1))
+		lineItems = append(lineItems, buildLineItem("Tax (PPN) 10% ", tax, 1))
 	}
 
 	var successURL, cancelURL string
@@ -213,7 +213,7 @@ func (s *paymentService) StripeWebhookNotification(event stripe.Event) error {
 	}
 	payment.PaymentMethod = "card"
 	payment.Status = "success"
-	payment.PaidAt = time.Now()
+	payment.PaidAt = time.Now().UTC()
 
 	if err := s.paymentRepo.UpdatePayment(payment); err != nil {
 		return fmt.Errorf("failed to update payment: %w", err)
@@ -243,7 +243,7 @@ func (s *paymentService) StripeWebhookNotification(event stripe.Event) error {
 	}
 
 	var existing models.UserPackage
-	now := time.Now()
+	now := time.Now().UTC()
 
 	err = s.userPackageRepo.GetActiveUserPackages(payment.UserID.String(), payment.PackageID.String(), &existing)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {

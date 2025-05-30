@@ -140,3 +140,14 @@ func ParseJSONToIntSlice(jsonStr string) []int {
 	}
 	return result
 }
+
+func ParseDate(dateStr string) (time.Time, error) {
+	if t, err := time.Parse("2006-01-02", dateStr); err == nil {
+		return t.UTC(), nil
+	}
+	if t, err := time.Parse(time.RFC3339, dateStr); err == nil {
+		return t.UTC(), nil
+	}
+
+	return time.Time{}, fmt.Errorf("invalid date format, must be YYYY-MM-DD or ISO 8601")
+}

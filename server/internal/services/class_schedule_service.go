@@ -1,20 +1,23 @@
 package services
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
+	"server/internal/utils"
 	"time"
 
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 type ClassScheduleService interface {
 	// admin
 	DeleteClassSchedule(id string) error
-	CreateClassSchedule(req dto.CreateClassScheduleRequest) error
+	CreateClassSchedule(req dto.CreateScheduleRequest) error
+	CreateRecurringSchedule(req dto.CreateRecurringScheduleRequest) error
 	UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error
 
 	// customer
@@ -34,30 +37,43 @@ type classScheduleService struct {
 	packageRepo     repositories.PackageRepository
 	userPackageRepo repositories.UserPackageRepository
 	bookingRepo     repositories.BookingRepository
+	templateRepo    repositories.ScheduleTemplateRepository
+	templateService ScheduleTemplateService
 }
 
-func NewClassScheduleService(repo repositories.ClassScheduleRepository, classRepo repositories.ClassRepository, packageRepo repositories.PackageRepository,
-	userPackageRepo repositories.UserPackageRepository, bookingRepo repositories.BookingRepository) ClassScheduleService {
+func NewClassScheduleService(
+	repo repositories.ClassScheduleRepository,
+	classRepo repositories.ClassRepository,
+	packageRepo repositories.PackageRepository,
+	userPackageRepo repositories.UserPackageRepository,
+	bookingRepo repositories.BookingRepository,
+	templateRepo repositories.ScheduleTemplateRepository,
+	templateService ScheduleTemplateService,
+) ClassScheduleService {
 	return &classScheduleService{
 		repo:            repo,
 		classRepo:       classRepo,
 		packageRepo:     packageRepo,
 		userPackageRepo: userPackageRepo,
 		bookingRepo:     bookingRepo,
+		templateRepo:    templateRepo,
+		templateService: templateService,
 	}
 }
 
-func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRequest) error {
-	localDate := req.Date.In(time.Local)
+// Service
+func (s *classScheduleService) CreateClassSchedule(req dto.CreateScheduleRequest) error {
+	parsedDate, err := utils.ParseDate(req.Date)
+	if err != nil {
+		return err
+	}
 
 	newStart := time.Date(
-		localDate.Year(), localDate.Month(), localDate.Day(),
-		req.StartHour, req.StartMinute, 0, 0, time.Local,
+		parsedDate.Year(), parsedDate.Month(), parsedDate.Day(),
+		req.StartHour, req.StartMinute, 0, 0, time.UTC,
 	)
 
-	now := time.Now().In(time.Local)
-
-	if newStart.Before(now) {
+	if newStart.Before(time.Now().UTC()) {
 		return fmt.Errorf("cannot create schedule in the past")
 	}
 
@@ -68,9 +84,9 @@ func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRe
 		return err
 	}
 	for _, schedule := range existingSchedules {
-		if schedule.InstructorID == uuid.MustParse(req.InstructorID) && schedule.Date.Equal(localDate) {
+		if schedule.InstructorID == uuid.MustParse(req.InstructorID) && schedule.Date.Equal(parsedDate) {
 			existStart := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
-				schedule.StartHour, schedule.StartMinute, 0, 0, time.Local)
+				schedule.StartHour, schedule.StartMinute, 0, 0, time.UTC)
 			existEnd := existStart.Add(time.Hour)
 
 			if newStart.Before(existEnd) && existStart.Before(newEnd) {
@@ -100,7 +116,7 @@ func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRe
 		Duration:       class.Duration,
 		Capacity:       req.Capacity,
 		Color:          req.Color,
-		Date:           localDate,
+		Date:           parsedDate,
 		StartHour:      req.StartHour,
 		StartMinute:    req.StartMinute,
 	}
@@ -108,58 +124,84 @@ func (s *classScheduleService) CreateClassSchedule(req dto.CreateClassScheduleRe
 	return s.repo.CreateClassSchedule(&schedule)
 }
 
-func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error {
-	schedule, err := s.repo.GetClassScheduleByID(id)
+func (s *classScheduleService) CreateRecurringSchedule(req dto.CreateRecurringScheduleRequest) error {
+	now := time.Now().UTC()
+
+	endDate, err := utils.ParseDate(req.EndDate)
 	if err != nil {
-		return fmt.Errorf("schedule not found")
+		return err
+	}
+
+	if endDate.Before(now) {
+		return fmt.Errorf("end date must be in the future")
 	}
 
 	instructorID := uuid.MustParse(req.InstructorID)
-	classID := uuid.MustParse(req.ClassID)
-	localDate := req.Date.In(time.Local)
-
-	newStart := time.Date(
-		localDate.Year(), localDate.Month(), localDate.Day(),
-		req.StartHour, req.StartMinute, 0, 0, time.Local,
-	)
-
-	now := time.Now().In(time.Local)
-
-	if newStart.Before(now) {
-		return fmt.Errorf("cannot update schedule to a past time")
-	}
-
-	newEnd := newStart.Add(time.Hour)
 
 	existingSchedules, err := s.repo.GetClassSchedules()
 	if err != nil {
 		return err
 	}
 
-	for _, other := range existingSchedules {
-		if other.ID == schedule.ID {
+	existingTemplates, err := s.templateRepo.GetAllTemplates()
+	if err != nil {
+		return err
+	}
+
+	for date := now; !date.After(endDate); date = date.AddDate(0, 0, 1) {
+		weekday := int(date.Weekday())
+		if !containsInt(req.DayOfWeeks, weekday) {
 			continue
 		}
-		if other.InstructorID == instructorID &&
-			other.Date.Year() == localDate.Year() &&
-			other.Date.Month() == localDate.Month() &&
-			other.Date.Day() == localDate.Day() {
 
-			existStart := time.Date(other.Date.Year(), other.Date.Month(), other.Date.Day(),
-				other.StartHour, other.StartMinute, 0, 0, time.Local)
+		simulatedStart := time.Date(date.Year(), date.Month(), date.Day(),
+			req.StartHour, req.StartMinute, 0, 0, time.UTC)
+		simulatedEnd := simulatedStart.Add(time.Hour)
+
+		for _, schedule := range existingSchedules {
+			if schedule.InstructorID != instructorID {
+				continue
+			}
+			if schedule.Date.Year() != date.Year() ||
+				schedule.Date.Month() != date.Month() ||
+				schedule.Date.Day() != date.Day() {
+				continue
+			}
+
+			existStart := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
+				schedule.StartHour, schedule.StartMinute, 0, 0, time.UTC)
 			existEnd := existStart.Add(time.Hour)
 
-			if newStart.Before(existEnd) && existStart.Before(newEnd) {
-				return fmt.Errorf("instructor already booked at this time")
+			if simulatedStart.Before(existEnd) && existStart.Before(simulatedEnd) {
+				return fmt.Errorf("instructor %s is already booked on %s at %02d:%02d (existing schedule)",
+					schedule.InstructorName, date.Format("2006-01-02"), req.StartHour, req.StartMinute)
+			}
+		}
+
+		for _, tpl := range existingTemplates {
+			if tpl.InstructorID != instructorID {
+				continue
+			}
+			var tplDays []int
+			if err := json.Unmarshal(tpl.DayOfWeeks, &tplDays); err != nil {
+				continue
+			}
+			if !containsInt(tplDays, weekday) {
+				continue
+			}
+
+			tplStart := time.Date(date.Year(), date.Month(), date.Day(),
+				tpl.StartHour, tpl.StartMinute, 0, 0, time.UTC)
+			tplEnd := tplStart.Add(time.Hour)
+
+			if simulatedStart.Before(tplEnd) && tplStart.Before(simulatedEnd) {
+				return fmt.Errorf("instructor %s is already booked on %s at %02d:%02d (template schedule)",
+					tpl.InstructorName, date.Format("2006-01-02"), req.StartHour, req.StartMinute)
 			}
 		}
 	}
 
-	if req.Capacity < schedule.Booked {
-		return fmt.Errorf("capacity cannot be less than booked participant (%d)", schedule.Booked)
-	}
-
-	class, err := s.repo.GetClassByID(classID)
+	class, err := s.repo.GetClassByID(uuid.MustParse(req.ClassID))
 	if err != nil {
 		return fmt.Errorf("class not found: %w", err)
 	}
@@ -169,7 +211,105 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 		return fmt.Errorf("instructor not found: %w", err)
 	}
 
-	schedule.Date = localDate
+	template := models.ScheduleTemplate{
+		ID:             uuid.New(),
+		ClassID:        class.ID,
+		ClassName:      class.Title,
+		ClassImage:     class.Image,
+		InstructorID:   instructor.ID,
+		Location:       class.Location.Name,
+		InstructorName: instructor.User.Profile.Fullname,
+		DayOfWeeks:     utils.IntSliceToJSON(req.DayOfWeeks),
+		StartHour:      req.StartHour,
+		StartMinute:    req.StartMinute,
+		Capacity:       req.Capacity,
+		IsActive:       false,
+		Color:          req.Color,
+		EndDate:        endDate,
+	}
+
+	err = s.templateRepo.CreateTemplate(&template)
+	if err != nil {
+		return fmt.Errorf("failed to create template: %w", err)
+	}
+
+	return s.templateService.GenerateScheduleByTemplateID(template.ID.String())
+}
+
+func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error {
+	const service = "ClassScheduleService"
+	const action = "UpdateClassSchedule"
+
+	schedule, err := s.repo.GetClassScheduleByID(id)
+	if err != nil {
+		utils.LogServiceError(service, action, err, zap.String("scheduleID", id))
+		return fmt.Errorf("schedule not found")
+	}
+
+	parsedDate, err := utils.ParseDate(req.Date)
+	if err != nil {
+		utils.LogServiceError(service, action, err, zap.String("invalidDate", req.Date))
+		return fmt.Errorf("invalid date format")
+	}
+
+	newStart := time.Date(parsedDate.Year(), parsedDate.Month(), parsedDate.Day(), req.StartHour, req.StartMinute, 0, 0, time.UTC)
+	if newStart.Before(time.Now().UTC()) {
+		utils.LogServiceError(service, action, nil,
+			zap.String("scheduleID", id),
+			zap.Time("attemptedDate", newStart),
+		)
+		return fmt.Errorf("cannot update schedule to a past time")
+	}
+
+	newEnd := newStart.Add(time.Hour)
+
+	existingSchedules, err := s.repo.GetClassSchedules()
+	if err != nil {
+		utils.LogServiceError(service, action, err)
+		return err
+	}
+
+	instructorID := uuid.MustParse(req.InstructorID)
+	for _, other := range existingSchedules {
+		if other.ID == schedule.ID {
+			continue
+		}
+		if other.InstructorID == instructorID && other.Date.Equal(parsedDate) {
+			existStart := time.Date(other.Date.Year(), other.Date.Month(), other.Date.Day(), other.StartHour, other.StartMinute, 0, 0, time.UTC)
+			existEnd := existStart.Add(time.Hour)
+
+			if newStart.Before(existEnd) && existStart.Before(newEnd) {
+				utils.LogServiceError(service, action, nil,
+					zap.String("instructorID", instructorID.String()),
+					zap.Time("conflictDate", parsedDate),
+				)
+				return fmt.Errorf("instructor already booked at this time")
+			}
+		}
+	}
+
+	if req.Capacity < schedule.Booked {
+		utils.LogServiceError(service, action, nil,
+			zap.Int("booked", schedule.Booked),
+			zap.Int("requestedCapacity", req.Capacity),
+		)
+		return fmt.Errorf("capacity cannot be less than booked participant (%d)", schedule.Booked)
+	}
+
+	classID := uuid.MustParse(req.ClassID)
+	class, err := s.repo.GetClassByID(classID)
+	if err != nil {
+		utils.LogServiceError(service, action, err, zap.String("classID", req.ClassID))
+		return fmt.Errorf("class not found: %w", err)
+	}
+
+	instructor, err := s.repo.GetInstructorWithProfileByID(instructorID)
+	if err != nil {
+		utils.LogServiceError(service, action, err, zap.String("instructorID", req.InstructorID))
+		return fmt.Errorf("instructor not found: %w", err)
+	}
+
+	schedule.Date = parsedDate
 	schedule.StartHour = req.StartHour
 	schedule.StartMinute = req.StartMinute
 	schedule.ClassID = class.ID
@@ -181,7 +321,18 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 	schedule.Color = req.Color
 	schedule.Duration = class.Duration
 
-	return s.repo.UpdateClassSchedule(schedule)
+	if err := s.repo.UpdateClassSchedule(schedule); err != nil {
+		utils.LogServiceError(service, action, err, zap.String("scheduleID", schedule.ID.String()))
+		return err
+	}
+
+	utils.LogServiceInfo(service, action, "schedule updated successfully",
+		zap.String("scheduleID", schedule.ID.String()),
+		zap.Time("date", schedule.Date),
+		zap.Int("startHour", schedule.StartHour),
+		zap.Int("startMinute", schedule.StartMinute),
+	)
+	return nil
 }
 
 func (s *classScheduleService) DeleteClassSchedule(id string) error {
@@ -190,17 +341,15 @@ func (s *classScheduleService) DeleteClassSchedule(id string) error {
 		return fmt.Errorf("schedule not found")
 	}
 
-	// Hitung waktu mulai kelas
 	startTime := time.Date(
 		schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
 		schedule.StartHour, schedule.StartMinute, 0, 0, time.Local,
 	)
 
-	if startTime.Before(time.Now().In(time.Local)) {
+	if startTime.Before(time.Now().UTC()) {
 		return fmt.Errorf("cannot delete past or ongoing class schedule")
 	}
 
-	// Cek apakah sudah dibooking
 	isBooked, err := s.repo.HasActiveBooking(schedule.ID)
 	if err != nil {
 		return fmt.Errorf("failed to check booking: %w", err)
@@ -244,7 +393,7 @@ func (s *classScheduleService) GetClassScheduleByID(scheduleID, userID string) (
 			InstructorID:   schedule.InstructorID.String(),
 			InstructorName: schedule.InstructorName,
 			Location:       schedule.Location,
-			Date:           schedule.Date,
+			Date:           schedule.Date.Format("2006-01-02"),
 			StartHour:      schedule.StartHour,
 			StartMinute:    schedule.StartMinute,
 			Capacity:       schedule.Capacity,
@@ -273,7 +422,7 @@ func (s *classScheduleService) GetSchedulesByFilter(filter dto.ClassScheduleQuer
 			InstructorID:   schedule.InstructorID.String(),
 			InstructorName: schedule.InstructorName,
 			Location:       schedule.Location,
-			Date:           schedule.Date,
+			Date:           schedule.Date.Format("2006-01-02"),
 			StartHour:      schedule.StartHour,
 			StartMinute:    schedule.StartMinute,
 			Capacity:       schedule.Capacity,
@@ -304,7 +453,7 @@ func (s *classScheduleService) GetSchedulesWithBookingStatus(userID string) ([]d
 			ClassImage:     schedule.ClassImage,
 			InstructorID:   schedule.InstructorID.String(),
 			InstructorName: schedule.InstructorName,
-			Date:           schedule.Date,
+			Date:           schedule.Date.Format("2006-01-02"),
 			StartHour:      schedule.StartHour,
 			Location:       schedule.Location,
 			StartMinute:    schedule.StartMinute,
@@ -323,7 +472,6 @@ func (s *classScheduleService) GetSchedulesByInstructor(userID string, params dt
 	ID := uuid.MustParse(userID)
 
 	instructor, err := s.repo.GetInstructorByUserID(ID)
-	log.Printf("instructor id %s", instructor.ID)
 	if err != nil {
 		return nil, nil, fmt.Errorf("instructor not found: %w with %s", err, instructor.ID)
 	}
@@ -343,7 +491,7 @@ func (s *classScheduleService) GetSchedulesByInstructor(userID string, params dt
 			InstructorID:   schedule.InstructorID.String(),
 			InstructorName: schedule.InstructorName,
 			Location:       schedule.Location,
-			Date:           schedule.Date,
+			Date:           schedule.Date.Format("2006-01-02"),
 			StartHour:      schedule.StartHour,
 			StartMinute:    schedule.StartMinute,
 			Capacity:       schedule.Capacity,
@@ -377,8 +525,16 @@ func (s *classScheduleService) OpenClassSchedule(id string, req dto.OpenClassSch
 func (s *classScheduleService) GetAttendancesForSchedule(scheduleID string) ([]dto.AttendanceWithUserResponse, error) {
 	bookings, err := s.repo.GetAttendancesByScheduleID(scheduleID)
 	if err != nil {
+		utils.LogServiceError("classScheduleService", "GetAttendancesByScheduleID", err,
+			zap.String("scheduleID", scheduleID),
+		)
 		return nil, err
 	}
+
+	utils.LogServiceInfo("classScheduleService", "GetAttendancesForSchedule", "successfully fetched attendances",
+		zap.String("scheduleID", scheduleID),
+		zap.Int("bookingCount", len(bookings)),
+	)
 
 	var result []dto.AttendanceWithUserResponse
 	for _, b := range bookings {
@@ -386,17 +542,18 @@ func (s *classScheduleService) GetAttendancesForSchedule(scheduleID string) ([]d
 		user := b.User
 
 		resp := dto.AttendanceWithUserResponse{
-			UserName:   user.Profile.Fullname,
+			Fullname:   user.Profile.Fullname,
+			Avatar:     user.Profile.Avatar,
 			Email:      user.Email,
 			Status:     attendance.Status,
 			CheckedIn:  attendance.CheckedIn,
 			CheckedOut: attendance.CheckedOut,
 		}
 
-		if !attendance.CheckedAt.IsZero() {
+		if attendance.CheckedAt != nil && !attendance.CheckedAt.IsZero() {
 			resp.CheckedAt = attendance.CheckedAt.Format("2006-01-02 15:04:05")
 		}
-		if !attendance.VerifiedAt.IsZero() {
+		if attendance.VerifiedAt != nil && !attendance.VerifiedAt.IsZero() {
 			resp.VerifiedAt = attendance.VerifiedAt.Format("2006-01-02 15:04:05")
 		}
 

@@ -2,11 +2,10 @@ package services
 
 import (
 	"errors"
-	"log"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
-	"time"
+	"server/internal/utils"
 
 	"github.com/google/uuid"
 )
@@ -31,8 +30,11 @@ func NewVoucherService(repo repositories.VoucherRepository) VoucherService {
 }
 
 func (s *voucherService) CreateVoucher(req dto.CreateVoucherRequest) error {
+	parsedExpired, err := utils.ParseDate(req.ExpiredAt)
+	if err != nil {
+		return err
+	}
 
-	log.Printf("HASIL REUSABLE OR NOT", req.IsReusable)
 	voucher := models.Voucher{
 		Code:         req.Code,
 		Description:  req.Description,
@@ -41,11 +43,10 @@ func (s *voucherService) CreateVoucher(req dto.CreateVoucherRequest) error {
 		MaxDiscount:  req.MaxDiscount,
 		IsReusable:   req.IsReusable,
 		Quota:        req.Quota,
-		ExpiredAt:    req.ExpiredAt,
-		CreatedAt:    time.Now(),
+		ExpiredAt:    parsedExpired,
 	}
 
-	err := s.repo.Create(&voucher)
+	err = s.repo.Create(&voucher)
 	if err != nil {
 		return err
 	}
@@ -54,6 +55,11 @@ func (s *voucherService) CreateVoucher(req dto.CreateVoucherRequest) error {
 }
 
 func (s *voucherService) UpdateVoucher(id string, req dto.UpdateVoucherRequest) error {
+	parsedExpired, err := utils.ParseDate(req.ExpiredAt)
+	if err != nil {
+		return err
+	}
+
 	voucherID, err := uuid.Parse(id)
 	if err != nil {
 		return errors.New("invalid voucher ID")
@@ -70,7 +76,7 @@ func (s *voucherService) UpdateVoucher(id string, req dto.UpdateVoucherRequest) 
 	voucher.MaxDiscount = req.MaxDiscount
 	voucher.Quota = req.Quota
 	voucher.IsReusable = req.IsReusable
-	voucher.ExpiredAt = req.ExpiredAt
+	voucher.ExpiredAt = parsedExpired
 
 	return s.repo.UpdateVoucher(voucher)
 }

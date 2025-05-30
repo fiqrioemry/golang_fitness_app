@@ -99,7 +99,6 @@ func (s *notificationService) SendNotificationByType(req dto.SendNotificationReq
 	var notifs []models.Notification
 	for _, setting := range settings {
 		notifs = append(notifs, models.Notification{
-			ID:       uuid.New(),
 			UserID:   setting.UserID,
 			TypeCode: req.TypeCode,
 			Title:    req.Title,
@@ -120,7 +119,7 @@ func (s *notificationService) SendNotificationByType(req dto.SendNotificationReq
 }
 
 func (s *notificationService) SendClassReminder() error {
-	reminderTime := time.Now().Add(1 * time.Hour).Truncate(time.Minute)
+	reminderTime := time.Now().UTC().Add(1 * time.Hour).Truncate(time.Minute)
 
 	var bookings []models.Booking
 	err := config.DB.Preload("User").Preload("ClassSchedule.Class").
@@ -180,7 +179,6 @@ func (s *notificationService) SendToUser(req dto.NotificationEvent) error {
 		}
 
 		notif := models.Notification{
-			ID:       uuid.New(),
 			UserID:   uid,
 			TypeCode: req.Type,
 			Title:    req.Title,

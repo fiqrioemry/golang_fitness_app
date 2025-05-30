@@ -17,7 +17,6 @@ func SeedUsers(db *gorm.DB) {
 	password, _ := bcrypt.GenerateFromPassword([]byte("123456"), 10)
 
 	adminUser := models.User{
-		ID:       uuid.New(),
 		Email:    "admin@fitness.com",
 		Password: string(password),
 		Role:     "admin",
@@ -29,7 +28,6 @@ func SeedUsers(db *gorm.DB) {
 
 	customerUsers := []models.User{
 		{
-			ID:       uuid.New(),
 			Email:    "customer1@fitness.com",
 			Password: string(password),
 			Role:     "customer",
@@ -40,7 +38,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "customer2@fitness.com",
 			Password: string(password),
 			Role:     "customer",
@@ -51,7 +48,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "customer3@fitness.com",
 			Password: string(password),
 			Role:     "customer",
@@ -62,7 +58,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "elena.morris@fitness.com",
 			Password: string(password),
 			Role:     "customer",
@@ -73,7 +68,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "brandon.tan@fitness.com",
 			Password: string(password),
 			Role:     "customer",
@@ -84,7 +78,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "yuki.sato@fitness.com",
 			Password: string(password),
 			Role:     "customer",
@@ -95,7 +88,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "elena.morrisaga@fitness.com",
 			Password: string(password),
 			Role:     "customer",
@@ -106,7 +98,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "elvis.presley@fitness.com",
 			Password: string(password),
 			Role:     "customer",
@@ -117,7 +108,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "david.jovovich@fitness.com",
 			Password: string(password),
 			Role:     "customer",
@@ -131,7 +121,6 @@ func SeedUsers(db *gorm.DB) {
 
 	instructorUsers := []models.User{
 		{
-			ID:       uuid.New(),
 			Email:    "instructor1@fitness.com",
 			Password: string(password),
 			Role:     "instructor",
@@ -141,7 +130,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "instructor2@fitness.com",
 			Password: string(password),
 			Role:     "instructor",
@@ -151,7 +139,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "instructor3@fitness.com",
 			Password: string(password),
 			Role:     "instructor",
@@ -161,7 +148,6 @@ func SeedUsers(db *gorm.DB) {
 			},
 		},
 		{
-			ID:       uuid.New(),
 			Email:    "instructor4@fitness.com",
 			Password: string(password),
 			Role:     "instructor",
@@ -506,10 +492,8 @@ func SeedClassGalleries(db *gorm.DB) {
 		images := galleryMap[class.Title]
 		for _, url := range images {
 			galleries = append(galleries, models.ClassGallery{
-				ID:        uuid.New(),
-				ClassID:   class.ID,
-				URL:       url,
-				CreatedAt: time.Now(),
+				ClassID: class.ID,
+				URL:     url,
 			})
 		}
 	}
@@ -522,7 +506,7 @@ func SeedClassGalleries(db *gorm.DB) {
 }
 
 func SeedPackages(db *gorm.DB) {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UTC().UnixNano())
 
 	var count int64
 	db.Model(&models.Package{}).Count(&count)
@@ -543,7 +527,6 @@ func SeedPackages(db *gorm.DB) {
 
 	packages := []models.Package{
 		{
-			ID:             uuid.New(),
 			Name:           "Yoga Wellness Trial",
 			Description:    "Try 1 Yoga class to relieve stress and boost flexibility.",
 			Price:          120000,
@@ -553,10 +536,8 @@ func SeedPackages(db *gorm.DB) {
 			AdditionalList: []string{"Valid for 14 days after first booking."},
 			Image:          "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1748043621/yoga-wellness_ueqi65.webp",
 			IsActive:       true,
-			CreatedAt:      time.Now(),
 		},
 		{
-			ID:             uuid.New(),
 			Name:           "Pilates Core Pack (5x)",
 			Description:    "Enjoy 5 Mat/Reformer Pilates sessions to build core strength and posture.",
 			Price:          600000,
@@ -566,10 +547,8 @@ func SeedPackages(db *gorm.DB) {
 			AdditionalList: []string{"Valid for 2 months", "Non-refundable"},
 			Image:          "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1748043619/pilates-core_reeqdu.webp",
 			IsActive:       true,
-			CreatedAt:      time.Now(),
 		},
 		{
-			ID:             uuid.New(),
 			Name:           "Cardio Burnout Pass (10x)",
 			Description:    "Get your heart pumping with 10 sessions of HIIT, Zumba, and Aerobic workouts.",
 			Price:          1000000,
@@ -579,10 +558,8 @@ func SeedPackages(db *gorm.DB) {
 			AdditionalList: []string{"Valid for 4 months", "Non-refundable"},
 			Image:          "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1748043620/cardio-burner_fi0nhe.webp",
 			IsActive:       true,
-			CreatedAt:      time.Now(),
 		},
 		{
-			ID:             uuid.New(),
 			Name:           "Combat Starter (1x)",
 			Description:    "Experience our Martial Arts class in one exciting session.",
 			Price:          150000,
@@ -592,10 +569,8 @@ func SeedPackages(db *gorm.DB) {
 			AdditionalList: []string{"Valid for 14 days after booking."},
 			Image:          "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1748043620/combat-starter_wdrrxk.webp",
 			IsActive:       true,
-			CreatedAt:      time.Now(),
 		},
 		{
-			ID:             uuid.New(),
 			Name:           "Warrior Pack (5x)",
 			Description:    "Boost your skills with 5 sessions of Boxing, Muay Thai, or Kickboxing.",
 			Price:          650000,
@@ -605,7 +580,6 @@ func SeedPackages(db *gorm.DB) {
 			AdditionalList: []string{"Valid for 2 months", "No refunds after activation."},
 			Image:          "https://res.cloudinary.com/dp1xbgxdn/image/upload/v1748043619/warior-pack_dmpnoa.webp",
 			IsActive:       true,
-			CreatedAt:      time.Now(),
 		},
 	}
 
@@ -710,7 +684,7 @@ func SeedPayments(db *gorm.DB) {
 		return
 	}
 
-	now := time.Now()
+	now := time.Now().UTC()
 	taxRate := utils.GetTaxRate()
 	base := pkg.Price * (1 - pkg.Discount/100)
 	tax := base * taxRate
@@ -776,7 +750,7 @@ func SeedUserPackages(db *gorm.DB) {
 		return
 	}
 
-	now := time.Now()
+	now := time.Now().UTC()
 	threeDaysAgo := now.AddDate(0, 0, -3)
 	expired := threeDaysAgo.AddDate(0, 0, getExpiredDays(pkg))
 
@@ -834,14 +808,14 @@ func SeedClassSchedules(db *gorm.DB) {
 		return
 	}
 
-	now := time.Now().Truncate(time.Minute)
+	now := time.Now().UTC().Truncate(time.Minute)
+
 	threeDaysAgo := now.AddDate(0, 0, -3)
 
 	zoomLink := "https://zoom.us/j/92613838319?pwd=cTlscGI5cGlTU2IwZVN1b0FuR2d2QT09"
 	verificationCode := "5443334"
 
 	schedulePast1 := models.ClassSchedule{
-		ID:               uuid.New(),
 		ClassID:          class.ID,
 		ClassName:        class.Title,
 		ClassImage:       class.Image,
@@ -862,7 +836,6 @@ func SeedClassSchedules(db *gorm.DB) {
 	db.Create(&schedulePast1)
 
 	schedulePast2 := models.ClassSchedule{
-		ID:               uuid.New(),
 		ClassID:          class.ID,
 		ClassName:        class.Title,
 		ClassImage:       class.Image,
@@ -882,7 +855,15 @@ func SeedClassSchedules(db *gorm.DB) {
 	}
 	db.Create(&schedulePast2)
 
-	startTime := now.Add(1 * time.Hour)
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+	nowLocal := time.Now().In(loc)
+	startTime := nowLocal.Add(1 * time.Hour)
+
+	// Gunakan time.Date untuk mengambil tanggal Asia/Jakarta secara tepat
+	dateOnly := time.Date(
+		nowLocal.Year(), nowLocal.Month(), nowLocal.Day(),
+		0, 0, 0, 0, time.UTC, // <-- harus UTC karena disimpan di DB pakai UTC
+	)
 
 	scheduleToday := models.ClassSchedule{
 		ID:             uuid.New(),
@@ -892,7 +873,7 @@ func SeedClassSchedules(db *gorm.DB) {
 		InstructorID:   instructor.ID,
 		InstructorName: instructor.User.Profile.Fullname,
 		Location:       class.Location.Name,
-		Date:           now,
+		Date:           dateOnly,
 		StartHour:      startTime.Hour(),
 		StartMinute:    startTime.Minute(),
 		Duration:       class.Duration,
@@ -900,6 +881,7 @@ func SeedClassSchedules(db *gorm.DB) {
 		Booked:         1,
 		Color:          "#10b981",
 	}
+
 	db.Create(&scheduleToday)
 
 	CreateBookingWithAttendance(db, user, schedulePast1, "attended", true, true)
@@ -911,11 +893,10 @@ func SeedClassSchedules(db *gorm.DB) {
 
 func CreateBookingWithAttendance(db *gorm.DB, user models.User, schedule models.ClassSchedule, status string, attended bool, reviewed bool) {
 	startTime := time.Date(schedule.Date.Year(), schedule.Date.Month(), schedule.Date.Day(),
-		schedule.StartHour, schedule.StartMinute, 0, 0, time.Local)
+		schedule.StartHour, schedule.StartMinute, 0, 0, time.UTC)
 	endTime := startTime.Add(time.Duration(schedule.Duration) * time.Minute)
 
 	booking := models.Booking{
-		ID:              uuid.New(),
 		UserID:          user.ID,
 		ClassScheduleID: schedule.ID,
 		Status:          "booked",
@@ -938,7 +919,6 @@ func CreateBookingWithAttendance(db *gorm.DB, user models.User, schedule models.
 	}
 
 	attendance := models.Attendance{
-		ID:         uuid.New(),
 		BookingID:  booking.ID,
 		Status:     status,
 		CheckedIn:  attended,
@@ -1077,7 +1057,7 @@ func SeedVouchers(db *gorm.DB) {
 		return
 	}
 
-	now := time.Now()
+	now := time.Now().UTC()
 	expired := now.AddDate(0, 1, 0)
 
 	max1 := 30000.0

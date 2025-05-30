@@ -4,8 +4,6 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
-
-	"github.com/google/uuid"
 )
 
 type TypeService interface {
@@ -26,7 +24,6 @@ func NewTypeService(repo repositories.TypeRepository) TypeService {
 
 func (s *typeService) CreateType(req dto.CreateTypeRequest) error {
 	t := models.Type{
-		ID:   uuid.New(),
 		Name: req.Name,
 	}
 	return s.repo.CreateType(&t)

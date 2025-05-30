@@ -146,7 +146,6 @@ func (r *classScheduleRepository) GetSchedulesByInstructorID(instructorID uuid.U
 
 	nowUTC := time.Now().UTC().Format("2006-01-02 15:04:05")
 
-	// Filter status upcoming / past
 	if params.Status == "upcoming" {
 		db = db.Where(`
 			ADDTIME(

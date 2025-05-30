@@ -8,15 +8,16 @@ import (
 	"server/internal/cron"
 	"server/internal/middleware"
 	"server/internal/routes"
-	"server/internal/seeders"
 	"server/internal/utils"
 	"time"
 
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	utils.LoadEnv()
+	utils.InitLogger()
 	config.InitRedis()
 	config.InitMailer()
 	config.InitDatabase()
@@ -24,12 +25,9 @@ func main() {
 	config.InitGoogleOAuthConfig()
 	config.InitStripe()
 
-	loc, _ := time.LoadLocation("Asia/Jakarta")
-	time.Local = loc
-
 	db := config.DB
 	//  Seeder ================================
-	seeders.ResetDatabase(db)
+	// seeders.ResetDatabase(db)
 
 	r := gin.Default()
 	err := r.SetTrustedProxies(config.GetTrustedProxies())
@@ -38,12 +36,13 @@ func main() {
 	}
 	// middleware config ======================
 	r.Use(
-		middleware.Logger(),
+		ginzap.Ginzap(utils.GetLogger(), time.RFC3339, true),
+		ginzap.RecoveryWithZap(utils.GetLogger(), true),
 		middleware.Recovery(),
 		middleware.CORS(),
 		middleware.RateLimiter(5, 10),
 		middleware.LimitFileSize(12<<20),
-		middleware.APIKeyGateway([]string{"/api/payments", "/api/auth/google", "/api/auth/google/callback"}),
+		middleware.APIKeyGateway([]string{"/api/payments/stripe/notifications", "/api/auth/google", "/api/auth/google/callback"}),
 	)
 
 	// layer ==================================

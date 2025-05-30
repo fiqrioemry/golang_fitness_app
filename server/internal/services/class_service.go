@@ -5,7 +5,6 @@ import (
 	"server/internal/models"
 	"server/internal/repositories"
 	"server/internal/utils"
-	"time"
 
 	"slices"
 
@@ -64,7 +63,6 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 		CategoryID:     categoryID,
 		SubcategoryID:  subcategoryID,
 		IsActive:       req.IsActive,
-		CreatedAt:      time.Now(),
 	}
 
 	if err := s.repo.CreateClass(&class); err != nil {
@@ -76,10 +74,9 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 		var galleries []models.ClassGallery
 		for _, url := range req.ImageURLs {
 			galleries = append(galleries, models.ClassGallery{
-				ID:        uuid.New(),
-				ClassID:   class.ID,
-				URL:       url,
-				CreatedAt: time.Now(),
+				ID:      uuid.New(),
+				ClassID: class.ID,
+				URL:     url,
 			})
 		}
 

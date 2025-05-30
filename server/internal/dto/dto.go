@@ -2,9 +2,6 @@ package dto
 
 import (
 	"mime/multipart"
-	"time"
-
-	"github.com/google/uuid"
 )
 
 // AUTHENTICATION  ==============
@@ -418,37 +415,74 @@ type SendNotificationRequest struct {
 }
 
 // CLASS-SCHEDULE ====================
-type CreateClassScheduleRequest struct {
-	ClassID      string    `json:"classId" binding:"required"`
-	InstructorID string    `json:"instructorId" binding:"required"`
-	Date         time.Time `json:"date" binding:"required"`
-	StartHour    int       `json:"startHour" validate:"required,min=8,max=17"`
-	StartMinute  int       `json:"startMinute" validate:"required,oneof=0 15 30 45"`
-	Capacity     int       `json:"capacity" validate:"required,min=1"`
-	Color        string    `json:"color"`
+type CreateScheduleRequest struct {
+	ClassID      string `json:"classId" binding:"required"`
+	InstructorID string `json:"instructorId" binding:"required"`
+	Date         string `json:"date" binding:"required"`
+	StartHour    int    `json:"startHour" validate:"required,min=8,max=17"`
+	StartMinute  int    `json:"startMinute" validate:"required,oneof=0 15 30 45"`
+	Capacity     int    `json:"capacity" validate:"required,min=1"`
+	Color        string `json:"color"`
+}
+
+type CreateRecurringScheduleRequest struct {
+	ClassID      string `json:"classId" binding:"required"`
+	InstructorID string `json:"instructorId" binding:"required"`
+	Capacity     int    `json:"capacity" binding:"required"`
+	Color        string `json:"color"`
+	Date         string `json:"date,omitempty"`
+	StartHour    int    `json:"startHour" validate:"required,min=8,max=17"`
+	StartMinute  int    `json:"startMinute" validate:"required,oneof=0 15 30 45"`
+	DayOfWeeks   []int  `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
+	EndDate      string `json:"endDate,omitempty"`
 }
 
 type UpdateClassScheduleRequest struct {
-	ClassID      string    `json:"classId" binding:"required"`
-	InstructorID string    `json:"instructorId" binding:"required"`
-	Date         time.Time `json:"date" binding:"required"`
-	StartHour    int       `json:"startHour" validate:"required,min=8,max=17"`
-	StartMinute  int       `json:"startMinute" validate:"required,oneof=0 15 30 45"`
-	Capacity     int       `json:"capacity" validate:"required,min=1"`
-	Color        string    `json:"color"`
+	ClassID      string `json:"classId" binding:"required"`
+	InstructorID string `json:"instructorId" binding:"required"`
+	Date         string `json:"date" binding:"required"`
+	StartHour    int    `json:"startHour" validate:"required,min=8,max=17"`
+	StartMinute  int    `json:"startMinute" validate:"required,oneof=0 15 30 45"`
+	Capacity     int    `json:"capacity" validate:"required,min=1"`
+	Color        string `json:"color"`
 }
 
-type CreateScheduleRequest struct {
-	IsRecurring  bool       `json:"isRecurring"`
-	ClassID      string     `json:"classId" binding:"required"`
-	InstructorID string     `json:"instructorId" binding:"required"`
-	Capacity     int        `json:"capacity" binding:"required"`
-	Color        string     `json:"color"`
-	Date         *time.Time `json:"date,omitempty"`
-	StartHour    int        `json:"startHour" validate:"required,min=8,max=17"`
-	StartMinute  int        `json:"startMinute" validate:"required,oneof=0 15 30 45"`
-	DayOfWeeks   []int      `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
-	EndDate      *time.Time `json:"endDate,omitempty"`
+type ScheduleTemplateResponse struct {
+	ID             string `json:"id"`
+	ClassID        string `json:"classId"`
+	ClassName      string `json:"className"`
+	InstructorID   string `json:"instructorId"`
+	InstructorName string `json:"instructorName"`
+	Instructor     string `json:"instructor"`
+	DayOfWeeks     []int  `json:"dayOfWeeks"`
+	StartHour      int    `json:"startHour"`
+	StartMinute    int    `json:"startMinute"`
+	Capacity       int    `json:"capacity"`
+	IsActive       bool   `json:"isActive"`
+	Frequency      string `json:"frequency"`
+	EndDate        string `json:"endDate"`
+	CreatedAt      string `json:"createdAt"`
+}
+
+type CreateScheduleTemplateRequest struct {
+	ClassID      string `json:"classId" binding:"required"`
+	InstructorID string `json:"instructorId" binding:"required"`
+	DayOfWeeks   []int  `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
+	StartHour    int    `json:"startHour" binding:"required,min=0,max=23"`
+	StartMinute  int    `json:"startMinute" binding:"required,min=0,max=59"`
+	Capacity     int    `json:"capacity" binding:"required,gt=0"`
+	Color        string `json:"color" binding:"required"`
+	EndDate      string `json:"endDate" binding:"required"`
+}
+
+type UpdateScheduleTemplateRequest struct {
+	ClassID      string `json:"classId" binding:"required"`
+	InstructorID string `json:"instructorId" binding:"required"`
+	DayOfWeeks   []int  `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
+	StartHour    int    `json:"startHour" validate:"required,min=8,max=17"`
+	StartMinute  int    `json:"startMinute" validate:"required,oneof=0 15 30 45"`
+	Capacity     int    `json:"capacity" binding:"required,gt=0"`
+	EndDate      string `json:"endDate" binding:"required"`
 }
 
 type ScheduleTemplateToggleRequest struct {
@@ -456,25 +490,26 @@ type ScheduleTemplateToggleRequest struct {
 }
 
 type ClassScheduleResponse struct {
-	ID             string    `json:"id"`
-	ClassID        string    `json:"classId"`
-	ClassName      string    `json:"className"`
-	ClassImage     string    `json:"classImage"`
-	InstructorID   string    `json:"instructorId"`
-	InstructorName string    `json:"instructorName"`
-	Location       string    `json:"location"`
-	Date           time.Time `json:"date"`
-	StartHour      int       `json:"startHour"`
-	StartMinute    int       `json:"startMinute"`
-	Capacity       int       `json:"capacity"`
-	BookedCount    int       `json:"bookedCount"`
-	Duration       int       `json:"duration"`
-	Color          string    `json:"color"`
-	IsBooked       bool      `json:"isBooked"`
+	ID             string `json:"id"`
+	ClassID        string `json:"classId"`
+	ClassName      string `json:"className"`
+	ClassImage     string `json:"classImage"`
+	InstructorID   string `json:"instructorId"`
+	InstructorName string `json:"instructorName"`
+	Location       string `json:"location"`
+	Date           string `json:"date"`
+	StartHour      int    `json:"startHour"`
+	StartMinute    int    `json:"startMinute"`
+	Capacity       int    `json:"capacity"`
+	BookedCount    int    `json:"bookedCount"`
+	Duration       int    `json:"duration"`
+	Color          string `json:"color"`
+	IsBooked       bool   `json:"isBooked"`
 }
 
 type AttendanceWithUserResponse struct {
-	UserName   string `json:"userName"`
+	Fullname   string `json:"fullname"`
+	Avatar     string `json:"avatar"`
 	Email      string `json:"email"`
 	Status     string `json:"status"`
 	CheckedIn  bool   `json:"checkedIn"`
@@ -497,44 +532,6 @@ type ClassScheduleDetailResponse struct {
 type ClassScheduleQueryParam struct {
 	StartDate string `form:"startDate"`
 	EndDate   string `form:"endDate"`
-}
-
-type ScheduleTemplateResponse struct {
-	ID             uuid.UUID `json:"id"`
-	ClassID        uuid.UUID `json:"classId"`
-	ClassName      string    `json:"className"`
-	InstructorID   uuid.UUID `json:"instructorId"`
-	InstructorName string    `json:"instructorName"`
-	Instructor     string    `json:"instructor"`
-	DayOfWeeks     []int     `json:"dayOfWeeks"`
-	StartHour      int       `json:"startHour"`
-	StartMinute    int       `json:"startMinute"`
-	Capacity       int       `json:"capacity"`
-	IsActive       bool      `json:"isActive"`
-	Frequency      string    `json:"frequency"`
-	EndDate        time.Time `json:"endDate"`
-	CreatedAt      string    `json:"createdAt"`
-}
-
-type CreateScheduleTemplateRequest struct {
-	ClassID      string    `json:"classId" binding:"required"`
-	InstructorID string    `json:"instructorId" binding:"required"`
-	DayOfWeeks   []int     `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
-	StartHour    int       `json:"startHour" binding:"required,min=0,max=23"`
-	StartMinute  int       `json:"startMinute" binding:"required,min=0,max=59"`
-	Capacity     int       `json:"capacity" binding:"required,gt=0"`
-	Color        string    `json:"color" binding:"required"`
-	EndDate      time.Time `json:"endDate" binding:"required"`
-}
-
-type UpdateScheduleTemplateRequest struct {
-	ClassID      string     `json:"classId" binding:"required"`
-	InstructorID string     `json:"instructorId" binding:"required"`
-	DayOfWeeks   []int      `json:"dayOfWeeks" binding:"required,dive,min=0,max=6"`
-	StartHour    int        `json:"startHour" validate:"required,min=8,max=17"`
-	StartMinute  int        `json:"startMinute" validate:"required,oneof=0 15 30 45"`
-	Capacity     int        `json:"capacity" binding:"required,gt=0"`
-	EndDate      *time.Time `json:"endDate" binding:"required"`
 }
 
 // CLASS-SCHEDULE =====================
@@ -749,24 +746,24 @@ type BookingListResponse struct {
 
 // VOUCHER
 type CreateVoucherRequest struct {
-	Code         string    `json:"code" binding:"required"`
-	Description  string    `json:"description" binding:"required"`
-	DiscountType string    `json:"discountType" binding:"required,oneof=fixed percentage"`
-	Discount     float64   `json:"discount" binding:"required,gt=0"`
-	MaxDiscount  *float64  `json:"maxDiscount,omitempty"`
-	Quota        int       `json:"quota" binding:"required,gt=0"`
-	IsReusable   bool      `json:"isReusable"`
-	ExpiredAt    time.Time `json:"expiredAt" binding:"required"`
+	Code         string   `json:"code" binding:"required"`
+	Description  string   `json:"description" binding:"required"`
+	DiscountType string   `json:"discountType" binding:"required,oneof=fixed percentage"`
+	Discount     float64  `json:"discount" binding:"required,gt=0"`
+	MaxDiscount  *float64 `json:"maxDiscount,omitempty"`
+	Quota        int      `json:"quota" binding:"required,gt=0"`
+	IsReusable   bool     `json:"isReusable"`
+	ExpiredAt    string   `json:"expiredAt" binding:"required"`
 }
 
 type UpdateVoucherRequest struct {
-	Description  string    `json:"description" binding:"required"`
-	DiscountType string    `json:"discountType" binding:"required,oneof=fixed percentage"`
-	Discount     float64   `json:"discount" binding:"required,gt=0"`
-	MaxDiscount  *float64  `json:"maxDiscount,omitempty"`
-	Quota        int       `json:"quota" binding:"required,gt=0"`
-	IsReusable   bool      `json:"isReusable"`
-	ExpiredAt    time.Time `json:"expiredAt" binding:"required"`
+	Description  string   `json:"description" binding:"required"`
+	DiscountType string   `json:"discountType" binding:"required,oneof=fixed percentage"`
+	Discount     float64  `json:"discount" binding:"required,gt=0"`
+	MaxDiscount  *float64 `json:"maxDiscount,omitempty"`
+	Quota        int      `json:"quota" binding:"required,gt=0"`
+	IsReusable   bool     `json:"isReusable"`
+	ExpiredAt    string   `json:"expiredAt" binding:"required"`
 }
 
 type VoucherResponse struct {
@@ -850,18 +847,18 @@ type OpenClassScheduleRequest struct {
 }
 
 type InstructorScheduleResponse struct {
-	ID             string    `json:"id"`
-	ClassID        string    `json:"classId"`
-	ClassName      string    `json:"className"`
-	ClassImage     string    `json:"classImage"`
-	InstructorID   string    `json:"instructorId"`
-	InstructorName string    `json:"instructorName"`
-	Location       string    `json:"location"`
-	Date           time.Time `json:"date"`
-	StartHour      int       `json:"startHour"`
-	StartMinute    int       `json:"startMinute"`
-	Capacity       int       `json:"capacity"`
-	BookedCount    int       `json:"bookedCount"`
-	Duration       int       `json:"duration"`
-	IsOpened       bool      `json:"isOpen"`
+	ID             string `json:"id"`
+	ClassID        string `json:"classId"`
+	ClassName      string `json:"className"`
+	ClassImage     string `json:"classImage"`
+	InstructorID   string `json:"instructorId"`
+	InstructorName string `json:"instructorName"`
+	Location       string `json:"location"`
+	Date           string `json:"date"`
+	StartHour      int    `json:"startHour"`
+	StartMinute    int    `json:"startMinute"`
+	Capacity       int    `json:"capacity"`
+	BookedCount    int    `json:"bookedCount"`
+	Duration       int    `json:"duration"`
+	IsOpened       bool   `json:"isOpen"`
 }
