@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { useLocation, useNavigate } from "react-router-dom";
-import { buildDateTime, formatDateTime, formatHour } from "@/lib/utils";
+import { formatDate, formatDateTime, formatHour } from "@/lib/utils";
 
 export const UpcomingBookedSchedules = ({ schedule }) => {
   const location = useLocation();
@@ -19,17 +19,6 @@ export const UpcomingBookedSchedules = ({ schedule }) => {
       state: { backgroundLocation: location },
     });
   };
-
-  const startTime = buildDateTime(
-    schedule.date,
-    schedule.startHour,
-    schedule.startMinute
-  );
-  const endTime = buildDateTime(
-    schedule.date,
-    schedule.startHour,
-    schedule.startMinute + schedule.duration
-  );
 
   return (
     <Card>
@@ -49,23 +38,31 @@ export const UpcomingBookedSchedules = ({ schedule }) => {
               <p className="text-sm text-muted-foreground">
                 {schedule.instructorName} • {schedule.duration} mins
               </p>
-            </div>
 
-            <Badge variant="outline" className="text-xs capitalize">
-              {schedule.bookingStatus}
-            </Badge>
+              {schedule.isOpen ? (
+                <Badge variant="destructive" className="text-xs mt-2">
+                  Class is ongoing
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-xs capitalize">
+                  {schedule.bookingStatus}
+                </Badge>
+              )}
+            </div>
 
             <div className="flex justify-between text-sm">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <CalendarIcon className="w-4 h-4" />
-                  <span>{formatDateTime(startTime)}</span>
+                  {formatDate(schedule.date)}
                 </div>
                 <div className="flex items-center gap-2">
                   <ClockIcon className="w-4 h-4" />
-                  <span>
-                    {formatHour(startTime)} - {formatHour(endTime)}
-                  </span>
+                  {formatHour(schedule.startHour, schedule.startMinute)} –{" "}
+                  {formatHour(
+                    schedule.startHour,
+                    schedule.startMinute + schedule.duration
+                  )}
                 </div>
               </div>
               <div className="space-y-2">

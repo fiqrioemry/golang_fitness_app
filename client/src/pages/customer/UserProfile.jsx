@@ -50,7 +50,7 @@ const UserProfile = () => {
               <div className="flex justify-between items-center text-muted-foreground">
                 <div>
                   <span className="font-medium text-foreground">Birthday:</span>{" "}
-                  {formatDate(joinedAt) || ""}
+                  {birthday ? formatDate(birthday) : "not set"}
                 </div>
                 <UpdateProfile profile={data} edit="birthday" />
               </div>

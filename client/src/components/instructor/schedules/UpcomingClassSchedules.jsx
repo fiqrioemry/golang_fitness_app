@@ -1,35 +1,26 @@
-import {
-  CalendarIcon,
-  ClockIcon,
-  MapPinIcon,
-  ArrowRightIcon,
-} from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { formatDate, formatHour } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/Card";
 import { useLocation, useNavigate } from "react-router-dom";
-import { buildDateTime, formatDateTime, formatHour } from "@/lib/utils";
+import { CalendarIcon, ClockIcon, MapPinIcon } from "lucide-react";
+import { ClassAccessInfo } from "./ClassAccessInfo";
 
 export const UpcomingClassSchedules = ({ schedule }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const openModal = (id) => {
-    navigate(`/profile/bookings/${id}`, {
+  const handleSeeDetail = (id) => {
+    navigate(`/instructor/schedules/${id}/attendance`, {
       state: { backgroundLocation: location },
     });
   };
 
-  const startTime = buildDateTime(
-    schedule.date,
-    schedule.startHour,
-    schedule.startMinute
-  );
-  const endTime = buildDateTime(
-    schedule.date,
-    schedule.startHour,
-    schedule.startMinute + schedule.duration
-  );
+  const handleStartClass = (id) => {
+    navigate(`/instructor/schedules/${id}/open`, {
+      state: { backgroundLocation: location },
+    });
+  };
 
   return (
     <Card>
@@ -37,55 +28,58 @@ export const UpcomingClassSchedules = ({ schedule }) => {
         <img
           src={schedule.classImage}
           alt={schedule.className}
-          className="w-full h-48 sm:h-full object-cover"
+          className="w-full h-48 sm:h-full object-cover rounded-t-sm sm:rounded-l-sm sm:rounded-t-none"
         />
 
         <CardContent className="p-5 flex flex-col justify-between gap-5">
-          <div className="space-y-4 max-w-xl w-full">
-            <div>
-              <h3 className="text-lg font-semibold text-foreground">
-                {schedule.className}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {schedule.instructorName} • {schedule.duration} mins
-              </p>
+          <div className="w-full">
+            <div className="flex justify-between items-start">
+              <h3 className="text-xl font-semibold">{schedule.className}</h3>
+              <Badge variant={schedule.isOpen ? "success" : "secondary"}>
+                {schedule.isOpen ? "Started" : "Not Started"}
+              </Badge>
             </div>
 
-            <Badge variant="outline" className="text-xs capitalize">
-              {schedule.bookingStatus}
-            </Badge>
-
-            <div className="flex justify-between text-sm">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <CalendarIcon className="w-4 h-4" />
-                  <span>{formatDateTime(startTime)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ClockIcon className="w-4 h-4" />
-                  <span>
-                    {formatHour(startTime)} - {formatHour(endTime)}
-                  </span>
-                </div>
+            <div className="mt-2 space-y-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4" />
+                {formatDate(schedule.date)}
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <MapPinIcon className="w-4 h-4" />
-                  <span>{schedule.location}</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <ClockIcon className="w-4 h-4" />
+                {formatHour(schedule.startHour, schedule.startMinute)} –{" "}
+                {formatHour(
+                  schedule.startHour,
+                  schedule.startMinute + schedule.duration
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPinIcon className="w-4 h-4" />
+                {schedule.location}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Participants:</span>
+                <Badge variant="outline">
+                  {schedule.bookedCount} / {schedule.capacity}
+                </Badge>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-between items-center text-xs text-muted-foreground max-w-xl w-full">
-            <span>Booked at {formatDateTime(schedule.bookedAt)}</span>
+          <div className="flex gap-3 justify-end flex-wrap">
             <Button
-              size="sm"
               variant="outline"
-              onClick={() => openModal(schedule.id)}
+              onClick={() => handleSeeDetail(schedule.id)}
             >
-              See Detail <ArrowRightIcon className="w-4 h-4" />
+              View Participants
             </Button>
+
+            {!schedule.isOpen && (
+              <Button onClick={() => handleStartClass(schedule.id)}>
+                Start Class
+              </Button>
+            )}
+            <ClassAccessInfo schedule={schedule} />
           </div>
         </CardContent>
       </div>

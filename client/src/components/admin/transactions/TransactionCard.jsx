@@ -19,7 +19,6 @@ export const TransactionCard = ({ transactions, sort, setSort }) => {
     return null;
   };
 
-  console.log(transactions);
   return (
     <>
       <div className="hidden md:block w-full">

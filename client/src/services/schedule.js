@@ -26,7 +26,7 @@ export const getClassScheduleDetail = async (id) => {
 };
 
 export const createClassSchedule = async (data) => {
-  const url = data.isRecuring ? "/schedules/recurring" : "/schedules";
+  const url = data.isRecurring ? "/schedules/recurring" : "/schedules";
   const res = await authInstance.post(url, data);
   return res.data;
 };
@@ -88,14 +88,17 @@ export const getInstructorSchedules = async (params) => {
   return res.data;
 };
 
-// PATCH /api/schedules/:id/open
+// PATCH /api/schedules/instructor/:id/open
 export const openClassSchedule = async ({ id, data }) => {
-  const res = await authInstance.patch(`/schedules/${id}/open`, data);
+  const res = await authInstance.patch(
+    `/schedules/instructor/${id}/open`,
+    data
+  );
   return res.data;
 };
 
-// GET /api/schedules/:id/attendance
+// GET /api/schedules/instructor/:id/attendance
 export const getClassAttendances = async (id) => {
-  const res = await authInstance.get(`/schedules/${id}/attendance`);
+  const res = await authInstance.get(`/schedules/instructor/${id}/attendance`);
   return res.data;
 };

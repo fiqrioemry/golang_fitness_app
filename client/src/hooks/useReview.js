@@ -10,14 +10,13 @@ export const useClassReviewsQuery = (classId) =>
   });
 
 export const useCreateReviewMutation = () => {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: reviewService.createReview,
-    onSuccess: (_, { classId }) => {
-      toast.success("Review submitted successfully");
-      qc.invalidateQueries({ queryKey: ["reviews", classId] });
-      qc.invalidateQueries({ queryKey: ["attendances"] });
+    onSuccess: (_, variables) => {
+      toast.success("Review Submitted Successfully");
+      queryClient.invalidateQueries(["booking", variables.id]);
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Failed to submit review");

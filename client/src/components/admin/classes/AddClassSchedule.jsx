@@ -1,4 +1,5 @@
 import { scheduleSchema } from "@/lib/schema";
+import { format } from "date-fns";
 import { FormSheet } from "@/components/form/FormSheet";
 import { useScheduleMutation } from "@/hooks/useSchedules";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -24,7 +25,10 @@ const AddClassSchedule = ({ open, setOpen, defaultDateTime }) => {
     isRecurring: false,
     startHour: defaultDateTime?.getHours(),
     startMinute: defaultDateTime?.getMinutes(),
-    date: defaultDateTime ? defaultDateTime.toISOString().split("T")[0] : "",
+    date: defaultDateTime
+      ? format(defaultDateTime, "yyyy-MM-dd").split("T")[0]
+      : "",
+    format,
   };
 
   return (

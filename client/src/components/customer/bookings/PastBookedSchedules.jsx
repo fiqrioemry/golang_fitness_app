@@ -5,10 +5,10 @@ import {
   ArrowRightIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
-import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { buildDateTime, formatDateTime, formatHour } from "@/lib/utils";
+import { useLocation, useNavigate } from "react-router-dom";
+import { formatDate, formatDateTime, formatHour } from "@/lib/utils";
 
 export const PastBookedSchedules = ({ schedule }) => {
   const location = useLocation();
@@ -19,17 +19,6 @@ export const PastBookedSchedules = ({ schedule }) => {
       state: { backgroundLocation: location },
     });
   };
-
-  const startTime = buildDateTime(
-    schedule.date,
-    schedule.startHour,
-    schedule.startMinute
-  );
-  const endTime = buildDateTime(
-    schedule.date,
-    schedule.startHour,
-    schedule.startMinute + schedule.duration
-  );
 
   return (
     <Card>
@@ -59,12 +48,16 @@ export const PastBookedSchedules = ({ schedule }) => {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <CalendarIcon className="w-4 h-4" />
-                  <span>{formatDateTime(startTime)}</span>
+                  {formatDate(schedule.date)}
                 </div>
                 <div className="flex items-center gap-2">
                   <ClockIcon className="w-4 h-4" />
                   <span>
-                    {formatHour(startTime)} - {formatHour(endTime)}
+                    {formatHour(schedule.startHour, schedule.startMinute)} –{" "}
+                    {formatHour(
+                      schedule.startHour,
+                      schedule.startMinute + schedule.duration
+                    )}
                   </span>
                 </div>
               </div>

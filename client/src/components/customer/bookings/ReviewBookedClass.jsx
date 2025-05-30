@@ -1,4 +1,4 @@
-import { Pencil } from "lucide-react";
+import { reviewState } from "@/lib/constant";
 import { Button } from "@/components/ui/Button";
 import { createReviewSchema } from "@/lib/schema";
 import { useCreateReviewMutation } from "@/hooks/useReview";
@@ -6,29 +6,25 @@ import { FormAddDialog } from "@/components/form/FormAddDialog";
 import { InputRatingElement } from "@/components/input/InputRatingElement";
 import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 
-const ReviewClass = ({ attendance }) => {
+export const ReviewBookedClass = ({ id }) => {
   const { mutate: createReview, isPending } = useCreateReviewMutation();
-  console.log(attendance);
-  const initialState = {
-    scheduleId: attendance.scheduleId,
-    comment: "",
-    rating: 0,
+
+  const handleReviewClass = (data) => {
+    createReview({ id, data });
   };
 
   return (
     <FormAddDialog
-      icon={true}
-      state={initialState}
-      schema={createReviewSchema}
+      loading={isPending}
+      state={reviewState}
       title="Create a comment"
+      schema={createReviewSchema}
+      action={handleReviewClass}
       buttonElement={
         <Button variant="outline">
-          <Pencil />
           <span>Review Class</span>
         </Button>
       }
-      loading={isPending}
-      action={createReview}
     >
       <InputRatingElement name="rating" label="Your Rating" />
       <InputTextareaElement
@@ -39,5 +35,3 @@ const ReviewClass = ({ attendance }) => {
     </FormAddDialog>
   );
 };
-
-export { ReviewClass };

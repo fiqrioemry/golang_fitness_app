@@ -75,7 +75,6 @@ const ClassRecuring = () => {
             const nextGen = addMonths(createdAt, 1);
 
             const showNextGen = endDate && isBefore(nextGen, endDate);
-            const createdAtStr = format(createdAt, "yyyy-MM-dd");
             const endDateStr = endDate ? format(endDate, "yyyy-MM-dd") : "-";
 
             return (

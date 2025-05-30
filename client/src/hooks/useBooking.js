@@ -10,6 +10,7 @@ export const useCreateBookingMutation = () => {
     onSuccess: () => {
       toast.success("Booking created successfully");
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["schedules"] });
       queryClient.invalidateQueries({ queryKey: ["schedules", "with-status"] });
     },
     onError: (error) => {
@@ -41,9 +42,9 @@ export const useCheckinBookingMutation = () => {
 
   return useMutation({
     mutationFn: booking.checkinBooking,
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast.success("Check-in successful");
-      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries(["booking", variables.id]);
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Failed to check-in");
@@ -66,9 +67,3 @@ export const useCheckoutBookingMutation = () => {
     },
   });
 };
-
-// const { mutate: checkin } = useCheckinBookingMutation();
-// checkin(bookingId); // hanya kirim ID
-
-// const { mutate: checkout } = useCheckoutBookingMutation();
-// checkout({ id: bookingId, code: "ABCD1234" }); // kirim ID dan kode checkout

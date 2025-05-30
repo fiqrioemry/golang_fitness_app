@@ -48,8 +48,10 @@ export function formatTime(hour, minute) {
   const m = String(minute).padStart(2, "0");
   return `${h}:${m}`;
 }
-export const formatHour = (dateStr) => {
-  const date = new Date(dateStr);
+export const formatHour = (hour, minute) => {
+  const date = new Date();
+  date.setHours(hour);
+  date.setMinutes(minute);
   return date.toLocaleString("id-ID", {
     hour: "2-digit",
     minute: "2-digit",

@@ -59,6 +59,9 @@ import { BookedScheduleDetail } from "./components/customer/bookings/BookedSched
 import InstructorLayout from "./components/instructor/InstructorLayout";
 import InstructorSchedules from "./pages/instructor/InstructorSchedules";
 import { InstructorProfile } from "./pages/instructor/InstructorProfile";
+import { ClassAttendanceDetail } from "./components/instructor/schedules/ClassAttendanceDetail";
+import { StartClassSchedule } from "./components/instructor/schedules/StartClassSchedule";
+import { ReviewBookedClass } from "./components/customer/bookings/ReviewBookedClass";
 
 function App() {
   const location = useLocation();
@@ -181,7 +184,19 @@ function App() {
       {/* background dialog */}
       {backgroundLocation && (
         <Routes>
+          {/* admin */}
           <Route path="/admin/users/:id" element={<UserDetailDialog />} />
+          {/* instructor */}
+          <Route
+            path="/instructor/schedules/:id/attendance"
+            element={<ClassAttendanceDetail />}
+          />
+          <Route
+            path="/instructor/schedules/:id/open"
+            element={<StartClassSchedule />}
+          />
+
+          {/* customer */}
           <Route
             path="/profile/bookings/:id"
             element={<BookedScheduleDetail />}

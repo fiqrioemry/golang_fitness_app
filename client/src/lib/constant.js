@@ -27,6 +27,10 @@ export const profileState = {
   fullname: "",
 };
 
+export const checkoutState = {
+  verificationCode: "",
+};
+
 export const classState = {
   title: "",
   duration: 0,
@@ -72,7 +76,6 @@ export const locationState = {
 
 export const reviewState = {
   rating: 0,
-  classId: "",
   comment: "",
 };
 
@@ -131,17 +134,6 @@ export const packageState = {
   image: undefined,
 };
 
-export const genderOptions = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-];
-
-export const typeCode = [
-  { label: "Promo Offer", value: "promo_offer" },
-  { label: "System Message", value: "system_message" },
-  { label: "Class Reminder", value: "class_reminder" },
-];
-
 export const createVoucherState = {
   code: "",
   quota: 1,
@@ -157,6 +149,22 @@ export const notificationState = {
   message: "",
   typeCode: "",
 };
+
+export const openClassState = {
+  zoomLink: "",
+  verificationCode: "",
+};
+
+export const genderOptions = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+];
+
+export const typeCode = [
+  { label: "Promo Offer", value: "promo_offer" },
+  { label: "System Message", value: "system_message" },
+  { label: "Class Reminder", value: "class_reminder" },
+];
 
 export const paymentStatusOptions = [
   { value: "all", label: "All" },

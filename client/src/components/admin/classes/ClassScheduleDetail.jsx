@@ -1,14 +1,24 @@
+import { buildDateTime } from "@/lib/utils";
 import { DeleteClassSchedule } from "./DeleteClassSchedule";
 import { UpdateClassSchedule } from "./UpdateClassSchedule";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/Dialog";
 
-const ClassScheduleDetail = ({ open, onClose, event }) => {
+export const ClassScheduleDetail = ({ open, onClose, event }) => {
   if (!event) return null;
 
   const { title, start, end, resource } = event;
 
-  const isPast = new Date(resource?.date) < new Date();
+  const classStart = buildDateTime(
+    resource?.date,
+    resource?.startHour,
+    resource?.startMinute
+  );
 
+  const now = new Date();
+  const tenMinutesBeforeClass = new Date(classStart.getTime() - 10 * 60000);
+  const isEditAllowed = now < tenMinutesBeforeClass;
+
+  const isPast = classStart < now;
   const hasBooking = resource?.bookedCount > 0;
 
   return (
@@ -26,7 +36,7 @@ const ClassScheduleDetail = ({ open, onClose, event }) => {
           <strong>Capacity :</strong> {resource?.bookedCount || 0}/
           {resource?.capacity}
         </p>
-        {!isPast && (
+        {isEditAllowed && (
           <div className="mt-4 flex gap-4 justify-end">
             {!hasBooking && (
               <DeleteClassSchedule onClose={onClose} schedule={resource} />
@@ -38,5 +48,3 @@ const ClassScheduleDetail = ({ open, onClose, event }) => {
     </Dialog>
   );
 };
-
-export { ClassScheduleDetail };

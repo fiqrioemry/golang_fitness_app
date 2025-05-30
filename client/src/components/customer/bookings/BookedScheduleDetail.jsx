@@ -7,31 +7,21 @@ import {
   SheetDescription,
 } from "@/components/ui/Sheet";
 import { Badge } from "@/components/ui/Badge";
+import { CheckoutClass } from "./CheckoutClass";
 import { Button } from "@/components/ui/Button";
+import { ReviewBookedClass } from "./ReviewBookedClass";
 import { useNavigate, useParams } from "react-router-dom";
 import { useBookingDetailQuery } from "@/hooks/useBooking";
-import { formatDateTime, formatHour, buildDateTime } from "@/lib/utils";
+import { useCheckinBookingMutation } from "@/hooks/useBooking";
+import { formatDate, formatDateTime, formatHour } from "@/lib/utils";
 import { BookedDetailSkeleton } from "@/components/loading/BookedDetailSkeleton";
 
 export const BookedScheduleDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const { data, isLoading } = useBookingDetailQuery(id);
-  console.log(data);
-  const startTime = buildDateTime(
-    data?.date,
-    data?.startHour,
-    data?.startMinute
-  );
-  const endTime = buildDateTime(
-    data?.date,
-    data?.startHour,
-    data?.startMinute + data?.duration
-  );
-  const isDisabled = data?.checkedIn && data?.checkedOut;
+  const { mutate: checkin } = useCheckinBookingMutation();
 
-  console.log(data);
   return (
     <Sheet open={true} onOpenChange={() => navigate(-1)}>
       <SheetContent side="right" className="max-w-xl w-full">
@@ -58,9 +48,10 @@ export const BookedScheduleDetail = () => {
             </div>
 
             <div className="text-sm space-y-2">
-              <DetailRow label="Date">{formatDateTime(startTime)}</DetailRow>
+              <DetailRow label="Date">{formatDate(data.date)}</DetailRow>
               <DetailRow label="Time">
-                {formatHour(startTime)} - {formatHour(endTime)}
+                {formatHour(data.startHour, data.startMinute)} -{" "}
+                {formatHour(data.startHour, data.startMinute + data.duration)}
               </DetailRow>
               <DetailRow label="Attendance">
                 <Badge variant="outline" className="capitalize">
@@ -75,9 +66,8 @@ export const BookedScheduleDetail = () => {
               </DetailRow>
             </div>
 
-            {data.checkedIn && (
+            {data.checkedIn && data.zoomLink !== "" && (
               <div className="text-center">
-                {" "}
                 <a
                   href={data.zoomLink}
                   target="_blank"
@@ -92,23 +82,20 @@ export const BookedScheduleDetail = () => {
             <div className="flex justify-between gap-2">
               <Button
                 variant="secondary"
-                disabled={!data.isOpened || data.checkedIn}
+                onClick={() => checkin(data.id)}
+                disabled={data.isOpen === false || data.checkedIn === true}
               >
                 Check In
               </Button>
 
-              <Button variant="default" disabled={isDisabled}>
-                Check Out
-              </Button>
+              {data.isReview ? (
+                <ReviewBookedClass id={data.id} />
+              ) : (
+                <CheckoutClass bookings={data} />
+              )}
             </div>
           </div>
         )}
-
-        <SheetClose asChild>
-          <Button variant="outline" className="w-full mt-6">
-            Close
-          </Button>
-        </SheetClose>
       </SheetContent>
     </Sheet>
   );

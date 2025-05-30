@@ -7,8 +7,6 @@ export const useSchedulesQuery = () =>
   useQuery({
     queryKey: ["schedules"],
     queryFn: scheduleService.getAllClassSchedules,
-    staleTime: 1000 * 60 * 5,
-    refetchOnMount: false,
   });
 
 // GET /api/schedules/status
@@ -16,6 +14,7 @@ export const useSchedulesWithStatusQuery = () => {
   return useQuery({
     queryKey: ["schedules", "with-status"],
     queryFn: scheduleService.getAllClassSchedulesWithStatus,
+    refetchOnMount: true,
   });
 };
 

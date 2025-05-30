@@ -45,6 +45,10 @@ export const sendOTPSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
 
+export const checkoutSchema = z.object({
+  verificationCode: z.string().min(1, "verification code is required"),
+});
+
 export const verifyOTPSchema = z.object({
   email: z.string().email("Invalid email address"),
   otp: z.string().min(6, "OTP code must be at least 6 characters"),
@@ -257,7 +261,6 @@ export const updateTemplateSchema = z.object({
 });
 
 export const createReviewSchema = z.object({
-  scheduleId: z.string().min(1, "Class is required"),
   rating: z
     .number({
       required_error: "Rating is required",
@@ -265,7 +268,7 @@ export const createReviewSchema = z.object({
     })
     .min(1, "Minimum rating is 1")
     .max(5, "Maximum rating is 5"),
-  comment: z.string().min(8, "Comment must be at least 8 characters"),
+  comment: z.string().min(10, "Comment must be at least 10 characters"),
 });
 
 export const createVoucherSchema = z
@@ -308,4 +311,12 @@ export const notificationSchema = z.object({
     .min(5, "Message is required")
     .max(200, "Maximum 200 characters allowed"),
   typeCode: z.enum(["system_message", "class_reminder", "promo_offer"]),
+});
+
+export const openClassSchema = z.object({
+  verificationCode: z
+    .string()
+    .min(6, "Verification code min. 6 char")
+    .max(6, "Verification code cannot exceed 6 char"),
+  zoomLink: z.string().url("Invalid Zoom URL").optional(),
 });

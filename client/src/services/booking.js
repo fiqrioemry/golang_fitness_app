@@ -16,7 +16,6 @@ export const getMyBookings = async (params) => {
 
 // GET /api/bookings/:id
 export const getBookingDetail = async (id) => {
-  console.log(id);
   const res = await authInstance.get(`/bookings/${id}`);
   return res.data;
 };
@@ -28,7 +27,7 @@ export const checkinBooking = async (id) => {
 };
 
 // POST /api/bookings/:id/check-out
-export const checkoutBooking = async ({ id, code }) => {
-  const res = await authInstance.post(`/bookings/${id}/check-out`, { code });
+export const checkoutBooking = async ({ id, data }) => {
+  const res = await authInstance.post(`/bookings/${id}/check-out`, data);
   return res.data;
 };

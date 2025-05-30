@@ -1,8 +1,8 @@
 import { publicInstance, authInstance } from ".";
 
 // POST /api/reviews
-export const createReview = async (data) => {
-  const res = await authInstance.post("/reviews", data);
+export const createReview = async ({ id, data }) => {
+  const res = await authInstance.post(`/reviews/${id}`, data);
   return res.data;
 };
 

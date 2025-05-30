@@ -22,7 +22,6 @@ export const SelectCalendarElement = ({
   const maxDate =
     mode === "past" ? today : new Date(today.getFullYear() + 5, 11, 31);
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -66,7 +65,7 @@ export const SelectCalendarElement = ({
                   selected={selectedDate}
                   onSelect={(date) => {
                     if (date) {
-                      onChange(date.toISOString());
+                      onChange(format(date, "yyyy-MM-dd"));
                       setOpen(false);
                     }
                   }}
