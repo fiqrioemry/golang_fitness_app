@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -10,8 +11,15 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/datatypes"
 )
+
+func LoadEnv() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, relying on system ENV")
+	}
+}
 
 func MustGetUserID(c *gin.Context) string {
 	userID, exists := c.Get("userID")

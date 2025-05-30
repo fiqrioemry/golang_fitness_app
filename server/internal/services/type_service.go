@@ -7,11 +7,11 @@ import (
 )
 
 type TypeService interface {
-	CreateType(req dto.CreateTypeRequest) error
-	UpdateType(id string, req dto.UpdateTypeRequest) error
 	DeleteType(id string) error
 	GetAllTypes() ([]dto.TypeResponse, error)
+	CreateType(req dto.CreateTypeRequest) error
 	GetTypeByID(id string) (*dto.TypeResponse, error)
+	UpdateType(id string, req dto.UpdateTypeRequest) error
 }
 
 type typeService struct {
@@ -20,23 +20,6 @@ type typeService struct {
 
 func NewTypeService(repo repositories.TypeRepository) TypeService {
 	return &typeService{repo}
-}
-
-func (s *typeService) CreateType(req dto.CreateTypeRequest) error {
-	t := models.Type{
-		Name: req.Name,
-	}
-	return s.repo.CreateType(&t)
-}
-
-func (s *typeService) UpdateType(id string, req dto.UpdateTypeRequest) error {
-	t, err := s.repo.GetTypeByID(id)
-	if err != nil {
-		return err
-	}
-
-	t.Name = req.Name
-	return s.repo.UpdateType(t)
 }
 
 func (s *typeService) DeleteType(id string) error {
@@ -64,6 +47,13 @@ func (s *typeService) GetAllTypes() ([]dto.TypeResponse, error) {
 	return result, nil
 }
 
+func (s *typeService) CreateType(req dto.CreateTypeRequest) error {
+	t := models.Type{
+		Name: req.Name,
+	}
+	return s.repo.CreateType(&t)
+}
+
 func (s *typeService) GetTypeByID(id string) (*dto.TypeResponse, error) {
 	t, err := s.repo.GetTypeByID(id)
 	if err != nil {
@@ -74,4 +64,14 @@ func (s *typeService) GetTypeByID(id string) (*dto.TypeResponse, error) {
 		ID:   t.ID.String(),
 		Name: t.Name,
 	}, nil
+}
+
+func (s *typeService) UpdateType(id string, req dto.UpdateTypeRequest) error {
+	t, err := s.repo.GetTypeByID(id)
+	if err != nil {
+		return err
+	}
+
+	t.Name = req.Name
+	return s.repo.UpdateType(t)
 }

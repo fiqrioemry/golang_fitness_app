@@ -21,8 +21,9 @@ import (
 type PaymentService interface {
 	ExpireOldPendingPayments() error
 	StripeWebhookNotification(event stripe.Event) error
-	GetAllUserPayments(params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error)
 	CreatePayment(userID string, req dto.CreatePaymentRequest) (*dto.CreatePaymentResponse, error)
+	GetAllUserPayments(params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error)
+	GetPaymentsByUserID(userID string, params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error)
 }
 type paymentService struct {
 	paymentRepo         repositories.PaymentRepository
@@ -249,6 +250,7 @@ func (s *paymentService) StripeWebhookNotification(event stripe.Event) error {
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return fmt.Errorf("failed checking existing user package: %w", err)
 	}
+
 	if existing.ID == uuid.Nil {
 		expired := now.AddDate(0, 0, pkg.Expired)
 		newUP := models.UserPackage{
@@ -274,8 +276,34 @@ func (s *paymentService) StripeWebhookNotification(event stripe.Event) error {
 	return s.userPackageRepo.UpdateUserPackage(&existing)
 }
 
-func (s *paymentService) GetAllUserPayments(params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error) {
+func (s *paymentService) GetPaymentsByUserID(userID string, params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error) {
 
+	payments, total, err := s.paymentRepo.GetPaymentsByUserID(userID, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var results []dto.PaymentListResponse
+	for _, p := range payments {
+		results = append(results, dto.PaymentListResponse{
+			ID:            p.ID.String(),
+			UserID:        p.UserID.String(),
+			InvoiceNumber: p.InvoiceNumber,
+			Email:         p.Email,
+			Fullname:      p.Fullname,
+			PackageID:     p.PackageID.String(),
+			PackageName:   p.PackageName,
+			Total:         p.Total,
+			PaymentMethod: p.PaymentMethod,
+			Status:        p.Status,
+			PaidAt:        p.PaidAt.Format("2006-01-02"),
+		})
+	}
+	pagination := utils.Paginate(total, params.Page, params.Limit)
+	return results, pagination, nil
+}
+
+func (s *paymentService) GetAllUserPayments(params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error) {
 	payments, total, err := s.paymentRepo.GetAllUserPayments(params)
 	if err != nil {
 		return nil, nil, err
@@ -297,14 +325,7 @@ func (s *paymentService) GetAllUserPayments(params dto.PaymentQueryParam) ([]dto
 			PaidAt:        p.PaidAt.Format("2006-01-02"),
 		})
 	}
-	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
-
-	pagination := &dto.PaginationResponse{
-		Page:       params.Page,
-		Limit:      params.Limit,
-		TotalRows:  int(total),
-		TotalPages: totalPages,
-	}
+	pagination := utils.Paginate(total, params.Page, params.Limit)
 	return results, pagination, nil
 }
 

@@ -1,14 +1,13 @@
 package services
 
 import (
-	"errors"
 	"fmt"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
+	"server/internal/utils"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 type PackageService interface {
@@ -16,7 +15,6 @@ type PackageService interface {
 	CreatePackage(req dto.CreatePackageRequest) error
 	UpdatePackage(id string, req dto.UpdatePackageRequest) error
 	GetPackageByID(id string) (*dto.PackageDetailResponse, error)
-	GetRelatedPackages(classID string) ([]dto.PackageListResponse, error)
 	GetAllPackages(params dto.PackageQueryParam) ([]dto.PackageListResponse, *dto.PaginationResponse, error)
 }
 
@@ -41,13 +39,13 @@ func (s *packageService) CreatePackage(req dto.CreatePackageRequest) error {
 	pkg := models.Package{
 		ID:             uuid.New(),
 		Name:           req.Name,
-		Description:    req.Description,
 		Price:          req.Price,
 		Credit:         req.Credit,
 		Discount:       req.Discount,
 		Image:          req.ImageURL,
 		IsActive:       req.IsActive,
 		AdditionalList: req.Additional,
+		Description:    req.Description,
 		Classes:        classes,
 	}
 
@@ -64,30 +62,24 @@ func (s *packageService) UpdatePackage(id string, req dto.UpdatePackageRequest) 
 		return err
 	}
 
-	if req.Name != "" {
-		pkg.Name = req.Name
-	}
-	if req.Description != "" {
-		pkg.Description = req.Description
-	}
-	if req.Discount > 0 {
-		pkg.Discount = req.Discount
-	}
-	if req.Price != 0 {
-		pkg.Price = req.Price
-	}
-	if req.Credit != 0 {
-		pkg.Credit = req.Credit
-	}
-	if req.Expired != 0 {
-		pkg.Expired = req.Expired
-	}
-	if len(req.Additional) > 0 {
-		pkg.AdditionalList = req.Additional
-	}
+	pkg.Name = req.Name
+	pkg.Price = req.Price
+	pkg.Credit = req.Credit
+	pkg.Expired = req.Expired
+	pkg.Description = req.Description
+
 	if req.ImageURL != "" {
 		pkg.Image = req.ImageURL
 	}
+
+	if req.Discount > 0 {
+		pkg.Discount = req.Discount
+	}
+
+	if len(req.Additional) > 0 {
+		pkg.AdditionalList = req.Additional
+	}
+
 	pkg.IsActive = req.IsActive
 
 	if len(req.ClassIDs) > 0 {
@@ -137,15 +129,8 @@ func (s *packageService) GetAllPackages(params dto.PackageQueryParam) ([]dto.Pac
 			Classes:     classes,
 		})
 	}
-	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
 
-	pagination := &dto.PaginationResponse{
-		Page:       params.Page,
-		Limit:      params.Limit,
-		TotalRows:  int(total),
-		TotalPages: totalPages,
-	}
-
+	pagination := utils.Paginate(total, params.Page, params.Limit)
 	return results, pagination, nil
 }
 
@@ -178,30 +163,6 @@ func (s *packageService) GetPackageByID(id string) (*dto.PackageDetailResponse, 
 		Additional:  pkg.AdditionalList,
 		Classes:     classes,
 	}, nil
-}
-
-func (s *packageService) GetRelatedPackages(classID string) ([]dto.PackageListResponse, error) {
-	packages, err := s.repo.GetPackagesByClassID(classID)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return []dto.PackageListResponse{}, nil
-		}
-		return nil, err
-	}
-
-	var res []dto.PackageListResponse
-	for _, pkg := range packages {
-		res = append(res, dto.PackageListResponse{
-			ID:          pkg.ID.String(),
-			Name:        pkg.Name,
-			Description: pkg.Description,
-			Price:       pkg.Price,
-			Credit:      pkg.Credit,
-			Image:       pkg.Image,
-			IsActive:    pkg.IsActive,
-		})
-	}
-	return res, nil
 }
 
 func (s *packageService) DeletePackage(id string) error {

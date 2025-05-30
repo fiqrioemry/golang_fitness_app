@@ -78,20 +78,6 @@ func (h *ProfileHandler) UpdateAvatar(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Avatar updated successfully"})
 }
 
-func (h *ProfileHandler) GetUserTransactions(c *gin.Context) {
-	userID := utils.MustGetUserID(c)
-	page := utils.GetQueryInt(c, "page", 1)
-	limit := utils.GetQueryInt(c, "limit", 10)
-
-	resp, err := h.profileService.GetUserTransactions(userID, page, limit)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch transactions", "error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, resp)
-}
-
 func (h *ProfileHandler) GetUserPackages(c *gin.Context) {
 	userID := utils.MustGetUserID(c)
 	page := utils.GetQueryInt(c, "page", 1)

@@ -11,7 +11,6 @@ import (
 type UserPackageRepository interface {
 	CreateUserPackage(userPackage *models.UserPackage) error
 	UpdateUserPackage(userPackage *models.UserPackage) error
-
 	GetUserPackagesByUserID(userID string) ([]models.UserPackage, error)
 	GetUserPackagesByPackageIDs(packageIDs []uuid.UUID) ([]models.UserPackage, error)
 	GetActiveUserPackages(userID, packageID string, result *models.UserPackage) error
@@ -40,6 +39,7 @@ func (r *userPackageRepository) GetUserPackagesByUserID(userID string) ([]models
 func (r *userPackageRepository) UpdateUserPackage(userPackage *models.UserPackage) error {
 	return r.db.Save(userPackage).Error
 }
+
 func (r *userPackageRepository) GetUserPackagesByPackageIDs(packageIDs []uuid.UUID) ([]models.UserPackage, error) {
 	var userPackages []models.UserPackage
 	err := r.db.Preload("Package").Where("package_id IN ?", packageIDs).Find(&userPackages).Error

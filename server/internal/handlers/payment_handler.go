@@ -83,3 +83,22 @@ func (h *PaymentHandler) GetAllUserPayments(c *gin.Context) {
 	})
 
 }
+
+func (h *PaymentHandler) GetMyTransactions(c *gin.Context) {
+	userID := utils.MustGetUserID(c)
+	var params dto.PaymentQueryParam
+	if !utils.BindAndValidateForm(c, &params) {
+		return
+	}
+	payments, pagination, err := h.paymentService.GetPaymentsByUserID(userID, params)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch payments", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":       payments,
+		"pagination": pagination,
+	})
+
+}

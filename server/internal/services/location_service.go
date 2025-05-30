@@ -7,11 +7,11 @@ import (
 )
 
 type LocationService interface {
-	CreateLocation(req dto.CreateLocationRequest) error
-	UpdateLocation(id string, req dto.UpdateLocationRequest) error
 	DeleteLocation(id string) error
 	GetAllLocations() ([]dto.LocationResponse, error)
+	CreateLocation(req dto.CreateLocationRequest) error
 	GetLocationByID(id string) (*dto.LocationResponse, error)
+	UpdateLocation(id string, req dto.UpdateLocationRequest) error
 }
 
 type locationService struct {
@@ -22,6 +22,10 @@ func NewLocationService(repo repositories.LocationRepository) LocationService {
 	return &locationService{repo}
 }
 
+func (s *locationService) DeleteLocation(id string) error {
+	return s.repo.DeleteLocation(id)
+}
+
 func (s *locationService) CreateLocation(req dto.CreateLocationRequest) error {
 	location := models.Location{
 		Name:        req.Name,
@@ -29,23 +33,6 @@ func (s *locationService) CreateLocation(req dto.CreateLocationRequest) error {
 		GeoLocation: req.GeoLocation,
 	}
 	return s.repo.CreateLocation(&location)
-}
-
-func (s *locationService) UpdateLocation(id string, req dto.UpdateLocationRequest) error {
-	location, err := s.repo.GetLocationByID(id)
-	if err != nil {
-		return err
-	}
-
-	location.Name = req.Name
-	location.Address = req.Address
-	location.GeoLocation = req.GeoLocation
-
-	return s.repo.UpdateLocation(location)
-}
-
-func (s *locationService) DeleteLocation(id string) error {
-	return s.repo.DeleteLocation(id)
 }
 
 func (s *locationService) GetAllLocations() ([]dto.LocationResponse, error) {
@@ -77,4 +64,17 @@ func (s *locationService) GetLocationByID(id string) (*dto.LocationResponse, err
 		Address:     location.Address,
 		GeoLocation: location.GeoLocation,
 	}, nil
+}
+
+func (s *locationService) UpdateLocation(id string, req dto.UpdateLocationRequest) error {
+	location, err := s.repo.GetLocationByID(id)
+	if err != nil {
+		return err
+	}
+
+	location.Name = req.Name
+	location.Address = req.Address
+	location.GeoLocation = req.GeoLocation
+
+	return s.repo.UpdateLocation(location)
 }

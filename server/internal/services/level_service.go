@@ -7,11 +7,11 @@ import (
 )
 
 type LevelService interface {
-	CreateLevel(req dto.CreateLevelRequest) error
-	UpdateLevel(id string, req dto.UpdateLevelRequest) error
 	DeleteLevel(id string) error
 	GetAllLevels() ([]dto.LevelResponse, error)
+	CreateLevel(req dto.CreateLevelRequest) error
 	GetLevelByID(id string) (*dto.LevelResponse, error)
+	UpdateLevel(id string, req dto.UpdateLevelRequest) error
 }
 
 type levelService struct {
@@ -27,16 +27,6 @@ func (s *levelService) CreateLevel(req dto.CreateLevelRequest) error {
 		Name: req.Name,
 	}
 	return s.repo.CreateLevel(&level)
-}
-
-func (s *levelService) UpdateLevel(id string, req dto.UpdateLevelRequest) error {
-	level, err := s.repo.GetLevelByID(id)
-	if err != nil {
-		return err
-	}
-
-	level.Name = req.Name
-	return s.repo.UpdateLevel(level)
 }
 
 func (s *levelService) DeleteLevel(id string) error {
@@ -74,4 +64,14 @@ func (s *levelService) GetLevelByID(id string) (*dto.LevelResponse, error) {
 		ID:   level.ID.String(),
 		Name: level.Name,
 	}, nil
+}
+
+func (s *levelService) UpdateLevel(id string, req dto.UpdateLevelRequest) error {
+	level, err := s.repo.GetLevelByID(id)
+	if err != nil {
+		return err
+	}
+
+	level.Name = req.Name
+	return s.repo.UpdateLevel(level)
 }

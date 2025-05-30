@@ -53,6 +53,6 @@ func InitServices(repo *RepositoryContainer, db *gorm.DB) *ServiceContainer {
 		ReviewService:           services.NewReviewService(repo.ReviewRepo, repo.BookingRepo, repo.InstructorRepo),
 		PaymentService:          services.NewPaymentService(repo.PaymentRepo, repo.PackageRepo, repo.UserPackageRepo, repo.AuthRepo, voucherService, notificationService),
 		BookingService:          services.NewBookingService(db, repo.BookingRepo, repo.ClassScheduleRepo, repo.UserPackageRepo, repo.PackageRepo, notificationService),
-		ClassScheduleService:    services.NewClassScheduleService(repo.ClassScheduleRepo, repo.ClassRepo, repo.PackageRepo, repo.UserPackageRepo, repo.BookingRepo, repo.ScheduleTemplateRepo, scheduleTemplateService),
+		ClassScheduleService:    services.NewClassScheduleService(repo.ClassScheduleRepo, repo.ClassRepo, repo.PackageRepo, repo.BookingRepo, repo.ScheduleTemplateRepo, scheduleTemplateService),
 	}
 }

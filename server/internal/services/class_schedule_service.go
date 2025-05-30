@@ -35,7 +35,6 @@ type classScheduleService struct {
 	repo            repositories.ClassScheduleRepository
 	classRepo       repositories.ClassRepository
 	packageRepo     repositories.PackageRepository
-	userPackageRepo repositories.UserPackageRepository
 	bookingRepo     repositories.BookingRepository
 	templateRepo    repositories.ScheduleTemplateRepository
 	templateService ScheduleTemplateService
@@ -45,7 +44,6 @@ func NewClassScheduleService(
 	repo repositories.ClassScheduleRepository,
 	classRepo repositories.ClassRepository,
 	packageRepo repositories.PackageRepository,
-	userPackageRepo repositories.UserPackageRepository,
 	bookingRepo repositories.BookingRepository,
 	templateRepo repositories.ScheduleTemplateRepository,
 	templateService ScheduleTemplateService,
@@ -54,7 +52,6 @@ func NewClassScheduleService(
 		repo:            repo,
 		classRepo:       classRepo,
 		packageRepo:     packageRepo,
-		userPackageRepo: userPackageRepo,
 		bookingRepo:     bookingRepo,
 		templateRepo:    templateRepo,
 		templateService: templateService,
@@ -565,10 +562,10 @@ func (s *classScheduleService) GetAttendancesForSchedule(scheduleID string) ([]d
 		}
 
 		if attendance.CheckedAt != nil && !attendance.CheckedAt.IsZero() {
-			resp.CheckedAt = attendance.CheckedAt.Format("2006-01-02 15:04:05")
+			resp.CheckedAt = attendance.CheckedAt.Format(time.RFC3339)
 		}
 		if attendance.VerifiedAt != nil && !attendance.VerifiedAt.IsZero() {
-			resp.VerifiedAt = attendance.VerifiedAt.Format("2006-01-02 15:04:05")
+			resp.VerifiedAt = attendance.VerifiedAt.Format(time.RFC3339)
 		}
 
 		result = append(result, resp)

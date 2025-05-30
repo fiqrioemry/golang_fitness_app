@@ -20,14 +20,14 @@ func NewDashboardService(repo repositories.DashboardRepository) DashboardService
 
 func (s *dashboardService) GetSummary() (*dto.DashboardSummaryResponse, error) {
 	users, _ := s.repo.CountUsers()
-	instructors, _ := s.repo.CountInstructors()
+	revenue, _ := s.repo.SumRevenue()
 	classes, _ := s.repo.CountClasses()
 	bookings, _ := s.repo.CountBookings()
 	payments, _ := s.repo.CountPayments()
-	revenue, _ := s.repo.SumRevenue()
+	instructors, _ := s.repo.CountInstructors()
 	packages, _ := s.repo.CountActivePackages()
-	attended, _ := s.repo.CountAttendanceByStatus("attended")
 	absent, _ := s.repo.CountAttendanceByStatus("absent")
+	attended, _ := s.repo.CountAttendanceByStatus("attended")
 
 	return &dto.DashboardSummaryResponse{
 		TotalUsers:         users,

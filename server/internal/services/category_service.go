@@ -24,24 +24,6 @@ func NewCategoryService(repo repositories.CategoryRepository) CategoryService {
 	return &categoryService{repo}
 }
 
-func (s *categoryService) CreateCategory(req dto.CreateCategoryRequest) error {
-	category := models.Category{
-		ID:   uuid.New(),
-		Name: req.Name,
-	}
-	return s.repo.CreateCategory(&category)
-}
-
-func (s *categoryService) UpdateCategory(id string, req dto.UpdateCategoryRequest) error {
-	category, err := s.repo.GetCategoryByID(id)
-	if err != nil {
-		return err
-	}
-
-	category.Name = req.Name
-	return s.repo.UpdateCategory(category)
-}
-
 func (s *categoryService) DeleteCategory(id string) error {
 	_, err := s.repo.GetCategoryByID(id)
 	if err != nil {
@@ -67,6 +49,14 @@ func (s *categoryService) GetAllCategories() ([]dto.CategoryResponse, error) {
 	return result, nil
 }
 
+func (s *categoryService) CreateCategory(req dto.CreateCategoryRequest) error {
+	category := models.Category{
+		ID:   uuid.New(),
+		Name: req.Name,
+	}
+	return s.repo.CreateCategory(&category)
+}
+
 func (s *categoryService) GetCategoryByID(id string) (*dto.CategoryResponse, error) {
 	category, err := s.repo.GetCategoryByID(id)
 	if err != nil {
@@ -77,4 +67,14 @@ func (s *categoryService) GetCategoryByID(id string) (*dto.CategoryResponse, err
 		ID:   category.ID.String(),
 		Name: category.Name,
 	}, nil
+}
+
+func (s *categoryService) UpdateCategory(id string, req dto.UpdateCategoryRequest) error {
+	category, err := s.repo.GetCategoryByID(id)
+	if err != nil {
+		return err
+	}
+
+	category.Name = req.Name
+	return s.repo.UpdateCategory(category)
 }

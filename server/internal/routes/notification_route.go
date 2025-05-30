@@ -14,6 +14,11 @@ func NotificationRoutes(r *gin.Engine, h *handlers.NotificationHandler) {
 	notif.PUT("/settings", h.UpdateNotificationSetting)
 	notif.GET("", h.GetAllNotifications)
 	notif.PATCH("/read", h.MarkAllNotificationsAsRead)
-
 	notif.POST("/broadcast", middleware.RoleOnly("admin"), h.SendNewNotificatioon)
 }
+
+// GET    /api/notifications/settings     → Ambil pengaturan notifikasi milik user
+// PUT    /api/notifications/settings     → Update pengaturan notifikasi user
+// GET    /api/notifications              → Ambil semua notifikasi milik user
+// PATCH  /api/notifications/read         → Tandai semua notifikasi sebagai sudah dibaca
+// POST   /api/notifications/broadcast    → Kirim notifikasi broadcast ke semua user (admin on

@@ -20,7 +20,6 @@ type User struct {
 
 	Profile      Profile       `gorm:"foreignKey:UserID" json:"profile"`
 	Tokens       []Token       `gorm:"foreignKey:UserID" json:"-"`
-	Payments     []Payment     `gorm:"foreignKey:UserID" json:"payments,omitempty"`
 	UserPackages []UserPackage `gorm:"foreignKey:UserID" json:"packages,omitempty"`
 	Bookings     []Booking     `gorm:"foreignKey:UserID" json:"bookings,omitempty"`
 }

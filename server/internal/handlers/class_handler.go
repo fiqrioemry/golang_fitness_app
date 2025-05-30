@@ -36,6 +36,7 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 	if !utils.BindAndValidateForm(c, &req) {
 		return
 	}
+
 	req.IsActive, _ = utils.ParseBoolFormField(c, "isActive")
 
 	if req.Image != nil {
@@ -117,13 +118,6 @@ func (h *ClassHandler) GetAllClasses(c *gin.Context) {
 	var params dto.ClassQueryParam
 	if !utils.BindAndValidateForm(c, &params) {
 		return
-	}
-
-	if params.Page == 0 {
-		params.Page = 1
-	}
-	if params.Limit == 0 {
-		params.Limit = 10
 	}
 
 	classes, pagination, err := h.classService.GetAllClasses(params)

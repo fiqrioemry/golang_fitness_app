@@ -10,6 +10,7 @@ import (
 	"server/internal/models"
 	"server/internal/repositories"
 	"server/internal/utils"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -90,14 +91,26 @@ func (s *authService) GetUserProfile(userID string) (*models.User, error) {
 }
 
 func (s *authService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
+	redisKey := fmt.Sprintf("login:attempt:%s", req.Email)
+	attemptsStr, _ := config.RedisClient.Get(config.Ctx, redisKey).Result()
+	attempts := 0
+
+	if attemptsStr != "" {
+		attempts, _ = strconv.Atoi(attemptsStr)
+	}
+
+	if attempts >= 5 {
+		return nil, errors.New("too many failed attempts, please try again in 30 minutes")
+	}
+
 	user, err := s.repo.GetUserByEmail(req.Email)
-	if err != nil {
+	if err != nil || !utils.CheckPasswordHash(req.Password, user.Password) {
+		config.RedisClient.Incr(config.Ctx, redisKey)
+		config.RedisClient.Expire(config.Ctx, redisKey, 30*time.Minute)
 		return nil, errors.New("invalid email or password")
 	}
 
-	if !utils.CheckPasswordHash(req.Password, user.Password) {
-		return nil, errors.New("invalid email or password")
-	}
+	config.RedisClient.Del(config.Ctx, redisKey)
 
 	accessToken, err := utils.GenerateAccessToken(user.ID.String(), user.Role)
 	if err != nil {

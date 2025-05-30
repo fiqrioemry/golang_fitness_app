@@ -4,6 +4,7 @@ package services
 import (
 	"server/internal/dto"
 	"server/internal/repositories"
+	"server/internal/utils"
 )
 
 type UserService interface {
@@ -27,9 +28,9 @@ func (s *userService) GetAllUsers(params dto.UserQueryParam) ([]dto.UserListResp
 		return nil, nil, err
 	}
 
-	var result []dto.UserListResponse
+	var results []dto.UserListResponse
 	for _, u := range users {
-		result = append(result, dto.UserListResponse{
+		results = append(results, dto.UserListResponse{
 			ID:       u.ID.String(),
 			Email:    u.Email,
 			Role:     u.Role,
@@ -39,16 +40,8 @@ func (s *userService) GetAllUsers(params dto.UserQueryParam) ([]dto.UserListResp
 			JoinedAt: u.CreatedAt.Format("2006-01-02"),
 		})
 	}
-	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
-
-	pagination := &dto.PaginationResponse{
-		Page:       params.Page,
-		Limit:      params.Limit,
-		TotalRows:  int(total),
-		TotalPages: totalPages,
-	}
-
-	return result, pagination, nil
+	pagination := utils.Paginate(total, params.Page, params.Limit)
+	return results, pagination, nil
 
 }
 

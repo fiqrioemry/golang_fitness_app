@@ -93,18 +93,6 @@ func (h *PackageHandler) GetAllPackages(c *gin.Context) {
 	})
 }
 
-func (h *PackageHandler) GetPackagesByClassID(c *gin.Context) {
-	id := c.Param("id")
-
-	classPackage, err := h.packageService.GetRelatedPackages(id)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": "Package not found"})
-		return
-	}
-
-	c.JSON(http.StatusOK, classPackage)
-}
-
 func (h *PackageHandler) GetPackageByID(c *gin.Context) {
 	id := c.Param("id")
 

@@ -25,6 +25,26 @@ func NewReviewService(repo repositories.ReviewRepository, bookingRepo repositori
 	return &reviewService{repo, bookingRepo, instructorRepo}
 }
 
+func (s *reviewService) GetReviewsByClassID(classID string) ([]dto.ReviewResponse, error) {
+	reviews, err := s.repo.GetReviewsByClassID(classID)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.ReviewResponse
+	for _, r := range reviews {
+		result = append(result, dto.ReviewResponse{
+			ID:        r.ID.String(),
+			UserName:  r.User.Profile.Fullname,
+			ClassName: r.Class.Title,
+			Rating:    r.Rating,
+			Comment:   r.Comment,
+			CreatedAt: r.CreatedAt.Format(time.RFC3339),
+		})
+	}
+	return result, nil
+}
+
 func (s *reviewService) CreateReview(userID string, bookingID string, req dto.CreateReviewRequest) error {
 
 	booking, err := s.bookingRepo.GetBookingByID(userID, bookingID)
@@ -65,24 +85,4 @@ func (s *reviewService) CreateReview(userID string, bookingID string, req dto.Cr
 	}
 
 	return nil
-}
-
-func (s *reviewService) GetReviewsByClassID(classID string) ([]dto.ReviewResponse, error) {
-	reviews, err := s.repo.GetReviewsByClassID(classID)
-	if err != nil {
-		return nil, err
-	}
-
-	var result []dto.ReviewResponse
-	for _, r := range reviews {
-		result = append(result, dto.ReviewResponse{
-			ID:        r.ID.String(),
-			UserName:  r.User.Profile.Fullname,
-			ClassName: r.Class.Title,
-			Rating:    r.Rating,
-			Comment:   r.Comment,
-			CreatedAt: r.CreatedAt.Format(time.RFC3339),
-		})
-	}
-	return result, nil
 }

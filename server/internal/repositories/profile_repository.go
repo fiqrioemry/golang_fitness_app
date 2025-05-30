@@ -9,9 +9,7 @@ import (
 type ProfileRepository interface {
 	UpdateUser(user *models.User) error
 	GetUserByID(userID string) (*models.User, error)
-	GetUserTransactions(userID string, limit, offset int) ([]models.Payment, int64, error)
 	GetUserPackages(userID string, limit, offset int) ([]models.UserPackage, int64, error)
-
 	GetUserPackagesByClassID(userID, classID string) ([]models.UserPackage, error)
 }
 
@@ -33,24 +31,6 @@ func (r *profileRepository) GetUserByID(userID string) (*models.User, error) {
 
 func (r *profileRepository) UpdateUser(user *models.User) error {
 	return r.db.Session(&gorm.Session{FullSaveAssociations: true}).Updates(user).Error
-}
-
-func (r *profileRepository) GetUserTransactions(userID string, limit, offset int) ([]models.Payment, int64, error) {
-	var payments []models.Payment
-	var count int64
-
-	query := r.db.
-		Model(&models.Payment{}).
-		Where("user_id = ?", userID)
-
-	if err := query.Count(&count).Error; err != nil {
-		return nil, 0, err
-	}
-	if err := query.Order("paid_at DESC").Limit(limit).Offset(offset).Find(&payments).Error; err != nil {
-		return nil, 0, err
-	}
-
-	return payments, count, nil
 }
 
 func (r *profileRepository) GetUserPackages(userID string, limit, offset int) ([]models.UserPackage, int64, error) {

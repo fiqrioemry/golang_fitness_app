@@ -8,6 +8,7 @@ import (
 	"server/internal/cron"
 	"server/internal/middleware"
 	"server/internal/routes"
+	"server/internal/seeders"
 	"server/internal/utils"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 )
 
 func main() {
+	// config =================================
 	utils.LoadEnv()
 	utils.InitLogger()
 	config.InitRedis()
@@ -27,7 +29,7 @@ func main() {
 
 	db := config.DB
 	//  Seeder ================================
-	// seeders.ResetDatabase(db)
+	seeders.ResetDatabase(db)
 
 	r := gin.Default()
 	err := r.SetTrustedProxies(config.GetTrustedProxies())

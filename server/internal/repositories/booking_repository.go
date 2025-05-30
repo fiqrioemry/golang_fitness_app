@@ -10,21 +10,20 @@ import (
 
 type BookingRepository interface {
 	CreateBooking(booking *models.Booking) error
-	GetBookingByID(userID, bookingID string) (*models.Booking, error)
 	CountBookingBySchedule(scheduleID string) (int64, error)
-	UpdateBookingStatus(bookingID uuid.UUID, status string) error
-	IsUserBookedSchedule(userID, scheduleID string) (bool, error)
-	FindByUserAndSchedule(userID, scheduleID string) (*models.Booking, error)
 	CheckAttendanceExists(bookingID uuid.UUID) (bool, error)
-
+	IsUserBookedSchedule(userID, scheduleID string) (bool, error)
+	UpdateBookingStatus(bookingID uuid.UUID, status string) error
+	GetBookingByID(userID, bookingID string) (*models.Booking, error)
+	FindByUserAndSchedule(userID, scheduleID string) (*models.Booking, error)
 	GetBookingsByUserID(userID string, params dto.BookingQueryParam) ([]models.Booking, int64, error)
-
-	// ** cron job
-	GetAllBookedWithScheduleAndClass() ([]models.Booking, error)
 
 	// attendance
 	CreateAttendance(attendance *models.Attendance) error
 	UpdateAttendance(attendance *models.Attendance) error
+
+	// ** cron job
+	GetAllBookedWithScheduleAndClass() ([]models.Booking, error)
 }
 
 type bookingRepository struct {
@@ -75,19 +74,12 @@ func (r *bookingRepository) GetBookingsByUserID(userID string, params dto.Bookin
 		db = db.Order("class_schedules.date DESC")
 	}
 
-	// Pagination
+	offset := (params.Page - 1) * params.Limit
+
 	if err := db.Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
 
-	if params.Page == 0 {
-		params.Page = 1
-	}
-	if params.Limit == 0 {
-		params.Limit = 10
-	}
-
-	offset := (params.Page - 1) * params.Limit
 	if err := db.Limit(params.Limit).Offset(offset).Find(&bookings).Error; err != nil {
 		return nil, 0, err
 	}

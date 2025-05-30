@@ -7,6 +7,7 @@ import (
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
+	"server/internal/utils"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,12 +15,11 @@ import (
 )
 
 type BookingService interface {
-	CreateBooking(userID, packageID, scheduleID string) error
 	MarkAbsentBookings() error
 	CheckedInClassSchedule(userID, bookingID string) error
-	CheckoutClassSchedule(userID, bookingID string, req dto.ValidateCheckoutRequest) error
+	CreateBooking(userID, packageID, scheduleID string) error
 	GetBookingDetail(userID, bookingID string) (*dto.BookingDetailResponse, error)
-
+	CheckoutClassSchedule(userID, bookingID string, req dto.ValidateCheckoutRequest) error
 	GetBookingByUser(userID string, params dto.BookingQueryParam) ([]dto.BookingResponse, *dto.PaginationResponse, error)
 }
 
@@ -110,7 +110,7 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 		return err
 	}
 
-	// ✅ Async side-effect (tidak perlu rollback kalau gagal)
+	// TODO: Use RabbitMQ to emit "booking_success" event for async email delivery
 	payload := dto.NotificationEvent{
 		UserID: bookingID.String(),
 		Type:   "system_message",
@@ -126,6 +126,7 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 	if err := s.notificationService.SendToUser(payload); err != nil {
 		log.Printf("failed sending notification to user %s: %v\n", payload.UserID, err)
 	}
+	// TODO: Use RabbitMQ to emit "booking_success" event for async email delivery
 
 	return nil
 }
@@ -153,18 +154,10 @@ func (s *bookingService) GetBookingByUser(userID string, params dto.BookingQuery
 			Location:       schedule.Location,
 			IsOpened:       schedule.IsOpened,
 			Date:           schedule.Date.Format("2006-01-02"),
-			BookedAt:       b.CreatedAt.Format("2006-01-02 15:04:05"),
+			BookedAt:       b.CreatedAt.Format(time.RFC3339),
 		})
 	}
-
-	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
-	pagination := &dto.PaginationResponse{
-		Page:       params.Page,
-		Limit:      params.Limit,
-		TotalRows:  int(total),
-		TotalPages: totalPages,
-	}
-
+	pagination := utils.Paginate(total, params.Page, params.Limit)
 	return result, pagination, nil
 }
 

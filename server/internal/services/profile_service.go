@@ -13,10 +13,8 @@ type ProfileService interface {
 	GetUserByID(userID string) (*models.User, error)
 	UpdateProfile(userID string, req dto.UpdateProfileRequest) error
 	UpdateAvatar(userID string, file *multipart.FileHeader) error
-	GetUserPackages(userID string, page, limit int) (*dto.UserPackageListResponse, error)
-	GetUserTransactions(userID string, page, limit int) (*dto.TransactionListResponse, error)
-
 	GetUserPackagesByClassID(userID, classID string) ([]dto.UserPackageResponse, error)
+	GetUserPackages(userID string, page, limit int) (*dto.UserPackageListResponse, error)
 }
 
 type profileService struct {
@@ -36,10 +34,10 @@ func (s *profileService) UpdateProfile(userID string, req dto.UpdateProfileReque
 		return err
 	}
 
-	user.Profile.Fullname = req.Fullname
-	user.Profile.Gender = req.Gender
-	user.Profile.Phone = req.Phone
 	user.Profile.Bio = req.Bio
+	user.Profile.Phone = req.Phone
+	user.Profile.Gender = req.Gender
+	user.Profile.Fullname = req.Fullname
 	if req.Birthday != "" {
 		birthday, err := time.Parse("2006-01-02", req.Birthday)
 		if err == nil {
@@ -86,43 +84,6 @@ func (s *profileService) UpdateAvatar(userID string, file *multipart.FileHeader)
 
 func isDiceBear(url string) bool {
 	return url != "" && (len(url) > 0 && (url[:30] == "https://api.dicebear.com" || url[:31] == "https://avatars.dicebear.com"))
-}
-
-func (s *profileService) GetUserTransactions(userID string, page, limit int) (*dto.TransactionListResponse, error) {
-	offset := (page - 1) * limit
-
-	payments, total, err := s.repo.GetUserTransactions(userID, limit, offset)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(payments) == 0 {
-		payments = make([]models.Payment, 0)
-	}
-
-	taxRate := utils.GetTaxRate()
-	var transactions []dto.TransactionResponse
-	for _, p := range payments {
-		transactions = append(transactions, dto.TransactionResponse{
-			ID:            p.ID.String(),
-			PackageID:     p.PackageID.String(),
-			PackageName:   p.PackageName,
-			PaymentLink:   p.PaymentLink,
-			PaymentMethod: p.PaymentMethod,
-			Status:        p.Status,
-			BasePrice:     p.BasePrice,
-			Tax:           taxRate,
-			Price:         p.Total,
-			PaidAt:        p.PaidAt.Format("2006-01-02 15:04:05"),
-		})
-	}
-
-	return &dto.TransactionListResponse{
-		Transactions: transactions,
-		Total:        total,
-		Page:         page,
-		Limit:        limit,
-	}, nil
 }
 
 func (s *profileService) GetUserPackages(userID string, page, limit int) (*dto.UserPackageListResponse, error) {

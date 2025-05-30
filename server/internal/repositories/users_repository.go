@@ -52,18 +52,11 @@ func (r *userRepository) FindAllUsers(params dto.UserQueryParam) ([]models.User,
 		db = db.Order("users.created_at desc")
 	}
 
-	page := params.Page
-	if page <= 0 {
-		page = 1
-	}
-	limit := params.Limit
-	if limit <= 0 {
-		limit = 10
-	}
+	offset := (params.Page - 1) * params.Limit
 
-	offset := (page - 1) * limit
-
-	db.Count(&count)
+	if err := db.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
 	if err := db.Limit(params.Limit).Offset(offset).Find(&users).Error; err != nil {
 		return nil, 0, err
 	}

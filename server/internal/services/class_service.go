@@ -197,13 +197,13 @@ func (s *classService) GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassRes
 		return nil, nil, err
 	}
 
-	var result []dto.ClassResponse
+	var results []dto.ClassResponse
 	for _, c := range classes {
 		galleries := make([]string, len(c.Galleries))
 		for i, g := range c.Galleries {
 			galleries[i] = g.URL
 		}
-		result = append(result, dto.ClassResponse{
+		results = append(results, dto.ClassResponse{
 			ID:            c.ID.String(),
 			Title:         c.Title,
 			Image:         c.Image,
@@ -221,15 +221,8 @@ func (s *classService) GetAllClasses(params dto.ClassQueryParam) ([]dto.ClassRes
 		})
 	}
 
-	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
-	pagination := &dto.PaginationResponse{
-		Page:       params.Page,
-		Limit:      params.Limit,
-		TotalRows:  int(total),
-		TotalPages: totalPages,
-	}
-
-	return result, pagination, nil
+	pagination := utils.Paginate(total, params.Page, params.Limit)
+	return results, pagination, nil
 }
 
 func (s *classService) UpdateClassGallery(classID uuid.UUID, keepImages []string, newImageURLs []string) error {

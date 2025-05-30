@@ -15,6 +15,7 @@ type PaymentRepository interface {
 	GetPaymentByID(id string) (*models.Payment, error)
 	GetPaymentByOrderID(orderID string) (*models.Payment, error)
 	GetAllUserPayments(params dto.PaymentQueryParam) ([]models.Payment, int64, error)
+	GetPaymentsByUserID(userID string, params dto.PaymentQueryParam) ([]models.Payment, int64, error)
 }
 
 type paymentRepository struct {
@@ -49,28 +50,17 @@ func (r *paymentRepository) UpdatePayment(payment *models.Payment) error {
 	return r.db.Save(payment).Error
 }
 
-func (r *paymentRepository) GetAllUserPayments(params dto.PaymentQueryParam) ([]models.Payment, int64, error) {
-	var payments []models.Payment
-	var count int64
-
-	db := r.db.Model(&models.Payment{})
-	// search
+func applyPaymentFilters(db *gorm.DB, params dto.PaymentQueryParam) *gorm.DB {
 	if params.Search != "" {
-		likeQuery := "%" + params.Search + "%"
-		db = db.Where("email LIKE ? OR fullname LIKE ?", likeQuery, likeQuery)
+		like := "%" + params.Search + "%"
+		db = db.Where("email LIKE ? OR fullname LIKE ?", like, like)
 	}
-
-	// status filter
 	if params.Status != "" && params.Status != "all" {
-		db = db.Where("payments.status = ?", params.Status)
+		db = db.Where("status = ?", params.Status)
 	}
-
-	// date range filter
 	if params.StartDate != "" && params.EndDate != "" {
 		db = db.Where("paid_at BETWEEN ? AND ?", params.StartDate, params.EndDate)
 	}
-
-	// sorting
 	switch params.Sort {
 	case "paid_at_asc":
 		db = db.Order("paid_at asc")
@@ -87,30 +77,50 @@ func (r *paymentRepository) GetAllUserPayments(params dto.PaymentQueryParam) ([]
 	default:
 		db = db.Order("paid_at desc")
 	}
+	return db
+}
 
-	// pagination
-	page := params.Page
-	if page <= 0 {
-		page = 1
-	}
-	// limit per page
-	limit := params.Limit
-	if limit <= 0 {
-		limit = 10
-	}
-	offset := (page - 1) * limit
+func (r *paymentRepository) GetAllUserPayments(params dto.PaymentQueryParam) ([]models.Payment, int64, error) {
+	var payments []models.Payment
+	var count int64
+
+	db := r.db.Model(&models.Payment{})
+
+	db = applyPaymentFilters(db, params)
+
+	offset := (params.Page - 1) * params.Limit
 
 	if err := db.Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
-	if err := db.Limit(limit).Offset(offset).Find(&payments).Error; err != nil {
+	if err := db.Limit(params.Limit).Offset(offset).Find(&payments).Error; err != nil {
 		return nil, 0, err
 	}
 
 	return payments, count, nil
 }
 
-// ** khusus cron job update status ke failed
+func (r *paymentRepository) GetPaymentsByUserID(userID string, params dto.PaymentQueryParam) ([]models.Payment, int64, error) {
+	var payments []models.Payment
+	var count int64
+
+	db := r.db.Model(&models.Payment{})
+	db = applyPaymentFilters(db, params)
+	db = db.Where("user_id = ?", userID)
+
+	offset := (params.Page - 1) * params.Limit
+
+	if err := db.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := db.Limit(params.Limit).Offset(offset).Find(&payments).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return payments, count, nil
+}
+
 func (r *paymentRepository) ExpireOldPendingPayments() (int64, error) {
 	threshold := time.Now().Add(-24 * time.Hour)
 

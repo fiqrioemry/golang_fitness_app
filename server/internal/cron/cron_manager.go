@@ -32,7 +32,7 @@ func NewCronManager(
 }
 
 func (cm *CronManager) RegisterJobs() {
-	// Update payment pending → failed (setiap hari 00:30)
+	// Update payment pending → failed (everyday @00:30)
 	cm.c.AddFunc("0 30 0 * * *", func() {
 		log.Println("Cron: Checking expired pending payments...")
 		if err := cm.paymentService.ExpireOldPendingPayments(); err != nil {
@@ -42,7 +42,7 @@ func (cm *CronManager) RegisterJobs() {
 		}
 	})
 
-	// Generate recurring class schedule (setiap hari 12:00)
+	// Generate recurring class schedule (everyday @12:00)
 	cm.c.AddFunc("0 12 * * *", func() {
 		log.Println("Cron: Auto-generating class schedules...")
 		if err := cm.scheduleService.AutoGenerateSchedules(); err != nil {
@@ -52,7 +52,7 @@ func (cm *CronManager) RegisterJobs() {
 		}
 	})
 
-	// Reminder dan Mark Absent  tiap 15 menit
+	// Reminder and Mark Absent every 15 minutes
 	cm.c.AddFunc("@every 15m", func() {
 		log.Println("Cron: Sending class reminders...")
 		if err := cm.notificationService.SendClassReminder(); err != nil {
