@@ -17,7 +17,8 @@ func NewReviewHandler(service services.ReviewService) *ReviewHandler {
 	return &ReviewHandler{service}
 }
 
-func (h *ReviewHandler) CreateReview(c *gin.Context) {
+func (h *ReviewHandler) CreateReviewFromBookingID(c *gin.Context) {
+	bookingID := c.Param("id")
 	var req dto.CreateReviewRequest
 	if !utils.BindAndValidateJSON(c, &req) {
 		return
@@ -25,7 +26,7 @@ func (h *ReviewHandler) CreateReview(c *gin.Context) {
 
 	userID := utils.MustGetUserID(c)
 
-	if err := h.service.CreateReview(userID, req); err != nil {
+	if err := h.service.CreateReview(userID, bookingID, req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error(), "error": err.Error()})
 		return
 	}

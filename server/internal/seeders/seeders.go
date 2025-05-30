@@ -813,7 +813,7 @@ func SeedClassSchedules(db *gorm.DB) {
 	threeDaysAgo := now.AddDate(0, 0, -3)
 
 	zoomLink := "https://zoom.us/j/92613838319?pwd=cTlscGI5cGlTU2IwZVN1b0FuR2d2QT09"
-	verificationCode := "5443334"
+	verificationCode := "123456"
 
 	schedulePast1 := models.ClassSchedule{
 		ClassID:          class.ID,
@@ -859,10 +859,9 @@ func SeedClassSchedules(db *gorm.DB) {
 	nowLocal := time.Now().In(loc)
 	startTime := nowLocal.Add(1 * time.Hour)
 
-	// Gunakan time.Date untuk mengambil tanggal Asia/Jakarta secara tepat
 	dateOnly := time.Date(
 		nowLocal.Year(), nowLocal.Month(), nowLocal.Day(),
-		0, 0, 0, 0, time.UTC, // <-- harus UTC karena disimpan di DB pakai UTC
+		0, 0, 0, 0, time.UTC,
 	)
 
 	scheduleToday := models.ClassSchedule{
@@ -886,7 +885,7 @@ func SeedClassSchedules(db *gorm.DB) {
 
 	CreateBookingWithAttendance(db, user, schedulePast1, "attended", true, true)
 	CreateBookingWithAttendance(db, user, schedulePast2, "entered", true, false)
-	CreateBookingWithAttendance(db, user, scheduleToday, "none", false, false)
+	CreateBookingWithAttendance(db, user, scheduleToday, "not-join", false, false)
 
 	log.Println("✅ Seeded ClassSchedules + Bookings + Attendance (past & today) safely.")
 }

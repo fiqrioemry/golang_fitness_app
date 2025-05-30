@@ -167,6 +167,7 @@ type ClassSchedule struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	Bookings  []Booking      `gorm:"foreignKey:ClassScheduleID" json:"bookings"`
 }
+
 type Booking struct {
 	ID              uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
 	UserID          uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_user_schedule" json:"userId"`
@@ -182,7 +183,7 @@ type Booking struct {
 type Attendance struct {
 	ID         uuid.UUID  `gorm:"type:char(36);primaryKey" json:"id"`
 	BookingID  uuid.UUID  `gorm:"type:char(36);not null;uniqueIndex" json:"bookingId"`
-	Status     string     `gorm:"type:varchar(20);not null;default:'none';check:status IN ('none','entered', 'attended', 'absent')" json:"status"`
+	Status     string     `gorm:"type:varchar(20);not null;default:'not-join';check:status IN ('not-join','entered', 'attended', 'absent')" json:"status"`
 	IsReviewed bool       `gorm:"default:false" json:"isReviewed"`
 	CheckedIn  bool       `gorm:"default:false" json:"checkedIn"`
 	CheckedOut bool       `gorm:"default:false" json:"checkedOut"`

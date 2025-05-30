@@ -24,7 +24,7 @@ type ClassScheduleRepository interface {
 	// instructor
 	GetInstructorByUserID(userID uuid.UUID) (*models.Instructor, error)
 	CloseScheduleWithCode(scheduleID uuid.UUID, code string) error
-	OpenSchedule(scheduleID uuid.UUID, zoomLink string) error
+	OpenSchedule(scheduleID uuid.UUID, schedule *models.ClassSchedule) error
 	GetAttendancesByScheduleID(scheduleID string) ([]models.Booking, error)
 	GetSchedulesByInstructorID(instructorID uuid.UUID, params dto.InstructorScheduleQueryParam) ([]models.ClassSchedule, int64, error)
 }
@@ -144,28 +144,16 @@ func (r *classScheduleRepository) GetSchedulesByInstructorID(instructorID uuid.U
 	db := r.db.Model(&models.ClassSchedule{}).
 		Where("instructor_id = ? AND booked > 0", instructorID)
 
-	nowUTC := time.Now().UTC().Format("2006-01-02 15:04:05")
-
 	if params.Status == "upcoming" {
 		db = db.Where(`
-			ADDTIME(
-				STR_TO_DATE(CONCAT(date, ' ', 
-					LPAD(start_hour, 2, '0'), ':', 
-					LPAD(start_minute, 2, '0')
-				), '%Y-%m-%d %H:%i'),
-				SEC_TO_TIME(duration * 60)
-			) > ?
-		`, nowUTC)
+		TIMESTAMP(class_schedules.date, MAKETIME(class_schedules.start_hour, class_schedules.start_minute, 0)) 
+		+ INTERVAL class_schedules.duration MINUTE > CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+07:00')
+	`)
 	} else if params.Status == "past" {
 		db = db.Where(`
-			ADDTIME(
-				STR_TO_DATE(CONCAT(date, ' ', 
-					LPAD(start_hour, 2, '0'), ':', 
-					LPAD(start_minute, 2, '0')
-				), '%Y-%m-%d %H:%i'),
-				SEC_TO_TIME(duration * 60)
-			) <= ?
-		`, nowUTC)
+		TIMESTAMP(class_schedules.date, MAKETIME(class_schedules.start_hour, class_schedules.start_minute, 0)) 
+		+ INTERVAL class_schedules.duration MINUTE <= CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+07:00')
+	`)
 	}
 
 	// Sorting
@@ -204,12 +192,13 @@ func (r *classScheduleRepository) GetSchedulesByInstructorID(instructorID uuid.U
 	return schedules, count, nil
 }
 
-func (r *classScheduleRepository) OpenSchedule(scheduleID uuid.UUID, zoomLink string) error {
+func (r *classScheduleRepository) OpenSchedule(scheduleID uuid.UUID, schedule *models.ClassSchedule) error {
 	return r.db.Model(&models.ClassSchedule{}).
 		Where("id = ?", scheduleID).
 		Updates(map[string]any{
-			"is_opened": true,
-			"zoom_link": zoomLink,
+			"zoom_link":         schedule.ZoomLink,
+			"verification_code": schedule.VerificationCode,
+			"is_opened":         true,
 		}).Error
 }
 

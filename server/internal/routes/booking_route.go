@@ -14,5 +14,5 @@ func BookingRoutes(r *gin.Engine, handler *handlers.BookingHandler) {
 	booking.GET("", handler.GetMyBookings)
 	booking.GET("/:id", handler.GetBookingDetail)
 	booking.POST("/:id/check-in", handler.CheckinBookedClass)
-	booking.POST("/:id/check-out", handler.CheckinBookedClass)
+	booking.POST("/:id/check-out", handler.CheckoutBookedClass)
 }

@@ -47,7 +47,7 @@ func main() {
 
 	// layer ==================================
 	repo := bootstrap.InitRepositories(db)
-	s := bootstrap.InitServices(repo)
+	s := bootstrap.InitServices(repo, db)
 	h := bootstrap.InitHandlers(s)
 
 	// Cron Job ===============================

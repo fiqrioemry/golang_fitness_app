@@ -67,16 +67,21 @@ func (s *classScheduleService) CreateClassSchedule(req dto.CreateScheduleRequest
 	if err != nil {
 		return err
 	}
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+
+	newStartLocal := time.Date(
+		parsedDate.Year(), parsedDate.Month(), parsedDate.Day(),
+		req.StartHour, req.StartMinute, 0, 0, loc,
+	)
+
+	if newStartLocal.Before(time.Now().In(loc)) {
+		return fmt.Errorf("cannot create schedule in the past")
+	}
 
 	newStart := time.Date(
 		parsedDate.Year(), parsedDate.Month(), parsedDate.Day(),
 		req.StartHour, req.StartMinute, 0, 0, time.UTC,
 	)
-
-	if newStart.Before(time.Now().UTC()) {
-		return fmt.Errorf("cannot create schedule in the past")
-	}
-
 	newEnd := newStart.Add(time.Hour)
 
 	existingSchedules, err := s.repo.GetClassSchedules()
@@ -484,20 +489,22 @@ func (s *classScheduleService) GetSchedulesByInstructor(userID string, params dt
 	var result []dto.InstructorScheduleResponse
 	for _, schedule := range schedules {
 		result = append(result, dto.InstructorScheduleResponse{
-			ID:             schedule.ID.String(),
-			ClassID:        schedule.ClassID.String(),
-			ClassName:      schedule.ClassName,
-			ClassImage:     schedule.ClassImage,
-			InstructorID:   schedule.InstructorID.String(),
-			InstructorName: schedule.InstructorName,
-			Location:       schedule.Location,
-			Date:           schedule.Date.Format("2006-01-02"),
-			StartHour:      schedule.StartHour,
-			StartMinute:    schedule.StartMinute,
-			Capacity:       schedule.Capacity,
-			Duration:       schedule.Duration,
-			BookedCount:    schedule.Booked,
-			IsOpened:       schedule.IsOpened,
+			ID:               schedule.ID.String(),
+			ClassID:          schedule.ClassID.String(),
+			ClassName:        schedule.ClassName,
+			ClassImage:       schedule.ClassImage,
+			InstructorID:     schedule.InstructorID.String(),
+			InstructorName:   schedule.InstructorName,
+			Location:         schedule.Location,
+			Date:             schedule.Date.Format("2006-01-02"),
+			StartHour:        schedule.StartHour,
+			StartMinute:      schedule.StartMinute,
+			Capacity:         schedule.Capacity,
+			Duration:         schedule.Duration,
+			BookedCount:      schedule.Booked,
+			IsOpened:         schedule.IsOpened,
+			ZoomLink:         *schedule.ZoomLink,
+			VerificationCode: *schedule.VerificationCode,
 		})
 	}
 	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
@@ -519,7 +526,14 @@ func (s *classScheduleService) OpenClassSchedule(id string, req dto.OpenClassSch
 	if schedule.IsOpened {
 		return fmt.Errorf("schedule already opened")
 	}
-	return s.repo.OpenSchedule(schedule.ID, req.ZoomLink)
+
+	if req.ZoomLink != "" {
+		schedule.ZoomLink = &req.ZoomLink
+	}
+
+	schedule.VerificationCode = &req.VerificationCode
+
+	return s.repo.OpenSchedule(schedule.ID, schedule)
 }
 
 func (s *classScheduleService) GetAttendancesForSchedule(scheduleID string) ([]dto.AttendanceWithUserResponse, error) {

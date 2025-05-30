@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type BookingService interface {
@@ -23,6 +24,7 @@ type BookingService interface {
 }
 
 type bookingService struct {
+	db                  *gorm.DB
 	bookingRepo         repositories.BookingRepository
 	classScheduleRepo   repositories.ClassScheduleRepository
 	userPackageRepo     repositories.UserPackageRepository
@@ -30,8 +32,9 @@ type bookingService struct {
 	notificationService NotificationService
 }
 
-func NewBookingService(bookingRepo repositories.BookingRepository, classScheduleRepo repositories.ClassScheduleRepository, userPackageRepo repositories.UserPackageRepository, packageRepo repositories.PackageRepository, notificationService NotificationService) BookingService {
+func NewBookingService(db *gorm.DB, bookingRepo repositories.BookingRepository, classScheduleRepo repositories.ClassScheduleRepository, userPackageRepo repositories.UserPackageRepository, packageRepo repositories.PackageRepository, notificationService NotificationService) BookingService {
 	return &bookingService{
+		db:                  db,
 		bookingRepo:         bookingRepo,
 		classScheduleRepo:   classScheduleRepo,
 		userPackageRepo:     userPackageRepo,
@@ -41,7 +44,6 @@ func NewBookingService(bookingRepo repositories.BookingRepository, classSchedule
 }
 
 func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) error {
-
 	schedule, err := s.classScheduleRepo.GetClassScheduleByID(scheduleID)
 	if err != nil {
 		return fmt.Errorf("class schedule not found")
@@ -64,37 +66,53 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 		return fmt.Errorf("class schedule is full")
 	}
 
-	booking := models.Booking{
-		UserID:          uuid.MustParse(userID),
-		ClassScheduleID: schedule.ID,
-		Status:          "booked",
-	}
-	if err := s.bookingRepo.CreateBooking(&booking); err != nil {
+	bookingID := uuid.New()
+	attendanceID := uuid.New()
+
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		// 1. Create booking
+		booking := models.Booking{
+			ID:              bookingID,
+			UserID:          uuid.MustParse(userID),
+			ClassScheduleID: schedule.ID,
+			Status:          "booked",
+		}
+		if err := tx.Create(&booking).Error; err != nil {
+			return err
+		}
+
+		// 2. Create attendance
+		attendance := models.Attendance{
+			ID:        attendanceID,
+			BookingID: booking.ID,
+		}
+		if err := tx.Create(&attendance).Error; err != nil {
+			return err
+		}
+
+		// 3. Update user package
+		if err := tx.Model(&models.UserPackage{}).
+			Where("id = ?", userPackage.ID).
+			Update("remaining_credit", gorm.Expr("remaining_credit - ?", 1)).Error; err != nil {
+			return err
+		}
+
+		// 4. Increment schedule booking count
+		if err := tx.Model(&models.ClassSchedule{}).
+			Where("id = ?", schedule.ID).
+			Update("booked", gorm.Expr("booked + 1")).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
 		return err
 	}
 
-	attendance := models.Attendance{
-		ID:        uuid.New(),
-		BookingID: booking.ID,
-		Status:    "none",
-	}
-
-	if err := s.bookingRepo.CreateAttendance(&attendance); err != nil {
-		return fmt.Errorf("failed to create attendance record: %v", err)
-	}
-
-	userPackage.RemainingCredit -= 1
-	if err := s.userPackageRepo.UpdateUserPackage(&userPackage); err != nil {
-		return err
-	}
-
-	if err := s.classScheduleRepo.IncrementBooked(schedule.ID); err != nil {
-		return err
-	}
-
-	// TODO: Use RabbitMQ to emit "booking_success" event for async email delivery (only in production with EDA)
+	// ✅ Async side-effect (tidak perlu rollback kalau gagal)
 	payload := dto.NotificationEvent{
-		UserID: booking.UserID.String(),
+		UserID: bookingID.String(),
 		Type:   "system_message",
 		Title:  "Class Booked Successfully",
 		Message: fmt.Sprintf(
@@ -105,11 +123,9 @@ func (s *bookingService) CreateBooking(userID, packageID, scheduleID string) err
 			schedule.StartMinute,
 		),
 	}
-
 	if err := s.notificationService.SendToUser(payload); err != nil {
 		log.Printf("failed sending notification to user %s: %v\n", payload.UserID, err)
 	}
-	// TODO: Use RabbitMQ to emit "payment_success" event for async email delivery (only in production with EDA)
 
 	return nil
 }
@@ -131,11 +147,12 @@ func (s *bookingService) GetBookingByUser(userID string, params dto.BookingQuery
 			ClassName:      schedule.ClassName,
 			ClassImage:     schedule.ClassImage,
 			InstructorName: schedule.InstructorName,
-			Date:           schedule.Date.Format("2006-01-02"),
 			StartHour:      schedule.StartHour,
 			StartMinute:    schedule.StartMinute,
 			Duration:       schedule.Duration,
 			Location:       schedule.Location,
+			IsOpened:       schedule.IsOpened,
+			Date:           schedule.Date.Format("2006-01-02"),
 			BookedAt:       b.CreatedAt.Format("2006-01-02 15:04:05"),
 		})
 	}
@@ -162,6 +179,7 @@ func (s *bookingService) GetBookingDetail(userID, bookingID string) (*dto.Bookin
 
 	res := &dto.BookingDetailResponse{
 		ID:               booking.ID.String(),
+		ScheduleID:       schedule.ID.String(),
 		ClassID:          schedule.ClassID.String(),
 		ClassName:        schedule.ClassName,
 		ClassImage:       schedule.ClassImage,
@@ -184,10 +202,11 @@ func (s *bookingService) GetBookingDetail(userID, bookingID string) (*dto.Bookin
 	}
 
 	if attendance.CheckedIn && attendance.CheckedAt != nil {
-		res.CheckedAt = attendance.CheckedAt.Format("2006-01-02 15:04:05")
+		res.CheckedAt = attendance.CheckedAt.Format(time.RFC3339)
 	}
 	if attendance.CheckedOut && attendance.VerifiedAt != nil {
-		res.VerifiedAt = attendance.VerifiedAt.Format("2006-01-02 15:04:05")
+		res.VerifiedAt = attendance.VerifiedAt.Format(time.RFC3339)
+
 	}
 
 	return res, nil
@@ -224,6 +243,7 @@ func (s *bookingService) CheckoutClassSchedule(userID, bookingID string, req dto
 	}
 	attendance := booking.Attendance
 
+	log.Printf("result for checkout state : %t", attendance.CheckedOut)
 	if attendance.CheckedOut {
 		return errors.New("you have already checkedout from this class")
 	}

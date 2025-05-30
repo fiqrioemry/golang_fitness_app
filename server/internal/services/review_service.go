@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"server/internal/dto"
 	"server/internal/models"
 	"server/internal/repositories"
@@ -10,27 +11,33 @@ import (
 )
 
 type ReviewService interface {
-	CreateReview(userID string, req dto.CreateReviewRequest) error
 	GetReviewsByClassID(classID string) ([]dto.ReviewResponse, error)
+	CreateReview(userID string, bookingID string, req dto.CreateReviewRequest) error
 }
 
 type reviewService struct {
 	repo           repositories.ReviewRepository
-	scheduleRepo   repositories.ClassScheduleRepository
+	bookingRepo    repositories.BookingRepository
 	instructorRepo repositories.InstructorRepository
 }
 
-func NewReviewService(repo repositories.ReviewRepository, scheduleRepo repositories.ClassScheduleRepository, instructorRepo repositories.InstructorRepository) ReviewService {
-	return &reviewService{repo, scheduleRepo, instructorRepo}
+func NewReviewService(repo repositories.ReviewRepository, bookingRepo repositories.BookingRepository, instructorRepo repositories.InstructorRepository) ReviewService {
+	return &reviewService{repo, bookingRepo, instructorRepo}
 }
 
-func (s *reviewService) CreateReview(userID string, req dto.CreateReviewRequest) error {
+func (s *reviewService) CreateReview(userID string, bookingID string, req dto.CreateReviewRequest) error {
 
-	schedule, err := s.scheduleRepo.GetClassScheduleByID(req.ScheduleID)
+	booking, err := s.bookingRepo.GetBookingByID(userID, bookingID)
 	if err != nil {
 		return err
 	}
 
+	attendance := booking.Attendance
+	if attendance.IsReviewed {
+		return errors.New("you already submitted a review")
+	}
+
+	schedule := booking.ClassSchedule
 	review := models.Review{
 		UserID:  uuid.MustParse(userID),
 		ClassID: schedule.ClassID,
@@ -39,6 +46,12 @@ func (s *reviewService) CreateReview(userID string, req dto.CreateReviewRequest)
 	}
 
 	if err := s.repo.CreateReview(&review); err != nil {
+		return err
+	}
+
+	attendance.IsReviewed = true
+
+	if err := s.bookingRepo.UpdateAttendance(&attendance); err != nil {
 		return err
 	}
 

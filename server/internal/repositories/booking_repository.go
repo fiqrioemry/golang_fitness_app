@@ -3,7 +3,6 @@ package repositories
 import (
 	"server/internal/dto"
 	"server/internal/models"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -50,33 +49,16 @@ func (r *bookingRepository) GetBookingsByUserID(userID string, params dto.Bookin
 		Where("user_id = ?", userID).
 		Joins("JOIN class_schedules ON class_schedules.id = bookings.class_schedule_id")
 
-	nowUTC := time.Now().UTC().Format("2006-01-02 15:04:05")
 	if params.Status == "upcoming" {
 		db = db.Where(`
-			ADDTIME(
-				STR_TO_DATE(
-					CONCAT(class_schedules.date, ' ', 
-						LPAD(class_schedules.start_hour, 2, '0'), ':', 
-						LPAD(class_schedules.start_minute, 2, '0')
-					),
-					'%Y-%m-%d %H:%i'
-				),
-				SEC_TO_TIME(class_schedules.duration * 60)
-			) > ?
-		`, nowUTC)
+		TIMESTAMP(class_schedules.date, MAKETIME(class_schedules.start_hour, class_schedules.start_minute, 0)) 
+		+ INTERVAL class_schedules.duration MINUTE > CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+07:00')
+	`)
 	} else if params.Status == "past" {
 		db = db.Where(`
-			ADDTIME(
-				STR_TO_DATE(
-					CONCAT(class_schedules.date, ' ', 
-						LPAD(class_schedules.start_hour, 2, '0'), ':', 
-						LPAD(class_schedules.start_minute, 2, '0')
-					),
-					'%Y-%m-%d %H:%i'
-				),
-				SEC_TO_TIME(class_schedules.duration * 60)
-			) <= ?
-		`, nowUTC)
+		TIMESTAMP(class_schedules.date, MAKETIME(class_schedules.start_hour, class_schedules.start_minute, 0)) 
+		+ INTERVAL class_schedules.duration MINUTE <= CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+07:00')
+	`)
 	}
 
 	// Sorting
@@ -123,12 +105,6 @@ func (r *bookingRepository) GetBookingByID(userID, bookingID string) (*models.Bo
 		return nil, err
 	}
 	return &booking, nil
-}
-
-func (r bookingRepository) UpdateAttendanceStatus(bookingID, status string) error {
-	return r.db.Model(&models.Attendance{}).
-		Where("booking_id = ?", bookingID).
-		Update("status", status).Error
 }
 
 func (r *bookingRepository) CountBookingBySchedule(scheduleID string) (int64, error) {
@@ -186,4 +162,9 @@ func (r bookingRepository) CreateAttendance(attendance *models.Attendance) error
 }
 func (r *bookingRepository) UpdateAttendance(attendance *models.Attendance) error {
 	return r.db.Save(attendance).Error
+}
+func (r bookingRepository) UpdateAttendanceStatus(bookingID, status string) error {
+	return r.db.Model(&models.Attendance{}).
+		Where("booking_id = ?", bookingID).
+		Update("status", status).Error
 }

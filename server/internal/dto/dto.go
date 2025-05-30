@@ -563,10 +563,12 @@ type BookingResponse struct {
 	StartMinute    int    `json:"startMinute"`
 	Location       string `json:"location"`
 	BookedAt       string `json:"bookedAt"`
+	IsOpened       bool   `json:"isOpen"`
 }
 
 type BookingDetailResponse struct {
 	ID               string `json:"id"`
+	ScheduleID       string `json:"scheduleId"`
 	ClassID          string `json:"classId"`
 	ClassName        string `json:"className"`
 	ClassImage       string `json:"classImage"`
@@ -621,9 +623,8 @@ type AttendanceDetailResponse struct {
 
 // REVIEWS ==========================
 type CreateReviewRequest struct {
-	ScheduleID string `json:"scheduleId" binding:"required"`
-	Rating     int    `json:"rating" binding:"required,min=1,max=5"`
-	Comment    string `json:"comment" binding:"omitempty"`
+	Rating  int    `json:"rating" binding:"required,min=1,max=5"`
+	Comment string `json:"comment" binding:"required,min=10"`
 }
 
 type ReviewResponse struct {
@@ -843,22 +844,25 @@ type InstructorScheduleQueryParam struct {
 }
 
 type OpenClassScheduleRequest struct {
-	ZoomLink string `json:"zoomLink"`
+	VerificationCode string `json:"verificationCode" binding:"required,len=6"`
+	ZoomLink         string `json:"zoomLink" binding:"omitempty"`
 }
 
 type InstructorScheduleResponse struct {
-	ID             string `json:"id"`
-	ClassID        string `json:"classId"`
-	ClassName      string `json:"className"`
-	ClassImage     string `json:"classImage"`
-	InstructorID   string `json:"instructorId"`
-	InstructorName string `json:"instructorName"`
-	Location       string `json:"location"`
-	Date           string `json:"date"`
-	StartHour      int    `json:"startHour"`
-	StartMinute    int    `json:"startMinute"`
-	Capacity       int    `json:"capacity"`
-	BookedCount    int    `json:"bookedCount"`
-	Duration       int    `json:"duration"`
-	IsOpened       bool   `json:"isOpen"`
+	ID               string `json:"id"`
+	ClassID          string `json:"classId"`
+	ClassName        string `json:"className"`
+	ClassImage       string `json:"classImage"`
+	InstructorID     string `json:"instructorId"`
+	InstructorName   string `json:"instructorName"`
+	Location         string `json:"location"`
+	Date             string `json:"date"`
+	StartHour        int    `json:"startHour"`
+	StartMinute      int    `json:"startMinute"`
+	Capacity         int    `json:"capacity"`
+	BookedCount      int    `json:"bookedCount"`
+	Duration         int    `json:"duration"`
+	IsOpened         bool   `json:"isOpen"`
+	VerificationCode string `json:"verificationCode"`
+	ZoomLink         string `json:"zoomLink"`
 }

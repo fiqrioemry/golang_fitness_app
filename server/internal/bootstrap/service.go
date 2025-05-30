@@ -2,6 +2,8 @@ package bootstrap
 
 import (
 	"server/internal/services"
+
+	"gorm.io/gorm"
 )
 
 type ServiceContainer struct {
@@ -26,7 +28,7 @@ type ServiceContainer struct {
 	ScheduleTemplateService services.ScheduleTemplateService
 }
 
-func InitServices(repo *RepositoryContainer) *ServiceContainer {
+func InitServices(repo *RepositoryContainer, db *gorm.DB) *ServiceContainer {
 	voucherService := services.NewVoucherService(repo.VoucherRepo)
 	notificationService := services.NewNotificationService(repo.NotificationRepo)
 	scheduleTemplateService :=
@@ -48,9 +50,9 @@ func InitServices(repo *RepositoryContainer) *ServiceContainer {
 		SubcategoryService:      services.NewSubcategoryService(repo.SubcategoryRepo),
 		AuthService:             services.NewAuthService(repo.AuthRepo, repo.NotificationRepo),
 		InstructorService:       services.NewInstructorService(repo.InstructorRepo, repo.AuthRepo),
-		ReviewService:           services.NewReviewService(repo.ReviewRepo, repo.ClassScheduleRepo, repo.InstructorRepo),
+		ReviewService:           services.NewReviewService(repo.ReviewRepo, repo.BookingRepo, repo.InstructorRepo),
 		PaymentService:          services.NewPaymentService(repo.PaymentRepo, repo.PackageRepo, repo.UserPackageRepo, repo.AuthRepo, voucherService, notificationService),
-		BookingService:          services.NewBookingService(repo.BookingRepo, repo.ClassScheduleRepo, repo.UserPackageRepo, repo.PackageRepo, notificationService),
+		BookingService:          services.NewBookingService(db, repo.BookingRepo, repo.ClassScheduleRepo, repo.UserPackageRepo, repo.PackageRepo, notificationService),
 		ClassScheduleService:    services.NewClassScheduleService(repo.ClassScheduleRepo, repo.ClassRepo, repo.PackageRepo, repo.UserPackageRepo, repo.BookingRepo, repo.ScheduleTemplateRepo, scheduleTemplateService),
 	}
 }
