@@ -71,15 +71,11 @@ func (s *profileService) UpdateAvatar(userID string, file *multipart.FileHeader)
 		return err
 	}
 
-	if user.Profile.Avatar != "" && user.Profile.Avatar != newAvatarURL && !isDiceBear(user.Profile.Avatar) {
+	if user.Profile.Avatar != "" && user.Profile.Avatar != newAvatarURL {
 		_ = utils.DeleteFromCloudinary(user.Profile.Avatar)
 	}
 
 	user.Profile.Avatar = newAvatarURL
 	err = s.repo.UpdateUser(user)
 	return err
-}
-
-func isDiceBear(url string) bool {
-	return url != "" && (len(url) > 0 && (url[:30] == "https://api.dicebear.com" || url[:31] == "https://avatars.dicebear.com"))
 }
