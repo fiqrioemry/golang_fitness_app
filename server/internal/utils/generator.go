@@ -22,7 +22,7 @@ func GenerateOTP(length int) string {
 	digits := "0123456789"
 	var sb strings.Builder
 
-	for i := 0; i < length; i++ {
+	for range length {
 		sb.WriteByte(digits[rand.Intn(len(digits))])
 	}
 

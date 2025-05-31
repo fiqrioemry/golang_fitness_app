@@ -171,5 +171,5 @@ func ParseDate(dateStr string) (time.Time, error) {
 		return t.UTC(), nil
 	}
 
-	return time.Time{}, fmt.Errorf("invalid date format, must be YYYY-MM-DD or ISO 8601")
+	return time.Time{}, fmt.Errorf("invalid date, format must be YYYY-MM-DD or ISO 8601")
 }
