@@ -3,7 +3,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/Dialog";
 import { openClassSchema } from "@/lib/schema";
 import { openClassState } from "@/lib/constant";

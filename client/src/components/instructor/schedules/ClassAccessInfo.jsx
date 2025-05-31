@@ -5,7 +5,7 @@ import {
   DialogTrigger,
   DialogContent,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from "@/components/ui/Dialog";
 import { toast } from "sonner";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/Button";

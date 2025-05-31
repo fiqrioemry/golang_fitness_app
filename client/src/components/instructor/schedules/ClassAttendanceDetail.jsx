@@ -3,11 +3,9 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetClose,
   SheetDescription,
 } from "@/components/ui/Sheet";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import { useScheduleAttendanceQuery } from "@/hooks/useSchedules";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
