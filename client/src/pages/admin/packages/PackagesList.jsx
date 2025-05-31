@@ -1,25 +1,23 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CirclePlus } from "lucide-react";
 import { statusOptions } from "@/lib/constant";
 import { Button } from "@/components/ui/Button";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Loading } from "@/components/ui/Loading";
-import { useQueryStore } from "@/store/useQueryStore";
 import { usePackagesQuery } from "@/hooks/usePackage";
 import { Pagination } from "@/components/ui/Pagination";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { SearchInput } from "@/components/ui/SearchInput";
+import { usePackageStore } from "@/store/usePackageStore";
 import { SearchNotFound } from "@/components/ui/SearchNotFound";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { FilterSelection } from "@/components/ui/FilterSelection";
 import { PackageCard } from "@/components/admin/packages/PackageCard";
 
 const PackagesList = () => {
-  const [q, setQ] = useState("");
-  const { page, limit, sort, status, setPage, setSort, setStatus } =
-    useQueryStore();
+  const { q, setQ, page, limit, sort, status, setPage, setSort, setStatus } =
+    usePackageStore();
 
   const debouncedQ = useDebounce(q, 500);
   const { data, isLoading, isError, refetch } = usePackagesQuery({

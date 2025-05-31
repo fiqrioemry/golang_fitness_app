@@ -82,16 +82,16 @@ export const BookedScheduleDetail = () => {
             <div className="flex justify-between gap-2">
               <Button
                 variant="secondary"
-                onClick={() => checkin(data.id)}
+                onClick={() => checkin({ id: data.id })}
                 disabled={data.isOpen === false || data.checkedIn === true}
               >
                 Check In
               </Button>
 
-              {data.isReview ? (
-                <ReviewBookedClass id={data.id} />
-              ) : (
+              {data.isReviewed ? (
                 <CheckoutClass bookings={data} />
+              ) : (
+                <ReviewBookedClass id={data.id} />
               )}
             </div>
           </div>

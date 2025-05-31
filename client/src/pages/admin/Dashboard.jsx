@@ -1,9 +1,9 @@
+import { useState } from "react";
 import { formatRupiah } from "@/lib/utils";
 import { revenueRangeOptions } from "@/lib/constant";
-import { useQueryStore } from "@/store/useQueryStore";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
-import { useAdminPaymentsQuery } from "@/hooks/usePayment";
+import { useAllPaymentsQuery } from "@/hooks/usePayment";
 import { FilterSelection } from "@/components/ui/FilterSelection";
 import { SummaryCard } from "@/components/admin/dashboard/SummaryCard";
 import { RevenueChart } from "@/components/admin/dashboard/RevenueChart";
@@ -12,9 +12,9 @@ import { useDashboardSummary, useRevenueStats } from "@/hooks/useDashboard";
 import { TransactionCard } from "@/components/admin/transactions/TransactionCard";
 
 const Dashboard = () => {
-  const { range, setRange } = useQueryStore();
-  const { data: revenue } = useRevenueStats(range);
-  const { data: response } = useAdminPaymentsQuery({ limit: 5 });
+  const [range, setRange] = useState("daily");
+  const { data: revenue } = useRevenueStats({ range });
+  const { data: response } = useAllPaymentsQuery({ limit: 5 });
 
   const { data: summary, isLoading, isError, refetch } = useDashboardSummary();
 

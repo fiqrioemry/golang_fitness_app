@@ -2,14 +2,12 @@ import { toast } from "sonner";
 import * as scheduleService from "@/services/schedule";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// GET /api/schedules
 export const useSchedulesQuery = () =>
   useQuery({
     queryKey: ["schedules"],
     queryFn: scheduleService.getAllClassSchedules,
   });
 
-// GET /api/schedules/status
 export const useSchedulesWithStatusQuery = () => {
   return useQuery({
     queryKey: ["schedules", "with-status"],
@@ -29,8 +27,8 @@ export const useScheduleMutation = () => {
   const qc = useQueryClient();
 
   const baseOpts = (msg) => ({
-    onSuccess: () => {
-      toast.success(msg);
+    onSuccess: (res) => {
+      toast.success(res.message || msg);
       qc.invalidateQueries({ queryKey: ["schedules"] });
     },
     onError: (err) => {
@@ -41,16 +39,16 @@ export const useScheduleMutation = () => {
   return {
     createSchedule: useMutation({
       mutationFn: scheduleService.createClassSchedule,
-      ...baseOpts("Schedule created"),
+      ...baseOpts("Schedule created successfully"),
     }),
     updateSchedule: useMutation({
       mutationFn: ({ id, data }) =>
         scheduleService.updateClassSchedule(id, data),
-      ...baseOpts("Schedule updated"),
+      ...baseOpts("Schedule updated successfully"),
     }),
     deleteSchedule: useMutation({
       mutationFn: scheduleService.deleteClassSchedule,
-      ...baseOpts("Schedule deleted"),
+      ...baseOpts("Schedule deleted successfully"),
     }),
   };
 };
@@ -64,11 +62,10 @@ export const useRecurringTemplatesQuery = () =>
 export const useScheduleTemplateMutation = () => {
   const qc = useQueryClient();
 
-  const mutationOpts = (successMsg, refetch) => ({
-    onSuccess: (res, vars) => {
+  const mutationOpts = (successMsg) => ({
+    onSuccess: (res) => {
       toast.success(res?.message || successMsg);
-      if (typeof refetch === "function") refetch(vars);
-      else qc.invalidateQueries({ queryKey: ["schedule-templates"] });
+      qc.invalidateQueries({ queryKey: ["schedule-templates"] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Something went wrong");
@@ -119,8 +116,8 @@ export const useOpenScheduleMutation = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: scheduleService.openClassSchedule,
-    onSuccess: () => {
-      toast.success("Schedule opened successfully");
+    onSuccess: (res) => {
+      toast.success(res.message || "Schedule opened successfully");
       qc.invalidateQueries({ queryKey: ["instructor-schedules"] });
     },
     onError: (err) => {

@@ -47,12 +47,6 @@ const InstructorSidebar = () => {
 
         <SidebarMenu className="space-y-1">
           <NavItem
-            to="/instructor"
-            title="My Profile"
-            icon={User}
-            active={currentPath === "/instructor"}
-          />
-          <NavItem
             to="/instructor/schedules"
             title="My Schedule"
             icon={Package}

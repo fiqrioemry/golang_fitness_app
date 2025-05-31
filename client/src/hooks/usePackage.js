@@ -6,7 +6,7 @@ export const usePackagesQuery = (params) =>
   useQuery({
     queryKey: ["packages", params],
     queryFn: () => packageService.getAllPackages(params),
-    keepPreviousData: true,
+    refetchOnMount: true,
     staleTime: 1000 * 60 * 15,
   });
 
@@ -17,21 +17,13 @@ export const usePackageDetailQuery = (id) =>
     enabled: !!id,
   });
 
-export const useClassPackagesQuery = (id) =>
-  useQuery({
-    queryKey: ["class-packages", id],
-    queryFn: () => packageService.getClassPackages(id),
-    enabled: !!id,
-  });
-
 export const usePackageMutation = () => {
   const qc = useQueryClient();
 
-  const mutationOpts = (msg, refetchFn) => ({
-    onSuccess: (res, vars) => {
+  const mutationOpts = (msg) => ({
+    onSuccess: (res) => {
       toast.success(res?.message || msg);
-      if (typeof refetchFn === "function") refetchFn(vars);
-      else qc.invalidateQueries({ queryKey: ["packages"] });
+      qc.invalidateQueries({ queryKey: ["packages"] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Something went wrong");

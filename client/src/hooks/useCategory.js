@@ -17,16 +17,12 @@ export const useCategoryDetailQuery = (id) =>
   });
 
 export const useCategoryMutation = () => {
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
 
-  const mutationOptions = (successMsg, refetchFn) => ({
-    onSuccess: (res, vars) => {
-      toast.success(res?.message || successMsg);
-      if (typeof refetchFn === "function") {
-        refetchFn(vars);
-      } else {
-        queryClient.invalidateQueries({ queryKey: ["categories"] });
-      }
+  const mutationOptions = (message) => ({
+    onSuccess: (res) => {
+      toast.success(res?.message || message);
+      qc.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Something went wrong");
@@ -41,10 +37,7 @@ export const useCategoryMutation = () => {
 
     updateOptions: useMutation({
       mutationFn: ({ id, data }) => category.updateCategory(id, data),
-      ...mutationOptions("Category updated successfully", ({ id }) => {
-        queryClient.invalidateQueries({ queryKey: ["category", id] });
-        queryClient.invalidateQueries({ queryKey: ["categories"] });
-      }),
+      ...mutationOptions("Category updated successfully"),
     }),
 
     deleteOptions: useMutation({

@@ -19,31 +19,3 @@ export const updateAvatar = async (data) => {
   const res = await authInstance.put("/user/profile/avatar", formData);
   return res.data;
 };
-
-// GET /api/user/packages
-export const getUserPackages = async () => {
-  const res = await authInstance.get("/user/packages");
-  return res.data;
-};
-
-// GET /api/user/packages
-export const getUserPackagesByClassID = async (id) => {
-  const res = await authInstance.get(`/user/packages/class/${id}`);
-  return res.data;
-};
-
-// GET /api/user/transactions
-export const getUserTransactions = async (page = 1, limit = 10) => {
-  const res = await authInstance.get("/user/transactions", {
-    params: { page, limit },
-  });
-  return res.data;
-};
-
-// GET /api/user/bookings
-export const getUserBookings = async (page = 1, limit = 10) => {
-  const res = await authInstance.get("/user/bookings", {
-    params: { page, limit },
-  });
-  return res.data.bookings;
-};

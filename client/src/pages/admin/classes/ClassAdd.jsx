@@ -1,5 +1,6 @@
 import { classSchema } from "@/lib/schema";
 import { classState } from "@/lib/constant";
+import { useNavigate } from "react-router-dom";
 import { useClassMutation } from "@/hooks/useClass";
 import { FormInput } from "@/components/form/FormInput";
 import { SectionTitle } from "@/components/header/SectionTitle";
@@ -11,7 +12,17 @@ import { InputTextareaElement } from "@/components/input/InputTextareaElement";
 import { SelectOptionsElement } from "@/components/input/SelectOptionsElement";
 
 const ClassAdd = () => {
+  const navigate = useNavigate();
   const { createClass } = useClassMutation();
+
+  const handleCreateClass = async (data) => {
+    try {
+      await createClass.mutateAsync(data);
+      navigate("/admin/classes");
+    } catch (error) {
+      console.error("Failed to create classes:", error);
+    }
+  };
 
   return (
     <section className="section">
@@ -27,7 +38,7 @@ const ClassAdd = () => {
           state={classState}
           text="Add New Class"
           schema={classSchema}
-          action={createClass.mutateAsync}
+          action={handleCreateClass}
           isLoading={createClass.isPending}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

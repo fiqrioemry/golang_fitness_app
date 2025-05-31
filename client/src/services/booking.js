@@ -21,7 +21,7 @@ export const getBookingDetail = async (id) => {
 };
 
 // POST /api/bookings/:id/check-in
-export const checkinBooking = async (id) => {
+export const checkinBooking = async ({ id }) => {
   const res = await authInstance.post(`/bookings/${id}/check-in`);
   return res.data;
 };

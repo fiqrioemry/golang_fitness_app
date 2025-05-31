@@ -19,11 +19,10 @@ export const useInstructorDetailQuery = (id) =>
 export const useInstructorMutation = () => {
   const qc = useQueryClient();
 
-  const mutationOptions = (successMessage, refetchFn) => ({
-    onSuccess: (res, vars) => {
-      toast.success(res?.message || successMessage);
-      if (typeof refetchFn === "function") refetchFn(vars);
-      else qc.invalidateQueries({ queryKey: ["instructors"] });
+  const mutationOptions = (message) => ({
+    onSuccess: (res) => {
+      toast.success(res?.message || message);
+      qc.invalidateQueries({ queryKey: ["instructors"] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Something went wrong");
@@ -38,10 +37,7 @@ export const useInstructorMutation = () => {
 
     updateInstructor: useMutation({
       mutationFn: ({ id, data }) => instructor.updateInstructor(id, data),
-      ...mutationOptions("Instructor updated successfully", ({ id }) => {
-        qc.invalidateQueries({ queryKey: ["instructor", id] });
-        qc.invalidateQueries({ queryKey: ["instructors"] });
-      }),
+      ...mutationOptions("Instructor updated successfully"),
     }),
 
     deleteInstructor: useMutation({

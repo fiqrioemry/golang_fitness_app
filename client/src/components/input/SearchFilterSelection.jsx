@@ -33,8 +33,8 @@ export const SearchFilterSelection = ({ paramKey, label, data }) => {
         className="input bg-background text-foreground border border-input focus:ring focus:ring-ring disabled:bg-muted disabled:text-muted-foreground"
       >
         <option value="">All</option>
-        {options.map((opt) => (
-          <option key={opt.id} value={opt.id}>
+        {options.map((opt, idx) => (
+          <option key={opt.id || `option-${idx}`} value={opt.id}>
             {opt.name}
           </option>
         ))}

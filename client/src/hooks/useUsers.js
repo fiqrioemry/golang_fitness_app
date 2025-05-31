@@ -6,7 +6,7 @@ export const useUsersQuery = (params) =>
     queryKey: ["users", params],
     queryFn: () => userService.getAllUsers(params),
     keepPreviousData: true,
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 5,
   });
 
 export const useUserDetailQuery = (userId) =>

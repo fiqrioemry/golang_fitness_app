@@ -78,11 +78,9 @@ export const stopScheduleTemplate = async (id) => {
   return res.data;
 };
 
-// INSTRUCTOR
 // GET /api/schedules/instructor
 export const getInstructorSchedules = async (params) => {
   const queryString = qs.stringify(params, { skipNulls: true });
-  console.log(queryString);
   const res = await authInstance.get(`/schedules/instructor?${queryString}`);
   console.log(res);
   return res.data;

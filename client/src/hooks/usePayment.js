@@ -2,12 +2,20 @@ import { toast } from "sonner";
 import * as paymentService from "@/services/payment";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const useAdminPaymentsQuery = (params) =>
+export const useAllPaymentsQuery = (params) =>
   useQuery({
     queryKey: ["payments", params],
     queryFn: () => paymentService.getAllUserPayments(params),
     keepPreviousData: true,
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 5,
+  });
+
+export const useMyPaymentsQuery = (params) =>
+  useQuery({
+    queryKey: ["my-payments", params],
+    queryFn: () => paymentService.getMyPayments(params),
+    keepPreviousData: true,
+    staleTime: 1000 * 60 * 5,
   });
 
 export const useCreatePaymentMutation = () =>

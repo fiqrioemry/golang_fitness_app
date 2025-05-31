@@ -217,3 +217,10 @@
   background-color: hsl(var(--primary) / 0.05) !important;
   transition: background-color 0.3s ease;
 }
+
+[data-sonner-toast] {
+  width: auto !important;
+  max-width: 90vw;
+  white-space: normal;
+  word-break: break-word;
+}
