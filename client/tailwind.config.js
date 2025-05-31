@@ -7,7 +7,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ["Montserrat", "sans-serif"], // Body text
-        heading: ["Orbitron", "sans-serif"], // Title / Heading
+        heading: ["Orbitron", "sans-serif"],
       },
       screens: {
         md: " 768px",

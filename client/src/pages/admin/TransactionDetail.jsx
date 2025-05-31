@@ -1,5 +1,6 @@
 import { useRef } from "react";
-import html2pdf from "html2pdf.js";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { DollarSign } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { Loading } from "@/components/ui/Loading";
@@ -12,16 +13,23 @@ const TransactionDetail = () => {
   const { id } = useParams();
   const { data, isLoading } = usePaymentDetailQuery(id);
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const element = invoiceRef.current;
-    const opt = {
-      margin: 0.3,
-      filename: `invoice-${id}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-    };
-    html2pdf().from(element).set(opt).save();
+
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`invoice-${id}.pdf`);
   };
 
   if (isLoading || !data) return <Loading />;

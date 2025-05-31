@@ -48,26 +48,14 @@ export const useAuthStore = create(
 
           await get().authMe();
         } catch (error) {
-          toast.error(error.response?.data?.message || "Login failed");
+          toast.error(error.response?.data?.message || "Login is failed");
         } finally {
           set({ loading: false });
         }
       },
 
-      googleLogin: async (idToken) => {
-        try {
-          const { message } = await auth.googleSignIn(idToken);
-          toast.success(message);
-          await get().authMe();
-        } catch (error) {
-          console.error(error);
-          toast.error(error.response?.data?.message || "Google Sign-In failed");
-        }
-      },
-
       logout: async () => {
         try {
-          console.log("LOGGOUT");
           await auth.logout();
           get().clearUser();
           queryClient.clear();
