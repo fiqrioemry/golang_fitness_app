@@ -6,18 +6,21 @@ import {
   TableHead,
   TableHeader,
 } from "@/components/ui/Table";
-import { Printer } from "lucide-react";
+import { Eye, Printer } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatDate, formatRupiah } from "@/lib/utils";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const MyTransactionCard = ({ transactions, sort, setSort }) => {
+  const location = useLocation();
   const navigate = useNavigate();
 
-  const handlePrint = (id) => {
-    navigate(`/profile/payments/${id}`);
+  const handleSeeDetail = (id) => {
+    navigate(`/profile/transactions/${id}`, {
+      state: { backgroundLocation: location },
+    });
   };
 
   const renderSortIcon = (field) => {
@@ -58,7 +61,7 @@ export const MyTransactionCard = ({ transactions, sort, setSort }) => {
                 Paid At
                 {renderSortIcon("paid_at")}
               </TableHead>
-              <TableHead>Print</TableHead>
+              <TableHead>Detail</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className="h-12">
@@ -90,16 +93,15 @@ export const MyTransactionCard = ({ transactions, sort, setSort }) => {
 
                 <TableCell>{formatRupiah(tx.total)}</TableCell>
                 <TableCell>{tx.paidAt ? formatDate(tx.paidAt) : "-"}</TableCell>
-                <TableHead>
+                <TableCell>
                   <Button
                     size="icon"
                     variant="ghost"
-                    title="Print Invoice"
-                    onClick={() => handlePrint(tx.id)}
+                    onClick={() => handleSeeDetail(tx.id)}
                   >
-                    <Printer className="w-5 h-5" />
+                    <Eye />
                   </Button>
-                </TableHead>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

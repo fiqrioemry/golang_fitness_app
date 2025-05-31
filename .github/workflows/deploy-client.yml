@@ -3,6 +3,8 @@ name: Deploy Frontend to Shared Hosting
 on:
   push:
     branches: [main]
+    paths:
+      - "client/**"
 
 jobs:
   build-and-deploy:
@@ -41,4 +43,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: client/dist/
-          server-dir: /public_html/sweat-up/
+          server-dir: /public_html/sweatup/

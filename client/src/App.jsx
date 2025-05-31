@@ -62,6 +62,8 @@ import AdminLayout from "./components/admin/AdminLayout";
 import PublicLayout from "./components/public/PublicLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
 import InstructorLayout from "./components/instructor/InstructorLayout";
+import { MyTransactionDetail } from "./components/customer/transactions/MyTransactionDetail";
+import TransactionDetail from "./pages/admin/TransactionDetail";
 
 function App() {
   const location = useLocation();
@@ -159,6 +161,7 @@ function App() {
           <Route path="packages/add" element={<PackageAdd />} />
           <Route path="instructors" element={<InstructorsList />} />
           <Route path="transactions" element={<TransactionsList />} />
+          <Route path="transactions/:id" element={<TransactionDetail />} />
           <Route path="classes/options" element={<ClassOptions />} />
           <Route path="classes/recuring" element={<ClassRecuring />} />
           <Route path="classes/schedules" element={<ClassSchedules />} />
@@ -200,6 +203,11 @@ function App() {
           <Route
             path="/profile/bookings/:id"
             element={<BookedScheduleDetail />}
+          />
+
+          <Route
+            path="/profile/transactions/:id"
+            element={<MyTransactionDetail />}
           />
         </Routes>
       )}

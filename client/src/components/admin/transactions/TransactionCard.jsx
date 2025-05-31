@@ -17,7 +17,7 @@ export const TransactionCard = ({ transactions, sort, setSort }) => {
   const navigate = useNavigate();
 
   const handlePrint = (id) => {
-    navigate(`/admin/payments/${id}`);
+    navigate(`/admin/transactions/${id}`);
   };
 
   const renderSortIcon = (field) => {
@@ -90,7 +90,7 @@ export const TransactionCard = ({ transactions, sort, setSort }) => {
 
                 <TableCell>{formatRupiah(tx.total)}</TableCell>
                 <TableCell>{tx.paidAt ? formatDate(tx.paidAt) : "-"}</TableCell>
-                <TableHead>
+                <TableCell>
                   <Button
                     size="icon"
                     variant="ghost"
@@ -99,7 +99,7 @@ export const TransactionCard = ({ transactions, sort, setSort }) => {
                   >
                     <Printer className="w-5 h-5" />
                   </Button>
-                </TableHead>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
