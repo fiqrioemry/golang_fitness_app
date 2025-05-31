@@ -66,7 +66,6 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 	}
 
 	if err := s.repo.CreateClass(&class); err != nil {
-		utils.CleanupImageOnError(req.ImageURL)
 		return err
 	}
 
@@ -79,12 +78,7 @@ func (s *classService) CreateClass(req dto.CreateClassRequest) error {
 				URL:     url,
 			})
 		}
-
 		if err := s.repo.SaveClassGalleries(galleries); err != nil {
-			for _, img := range req.ImageURLs {
-				utils.CleanupImageOnError(img)
-			}
-			utils.CleanupImageOnError(req.ImageURL)
 			return err
 		}
 	}
@@ -98,17 +92,11 @@ func (s *classService) UpdateClass(id string, req dto.UpdateClassRequest) error 
 		return err
 	}
 
+	class.Title = req.Title
 	class.IsActive = req.IsActive
+	class.Duration = req.Duration
+	class.Description = req.Description
 
-	if req.Title != "" {
-		class.Title = req.Title
-	}
-	if req.Description != "" {
-		class.Description = req.Description
-	}
-	if req.Duration != 0 {
-		class.Duration = req.Duration
-	}
 	if len(req.Additional) > 0 {
 		class.AdditionalList = req.Additional
 	}
@@ -148,12 +136,10 @@ func (s *classService) DeleteClass(id string) error {
 		return err
 	}
 
-	// Hapus image utama dari Cloudinary
 	if class.Image != "" {
 		_ = utils.DeleteFromCloudinary(class.Image)
 	}
 
-	// Hapus semua gallery dari cloudinary
 	for _, gallery := range class.Galleries {
 		if gallery.URL != "" {
 			_ = utils.DeleteFromCloudinary(gallery.URL)

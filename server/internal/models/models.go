@@ -18,10 +18,8 @@ type User struct {
 	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Profile      Profile       `gorm:"foreignKey:UserID" json:"profile"`
-	Tokens       []Token       `gorm:"foreignKey:UserID" json:"-"`
-	UserPackages []UserPackage `gorm:"foreignKey:UserID" json:"packages,omitempty"`
-	Bookings     []Booking     `gorm:"foreignKey:UserID" json:"bookings,omitempty"`
+	Profile Profile `gorm:"foreignKey:UserID" json:"profile"`
+	Tokens  []Token `gorm:"foreignKey:UserID" json:"-"`
 }
 
 type Token struct {

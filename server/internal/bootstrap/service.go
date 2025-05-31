@@ -25,6 +25,7 @@ type ServiceContainer struct {
 	SubcategoryService      services.SubcategoryService
 	NotificationService     services.NotificationService
 	ClassScheduleService    services.ClassScheduleService
+	UserPackageService      services.UserPackageService
 	ScheduleTemplateService services.ScheduleTemplateService
 }
 
@@ -47,11 +48,12 @@ func InitServices(repo *RepositoryContainer, db *gorm.DB) *ServiceContainer {
 		LocationService:         services.NewLocationService(repo.LocationRepo),
 		CategoryService:         services.NewCategoryService(repo.CategoryRepo),
 		DashboardService:        services.NewDashboardService(repo.DashboardRepo),
+		UserPackageService:      services.NewUserPackageService(repo.UserPackageRepo),
 		SubcategoryService:      services.NewSubcategoryService(repo.SubcategoryRepo),
 		AuthService:             services.NewAuthService(repo.AuthRepo, repo.NotificationRepo),
 		InstructorService:       services.NewInstructorService(repo.InstructorRepo, repo.AuthRepo),
 		ReviewService:           services.NewReviewService(repo.ReviewRepo, repo.BookingRepo, repo.InstructorRepo),
-		PaymentService:          services.NewPaymentService(repo.PaymentRepo, repo.PackageRepo, repo.UserPackageRepo, repo.AuthRepo, voucherService, notificationService),
+		PaymentService:          services.NewPaymentService(db, repo.PaymentRepo, repo.PackageRepo, repo.UserPackageRepo, repo.AuthRepo, voucherService, notificationService),
 		BookingService:          services.NewBookingService(db, repo.BookingRepo, repo.ClassScheduleRepo, repo.UserPackageRepo, repo.PackageRepo, notificationService),
 		ClassScheduleService:    services.NewClassScheduleService(repo.ClassScheduleRepo, repo.ClassRepo, repo.PackageRepo, repo.BookingRepo, repo.ScheduleTemplateRepo, scheduleTemplateService),
 	}

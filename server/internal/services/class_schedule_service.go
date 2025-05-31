@@ -239,8 +239,8 @@ func (s *classScheduleService) CreateRecurringSchedule(req dto.CreateRecurringSc
 }
 
 func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error {
-	const service = "ClassScheduleService"
-	const action = "UpdateClassSchedule"
+	const action = "update"
+	const service = "class_schedule"
 
 	schedule, err := s.repo.GetClassScheduleByID(id)
 	if err != nil {
@@ -311,17 +311,17 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 		return fmt.Errorf("instructor not found: %w", err)
 	}
 
+	schedule.Color = req.Color
 	schedule.Date = parsedDate
-	schedule.StartHour = req.StartHour
-	schedule.StartMinute = req.StartMinute
 	schedule.ClassID = class.ID
+	schedule.Capacity = req.Capacity
 	schedule.ClassName = class.Title
 	schedule.ClassImage = class.Image
-	schedule.InstructorID = instructor.ID
-	schedule.InstructorName = instructor.User.Profile.Fullname
-	schedule.Capacity = req.Capacity
-	schedule.Color = req.Color
+	schedule.StartHour = req.StartHour
 	schedule.Duration = class.Duration
+	schedule.InstructorID = instructor.ID
+	schedule.StartMinute = req.StartMinute
+	schedule.InstructorName = instructor.User.Profile.Fullname
 
 	if err := s.repo.UpdateClassSchedule(schedule); err != nil {
 		utils.LogServiceError(service, action, err, zap.String("scheduleID", schedule.ID.String()))

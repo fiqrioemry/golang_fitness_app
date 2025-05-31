@@ -13,8 +13,6 @@ type ProfileService interface {
 	GetUserByID(userID string) (*models.User, error)
 	UpdateProfile(userID string, req dto.UpdateProfileRequest) error
 	UpdateAvatar(userID string, file *multipart.FileHeader) error
-	GetUserPackagesByClassID(userID, classID string) ([]dto.UserPackageResponse, error)
-	GetUserPackages(userID string, page, limit int) (*dto.UserPackageListResponse, error)
 }
 
 type profileService struct {
@@ -84,70 +82,4 @@ func (s *profileService) UpdateAvatar(userID string, file *multipart.FileHeader)
 
 func isDiceBear(url string) bool {
 	return url != "" && (len(url) > 0 && (url[:30] == "https://api.dicebear.com" || url[:31] == "https://avatars.dicebear.com"))
-}
-
-func (s *profileService) GetUserPackages(userID string, page, limit int) (*dto.UserPackageListResponse, error) {
-	offset := (page - 1) * limit
-	pkgs, total, err := s.repo.GetUserPackages(userID, limit, offset)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(pkgs) == 0 {
-		pkgs = make([]models.UserPackage, 0)
-	}
-
-	var responses []dto.UserPackageResponse
-	for _, p := range pkgs {
-		expired := ""
-		if p.ExpiredAt != nil {
-			expired = p.ExpiredAt.Format("2006-01-02")
-		}
-		responses = append(responses, dto.UserPackageResponse{
-			ID:              p.ID.String(),
-			PackageName:     p.PackageName,
-			RemainingCredit: p.RemainingCredit,
-			ExpiredAt:       expired,
-			PurchasedAt:     p.PurchasedAt.Format("2006-01-02"),
-		})
-	}
-
-	return &dto.UserPackageListResponse{
-		Packages: responses,
-		Total:    total,
-		Page:     page,
-		Limit:    limit,
-	}, nil
-}
-
-func (s *profileService) GetUserPackagesByClassID(userID, classID string) ([]dto.UserPackageResponse, error) {
-	userPackages, err := s.repo.GetUserPackagesByClassID(userID, classID)
-	if err != nil {
-		return nil, err
-	}
-
-	var result []dto.UserPackageResponse
-	for _, up := range userPackages {
-		var (
-			expiredAt     string
-			expiredInDays int
-		)
-
-		if up.ExpiredAt != nil {
-			expiredAt = up.ExpiredAt.Format("2006-01-02")
-			expiredInDays = int(max(0, int(time.Until(*up.ExpiredAt).Hours()/24)))
-		}
-
-		result = append(result, dto.UserPackageResponse{
-			ID:              up.ID.String(),
-			PackageID:       up.Package.ID.String(),
-			PackageName:     up.Package.Name,
-			RemainingCredit: up.RemainingCredit,
-			ExpiredAt:       expiredAt,
-			ExpiredInDays:   expiredInDays,
-			PurchasedAt:     up.PurchasedAt.Format("2006-01-02"),
-		})
-	}
-
-	return result, nil
 }

@@ -26,6 +26,7 @@ type PaymentService interface {
 	GetPaymentsByUserID(userID string, params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error)
 }
 type paymentService struct {
+	db                  *gorm.DB
 	paymentRepo         repositories.PaymentRepository
 	packageRepo         repositories.PackageRepository
 	userPackageRepo     repositories.UserPackageRepository
@@ -35,6 +36,7 @@ type paymentService struct {
 }
 
 func NewPaymentService(
+	db *gorm.DB,
 	paymentRepo repositories.PaymentRepository,
 	packageRepo repositories.PackageRepository,
 	userPackageRepo repositories.UserPackageRepository,
@@ -43,6 +45,7 @@ func NewPaymentService(
 	notificationService NotificationService,
 ) PaymentService {
 	return &paymentService{
+		db:                  db,
 		paymentRepo:         paymentRepo,
 		packageRepo:         packageRepo,
 		userPackageRepo:     userPackageRepo,
@@ -106,7 +109,6 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 	paymentID := uuid.New()
 	invoice := utils.GenerateInvoiceNumber(paymentID)
 
-	// Stripe Line Items
 	lineItems := []*stripe.CheckoutSessionLineItemParams{
 		buildLineItem(pkg.Name, base, 1),
 	}
@@ -137,7 +139,6 @@ func (s *paymentService) CreatePayment(userID string, req dto.CreatePaymentReque
 		},
 	}
 
-	// 🔁 Buat Stripe session sebelum menyimpan ke DB
 	sess, err := session.New(params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create stripe session: %w", err)

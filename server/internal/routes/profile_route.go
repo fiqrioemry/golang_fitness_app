@@ -12,7 +12,5 @@ func ProfileRoutes(r *gin.Engine, handler *handlers.ProfileHandler) {
 	user.Use(middleware.AuthRequired())
 	user.GET("/profile", handler.GetProfile)
 	user.PUT("/profile", handler.UpdateProfile)
-	user.GET("/packages", handler.GetUserPackages)
 	user.PUT("/profile/avatar", handler.UpdateAvatar)
-	user.GET("/packages/class/:id", handler.GetUserPackagesByClassID)
 }

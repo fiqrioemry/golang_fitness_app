@@ -58,9 +58,11 @@ func applyPaymentFilters(db *gorm.DB, params dto.PaymentQueryParam) *gorm.DB {
 	if params.Status != "" && params.Status != "all" {
 		db = db.Where("status = ?", params.Status)
 	}
+
 	if params.StartDate != "" && params.EndDate != "" {
 		db = db.Where("paid_at BETWEEN ? AND ?", params.StartDate, params.EndDate)
 	}
+
 	switch params.Sort {
 	case "paid_at_asc":
 		db = db.Order("paid_at asc")

@@ -658,6 +658,7 @@ func SeedInstructors(db *gorm.DB) {
 		log.Println("Successfully seeded instructors!")
 	}
 }
+
 func SeedPayments(db *gorm.DB) {
 	var count int64
 	db.Model(&models.Payment{}).Count(&count)
@@ -752,7 +753,7 @@ func SeedUserPackages(db *gorm.DB) {
 
 	now := time.Now().UTC()
 	threeDaysAgo := now.AddDate(0, 0, -3)
-	expired := threeDaysAgo.AddDate(0, 0, getExpiredDays(pkg))
+	expired := threeDaysAgo.AddDate(0, 0, 30)
 
 	var userPackages []models.UserPackage
 
@@ -761,13 +762,13 @@ func SeedUserPackages(db *gorm.DB) {
 		UserID:          customer1.ID,
 		PackageID:       pkg.ID,
 		PackageName:     pkg.Name,
-		RemainingCredit: pkg.Credit - 2,
+		RemainingCredit: pkg.Credit,
 		PurchasedAt:     threeDaysAgo,
 		ExpiredAt:       &expired,
 	})
 
 	for range 5 {
-		exp := now.AddDate(0, 0, getExpiredDays(pkg))
+		exp := now.AddDate(0, 0, 30)
 		userPackages = append(userPackages, models.UserPackage{
 			ID:              uuid.New(),
 			UserID:          customer2.ID,
@@ -784,10 +785,6 @@ func SeedUserPackages(db *gorm.DB) {
 	} else {
 		log.Println("Seeded 6 user packages: 1 for customer1 with reduced credit, 5 for customer02")
 	}
-}
-
-func getExpiredDays(pkg models.Package) int {
-	return 30
 }
 
 func SeedClassSchedules(db *gorm.DB) {

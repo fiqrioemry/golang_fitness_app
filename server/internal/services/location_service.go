@@ -44,6 +44,7 @@ func (s *locationService) GetAllLocations() ([]dto.LocationResponse, error) {
 	var result []dto.LocationResponse
 	for _, l := range locations {
 		result = append(result, dto.LocationResponse{
+			// ID:          l.ID.String(),
 			Name:        l.Name,
 			Address:     l.Address,
 			GeoLocation: l.GeoLocation,
