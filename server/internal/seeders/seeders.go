@@ -765,23 +765,20 @@ func SeedUserPackages(db *gorm.DB) {
 		ExpiredAt:       &expired,
 	})
 
-	for range 5 {
-		exp := now.AddDate(0, 0, 30)
-		userPackages = append(userPackages, models.UserPackage{
-			ID:              uuid.New(),
-			UserID:          customer2.ID,
-			PackageID:       pkg.ID,
-			PackageName:     pkg.Name,
-			RemainingCredit: pkg.Credit,
-			PurchasedAt:     now,
-			ExpiredAt:       &exp,
-		})
-	}
+	userPackages = append(userPackages, models.UserPackage{
+		ID:              uuid.New(),
+		UserID:          customer2.ID,
+		PackageID:       pkg.ID,
+		PackageName:     pkg.Name,
+		RemainingCredit: pkg.Credit,
+		PurchasedAt:     threeDaysAgo,
+		ExpiredAt:       &expired,
+	})
 
 	if err := db.Create(&userPackages).Error; err != nil {
 		log.Printf("Failed seeding user packages: %v", err)
 	} else {
-		log.Println("Seeded 6 user packages: 1 for customer1 with reduced credit, 5 for customer02")
+		log.Println("Seeded user packages successfully")
 	}
 }
 

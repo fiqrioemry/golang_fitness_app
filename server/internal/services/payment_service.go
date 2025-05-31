@@ -21,6 +21,7 @@ import (
 type PaymentService interface {
 	ExpireOldPendingPayments() error
 	StripeWebhookNotification(event stripe.Event) error
+	GetPaymentDetail(paymentID string) (dto.PaymentDetailResponse, error)
 	CreatePayment(userID string, req dto.CreatePaymentRequest) (*dto.CreatePaymentResponse, error)
 	GetAllUserPayments(params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error)
 	GetPaymentsByUserID(userID string, params dto.PaymentQueryParam) ([]dto.PaymentListResponse, *dto.PaginationResponse, error)
@@ -328,6 +329,33 @@ func (s *paymentService) GetAllUserPayments(params dto.PaymentQueryParam) ([]dto
 	}
 	pagination := utils.Paginate(total, params.Page, params.Limit)
 	return results, pagination, nil
+}
+
+func (s *paymentService) GetPaymentDetail(paymentID string) (dto.PaymentDetailResponse, error) {
+	payment, err := s.paymentRepo.GetPaymentByID(paymentID)
+	if err != nil {
+		return dto.PaymentDetailResponse{}, err
+	}
+
+	result := dto.PaymentDetailResponse{
+		ID:              payment.ID.String(),
+		UserID:          payment.UserID.String(),
+		InvoiceNumber:   payment.InvoiceNumber,
+		Email:           payment.Email,
+		Fullname:        payment.Fullname,
+		PackageID:       payment.PackageID.String(),
+		PackageName:     payment.PackageName,
+		BasePrice:       payment.BasePrice,
+		Tax:             payment.Tax,
+		Total:           payment.Total,
+		VoucherCode:     *payment.VoucherCode,
+		VoucherDiscount: payment.VoucherDiscount,
+		PaymentMethod:   payment.PaymentMethod,
+		Status:          payment.Status,
+		PaidAt:          payment.PaidAt.Format(time.RFC3339),
+	}
+
+	return result, nil
 }
 
 // ** khusus cron job update status to failed

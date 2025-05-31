@@ -375,6 +375,24 @@ type PaymentListResponse struct {
 	PaidAt        string  `json:"paidAt"`
 }
 
+type PaymentDetailResponse struct {
+	ID              string  `json:"id"`
+	UserID          string  `json:"userId"`
+	InvoiceNumber   string  `json:"invoiceNumber"`
+	Email           string  `json:"email"`
+	Fullname        string  `json:"fullname"`
+	PackageID       string  `json:"packageId"`
+	PackageName     string  `json:"packageName"`
+	BasePrice       float64 `json:"basePrice"`
+	Tax             float64 `json:"tax"`
+	VoucherCode     string  `json:"voucherCode"`
+	VoucherDiscount float64 `json:"voucherDiscount"`
+	Total           float64 `json:"total"`
+	PaymentMethod   string  `json:"paymentMethod"`
+	Status          string  `json:"status"`
+	PaidAt          string  `json:"paidAt"`
+}
+
 // NOTIFICATIONS
 type NotificationSettingResponse struct {
 	TypeID  string `json:"typeId"`

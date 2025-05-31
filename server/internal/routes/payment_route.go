@@ -14,8 +14,10 @@ func PaymentRoutes(r *gin.Engine, handler *handlers.PaymentHandler) {
 	payments.Use(middleware.AuthRequired())
 	payments.POST("", handler.CreatePayment)
 	payments.GET("/me", handler.GetMyTransactions)
+	payments.GET("/me/:id", handler.GetPaymentDetail)
 
 	admin := payments.Use(middleware.RoleOnly("admin"))
 	admin.GET("", handler.GetAllUserPayments)
+	admin.GET("/:id", handler.GetPaymentDetail)
 
 }
