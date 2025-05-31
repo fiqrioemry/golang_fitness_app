@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Copy } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { formatDate, formatHour } from "@/lib/utils";
 
 export const ClassAccessInfo = ({ schedule }) => {

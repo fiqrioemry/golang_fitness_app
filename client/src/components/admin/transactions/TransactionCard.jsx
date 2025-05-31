@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/Table";
 import { Printer } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import { formatDate, formatRupiah } from "@/lib/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";

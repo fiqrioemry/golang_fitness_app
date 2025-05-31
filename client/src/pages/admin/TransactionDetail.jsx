@@ -4,7 +4,7 @@ import jsPDF from "jspdf";
 import { DollarSign } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { Loading } from "@/components/ui/Loading";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { usePaymentDetailQuery } from "@/hooks/usePayment";
 

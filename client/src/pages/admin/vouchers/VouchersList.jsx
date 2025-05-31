@@ -18,7 +18,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { VoucherUpdate } from "@/components/admin/vouchers/VoucherUpdate";
 import { VoucherDelete } from "@/components/admin/vouchers/VoucherDelete";
-import { truncateText } from "../../../lib/utils";
+import { truncateText } from "@/lib/utils";
 
 const VouchersList = () => {
   const {
