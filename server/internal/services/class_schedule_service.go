@@ -483,9 +483,9 @@ func (s *classScheduleService) GetSchedulesByInstructor(userID string, params dt
 		return nil, nil, err
 	}
 
-	var result []dto.InstructorScheduleResponse
+	var results []dto.InstructorScheduleResponse
 	for _, schedule := range schedules {
-		result = append(result, dto.InstructorScheduleResponse{
+		results = append(results, dto.InstructorScheduleResponse{
 			ID:               schedule.ID.String(),
 			ClassID:          schedule.ClassID.String(),
 			ClassName:        schedule.ClassName,
@@ -493,26 +493,19 @@ func (s *classScheduleService) GetSchedulesByInstructor(userID string, params dt
 			InstructorID:     schedule.InstructorID.String(),
 			InstructorName:   schedule.InstructorName,
 			Location:         schedule.Location,
-			Date:             schedule.Date.Format("2006-01-02"),
 			StartHour:        schedule.StartHour,
 			StartMinute:      schedule.StartMinute,
 			Capacity:         schedule.Capacity,
 			Duration:         schedule.Duration,
 			BookedCount:      schedule.Booked,
 			IsOpened:         schedule.IsOpened,
-			ZoomLink:         *schedule.ZoomLink,
-			VerificationCode: *schedule.VerificationCode,
+			Date:             schedule.Date.Format("2006-01-02"),
+			ZoomLink:         utils.EmptyString(schedule.ZoomLink),
+			VerificationCode: utils.EmptyString(schedule.VerificationCode),
 		})
 	}
-	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
-	pagination := &dto.PaginationResponse{
-		Page:       params.Page,
-		Limit:      params.Limit,
-		TotalRows:  int(total),
-		TotalPages: totalPages,
-	}
-
-	return result, pagination, nil
+	pagination := utils.Paginate(total, params.Page, params.Limit)
+	return results, pagination, nil
 }
 
 func (s *classScheduleService) OpenClassSchedule(id string, req dto.OpenClassScheduleRequest) error {

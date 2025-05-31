@@ -125,6 +125,7 @@ func (s *classService) UpdateClass(id string, req dto.UpdateClassRequest) error 
 	}
 
 	if req.ImageURL != "" {
+		_ = utils.DeleteFromCloudinary(class.Image)
 		class.Image = req.ImageURL
 	}
 	return s.repo.UpdateClass(class)

@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"slices"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
@@ -20,6 +22,13 @@ func LoadEnv() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, relying on system ENV")
 	}
+}
+
+func EmptyString(s *string) string {
+	if s != nil {
+		return *s
+	}
+	return ""
 }
 
 func HashPassword(password string) (string, error) {
@@ -141,15 +150,9 @@ func IntSliceToJSON(data []int) datatypes.JSON {
 	return datatypes.JSON(bytes)
 }
 func IsDayMatched(currentDay int, allowedDays []int) bool {
-	for _, d := range allowedDays {
-		if d == currentDay {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(allowedDays, currentDay)
 }
 
-// Mengubah string JSON ke []int: "[1,2,3]" -> []int{1, 2, 3}
 func ParseJSONToIntSlice(jsonStr string) []int {
 	var result []int
 	err := json.Unmarshal([]byte(jsonStr), &result)

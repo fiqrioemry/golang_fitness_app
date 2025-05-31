@@ -307,13 +307,11 @@ func SeedLocations(db *gorm.DB) {
 
 	locations := []models.Location{
 		{
-			ID:          uuid.New(),
 			Name:        "Sweat Up Studio A",
 			Address:     "123 Fitness St, New York, NY",
 			GeoLocation: "40.712776,-74.005974",
 		},
 		{
-			ID:          uuid.New(),
 			Name:        "Sweat Up Studio B",
 			Address:     "456 Gym Ave, Los Angeles, CA",
 			GeoLocation: "34.052235,-118.243683",
