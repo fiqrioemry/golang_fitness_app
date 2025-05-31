@@ -149,9 +149,21 @@ const Schedules = () => {
                     </Button>
                   </Link>
                 ) : (
-                  <Link to={`/schedules/${s.id}`}>
-                    <Button>Book Now</Button>
-                  </Link>
+                  <>
+                    {Date.now() > s.startTime.getTime() ? (
+                      <Button
+                        disabled
+                        variant="outline"
+                        className="opacity-60 cursor-not-allowed"
+                      >
+                        Closed
+                      </Button>
+                    ) : (
+                      <Link to={`/schedules/${s.id}`}>
+                        <Button>Book Now</Button>
+                      </Link>
+                    )}
+                  </>
                 )}
               </div>
             </div>

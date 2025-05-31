@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useClassesQuery } from "@/hooks/useClass";
-import { useQueryStore } from "@/store/useQueryStore";
 import { Pagination } from "@/components/ui/Pagination";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
@@ -14,13 +13,12 @@ import { SectionTitle } from "@/components/header/SectionTitle";
 import { SearchNotFound } from "@/components/ui/SearchNotFound";
 import { ClassCard } from "@/components/admin/classes/ClassCard";
 import { FilterSelection } from "@/components/ui/FilterSelection";
-import { useState } from "react";
+import { useClassStore } from "@/store/useClassStore";
 
 const ClassesList = () => {
-  const [q, setQ] = useState("");
   const navigate = useNavigate();
-  const { page, limit, sort, status, setPage, setSort, setStatus } =
-    useQueryStore();
+  const { q, setQ, page, limit, sort, status, setPage, setSort, setStatus } =
+    useClassStore();
 
   const debouncedQ = useDebounce(q, 500);
 

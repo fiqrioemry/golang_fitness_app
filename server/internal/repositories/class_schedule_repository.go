@@ -169,21 +169,11 @@ func (r *classScheduleRepository) GetSchedulesByInstructorID(instructorID uuid.U
 	default:
 		db = db.Order("date DESC").Order("start_hour ASC").Order("start_minute ASC")
 	}
+	offset := (params.Page - 1) * params.Limit
 
-	// Hitung total data
 	if err := db.Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
-
-	// Pagination fallback
-	if params.Page == 0 {
-		params.Page = 1
-	}
-	if params.Limit == 0 {
-		params.Limit = 10
-	}
-	offset := (params.Page - 1) * params.Limit
-
 	// Ambil data
 	if err := db.Limit(params.Limit).Offset(offset).Find(&schedules).Error; err != nil {
 		return nil, 0, err

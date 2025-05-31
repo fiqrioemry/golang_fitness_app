@@ -14,8 +14,7 @@ import { SearchNotFound } from "@/components/ui/SearchNotFound";
 import { FilterSelection } from "@/components/ui/FilterSelection";
 
 const UsersList = () => {
-  const [q, setQ] = useState("");
-  const { page, limit, sort, role, setPage, setSort, setRole } =
+  const { q, setQ, page, limit, sort, role, setPage, setSort, setRole } =
     useQueryStore();
 
   const debouncedQ = useDebounce(q, 500);

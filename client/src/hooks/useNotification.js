@@ -21,9 +21,9 @@ export const useUpdateNotificationSetting = () => {
 
   return useMutation({
     mutationFn: notifService.updateNotificationSetting,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      toast.success(res.message || "Settings updated successfully");
       qc.invalidateQueries({ queryKey: ["notification-settings"] });
-      toast.success("Settings updated");
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Failed to update setting");
@@ -42,6 +42,7 @@ export const useSendPromoNotification = () => {
     },
   });
 };
+
 export const useMarkAllNotificationsAsRead = () => {
   return useMutation({
     mutationFn: notifService.markAllNotificationsAsRead,

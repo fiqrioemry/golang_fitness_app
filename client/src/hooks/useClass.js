@@ -4,10 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useClassesQuery = (params) =>
   useQuery({
-    queryKey: ["classes", params],
+    queryKey: ["classes"],
     queryFn: () => classService.getAllClasses(params),
-    keepPreviousData: true,
     staleTime: 1000 * 60 * 15,
+    refetchOnMount: true,
   });
 
 export const useClassDetailQuery = (id) =>
@@ -20,44 +20,42 @@ export const useClassDetailQuery = (id) =>
 export const useClassMutation = () => {
   const qc = useQueryClient();
 
-  const mutationOpts = (msg, refetch) => ({
-    onSuccess: (res, vars) => {
-      toast.success(res?.message || msg);
-      if (typeof refetch === "function") refetch(vars);
-      else qc.invalidateQueries({ queryKey: ["classes"] });
+  const mutationOpts = (loadingMsg, successMsg) => ({
+    onMutate: async () => {
+      toast.loading(loadingMsg, { id: "class-action" });
+    },
+    onSuccess: (res) => {
+      toast.success(res?.message || successMsg, {
+        id: "class-action",
+      });
+      qc.invalidateQueries({ queryKey: ["classes"] });
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || "Something went wrong");
+      toast.error(err?.response?.data?.message || "Something went wrong", {
+        id: "class-action",
+      });
     },
   });
-
   return {
     createClass: useMutation({
       mutationFn: classService.createClass,
-      ...mutationOpts("Class created successfully"),
+      ...mutationOpts("Creating class...", "Class created successfully"),
     }),
 
     updateClass: useMutation({
       mutationFn: ({ id, data }) => classService.updateClass(id, data),
-
-      ...mutationOpts("Class updated", ({ id }) => {
-        qc.invalidateQueries({ queryKey: ["class", id] });
-        qc.invalidateQueries({ queryKey: ["classes"] });
-      }),
+      ...mutationOpts("Updating class...", "Class updated successfully"),
     }),
 
     deleteClass: useMutation({
       mutationFn: classService.deleteClass,
-      ...mutationOpts("Class deleted"),
+      ...mutationOpts("Deleting class...", "Class deleted successfully"),
     }),
 
     uploadGallery: useMutation({
       mutationFn: ({ id, images }) =>
         classService.uploadClassGallery(id, images),
-      ...mutationOpts("Gallery uploaded", ({ id }) => {
-        qc.invalidateQueries({ queryKey: ["class", id] });
-        qc.invalidateQueries({ queryKey: ["classes"] });
-      }),
+      ...mutationOpts("Uploading gallery...", "Gallery uploaded successfully"),
     }),
   };
 };

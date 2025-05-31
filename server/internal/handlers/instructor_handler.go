@@ -10,11 +10,11 @@ import (
 )
 
 type InstructorHandler struct {
-	instructorService services.InstructorService
+	service services.InstructorService
 }
 
-func NewInstructorHandler(instructorService services.InstructorService) *InstructorHandler {
-	return &InstructorHandler{instructorService}
+func NewInstructorHandler(service services.InstructorService) *InstructorHandler {
+	return &InstructorHandler{service}
 }
 
 func (h *InstructorHandler) CreateInstructor(c *gin.Context) {
@@ -23,7 +23,7 @@ func (h *InstructorHandler) CreateInstructor(c *gin.Context) {
 		return
 	}
 
-	if err := h.instructorService.CreateInstructor(req); err != nil {
+	if err := h.service.CreateInstructor(req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create instructor", "error": err.Error()})
 		return
 	}
@@ -38,7 +38,7 @@ func (h *InstructorHandler) UpdateInstructor(c *gin.Context) {
 		return
 	}
 
-	if err := h.instructorService.UpdateInstructor(id, req); err != nil {
+	if err := h.service.UpdateInstructor(id, req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update instructor", "error": err.Error()})
 		return
 	}
@@ -48,7 +48,7 @@ func (h *InstructorHandler) UpdateInstructor(c *gin.Context) {
 func (h *InstructorHandler) DeleteInstructor(c *gin.Context) {
 	id := c.Param("id")
 
-	if err := h.instructorService.DeleteInstructor(id); err != nil {
+	if err := h.service.DeleteInstructor(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to delete instructor", "error": err.Error()})
 		return
 	}
@@ -59,7 +59,7 @@ func (h *InstructorHandler) DeleteInstructor(c *gin.Context) {
 func (h *InstructorHandler) GetInstructorByID(c *gin.Context) {
 	id := c.Param("id")
 
-	instructor, err := h.instructorService.GetInstructorByID(id)
+	instructor, err := h.service.GetInstructorByID(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Instructor not found"})
 		return
@@ -69,7 +69,7 @@ func (h *InstructorHandler) GetInstructorByID(c *gin.Context) {
 }
 
 func (h *InstructorHandler) GetAllInstructors(c *gin.Context) {
-	instructors, err := h.instructorService.GetAllInstructors()
+	instructors, err := h.service.GetAllInstructors()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch instructors", "error": err.Error()})
 		return

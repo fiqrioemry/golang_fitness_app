@@ -41,13 +41,3 @@ export const getMe = async () => {
   const res = await authInstance.get("/auth/me");
   return res.data;
 };
-
-export default {
-  getMe,
-  register,
-  refreshToken,
-  logout,
-  login,
-  verifyOTP,
-  sendOTP,
-};

@@ -21,10 +21,3 @@ func PackageRoutes(r *gin.Engine, handler *handlers.PackageHandler) {
 		admin.DELETE("/:id", middleware.RoleOnly("owner"), handler.DeletePackage)
 	}
 }
-
-// Endpoint List:
-// GET    /api/packages              → Ambil semua paket yang tersedia
-// POST   /api/packages              → Buat paket baru (admin only)
-// GET    /api/packages/:id          → Ambil detail paket berdasarkan ID
-// PUT    /api/packages/:id          → Update data paket (admin only)
-// DELETE /api/packages/:id          → Hapus paket (khusus role owner)

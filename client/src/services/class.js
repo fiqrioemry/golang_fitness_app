@@ -2,9 +2,9 @@ import qs from "qs";
 import { buildFormData } from "@/lib/utils";
 import { publicInstance, authInstance } from ".";
 
+// GET /api/classes?q=&page=&limit=&status=&sort=
 export const getAllClasses = async (params) => {
   const queryString = qs.stringify(params, { skipNulls: true });
-  console.log(queryString);
   const res = await publicInstance.get(`/classes?${queryString}`);
   return res.data;
 };

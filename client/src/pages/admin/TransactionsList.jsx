@@ -1,25 +1,23 @@
-import { useState } from "react";
 import { Loading } from "@/components/ui/Loading";
 import { useDebounce } from "@/hooks/useDebounce";
 import { paymentStatusOptions } from "@/lib/constant";
-import { useQueryStore } from "@/store/useQueryStore";
 import { Pagination } from "@/components/ui/Pagination";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { useAdminPaymentsQuery } from "@/hooks/usePayment";
+import { useAllPaymentsQuery } from "@/hooks/usePayment";
 import { SectionTitle } from "@/components/header/SectionTitle";
 import { SearchNotFound } from "@/components/ui/SearchNotFound";
 import { FilterSelection } from "@/components/ui/FilterSelection";
+import { useTransactionStore } from "@/store/useTransactionStore";
 import { TransactionCard } from "@/components/admin/transactions/TransactionCard";
 
 const TransactionsList = () => {
-  const [q, setQ] = useState("");
-  const { page, limit, sort, setPage, status, setSort, setStatus } =
-    useQueryStore();
+  const { q, setQ, page, limit, sort, setPage, status, setSort, setStatus } =
+    useTransactionStore();
 
   const debouncedQ = useDebounce(q, 500);
-  const { data, isLoading, isError, refetch } = useAdminPaymentsQuery({
+  const { data, isLoading, isError, refetch } = useAllPaymentsQuery({
     q: debouncedQ,
     status,
     sort,

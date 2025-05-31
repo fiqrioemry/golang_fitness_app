@@ -12,11 +12,10 @@ export const useVouchersQuery = () =>
 export const useVoucherMutation = () => {
   const qc = useQueryClient();
 
-  const mutationOpts = (msg, refetchFn) => ({
-    onSuccess: (res, vars) => {
+  const mutationOpts = (msg) => ({
+    onSuccess: (res) => {
       toast.success(res?.message || msg);
-      if (typeof refetchFn === "function") refetchFn(vars);
-      else qc.invalidateQueries({ queryKey: ["vouchers"] });
+      qc.invalidateQueries({ queryKey: ["vouchers"] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Something went wrong");
@@ -31,9 +30,7 @@ export const useVoucherMutation = () => {
 
     updateVoucher: useMutation({
       mutationFn: ({ id, data }) => voucherService.updateVoucher({ id, data }),
-      ...mutationOpts("Voucher updated successfully", () => {
-        qc.invalidateQueries({ queryKey: ["vouchers"] });
-      }),
+      ...mutationOpts("Voucher updated successfully"),
     }),
 
     deleteVoucher: useMutation({
@@ -43,9 +40,7 @@ export const useVoucherMutation = () => {
 
     applyVoucher: useMutation({
       mutationFn: voucherService.applyVoucher,
-      onError: (err) => {
-        toast.error(err?.response?.data?.message || "Failed to apply voucher");
-      },
+      ...mutationOpts("Voucher applied successfully"),
     }),
   };
 };

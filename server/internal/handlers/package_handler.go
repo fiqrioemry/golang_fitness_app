@@ -74,13 +74,6 @@ func (h *PackageHandler) GetAllPackages(c *gin.Context) {
 		return
 	}
 
-	if params.Page == 0 {
-		params.Page = 1
-	}
-	if params.Limit == 0 {
-		params.Limit = 10
-	}
-
 	packages, pagination, err := h.packageService.GetAllPackages(params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to fetch payments", "error": err.Error()})

@@ -1,7 +1,7 @@
 // src/store/useAuthStore.jsx
 import { toast } from "sonner";
 import { create } from "zustand";
-import auth from "@/services/auth";
+import * as auth from "@/services/auth";
 import { persist } from "zustand/middleware";
 import { queryClient } from "@/lib/react-query";
 
@@ -67,6 +67,7 @@ export const useAuthStore = create(
 
       logout: async () => {
         try {
+          console.log("LOGGOUT");
           await auth.logout();
           get().clearUser();
           queryClient.clear();

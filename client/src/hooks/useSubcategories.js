@@ -2,7 +2,6 @@ import { toast } from "sonner";
 import * as subcategoryService from "@/services/subcategories";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// GET /api/subcategories
 export const useSubcategoriesQuery = () =>
   useQuery({
     queryKey: ["subcategories"],
@@ -10,7 +9,6 @@ export const useSubcategoriesQuery = () =>
     keepPreviousData: true,
   });
 
-// GET /api/subcategories/:id
 export const useSubcategoryDetailQuery = (id) =>
   useQuery({
     queryKey: ["subcategory", id],
@@ -18,7 +16,6 @@ export const useSubcategoryDetailQuery = (id) =>
     enabled: !!id,
   });
 
-// GET /api/subcategories/category/:categoryId
 export const useSubcategoriesByCategoryQuery = (categoryId) =>
   useQuery({
     queryKey: ["subcategories", "category", categoryId],
@@ -29,11 +26,10 @@ export const useSubcategoriesByCategoryQuery = (categoryId) =>
 export const useSubcategoryMutation = () => {
   const qc = useQueryClient();
 
-  const mutationOpts = (msg, refetchFn) => ({
-    onSuccess: (res, vars) => {
+  const mutationOpts = (msg) => ({
+    onSuccess: (res) => {
       toast.success(res?.message || msg);
-      if (typeof refetchFn === "function") refetchFn(vars);
-      else qc.invalidateQueries({ queryKey: ["subcategories"] });
+      qc.invalidateQueries({ queryKey: ["subcategories"] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Something went wrong");
@@ -49,10 +45,7 @@ export const useSubcategoryMutation = () => {
     updateOptions: useMutation({
       mutationFn: ({ id, data }) =>
         subcategoryService.updateSubcategory(id, data),
-      ...mutationOpts("Subcategory updated successfully", ({ id }) => {
-        qc.invalidateQueries({ queryKey: ["subcategory", id] });
-        qc.invalidateQueries({ queryKey: ["subcategories"] });
-      }),
+      ...mutationOpts("Subcategory updated successfully"),
     }),
 
     deleteOptions: useMutation({

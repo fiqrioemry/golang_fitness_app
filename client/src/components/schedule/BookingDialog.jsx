@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { formatDateTime, formatRupiah } from "@/lib/utils";
 import { useCreateBookingMutation } from "@/hooks/useBooking";
-import { useUserClassPackagesQuery } from "@/hooks/useProfile";
+import { useUserClassPackagesQuery } from "@/hooks/useUserPackage";
 
 export const BookingDialog = ({ schedule, openDialog, setOpenDialog }) => {
   const navigate = useNavigate();

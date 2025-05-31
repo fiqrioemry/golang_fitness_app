@@ -1,6 +1,6 @@
 // src/services/index.js
 import axios from "axios";
-import auth from "./auth";
+import * as auth from "./auth";
 
 export const publicInstance = axios.create({
   baseURL: import.meta.env.VITE_API_SERVICES,

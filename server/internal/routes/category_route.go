@@ -20,9 +20,3 @@ func CategoryRoutes(r *gin.Engine, h *handlers.CategoryHandler) {
 	admin.PUT("/:id", h.UpdateCategory)
 	admin.DELETE("/:id", middleware.RoleOnly("owner"), h.DeleteCategory)
 }
-
-// GET    /api/categories             → Ambil semua kategori (public)
-// GET    /api/categories/:id         → Ambil detail kategori berdasarkan ID
-// POST   /api/categories             → Tambah kategori baru (admin only)
-// PUT    /api/categories/:id         → Update data kategori (admin only)
-// DELETE /api/categories/:id         → Hapus kategori (khusus role owner)

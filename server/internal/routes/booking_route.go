@@ -17,9 +17,3 @@ func BookingRoutes(r *gin.Engine, handler *handlers.BookingHandler) {
 	booking.POST("/:id/check-in", handler.CheckinBookedClass)
 	booking.POST("/:id/check-out", handler.CheckoutBookedClass)
 }
-
-// POST   /api/bookings               		→ Buat booking baru (user)
-// GET    /api/bookings           			→ Ambil semua jadwal yang dibooking oleh user login
-// GET    /api/bookings/:id          		→ Ambil detail booking berdasarkan ID
-// POST   /api/bookings/:id/check-in 		→ Check-in ke kelas yang telah dibooking
-// POST   /api/bookings/:id/check-out 		→ Check-out dan verifikasi kehadiran

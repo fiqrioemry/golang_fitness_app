@@ -239,8 +239,8 @@ func (s *classScheduleService) CreateRecurringSchedule(req dto.CreateRecurringSc
 }
 
 func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClassScheduleRequest) error {
-	const service = "ClassScheduleService"
-	const action = "UpdateClassSchedule"
+	const action = "update"
+	const service = "class_schedule"
 
 	schedule, err := s.repo.GetClassScheduleByID(id)
 	if err != nil {
@@ -311,17 +311,17 @@ func (s *classScheduleService) UpdateClassSchedule(id string, req dto.UpdateClas
 		return fmt.Errorf("instructor not found: %w", err)
 	}
 
+	schedule.Color = req.Color
 	schedule.Date = parsedDate
-	schedule.StartHour = req.StartHour
-	schedule.StartMinute = req.StartMinute
 	schedule.ClassID = class.ID
+	schedule.Capacity = req.Capacity
 	schedule.ClassName = class.Title
 	schedule.ClassImage = class.Image
-	schedule.InstructorID = instructor.ID
-	schedule.InstructorName = instructor.User.Profile.Fullname
-	schedule.Capacity = req.Capacity
-	schedule.Color = req.Color
+	schedule.StartHour = req.StartHour
 	schedule.Duration = class.Duration
+	schedule.InstructorID = instructor.ID
+	schedule.StartMinute = req.StartMinute
+	schedule.InstructorName = instructor.User.Profile.Fullname
 
 	if err := s.repo.UpdateClassSchedule(schedule); err != nil {
 		utils.LogServiceError(service, action, err, zap.String("scheduleID", schedule.ID.String()))
@@ -483,9 +483,9 @@ func (s *classScheduleService) GetSchedulesByInstructor(userID string, params dt
 		return nil, nil, err
 	}
 
-	var result []dto.InstructorScheduleResponse
+	var results []dto.InstructorScheduleResponse
 	for _, schedule := range schedules {
-		result = append(result, dto.InstructorScheduleResponse{
+		results = append(results, dto.InstructorScheduleResponse{
 			ID:               schedule.ID.String(),
 			ClassID:          schedule.ClassID.String(),
 			ClassName:        schedule.ClassName,
@@ -493,26 +493,19 @@ func (s *classScheduleService) GetSchedulesByInstructor(userID string, params dt
 			InstructorID:     schedule.InstructorID.String(),
 			InstructorName:   schedule.InstructorName,
 			Location:         schedule.Location,
-			Date:             schedule.Date.Format("2006-01-02"),
 			StartHour:        schedule.StartHour,
 			StartMinute:      schedule.StartMinute,
 			Capacity:         schedule.Capacity,
 			Duration:         schedule.Duration,
 			BookedCount:      schedule.Booked,
 			IsOpened:         schedule.IsOpened,
-			ZoomLink:         *schedule.ZoomLink,
-			VerificationCode: *schedule.VerificationCode,
+			Date:             schedule.Date.Format("2006-01-02"),
+			ZoomLink:         utils.EmptyString(schedule.ZoomLink),
+			VerificationCode: utils.EmptyString(schedule.VerificationCode),
 		})
 	}
-	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
-	pagination := &dto.PaginationResponse{
-		Page:       params.Page,
-		Limit:      params.Limit,
-		TotalRows:  int(total),
-		TotalPages: totalPages,
-	}
-
-	return result, pagination, nil
+	pagination := utils.Paginate(total, params.Page, params.Limit)
+	return results, pagination, nil
 }
 
 func (s *classScheduleService) OpenClassSchedule(id string, req dto.OpenClassScheduleRequest) error {

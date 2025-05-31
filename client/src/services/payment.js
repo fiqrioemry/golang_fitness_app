@@ -7,6 +7,12 @@ export const getAllUserPayments = async (params) => {
   const res = await authInstance.get(`/payments?${queryString}`);
   return res.data;
 };
+// GET /api/payments/me?q=&page=&limit=&status=&sort=
+export const getMyPayments = async (params) => {
+  const queryString = qs.stringify(params, { skipNulls: true });
+  const res = await authInstance.get(`/payments/me?${queryString}`);
+  return res.data;
+};
 
 // POST /api/payments
 export const createPayment = async (data) => {

@@ -73,16 +73,16 @@ type CreateClassRequest struct {
 }
 
 type UpdateClassRequest struct {
-	Title         string                `form:"title"`
-	Duration      int                   `form:"duration"`
+	Title         string                `form:"title" binding:"required"`
+	Duration      int                   `form:"duration" binding:"required,min=15"`
+	Description   string                `form:"description" binding:"required"`
 	IsActive      bool                  `form:"isActive"`
-	Description   string                `form:"description"`
 	Additional    []string              `form:"additional"`
-	TypeID        string                `form:"typeId"`
-	LevelID       string                `form:"levelId"`
-	LocationID    string                `form:"locationId"`
-	CategoryID    string                `form:"categoryId"`
-	SubcategoryID string                `form:"subcategoryId"`
+	TypeID        string                `form:"typeId" binding:"required"`
+	LevelID       string                `form:"levelId" binding:"required"`
+	LocationID    string                `form:"locationId" binding:"required"`
+	CategoryID    string                `form:"categoryId" binding:"required"`
+	SubcategoryID string                `form:"subcategoryId" binding:"required"`
 	Image         *multipart.FileHeader `form:"image"`
 	ImageURL      string                `form:"-"`
 }
@@ -701,33 +701,6 @@ type UpdateProfileRequest struct {
 	Bio      string `form:"bio"`
 }
 
-type TransactionResponse struct {
-	ID            string  `json:"id"`
-	PackageID     string  `json:"packageId"`
-	PackageName   string  `json:"packageName"`
-	PaymentMethod string  `json:"paymentMethod"`
-	PaymentLink   string  `json:"PaymentLink"`
-	Status        string  `json:"status"`
-	BasePrice     float64 `json:"basePrice"`
-	Tax           float64 `json:"taxRate"`
-	Price         float64 `json:"price"`
-	PaidAt        string  `json:"paidAt"`
-}
-
-type TransactionListResponse struct {
-	Transactions []TransactionResponse `json:"transactions"`
-	Total        int64                 `json:"total"`
-	Page         int                   `json:"page"`
-	Limit        int                   `json:"limit"`
-}
-
-type UserPackageListResponse struct {
-	Packages []UserPackageResponse `json:"packages"`
-	Total    int64                 `json:"total"`
-	Page     int                   `json:"page"`
-	Limit    int                   `json:"limit"`
-}
-
 type UserPackageResponse struct {
 	ID              string `json:"id"`
 	PackageID       string `json:"packageId"`
@@ -810,6 +783,18 @@ type DashboardSummaryResponse struct {
 	TotalAttendance    int     `json:"totalAttendance"`
 	AbsentAttendance   int     `json:"absentAttendance"`
 	AttendedAttendance int     `json:"attendedAttendance"`
+}
+type InstructorStatisticResponse struct {
+	InstructorID        string  `json:"instructorId"`
+	Fullname            string  `json:"fullname"`
+	Rating              float64 `json:"rating"`
+	Experience          int     `json:"experience"`
+	TotalClass          int     `json:"totalClass"`
+	TotalSchedule       int     `json:"totalSchedule"`
+	ParticipantsCount   int     `json:"participantsCount"`
+	TotalAttendance     int     `json:"totalAttendance"`
+	ReviewCount         int     `json:"reviewCount"`
+	AverageReviewRating float64 `json:"averageReviewRating"`
 }
 
 type RevenueStatRequest struct {

@@ -14,21 +14,21 @@ type HandlerContainer struct {
 	ReviewHandler           *handlers.ReviewHandler
 	ProfileHandler          *handlers.ProfileHandler
 	PackageHandler          *handlers.PackageHandler
-	LocationHandler         *handlers.LocationHandler
-	CategoryHandler         *handlers.CategoryHandler
+	UserPackageHandler      *handlers.UserPackageHandler
+	BookingHandler          *handlers.BookingHandler
 	VoucherHandler          *handlers.VoucherHandler
+	PaymentHandler          *handlers.PaymentHandler
+	CategoryHandler         *handlers.CategoryHandler
+	LocationHandler         *handlers.LocationHandler
+	InstructorHandler       *handlers.InstructorHandler
 	SubcategoryHandler      *handlers.SubcategoryHandler
 	NotificationHandler     *handlers.NotificationHandler
-	InstructorHandler       *handlers.InstructorHandler
-	PaymentHandler          *handlers.PaymentHandler
-	BookingHandler          *handlers.BookingHandler
-	ScheduleTemplateHandler *handlers.ScheduleTemplateHandler
 	ClassScheduleHandler    *handlers.ClassScheduleHandler
+	ScheduleTemplateHandler *handlers.ScheduleTemplateHandler
 }
 
 func InitHandlers(svc *ServiceContainer) *HandlerContainer {
 	return &HandlerContainer{
-		DashboardHandler:        handlers.NewDashboardHandler(svc.DashboardService),
 		AuthHandler:             handlers.NewAuthHandler(svc.AuthService),
 		UserHandler:             handlers.NewUserHandler(svc.UserService),
 		TypeHandler:             handlers.NewTypeHandler(svc.TypeService),
@@ -36,16 +36,18 @@ func InitHandlers(svc *ServiceContainer) *HandlerContainer {
 		LevelHandler:            handlers.NewLevelHandler(svc.LevelService),
 		ReviewHandler:           handlers.NewReviewHandler(svc.ReviewService),
 		ProfileHandler:          handlers.NewProfileHandler(svc.ProfileService),
+		PaymentHandler:          handlers.NewPaymentHandler(svc.PaymentService),
 		PackageHandler:          handlers.NewPackageHandler(svc.PackageService),
-		LocationHandler:         handlers.NewLocationHandler(svc.LocationService),
-		CategoryHandler:         handlers.NewCategoryHandler(svc.CategoryService),
 		VoucherHandler:          handlers.NewVoucherHandler(svc.VoucherService),
+		BookingHandler:          handlers.NewBookingHandler(svc.BookingService),
+		CategoryHandler:         handlers.NewCategoryHandler(svc.CategoryService),
+		LocationHandler:         handlers.NewLocationHandler(svc.LocationService),
+		DashboardHandler:        handlers.NewDashboardHandler(svc.DashboardService),
+		InstructorHandler:       handlers.NewInstructorHandler(svc.InstructorService),
+		UserPackageHandler:      handlers.NewUserPackageHandler(svc.UserPackageService),
 		SubcategoryHandler:      handlers.NewSubcategoryHandler(svc.SubcategoryService),
 		NotificationHandler:     handlers.NewNotificationHandler(svc.NotificationService),
-		InstructorHandler:       handlers.NewInstructorHandler(svc.InstructorService),
-		PaymentHandler:          handlers.NewPaymentHandler(svc.PaymentService),
-		BookingHandler:          handlers.NewBookingHandler(svc.BookingService),
-		ScheduleTemplateHandler: handlers.NewScheduleTemplateHandler(svc.ScheduleTemplateService),
 		ClassScheduleHandler:    handlers.NewClassScheduleHandler(svc.ClassScheduleService),
+		ScheduleTemplateHandler: handlers.NewScheduleTemplateHandler(svc.ScheduleTemplateService),
 	}
 }

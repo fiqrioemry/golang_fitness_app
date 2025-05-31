@@ -1,6 +1,6 @@
-export const NoTransaction = () => {
+export const NoTransactionRecord = () => {
   return (
-    <div className="border border-dashed border-border bg-muted/40 rounded-xl p-10 text-center space-y-4">
+    <div className="p-10 text-center space-y-4">
       <div className="flex justify-center">
         <img
           src="/no-transactions.webp"

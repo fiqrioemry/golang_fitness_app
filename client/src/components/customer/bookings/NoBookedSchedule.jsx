@@ -26,12 +26,11 @@ export const NoBookedSchedule = ({ type = "upcoming" }) => {
             : "Start joining classes and track your progress 📈"}
         </p>
       </div>
-
-      {isUpcoming && (
+      <div className="mt-4">
         <Link to="/schedules">
           <Button>Book a class</Button>
         </Link>
-      )}
+      </div>
     </div>
   );
 };

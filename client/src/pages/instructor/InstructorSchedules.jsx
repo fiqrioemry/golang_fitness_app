@@ -2,12 +2,12 @@ import { Pagination } from "@/components/ui/Pagination";
 import { useBookingStore } from "@/store/useBookingStore";
 import { ErrorDialog } from "@/components/ui/ErrorDialog";
 import { SectionTitle } from "@/components/header/SectionTitle";
+import { useInstructorSchedulesQuery } from "@/hooks/useSchedules";
 import { SectionSkeleton } from "@/components/loading/SectionSkeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { NoClassSchedule } from "@/components/instructor/schedules/NoClassSchedule";
 import { PastClassSchedules } from "@/components/instructor/schedules/PastClassSchedules";
 import { UpcomingClassSchedules } from "@/components/instructor/schedules/UpcomingClassSchedules";
-import { useInstructorSchedulesQuery } from "@/hooks/useSchedules";
 
 const InstructorSchedule = () => {
   const { page, limit, sort, status, setStatus, setPage } = useBookingStore();
@@ -24,6 +24,8 @@ const InstructorSchedule = () => {
 
   const isPast = status === "past";
   const isUpcoming = status === "upcoming";
+
+  console.log(data);
 
   return (
     <section className="section p-8 space-y-6">
@@ -83,7 +85,7 @@ const InstructorSchedule = () => {
         )}
       </Tabs>
 
-      {pagination && (
+      {pagination && pagination.totalRows > 5 && (
         <Pagination
           page={pagination.page}
           onPageChange={setPage}

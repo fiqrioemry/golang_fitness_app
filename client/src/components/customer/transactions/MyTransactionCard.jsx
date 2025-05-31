@@ -8,16 +8,16 @@ import {
 } from "@/components/ui/Table";
 import { Printer } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { formatDate, formatRupiah } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { formatDate, formatRupiah } from "@/lib/utils";
 
-export const TransactionCard = ({ transactions, sort, setSort }) => {
+export const MyTransactionCard = ({ transactions, sort, setSort }) => {
   const navigate = useNavigate();
 
   const handlePrint = (id) => {
-    navigate(`/admin/payments/${id}`);
+    navigate(`/profile/payments/${id}`);
   };
 
   const renderSortIcon = (field) => {
@@ -124,18 +124,19 @@ export const TransactionCard = ({ transactions, sort, setSort }) => {
                 </p>
                 <p>{formatRupiah(tx.total)}</p>
                 <p>{tx.method?.toUpperCase() || "-"}</p>
-
-                <Badge
-                  variant={
-                    tx.status === "success"
-                      ? "default"
-                      : tx.status === "failed"
-                      ? "destructive"
-                      : "secondary"
-                  }
-                >
-                  {tx.status}
-                </Badge>
+                <p>
+                  <Badge
+                    variant={
+                      tx.status === "success"
+                        ? "default"
+                        : tx.status === "failed"
+                        ? "destructive"
+                        : "secondary"
+                    }
+                  >
+                    {tx.status}
+                  </Badge>
+                </p>
               </div>
               <div className="space-x-4">
                 <span className="text-muted-foreground">Paid At</span>

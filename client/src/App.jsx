@@ -12,8 +12,8 @@ import PackageDetail from "./pages/PackageDetail";
 import ScheduleDetail from "./pages/ScheduleDetail";
 
 // admin pages
-import Dashboard from "./pages/admin/Dashboard";
 import UsersList from "./pages/admin/UsersList";
+import Dashboard from "./pages/admin/Dashboard";
 import ClassAdd from "./pages/admin/classes/ClassAdd";
 import Notifications from "./pages/admin/Notifications";
 import PackageAdd from "./pages/admin/packages/PackageAdd";
@@ -26,6 +26,7 @@ import VouchersList from "./pages/admin/vouchers/VouchersList";
 import PackagesList from "./pages/admin/packages/PackagesList";
 import ClassRecuring from "./pages/admin/classes/ClassRecuring";
 import ClassSchedules from "./pages/admin/classes/ClassSchedules";
+import { UserDetailDialog } from "./components/admin/users/UserDetailDialog";
 
 // customer pages
 import UserProfile from "./pages/customer/UserProfile";
@@ -34,34 +35,33 @@ import UserPackages from "./pages/customer/UserPackages";
 import UserSettings from "./pages/customer/UserSettings";
 import UserTransactions from "./pages/customer/UserTransactions";
 import UserNotifications from "./pages/customer/UserNotifications";
+import { BookedScheduleDetail } from "./components/customer/bookings/BookedScheduleDetail";
+
+// instructor pages
+import InstructorSchedules from "./pages/instructor/InstructorSchedules";
+import { StartClassSchedule } from "./components/instructor/schedules/StartClassSchedule";
+import { ClassAttendanceDetail } from "./components/instructor/schedules/ClassAttendanceDetail";
 
 // route config & support
 import { Toaster } from "sonner";
-import { useEffect } from "react";
 import { Loading } from "@/components/ui/Loading";
-import { useAuthStore } from "./store/useAuthStore";
 import { ScrollToTop } from "./hooks/useScrollToTop";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import {
-  AdminRoute,
   AuthRoute,
-  InstructorRoute,
-  NonAuthRoute,
+  AdminRoute,
   PublicRoute,
+  NonAuthRoute,
+  InstructorRoute,
 } from "./middleware";
 
 // layout pages
+import { useEffect } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
 import AdminLayout from "./components/admin/AdminLayout";
 import PublicLayout from "./components/public/PublicLayout";
 import CustomerLayout from "./components/customer/CustomerLayout";
-import { UserDetailDialog } from "./components/admin/users/UserDetailDialog";
-import { BookedScheduleDetail } from "./components/customer/bookings/BookedScheduleDetail";
 import InstructorLayout from "./components/instructor/InstructorLayout";
-import InstructorSchedules from "./pages/instructor/InstructorSchedules";
-import { InstructorProfile } from "./pages/instructor/InstructorProfile";
-import { ClassAttendanceDetail } from "./components/instructor/schedules/ClassAttendanceDetail";
-import { StartClassSchedule } from "./components/instructor/schedules/StartClassSchedule";
-import { ReviewBookedClass } from "./components/customer/bookings/ReviewBookedClass";
 
 function App() {
   const location = useLocation();
@@ -174,8 +174,8 @@ function App() {
             </InstructorRoute>
           }
         >
-          <Route index element={<InstructorProfile />} />
           <Route path="schedules" element={<InstructorSchedules />} />
+          <Route index element={<Navigate to="schedules" replace />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

@@ -38,18 +38,3 @@ func ClassScheduleRoutes(r *gin.Engine, h *handlers.ClassScheduleHandler) {
 	admin.PUT("/:id", h.UpdateClassSchedule)
 	admin.DELETE("/:id", h.DeleteClassSchedule)
 }
-
-// PUBLIC
-// GET    /api/schedules                      → Ambil semua jadwal kelas (public)
-// INSTRUCTOR (role: instructor)
-// GET    /api/schedules/instructor           → Ambil semua jadwal milik instruktur login
-// PATCH  /api/schedules/:id/open             → Buka jadwal kelas agar bisa diakses peserta
-// GET    /api/schedules/:id/attendance       → Ambil daftar peserta & kehadiran pada jadwal
-// CUSTOMER (role: customer)
-// GET    /api/schedules/status               → Ambil semua jadwal beserta status booking/kehadiran user
-// GET    /api/schedules/:id                  → Ambil detail jadwal berdasarkan ID
-// ADMIN (role: admin)
-// POST   /api/schedules                      → Buat satu jadwal kelas
-// POST   /api/schedules/recurring            → Buat jadwal berulang
-// PUT    /api/schedules/:id                  → Update jadwal kelas
-// DELETE /api/schedules/:id                  → Hapus jadwal kelas

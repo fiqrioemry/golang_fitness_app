@@ -2,7 +2,6 @@ import { toast } from "sonner";
 import * as levelService from "@/services/level";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// GET /api/levels
 export const useLevelsQuery = () =>
   useQuery({
     queryKey: ["levels"],
@@ -10,7 +9,6 @@ export const useLevelsQuery = () =>
     keepPreviousData: true,
   });
 
-// GET /api/levels/:id
 export const useLevelDetailQuery = (id) =>
   useQuery({
     queryKey: ["level", id],
@@ -21,11 +19,10 @@ export const useLevelDetailQuery = (id) =>
 export const useLevelMutation = () => {
   const qc = useQueryClient();
 
-  const mutationOpts = (msg, refetchFn) => ({
-    onSuccess: (res, vars) => {
+  const mutationOpts = (msg) => ({
+    onSuccess: (res) => {
       toast.success(res?.message || msg);
-      if (typeof refetchFn === "function") refetchFn(vars);
-      else qc.invalidateQueries({ queryKey: ["levels"] });
+      qc.invalidateQueries({ queryKey: ["levels"] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Something went wrong");
@@ -40,10 +37,7 @@ export const useLevelMutation = () => {
 
     updateOptions: useMutation({
       mutationFn: ({ id, data }) => levelService.updateLevel(id, data),
-      ...mutationOpts("Level updated successfully", ({ id }) => {
-        qc.invalidateQueries({ queryKey: ["level", id] });
-        qc.invalidateQueries({ queryKey: ["levels"] });
-      }),
+      ...mutationOpts("Level updated successfully"),
     }),
 
     deleteOptions: useMutation({

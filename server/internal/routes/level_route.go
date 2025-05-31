@@ -19,9 +19,3 @@ func LevelRoutes(r *gin.Engine, h *handlers.LevelHandler) {
 	admin.PUT("/:id", h.UpdateLevel)
 	admin.DELETE("/:id", middleware.RoleOnly("owner"), h.DeleteLevel)
 }
-
-// GET    /api/levels             → Ambil semua level kelas (public)
-// GET    /api/levels/:id         → Ambil detail level berdasarkan ID
-// POST   /api/levels             → Tambah level baru (admin only)
-// PUT    /api/levels/:id         → Update data level (admin only)
-// DELETE /api/levels/:id         → Hapus level (khusus role owner)

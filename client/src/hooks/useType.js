@@ -2,7 +2,6 @@ import { toast } from "sonner";
 import * as typeService from "@/services/type";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// GET /api/types
 export const useTypesQuery = () =>
   useQuery({
     queryKey: ["types"],
@@ -10,7 +9,6 @@ export const useTypesQuery = () =>
     keepPreviousData: true,
   });
 
-// GET /api/types/:id
 export const useTypeDetailQuery = (id) =>
   useQuery({
     queryKey: ["type", id],
@@ -21,11 +19,10 @@ export const useTypeDetailQuery = (id) =>
 export const useTypeMutation = () => {
   const qc = useQueryClient();
 
-  const mutationOpts = (msg, refetchFn) => ({
-    onSuccess: (res, vars) => {
+  const mutationOpts = (msg) => ({
+    onSuccess: (res) => {
       toast.success(res?.message || msg);
-      if (typeof refetchFn === "function") refetchFn(vars);
-      else qc.invalidateQueries({ queryKey: ["types"] });
+      qc.invalidateQueries({ queryKey: ["types"] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || "Something went wrong");
@@ -40,10 +37,7 @@ export const useTypeMutation = () => {
 
     updateOptions: useMutation({
       mutationFn: ({ id, data }) => typeService.updateType(id, data),
-      ...mutationOpts("Type updated successfully", ({ id }) => {
-        qc.invalidateQueries({ queryKey: ["type", id] });
-        qc.invalidateQueries({ queryKey: ["types"] });
-      }),
+      ...mutationOpts("Type updated successfully"),
     }),
 
     deleteOptions: useMutation({

@@ -58,6 +58,10 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 	req.ImageURLs = uploadedURLs
 
 	if err := h.classService.CreateClass(req); err != nil {
+		for _, img := range req.ImageURLs {
+			utils.CleanupImageOnError(img)
+		}
+		utils.CleanupImageOnError(req.ImageURL)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create class", "error": err.Error()})
 		return
 	}
