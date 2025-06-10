@@ -4,9 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useClassesQuery = (params) =>
   useQuery({
-    queryKey: ["classes"],
+    queryKey: ["classes", params],
     queryFn: () => classService.getAllClasses(params),
-    staleTime: 1000 * 60 * 15,
     refetchOnMount: true,
   });
 

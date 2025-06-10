@@ -370,7 +370,7 @@ func (s *scheduleTemplateService) GenerateScheduleByTemplateID(templateID string
 	return nil
 }
 
-func (s *scheduleTemplateService) checkInstructorConflict(date time.Time, instructorID uuid.UUID, hour, minute int) (bool, error) {
+func (s *scheduleTemplateService) checkInstructorConflict(date time.Time, instructorID string, hour, minute int) (bool, error) {
 	schedules, err := s.classScheduleRepo.GetClassSchedules()
 	if err != nil {
 		return false, err

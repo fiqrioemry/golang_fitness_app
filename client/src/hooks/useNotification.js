@@ -13,6 +13,7 @@ export const useBrowserNotificationsQuery = () =>
   useQuery({
     queryKey: ["browser-notifications"],
     queryFn: notifService.getAllBrowserNotifications,
+    refetchOnMount: true,
     staleTime: 0,
   });
 
@@ -47,7 +48,6 @@ export const useMarkAllNotificationsAsRead = () => {
   return useMutation({
     mutationFn: notifService.markAllNotificationsAsRead,
     onError: (err) => {
-      console.log(err);
       toast.error(err?.response?.data?.message || "Failed to mark all as read");
     },
   });

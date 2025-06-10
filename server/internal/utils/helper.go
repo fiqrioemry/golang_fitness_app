@@ -24,13 +24,6 @@ func LoadEnv() {
 	}
 }
 
-func EmptyString(s *string) string {
-	if s != nil {
-		return *s
-	}
-	return ""
-}
-
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(bytes), err

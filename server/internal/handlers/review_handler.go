@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"server/internal/dto"
 	"server/internal/services"
-	"server/internal/utils"
+	"server/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )

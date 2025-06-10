@@ -21,7 +21,6 @@ export const ClassCard = ({ classes, sort, setSort }) => {
     return null;
   };
 
-  console.log(classes);
   return (
     <>
       <div className="hidden md:block w-full">

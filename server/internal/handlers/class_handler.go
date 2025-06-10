@@ -37,7 +37,7 @@ func (h *ClassHandler) CreateClass(c *gin.Context) {
 		return
 	}
 
-	req.IsActive, _ = utils.ParseBoolFormField(c, "isActive")
+	req.IsActive = utils.ParseBoolFormField(c, "isActive")
 
 	if req.Image != nil {
 		singleImageURL, err := utils.UploadImageWithValidation(req.Image)
@@ -76,7 +76,7 @@ func (h *ClassHandler) UpdateClass(c *gin.Context) {
 		return
 	}
 
-	req.IsActive, _ = utils.ParseBoolFormField(c, "isActive")
+	req.IsActive = utils.ParseBoolFormField(c, "isActive")
 
 	if req.Image != nil && req.Image.Filename != "" {
 		imageURL, err := utils.UploadImageWithValidation(req.Image)
