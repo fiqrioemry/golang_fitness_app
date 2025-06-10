@@ -1,3 +1,5 @@
+![thumbnail](./client/public/thumbnail.png)
+
 # 🏋️ SweatUp – Fitness Booking App
 
 SweatUp adalah aplikasi berbasis web yang dirancang untuk membantu pelanggan memesan kelas kebugaran, mengelola paket membership, melakukan pembayaran, dan memantau kehadiran dengan mudah. Aplikasi ini memiliki dashboard admin lengkap serta fitur untuk pengguna umum (customer) dan instruktur.
@@ -285,11 +287,29 @@ Terbuka untuk Kontribusi bagi yang ingin mengembangkan fitur lebih jauh :
 
 Berikut adalah beberapa preview tampilan untuk halaman website travel planner ini. Homepage Create Trip Detail Trip My Trip List
 
-![Preview1](./public/preview1.png)
-![Preview2](./public/preview2.png)
-![Preview3](./public/preview3.png)
-![Preview4](./public/preview4.png)
+<p align="center">
+  <img src="./client/public/preview1.png" width="45%" />
+  <img src="./client/public/preview2.png" width="45%" />
+</p>
 
-```
+<p align="center">
+  <img src="./client/public/preview3.png" width="45%" />
+  <img src="./client/public/preview4.png" width="45%" />
+</p>
 
-```
+<p align="center">
+  <img src="./client/public/preview5.png" width="45%" />
+  <img src="./client/public/preview6.png" width="45%" />
+</p>
+
+<p align="center">
+  <img src="./client/public/preview7.png" width="45%" />
+  <img src="./client/public/preview8.png" width="45%" />
+</p>
+
+<p align="center">
+  <img src="./client/public/preview9.png" width="45%" />
+  <img src="./client/public/preview10.png" width="45%" />
+</p>
+
+---
